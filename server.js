@@ -154,9 +154,9 @@ app.get("/api/players/:id", function (req, res) {
 
 app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
-  //delete updateDoc._id;
+  delete updateDoc._id;
 
-  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc).then(function(err, doc) {
+  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to update player");
     } else {
