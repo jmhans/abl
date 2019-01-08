@@ -1,7 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Player } from '../player';
-import { PlayerService } from '../player.service';
-import { PlayerDetailsComponent } from '../player-details/player-details.component';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
+import {
+  Player
+} from '../player';
+import {
+  PlayerService
+} from '../player.service';
+import {
+  PlayerDetailsComponent
+} from '../player-details/player-details.component';
 
 @Component({
   selector: 'player-list',
@@ -15,19 +24,19 @@ export class PlayerListComponent implements OnInit {
   players: Player[]
   selectedPlayer: Player
 
-  constructor(private playerService: PlayerService) { }
+  constructor(private playerService: PlayerService) {}
 
   ngOnInit() {
-     this.playerService
+    this.playerService
       .getPlayers()
       .then((players: Player[]) => {
         this.players = players.map((player) => {
-//           if (!player.phone) {
-//             player.phone = {
-//               mobile: '',
-//               work: ''
-//             }
-//           }
+          //           if (!player.phone) {
+          //             player.phone = {
+          //               mobile: '',
+          //               work: ''
+          //             }
+          //           }
           return player;
         });
       });
@@ -47,7 +56,6 @@ export class PlayerListComponent implements OnInit {
     var player: Player = {
       name: '',
       mlbID: ''
-      }
     };
 
     // By default, a newly-created player will have the selected state.
