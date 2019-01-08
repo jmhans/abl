@@ -46,7 +46,7 @@ export class PlayerListComponent implements OnInit {
   createNewPlayer() {
     var player: Player = {
       name: '',
-      mlbID: '';
+      mlbID: ''
       }
     };
 
