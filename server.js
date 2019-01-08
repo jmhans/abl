@@ -4,7 +4,7 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 
 var CONTACTS_COLLECTION = "contacts";
-var PLAYERS_COLLECTIONS = "players";
+var PLAYERS_COLLECTION = "players";
 
 var app = express();
 app.use(bodyParser.json());

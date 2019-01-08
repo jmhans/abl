@@ -30,7 +30,7 @@ export class PlayerService {
       .catch(this.handleError);
   }
 
-  // get("/api/Players/:id") endpoint not used by Angular app
+  // get("/api/players/:id") endpoint not used by Angular app
 
   // delete("/api/players/:id")
   deletePlayer(delPlayerId: String): Promise < void | String > {
