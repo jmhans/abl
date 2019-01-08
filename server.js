@@ -74,6 +74,34 @@ app.post("/api/contacts", function(req, res) {
   }
 });
 
+app.get("/api/players", function(req, res) {
+  db.collection(PLAYERS_COLLECTION).find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get players.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
+app.post("/api/players", function(req, res) {
+  var newPlayer = req.body;
+  newPlayer.createDate = new Date();
+
+  if (!req.body.name) {
+    handleError(res, "Invalid user input", "Must provide a name.", 400);
+  } else {
+    db.collection(PLAYERS_COLLECTION).insertOne(newPlayer, function(err, doc) {
+      if (err) {
+        handleError(res, err.message, "Failed to create new player.");
+      } else {
+        res.status(201).json(doc.ops[0]);
+      }
+    });
+  }
+});
+
+
 /*  "/api/contacts/:id"
  *    GET: find contact by id
  *    PUT: update contact by id
@@ -123,3 +151,28 @@ app.get("/api/players/:id", function (req, res) {
     }
   });
 });
+
+app.put("/api/players/:id", function(req, res) {
+  var updateDoc = req.body;
+  delete updateDoc._id;
+
+  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update player");
+    } else {
+      updateDoc._id = req.params.id;
+      res.status(200).json(updateDoc);
+    }
+  });
+});
+
+app.delete("/api/players/:id", function(req, res) {
+  db.collection(PLAYERS_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete player");
+    } else {
+      res.status(200).json(req.params.id);
+    }
+  });
+});
+
