@@ -22,12 +22,6 @@ export class PlayerListComponent implements OnInit {
       .getPlayers()
       .then((players: Player[]) => {
         this.players = players.map((player) => {
-          if (!player.phone) {
-            player.phone = {
-              mobile: '',
-              work: ''
-            }
-          }
           return player;
         });
       });
