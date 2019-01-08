@@ -3,7 +3,7 @@
     <h2>Players</h2>
     <ul class="list-group">
       <li class="list-group-item"
-        *ngFor="let player of playerss"
+        *ngFor="let player of players"
         (click)="selectPlayer(player)"
         [class.active]="player === selectedPlayer">
         {{player.name}}
