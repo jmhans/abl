@@ -4,6 +4,7 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 
 var CONTACTS_COLLECTION = "contacts";
+var PLAYERS_COLLECTIONS = "players";
 
 var app = express();
 app.use(bodyParser.json());
@@ -109,6 +110,16 @@ app.delete("/api/contacts/:id", function(req, res) {
       handleError(res, err.message, "Failed to delete contact");
     } else {
       res.status(200).json(req.params.id);
+    }
+  });
+});
+
+app.get("/api/players/:id", function (req, res) {
+  db.collections(PLAYERS_COLLECTION).findOne({mlbID: new ObjectID(req.params.id) }, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to find player");
+    } else {
+      res.status(200).json(doc);
     }
   });
 });
