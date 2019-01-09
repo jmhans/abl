@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var db;
 
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
