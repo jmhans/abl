@@ -156,13 +156,13 @@ app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
   delete updateDoc._id;
 
-  db.collection(PLAYERS_COLLECTION).updateOne({_id: req.params.id}, updateDoc, function(err, doc) {
-    if (err) {
-      handleError(res, err.message, "Failed to update player");
-    } else {
-      updateDoc._id = req.params.id;
-      res.status(200).json(updateDoc);
-    }
+  db.collection(PLAYERS_COLLECTION).updateOne({_id: ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
+    .then((obj) => {
+      updateDoc._id = req.params.id
+      obj.status(200).json(updateDoc)
+  })
+    .catch((err) => {
+    handleError(res, err.message, "Failed to update player");
   });
 });
 
