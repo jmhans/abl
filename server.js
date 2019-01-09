@@ -13,6 +13,8 @@ app.use(bodyParser.json());
 var distDir = __dirname + "/dist/";
 app.use(express.static(distDir));
 
+app.use(require('./routes/routes'));
+
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 
@@ -33,6 +35,9 @@ mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:2701
     console.log("App now running on port", port);
   });
 });
+
+
+
 
 // CONTACTS API ROUTES BELOW
 
@@ -142,41 +147,5 @@ app.delete("/api/contacts/:id", function(req, res) {
   });
 });
 
-app.get("/api/players/:id", function (req, res) {
-  db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
-    if (err) {
-      handleError(res, err.message, "Failed to find player");
-    } else {
-      res.status(200).json(doc);
-    }
-  });
-});
 
-app.put("/api/players/:id", function(req, res) {
-  var updateDoc = req.body;
-  delete updateDoc._id;
-
-  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set : updateDoc}, {upsert : true}, function(err, doc) {
-    console.log(err);
-    console.log(doc);
-    
-    if (err) {
-      handleError(res, err.message, "Failed to update contact");
-    } else {
-      updateDoc._id = req.params.id;
-      res.status(200).json(updateDoc);
-    }
-  });
-});
-
-
-app.delete("/api/players/:id", function(req, res) {
-  db.collection(PLAYERS_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
-    if (err) {
-      handleError(res, err.message, "Failed to delete player");
-    } else {
-      res.status(200).json(req.params.id);
-    }
-  });
-});
 
