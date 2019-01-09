@@ -154,7 +154,6 @@ app.get("/api/players/:id", function (req, res) {
 
 app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
-  console.log("I made it this far!")
   console.log(updateDoc);
   delete updateDoc._id;
 
