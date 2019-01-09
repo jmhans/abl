@@ -143,7 +143,7 @@ app.delete("/api/contacts/:id", function(req, res) {
 });
 
 app.get("/api/players/:id", function (req, res) {
-  db.collections(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+  db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to find player");
     } else {
@@ -154,7 +154,7 @@ app.get("/api/players/:id", function (req, res) {
 
 app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
-  
+  console.log("I made it this far!")
   console.log(updateDoc);
   delete updateDoc._id;
 
