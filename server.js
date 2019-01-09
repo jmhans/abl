@@ -154,20 +154,21 @@ app.get("/api/players/:id", function (req, res) {
 
 app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
-  console.log(updateDoc);
   delete updateDoc._id;
 
-  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
-    .then((obj) => {
-      console.log(obj);
-      console.log(req.params);
+  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
+    console.log("ERROR:" + err);
+    console.log("DOC:" + doc);
+    
+    if (err) {
+      handleError(res, err.message, "Failed to update contact");
+    } else {
       updateDoc._id = req.params.id;
-      obj.status(200).json(updateDoc)
-  })
-    .catch((err) => {
-    handleError(res, err.message, "Failed to update player");
+      res.status(200).json(updateDoc);
+    }
   });
 });
+
 
 app.delete("/api/players/:id", function(req, res) {
   db.collection(PLAYERS_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
