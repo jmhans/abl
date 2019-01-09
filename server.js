@@ -143,7 +143,7 @@ app.delete("/api/contacts/:id", function(req, res) {
 });
 
 app.get("/api/players/:id", function (req, res) {
-  db.collections(PLAYERS_COLLECTION).findOne({mlbID: req.params.id }, function(err, doc) {
+  db.collections(PLAYERS_COLLECTION).findOne({ _id: new ObjectId(req.params.id) }, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to find player");
     } else {
@@ -157,7 +157,7 @@ app.put("/api/players/:id", function(req, res) {
   console.log(updateDoc);
   delete updateDoc._id;
 
-  db.collection(PLAYERS_COLLECTION).updateOne({_id: ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
+  db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
     .then((obj) => {
       updateDoc._id = req.params.id
       obj.status(200).json(updateDoc)
