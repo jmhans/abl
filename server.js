@@ -154,6 +154,7 @@ app.get("/api/players/:id", function (req, res) {
 
 app.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
+  console.log(updateDoc);
   delete updateDoc._id;
 
   db.collection(PLAYERS_COLLECTION).updateOne({_id: ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
