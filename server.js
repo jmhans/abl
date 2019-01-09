@@ -160,7 +160,9 @@ app.put("/api/players/:id", function(req, res) {
 
   db.collection(PLAYERS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, {$set: updateDoc}, {upsert: true})
     .then((obj) => {
-      updateDoc._id = req.params.id
+      console.log(obj);
+      console.log(req.params);
+      updateDoc._id = req.params.id;
       obj.status(200).json(updateDoc)
   })
     .catch((err) => {
