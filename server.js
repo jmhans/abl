@@ -28,7 +28,7 @@ mongoUtil.connectToServer( function (err) {
   }
 
   // Save database object from the callback for reuse.
-  db = mongoUtil.getDb(); //client.db();
+  //db = mongoUtil.getDb(); //client.db();
   console.log("Database connection ready");
   // Initialize the app.
   var server = app.listen(process.env.PORT || 8080, function () {
