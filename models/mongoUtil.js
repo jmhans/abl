@@ -14,6 +14,7 @@ module.exports = {
   },
 
   getDb: function() {
+    console.log("got into getDb")
     return _db;
   }
 };
