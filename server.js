@@ -21,9 +21,8 @@ var db;
 
 // Connect to the database before starting the application server.
 mongoUtil.connectToServer( function (err) {
-  console.log("Yay - I'm here!");
   if (err) {
-    console.log(err);
+    console.log("I'm logging this one now." + err);
     process.exit(1);
   }
 

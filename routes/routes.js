@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoUtil = require( '../models/mongoUtil')
 
-var db = mongoUtil.getDb();
+//var db = mongoUtil.getDb();
 
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
