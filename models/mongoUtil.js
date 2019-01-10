@@ -6,9 +6,9 @@ module.exports = {
 
   connectToServer: function( callback ) {
     console.log("inside mongoUtil");
-    MongoClient.connect( "mongodb://localhost:27017", function( err, db ) {
+    MongoClient.connect( "mongodb://localhost:27017", function( err, client ) {
       console.log("inside mongoUtil.connect");
-      _db = db;
+      _db = client.db();
       return callback( err );
     } );
   },
