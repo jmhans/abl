@@ -4,8 +4,6 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 var mongoUtil = require("./models/mongoUtil");
 
-
-
 var CONTACTS_COLLECTION = "contacts";
 var PLAYERS_COLLECTION = "players";
 
@@ -23,6 +21,7 @@ var db;
 
 // Connect to the database before starting the application server.
 mongoUtil.connectToServer( function (err) {
+  console.log("Yay - I'm here!");
   if (err) {
     console.log(err);
     process.exit(1);
