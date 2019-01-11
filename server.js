@@ -152,7 +152,7 @@ app.delete("/api/contacts/:id", function(req, res) {
 let ownerModel = require('./models/owners');
 let own = new ownerModel({ name: 'Justin'})
 
-own.save().the(doc => { 
+own.save().then(doc => { 
   console.log(doc)
 })
 .catch(err => {
