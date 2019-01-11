@@ -149,15 +149,7 @@ app.delete("/api/contacts/:id", function(req, res) {
 
   app.use('/', indexRouter);
 
-let ownerModel = require('./models/owners');
-let own = new ownerModel({ name: 'Justin'})
 
-own.save().then(doc => { 
-  console.log(doc)
-})
-.catch(err => {
-  console.error(err)
-})
   
 
 // app.get("/api/players/:id", function (req, res) {

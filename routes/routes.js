@@ -10,6 +10,17 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
+var Owner = require('../models/owners')
+let ownerModel = require('./models/owners');
+let own = new ownerModel({ name: 'Justin'})
+
+own.save().then(doc => { 
+  console.log(doc)
+})
+.catch(err => {
+  console.error(err)
+})
+
 
 router.get("/api/players/:id", function (req, res) {
   db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
