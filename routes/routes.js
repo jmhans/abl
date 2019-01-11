@@ -10,8 +10,7 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-var Owner = require('../models/owners')
-let ownerModel = require('./models/owners');
+let ownerModel = require('../models/owners');
 let own = new ownerModel({ name: 'Justin'})
 
 own.save().then(doc => { 
