@@ -2,9 +2,9 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
-var mongoUtil = require("./models/mongoUtil");
-var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
+var db = require("./models/mongoUtil");
+// var mongoose = require('mongoose');
+// mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
 
 
 var CONTACTS_COLLECTION = "contacts";
@@ -33,41 +33,6 @@ db.once('open', function () {
 
 })
 
-
-// Connect to the database before starting the application server.
-// mongoUtil.connectToServer( function (err) {
-//   if (err) {
-//     console.log("I'm logging this one now." + err);
-//     process.exit(1);
-//   }
-
-//   // Save database object from the callback for reuse.
-//   //db = mongoUtil.getDb(); //client.db();
-//   console.log("Database connection ready");
-//   // Initialize the app.
-//   var server = app.listen(process.env.PORT || 8080, function () {
-//     var port = server.address().port;
-//     console.log("App now running on port", port);
-//   });
-// })
-
-
-// mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", function (err, client) {
-//   if (err) {
-//     console.log(err);
-//     process.exit(1);
-//   }
-
-//   // Save database object from the callback for reuse.
-//   db = client.db();
-//   console.log("Database connection ready");
-//   // Initialize the app.
-//   var server = app.listen(process.env.PORT || 8080, function () {
-//     var port = server.address().port;
-//     console.log("App now running on port", port);
-//   });
-
-// });
 
 
 
@@ -183,6 +148,16 @@ app.delete("/api/contacts/:id", function(req, res) {
   var indexRouter = require('./routes/routes');
 
   app.use('/', indexRouter);
+
+let ownerModel = require('./models/owners');
+let own = new ownerModel({ name: 'Justin'})
+
+own.save().the(doc => { 
+  console.log(doc)
+})
+.catch(err => {
+  console.error(err)
+})
   
 
 // app.get("/api/players/:id", function (req, res) {

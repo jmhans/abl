@@ -1,20 +1,27 @@
-var MongoClient = require( 'mongodb' ).MongoClient;
 
-var _db;
 
-module.exports = {
+// module database.js
+var mongodb= require('mongodb');
+var MongoClient= mongodb.MongoClient;
+var URL = process.env.MONGODB_URI || "mongodb://localhost:27017/test";
 
-  connectToServer: function( callback ) {
-    console.log("inside mongoUtil");
-    MongoClient.connect( "mongodb://localhost:27017", function( err, client ) {
-      console.log("inside mongoUtil.connect");
-      _db = client.db();
-      return callback( err );
-    } );
-  },
+var db;
+var error;
+var waiting = []; // Callbacks waiting for the connection to be made
 
-  getDb: function() {
-    console.log("got into getDb")
-    return _db;
+MongoClient.connect(URL,function(err,database){
+  error = err;
+  db = database;
+
+  waiting.forEach(function(callback) {
+    callback(err, database);
+  });
+});
+
+module.exports = function(callback) {
+  if (db || error) {
+    callback(error, db);
+  } else {
+    waiting.push(callback);
   }
-};
+}
