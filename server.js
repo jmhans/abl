@@ -6,7 +6,6 @@ var ObjectID = mongodb.ObjectID;
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
 
-
 var CONTACTS_COLLECTION = "contacts";
 var PLAYERS_COLLECTION = "players";
 
@@ -148,7 +147,8 @@ app.delete("/api/contacts/:id", function(req, res) {
   var indexRouter = require('./routes/routes');
 
   app.use('/', indexRouter);
-
+  const owner = require('./routes/owners.route'); // Imports routes for the products
+  app.use('/owners', owner);
 
   
 
