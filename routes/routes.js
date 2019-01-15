@@ -20,7 +20,7 @@ router.post('/api/players2/create', owners_controller.owner_create);
 router.get("/api/players", function(req, res, next) {
   Player.find(function(err, players) {
     if (err) return next(err);
-    res.json(products);
+    res.json(players);
   });
   });
 
