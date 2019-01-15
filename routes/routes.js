@@ -37,7 +37,8 @@ router.get('/api/players/:id', function (req, res, next) {
 
 /* UPDATE PRODUCT */
 router.put('/api/players/:id', function(req, res, next) {
-  Player.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+  var options = {new : true, upsert : true};
+  Player.findByIdAndUpdate(req.params.id, req.body, options,  function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
