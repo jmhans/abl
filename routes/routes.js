@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var mongoUtil = require( '../models/mongoUtil')
+var mongoUtil = require( '../models/mongoUtil');
+var Player = require('../models/player.js');
 
 //var db = mongoUtil.getDb();
 
@@ -15,17 +16,22 @@ const owners_controller = require('../controllers/owners.controller');
 // a simple test url to check that all of our files are communicating correctly.
 router.get('/api/players2/test', owners_controller.test);
 router.post('/api/players2/create', owners_controller.owner_create);
-
-
-router.get("/api/players/:id", function (req, res) {
-  db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
-    if (err) {
-      handleError(res, err.message, "Failed to find player");
-    } else {
-      res.status(200).json(doc);
-    }
+router.get('/api/players/:id', function (req, res, next) {
+  Player.findById(req.params.id, function (err, post) {
+    if (err) return next(err);
+    res.json(post);
   });
 });
+
+// router.get("/api/players/:id", function (req, res) {
+//   db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+//     if (err) {
+//       handleError(res, err.message, "Failed to find player");
+//     } else {
+//       res.status(200).json(doc);
+//     }
+//   });
+// });
 
 router.put("/api/players/:id", function(req, res) {
   var updateDoc = req.body;
