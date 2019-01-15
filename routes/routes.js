@@ -20,14 +20,13 @@ own.save().then(doc => {
   console.error(err)
 })
 
-router.get("/api/players2/:id", function (req, res) {
+router.get("/api/players2", function (req, res) {
   var o = own.find(function(err, kittens) {
     if (err) return console.log(err);
     console.log(kittens);
   });
   res.status(200).json(kittens);
 });
-
 
 router.get("/api/players/:id", function (req, res) {
   db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
