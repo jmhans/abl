@@ -2,8 +2,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
-// var db = require("./models/mongoUtil");
 var mongoose = require('mongoose');
+
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
 
 var CONTACTS_COLLECTION = "contacts";
