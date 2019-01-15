@@ -147,8 +147,8 @@ app.delete("/api/contacts/:id", function(req, res) {
   var indexRouter = require('./routes/routes');
 
   app.use('/', indexRouter);
-  const owner = require('./routes/owners.route'); // Imports routes for the products
-  app.use('/owners', owner);
+//   const owner = require('./routes/owners.route'); // Imports routes for the products
+//   app.use('/owners', owner);
 
   
 

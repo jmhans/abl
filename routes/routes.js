@@ -10,23 +10,12 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-let ownerModel = require('../models/owners');
-let own = new ownerModel({ name: 'Justin'})
+const owners_controller = require('../controllers/owners.controller');
 
-own.save().then(doc => { 
-  console.log(doc)
-})
-.catch(err => {
-  console.error(err)
-})
+// a simple test url to check that all of our files are communicating correctly.
+router.get('/api/players2/test', owners_controller.test);
+router.post('/api/players2/create', owners_controller.owner_create);
 
-router.get("/api/players2", function (req, res) {
-  var o = own.find(function(err, kittens) {
-    if (err) return console.log(err);
-    console.log(kittens);
-  });
-  res.status(200).json(kittens);
-});
 
 router.get("/api/players/:id", function (req, res) {
   db.collection(PLAYERS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
