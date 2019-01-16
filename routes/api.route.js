@@ -10,7 +10,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 // a simple test url to check that all of our files are communicating correctly.
-router.get('/owners', owners_controller.test);
+router.get('/owners', owners_controller.owner_get);
 router.post('/owners', owners_controller.owner_create);
 router.get('/owners/:id', owners_controller.owner_getOne);
 router.put('/owners/:id', owners_controller.owner_update);
