@@ -1,4 +1,4 @@
-const Product = require('../models/owners');
+const Product = require('../models/owner');
 
 //Simple version, without validation or sanitation
 exports.test = function (req, res) {
