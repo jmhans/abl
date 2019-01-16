@@ -1,21 +1,17 @@
-const Product = require('../models/owner');
+const Owner = require('../models/owner');
 
 //Simple version, without validation or sanitation
-exports.test = function (req, res) {
-    res.send('Greetings from the Test controller!');
-};
+exports.owners_get = function(req, res, next) {
+  Player.find(function(err, owners) {
+    if (err) return next(err);
+    res.json(owners);
+  });
+  };
 
-exports.owner_create = function (req, res) {
-    let owner = new Owner(
-        {
-            name: req.body.name
-        }
-    );
 
-    owner.save(function (err) {
-        if (err) {
-            return next(err);
-        }
-        res.send('Owner Created successfully')
-    })
+exports.owner_create = function(req, res, next) {
+  Owner.create(req.body, function (err, post) {
+    if (err) return next(err);
+    res.json(post);
+  });
 };

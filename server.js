@@ -119,6 +119,9 @@ app.delete("/api/contacts/:id", function(req, res) {
   });
 });
 
-  var indexRouter = require('./routes/routes');
+//   var indexRouter = require('./routes/routes');
 
-  app.use('/', indexRouter);
+//   app.use('/', indexRouter);
+
+var api = require('./routes/api.route.js');
+app.use('/api', api);

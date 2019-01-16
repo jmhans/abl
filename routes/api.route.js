@@ -12,17 +12,14 @@ router.use(function timeLog(req, res, next) {
 // a simple test url to check that all of our files are communicating correctly.
 router.get('/owners', owners_controller.test);
 router.post('/owners', owners_controller.owner_create);
+router.get('/owners/:id', owners_controller.owner_getOne);
+router.put('/owners/:id', owners_controller.owner_update);
+router.delete('/owners/:id', owners_controller.owner_delete);
+
 router.get('/players', players_controller.player_get);
 router.post('/players', players_controller.player_create);
-
-
-
 router.get('/players/:id', players_controller.player_getOne);
-
-/* UPDATE PRODUCT */
 router.put('/players/:id', players_controller.player_update);
-
-/* DELETE PRODUCT */
 router.delete('/players/:id', players_controller.player_delete);
 
 module.exports = router;
