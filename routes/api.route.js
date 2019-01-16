@@ -10,13 +10,13 @@ router.use(function timeLog(req, res, next) {
 });
 
 // a simple test url to check that all of our files are communicating correctly.
-router.get('/owners', owners_controller.owner_get);
+router.get('/owners', owners_controller.owners_get);
 router.post('/owners', owners_controller.owner_create);
 router.get('/owners/:id', owners_controller.owner_getOne);
 router.put('/owners/:id', owners_controller.owner_update);
 router.delete('/owners/:id', owners_controller.owner_delete);
 
-router.get('/players', players_controller.player_get);
+router.get('/players', players_controller.players_get);
 router.post('/players', players_controller.player_create);
 router.get('/players/:id', players_controller.player_getOne);
 router.put('/players/:id', players_controller.player_update);

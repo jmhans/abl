@@ -15,3 +15,25 @@ exports.owner_create = function(req, res, next) {
     res.json(post);
   });
 };
+
+exports.owner_getOne = function (req, res, next) {
+  Player.findById(req.params.id, function (err, post) {
+    if (err) return next(err);
+    res.json(post);
+  });
+};
+
+exports.owner_update = function(req, res, next) {
+  var options = {new : true, upsert : true};
+  Player.findByIdAndUpdate(req.params.id, req.body, options,  function (err, post) {
+    if (err) return next(err);
+    res.json(post);
+  });
+};
+
+exports.owner_delete = function(req, res, next) {
+  Player.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+    if (err) return next(err);
+    res.json(post);
+  });
+};
