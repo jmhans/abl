@@ -1,0 +1,22 @@
+<div *ngIf="owner" class="row">
+  <div class="col-md-12">
+    <h2 *ngIf="owner._id">Owner Details</h2>
+    <h2 *ngIf="!owner._id">New Owner</h2>
+  </div>
+</div>
+<div *ngIf="owner" class="row">
+  <form class="col-md-12">
+    <div class="form-group">
+      <label for="owner-name">Name</label>
+      <input class="form-control" name="owner-name" [(ngModel)]="owner.name" placeholder="Name"/>
+    </div>
+    <div class="form-group">
+      <label for="owner-email">Email</label>
+      <input class="form-control" name="owner-email" [(ngModel)]="owner.email" placeholder="support@actuarialgames.com"/>
+    </div>
+    <button class="btn btn-primary" *ngIf="!owner._id" (click)="createOwner(owner)">Create</button>
+    <button class="btn btn-info" *ngIf="owner._id" (click)="updateOwner(owner)">Update</button>
+    <button class="btn btn-danger" *ngIf="owner._id" (click)="deleteOwner(owner._id)">Delete</button>
+  </form>
+</div>
+

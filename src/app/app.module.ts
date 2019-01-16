@@ -10,6 +10,9 @@ import { ContactDetailsComponent } from './contacts/contact-details/contact-deta
 import { ContactListComponent } from './contacts/contact-list/contact-list.component';
 import { PlayerDetailsComponent } from './players/player-details/player-details.component';
 import { PlayerListComponent } from './players/player-list/player-list.component';
+import { OwnersComponent } from './owners/owners.component';
+import { OwnerDetailsComponent } from './owners/owner-details/owner-details.component';
+import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +20,10 @@ import { PlayerListComponent } from './players/player-list/player-list.component
     ContactDetailsComponent,
     ContactListComponent,
     PlayerDetailsComponent,
-    PlayerListComponent
+    PlayerListComponent,
+    OwnersComponent,
+    OwnerDetailsComponent,
+    OwnerListComponent
   ],
   imports: [
     BrowserModule,
