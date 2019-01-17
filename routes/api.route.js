@@ -22,4 +22,10 @@ router.get('/players/:id', players_controller.player_getOne);
 router.put('/players/:id', players_controller.player_update);
 router.delete('/players/:id', players_controller.player_delete);
 
+var OwnersController = require('../controllers/owners.controller');
+
+app.use('/api/owners', OwnersController.route());
+
+
+
 module.exports = router;
