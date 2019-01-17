@@ -39,8 +39,10 @@ const Owner = require('../models/owner');
 //   });
 // };
 
-export class OwnersController extends BaseController{
+class OwnersController extends BaseController{
   constructor(){
     super(Owner);
   }
 }
+
+module.exports = OwnersController

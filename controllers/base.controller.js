@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-export default class BaseController{
+class BaseController{
 
   /**
     @param model Mongoose model
@@ -57,3 +57,5 @@ export default class BaseController{
   }
  
 }
+
+module.exports = BaseController;
