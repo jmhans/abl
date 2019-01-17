@@ -24,7 +24,7 @@ router.delete('/players/:id', players_controller.player_delete);
 
 var OwnersController = require('../controllers/owners.controller');
 
-app.use('/api/owners', OwnersController.route());
+router.use('/owners', OwnersController.route());
 
 
 
