@@ -125,6 +125,7 @@ app.delete("/api/contacts/:id", function(req, res) {
 
 var api = require('./routes/api.route.js');
 app.use('/api', api);
+
 const OwnersController = require('./controllers/owners.controller');
 
 app.use('/api/owners', OwnersController.route());
