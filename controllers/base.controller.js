@@ -5,8 +5,6 @@ class BaseController{
 
   /**
     @param model Mongoose model
-    @param key primary key of the model that will be used for searching, removing
-    and reading
   */
   constructor(model){
     this.model = model;
