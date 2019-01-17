@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+
+
 
 class BaseController{
 
@@ -12,8 +12,8 @@ class BaseController{
   }
   
   route() {
-
-
+    var express = require('express');
+    const router = new express.Router()
     router.get("/", (req, res, next) => {
       this.model
         .find(function(err, players) {
