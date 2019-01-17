@@ -1,4 +1,4 @@
-import BaseController              from './base.controller';
+const BaseController = require('./base.controller');
 const Owner = require('../models/owner');
 
 // //Simple version, without validation or sanitation
