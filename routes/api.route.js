@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var router2 = express.Router();
 //const owners_controller = require('../controllers/owners.controller');
 const players_controller = require('../controllers/players.controller');
 
@@ -23,9 +22,6 @@ router.get('/players/:id', players_controller.player_getOne);
 router.put('/players/:id', players_controller.player_update);
 router.delete('/players/:id', players_controller.player_delete);
 
-const OwnersController = require('../controllers/owners.controller');
 
-router2.use('/api/owners', new OwnersController().route());
 
 exports = router;
-return router2;
