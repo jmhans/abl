@@ -127,4 +127,4 @@ var api = require('./routes/api.route.js');
 app.use('/api', api);
 const OwnersController = require('./controllers/owners.controller');
 
-router.use('/api/owners', OwnersController.route());
+app.use('/api/owners', OwnersController.route());
