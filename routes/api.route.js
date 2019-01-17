@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-//const owners_controller = require('../controllers/owners.controller');
+const owners_controller = require('../controllers/owners.controller');
 const players_controller = require('../controllers/players.controller');
 
 //Middle ware that is specific to this router
@@ -22,9 +22,17 @@ router.get('/players/:id', players_controller.player_getOne);
 router.put('/players/:id', players_controller.player_update);
 router.delete('/players/:id', players_controller.player_delete);
 
-var OwnersController = require('../controllers/owners.controller');
+router.get('/owners', owners_controller.owners_get);
+router.post('/owners', owners_controller.owner_create);
+router.get('/owners/:id', owners_controller.owner_getOne);
+router.put('/owners/:id', owners_controller.owner_update);
+router.delete('/owners/:id', owners_controller.owner_delete);
 
-router.use('/owners', OwnersController.route);
+
+
+// var OwnersController = require('../controllers/owners.controller');
+
+// router.use('/owners', OwnersController.route);
 
 
 
