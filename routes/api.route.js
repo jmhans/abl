@@ -3,9 +3,6 @@ var router = express.Router();
 //const owners_controller = require('../controllers/owners.controller');
 const players_controller = require('../controllers/players.controller');
 
-const generic_api_controller = require('../controllers/generic.controller');
-
-
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
   console.log('Time: ', Date.now());
