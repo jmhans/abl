@@ -45,4 +45,4 @@ class OwnersController extends BaseController{
   }
 }
 
-module.exports = OwnersController
+module.exports = new OwnersController()

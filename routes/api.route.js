@@ -22,6 +22,8 @@ router.get('/players/:id', players_controller.player_getOne);
 router.put('/players/:id', players_controller.player_update);
 router.delete('/players/:id', players_controller.player_delete);
 
+const OwnersController = require('../controllers/owners.controller');
 
+router.use('/api/owners', OwnersController.route());
 
 exports = router;
