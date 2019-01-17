@@ -126,5 +126,3 @@ app.delete("/api/contacts/:id", function(req, res) {
 var api = require('./routes/api.route.js');
 app.use('/api', api);
 
-
-//Inconsequential change.
