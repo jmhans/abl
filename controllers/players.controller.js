@@ -9,12 +9,22 @@ exports.players_get = function(req, res, next) {
   };
 
 
-exports.player_create = function(req, res, next) {
-  Player.create(req.body, function (err, post) {
+_create = function(model) {
+return( function(req, res, next) {
+  model.create(req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
-};
+})  
+}
+
+exports.player_create = _create(Player);
+// exports.player_create = function(req, res, next) {
+//   Player.create(req.body, function (err, post) {
+//     if (err) return next(err);
+//     res.json(post);
+//   });
+// };
 
 exports.player_getOne = function (req, res, next) {
   Player.findById(req.params.id, function (err, post) {
