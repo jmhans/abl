@@ -57,5 +57,5 @@ class PlayersController extends BaseController {
   }
 }
 
-module.exports = MyNewClass
+module.exports = PlayersController
 
