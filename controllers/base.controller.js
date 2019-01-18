@@ -12,7 +12,7 @@ class BaseController {
     console.log("BaseController constructor called");
     console.log("Model:" + this.model.find(function(err, results) {
       if (err) return next(err);
-      console.log(json(results));
+      console.log(results);
     }));
   }  
   
