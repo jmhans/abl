@@ -51,8 +51,7 @@ const BaseController = require('./base.controller');
 
 class PlayersController extends BaseController {
 
-  constructor(){
-    // Use 'Country' Mongoose model with 'isocode' as a primary key
+  constructor() {
     super(Player);
   }
 }

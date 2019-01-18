@@ -9,11 +9,13 @@ var router = express.Router();
 class BaseController {
   constructor(model) {
     this.model = model
+    console.log("BaseController constructor called");
+    console.log("Model:" + model);
   }  
   
   //Simple version, without validation or sanitation
 _get(req, res, next) {
-  this.model.find(function(err, results) {
+  return this.model.find(function(err, results) {
     if (err) return next(err);
     res.json(results);
   });
@@ -21,14 +23,14 @@ _get(req, res, next) {
 
 
 _create(req, res, next) {
-  this.model.create(req.body, function (err, post) {
+  return this.model.create(req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
 }
 
 _getOne(req, res, next) {
-  this.model.findById(req.params.id, function (err, post) {
+  return this.model.findById(req.params.id, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
@@ -36,14 +38,14 @@ _getOne(req, res, next) {
 
 _update (req, res, next) {
   var options = {new : true, upsert : true};
-  this.model.findByIdAndUpdate(req.params.id, req.body, options,  function (err, post) {
+  return this.model.findByIdAndUpdate(req.params.id, req.body, options,  function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
 }
 
 _delete(req, res, next) {
-  this.model.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+  return this.model.findByIdAndRemove(req.params.id, req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
