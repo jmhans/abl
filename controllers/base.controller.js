@@ -56,8 +56,8 @@ _delete(req, res, next) {
   
   
   route() {
-    router.get('/players', function (req, res, next) {
-      return this.model.find(function(err, results) {
+    router.get('/players', (req, res, next) => {
+      this.model.find(function(err, results) {
         if (err) return next(err);
         res.json(results);
       });
