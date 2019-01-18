@@ -20,13 +20,11 @@ _get(req, res, next) {
   }
 
 
-_create(model) {
-return( function(req, res, next) {
+_create(req, res, next) {
   this.model.create(req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
-})  
 }
 
 _getOne(req, res, next) {
@@ -53,11 +51,11 @@ _delete(req, res, next) {
   
   
   route() {
-    router.get('/players', _get);
-    router.post('/players', _create);
-    router.get('/players/:id', _getOne);
-    router.put('/players/:id', _update);
-    router.delete('/players/:id', _delete);
+    router.get('/players', this._get);
+    router.post('/players', this._create);
+    router.get('/players/:id', this._getOne);
+    router.put('/players/:id', this._update);
+    router.delete('/players/:id', this._delete);
     return router;
   }
 
