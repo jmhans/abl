@@ -52,6 +52,7 @@ const BaseController = require('./base.controller');
 class PlayersController extends BaseController {
 
   constructor() {
+    console.log("Hey! I'm walking here.")
     super(Player);
   }
 }
