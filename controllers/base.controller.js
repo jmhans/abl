@@ -10,7 +10,10 @@ class BaseController {
   constructor(model) {
     this.model = model
     console.log("BaseController constructor called");
-    console.log("Model:" + model);
+    console.log("Model:" + this.model.find(function(err, results) {
+      if (err) return next(err);
+      res.json(results);
+    }));
   }  
   
   //Simple version, without validation or sanitation
