@@ -1,12 +1,10 @@
 //const Player = require('../models/player');
-let mongoose = require('mongoose') 
 var express = require('express');
 var router = express.Router();
-const obj = mongoose.model('Player')
 
-routePath = api_prefix + resourceName.toLowerCase();
-    var modelName = inflect.singularize(resourceName);
-    var Model = mongoose.model(modelName);
+// routePath = api_prefix + resourceName.toLowerCase();
+//     var modelName = inflect.singularize(resourceName);
+//     var Model = mongoose.model(modelName);
 
 class BaseController {
   constructor(model) {
@@ -65,4 +63,5 @@ _delete(req, res, next) {
 
 }
 
+module.exports = BaseController
 
