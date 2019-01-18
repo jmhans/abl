@@ -9,12 +9,7 @@ var router = express.Router();
 class BaseController {
   constructor(model) {
     this.model = model
-    console.log("BaseController constructor called");
-    console.log("Model:" + this.model.find(function(err, results) {
-      if (err) return next(err);
-      console.log(results);
-    }));
-  }  
+    }  
   
   //Simple version, without validation or sanitation
 _get(req, res, next) {
