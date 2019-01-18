@@ -1,4 +1,4 @@
-const BaseController = require('./base.controller');
+
 const Owner = require('../models/owner');
 
 //Simple version, without validation or sanitation
@@ -39,9 +39,5 @@ module.exports.owner_delete = function(req, res, next) {
   });
 };
 
-// class OwnersController extends BaseController{
-//   constructor(){
-//     super(Owner);
-//   }
-// }
+
 

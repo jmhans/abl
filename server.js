@@ -123,6 +123,9 @@ app.delete("/api/contacts/:id", function(req, res) {
 
 //   app.use('/', indexRouter);
 
-var api = require('./routes/api.route.js');
+var api = require('./routes/api.route');
 app.use('/api', api);
+
+var PlayersController = require('./controllers/players.controller');
+app.use('/api2', new PlayersController().route());
 
