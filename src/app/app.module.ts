@@ -6,8 +6,6 @@ import { HttpModule } from '@angular/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ContactDetailsComponent } from './contacts/contact-details/contact-details.component';
-import { ContactListComponent } from './contacts/contact-list/contact-list.component';
 import { PlayerDetailsComponent } from './players/player-details/player-details.component';
 import { PlayerListComponent } from './players/player-list/player-list.component';
 import { OwnerDetailsComponent } from './owners/owner-details/owner-details.component';
@@ -16,8 +14,6 @@ import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 @NgModule({
   declarations: [
     AppComponent,
-    ContactDetailsComponent,
-    ContactListComponent,
     PlayerDetailsComponent,
     PlayerListComponent,
     OwnerDetailsComponent,

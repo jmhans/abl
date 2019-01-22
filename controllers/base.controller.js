@@ -7,8 +7,9 @@ var router = express.Router();
 //     var Model = mongoose.model(modelName);
 
 class BaseController {
-  constructor(model) {
+  constructor(model, routeString) {
     this.model = model
+    this.routeString = routeString;
     }  
   
   //Simple version, without validation or sanitation
@@ -51,11 +52,11 @@ _delete(req, res, next) {
   
   
   route() {
-    router.get('/players', (...args) => this._get(...args));
-    router.post('/players', (...args) => this._create(...args));
-    router.get('/players/:id', (...args) => this._getOne(...args));
-    router.put('/players/:id', (...args) => this._update(...args));
-    router.delete('/players/:id', (...args) => this._delete(...args));
+    router.get('/' + this.routeString, (...args) => this._get(...args));
+    router.post('/' + this.routeString , (...args) => this._create(...args));
+    router.get('/' + this.routeString + '/:id', (...args) => this._getOne(...args));
+    router.put('/' + this.routeString + '/:id', (...args) => this._update(...args));
+    router.delete('/' + this.routeString + '/:id', (...args) => this._delete(...args));
     return router;
   }
 
