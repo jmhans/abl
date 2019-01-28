@@ -1,0 +1,25 @@
+<div *ngIf="roster" class="row">
+  <div class="col-md-12">
+    <h2 *ngIf="roster._id">Roster Details</h2>
+    <h2 *ngIf="!roster._id">New Roster</h2>
+  </div>
+</div>
+<div *ngIf="roster" class="row">
+  <form class="col-md-12">
+    <div class="form-group">
+      <label for="roster-teamId">TeamId</label>
+      <input class="form-control" name="roster-teamId" [(ngModel)]="roster.teamId" placeholder="TeamID"/>
+    </div>
+    <div class="form-group">
+      <label for="roster-players">Players</label>
+      <div *ngFor="let player of roster.players">
+           <input class="form-control" name="roster-players" [(ngModel)]="player" placeholder="player name" />
+      </div>
+      <button class="btn btn-primary" (click)="addPlayer(roster)">Add Player</button>
+    </div>
+    <button class="btn btn-primary" (click)="createRoster(roster)">Create</button>
+<!--     <button class="btn btn-info" *ngIf="roster._id" (click)="updateRoster(roster)">Update</button>
+    <button class="btn btn-danger" *ngIf="roster._id" (click)="deleteRoster(roster._id)">Delete</button> -->
+  </form>
+</div>
+

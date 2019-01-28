@@ -1,10 +1,19 @@
 <h1>Angular Router</h1>
-<nav>
-  <a routerLink="/owners" routerLinkActive="active">Owners</a>
-  <a routerLink="/players" routerLinkActive="active">Players</a>
+<nav class="navbar navbar-default">
+  <ul class="nav navbar-nav">
+      <li><a routerLink="/owners" routerLinkActive="active">Owners</a></li>
+      <li><a routerLink="/players" routerLinkActive="active">Players</a></li>
+      <li><a routerLink="/owners/roster" routerLinkActive="active">Rosters</a></li>
+      <li><a routerLink="/owners/detail" routerLinkActive="active">Roster Detail</a></li>
+      <li><a routerLink="/dashboard">Dashboard</a></li>
+      <li><a routerLink="/heroes">Heroes</a></li>
+    </ul>
+  
+  
 </nav>
-<router-outlet></router-outlet>
 
+<router-outlet></router-outlet>
+<app-messages></app-messages>
 
 <!-- 
 <div class="container">

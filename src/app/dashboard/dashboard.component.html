@@ -1,0 +1,11 @@
+<h3>Top Owners</h3>
+<div class="grid grid-pad">
+  <a *ngFor="let owner of owners" class="col-1-4"
+      routerLink="/detail/{{owner._id}}">
+    <div class="module owner">
+      <h4>{{owner.name}}</h4>
+    </div>
+  </a>
+</div>
+
+<app-hero-search></app-hero-search>

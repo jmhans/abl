@@ -1,0 +1,39 @@
+<!-- <div *ngIf="hero">
+  <h2>{{hero.name | uppercase}} Details</h2>
+  <div><span>id: </span>{{hero.id}}</div>
+  <div>
+    <label>name:
+      <input [(ngModel)]="hero.name" placeholder="name"/>
+    </label>
+    {{hero | json}}
+  </div>
+  <div>
+    <span *ngFor="let lstItem of hero.list">{{lstItem}}</span>
+    <input [(ngModel)]="lstItem" placeholder="List Value"/>
+  </div>
+  <div>
+    <label>New List Item
+      <input [(ngModel)]="newAttVal" placeholder="attName"/>
+    </label>
+  </div>
+  <button (click)="addAttribute(newAttVal)">add attribute</button>
+  <button (click)="goBack()">go back</button>
+  <button (click)="save()">save</button>
+</div> -->
+
+
+<div *ngIf="owner">
+  <h2>{{owner.name | uppercase}} Details</h2>
+  <div><span>id: </span>{{owner._id}}</div>
+  <div>
+    <label>name:
+      <input [(ngModel)]="owner.name" placeholder="name"/>
+    </label>
+    <label>email:
+      <input [(ngModel)]="owner.email" placeholder="email"/>
+    </label>
+    {{owner | json}}
+  </div>
+  <button (click)="goBack()">go back</button>
+  <button (click)="saveOwner()">save</button>
+</div>
