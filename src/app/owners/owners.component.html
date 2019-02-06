@@ -1,0 +1,29 @@
+<h2>My Owners</h2>
+
+<div>
+  <label>Owner name:
+    <input #ownerName />
+  </label>
+  </div>
+    
+<div>
+  <label>Email:
+    <input #ownerEmail />
+  </label>
+</div>
+<div>
+  <!-- (click) passes input value to add() and then clears the input -->
+  <button (click)="add(ownerName.value, ownerEmail.value); ownerName.value=''; ownerEmail.value=''">
+    add
+  </button>
+</div>
+
+<ul class="owners">
+  <li *ngFor="let owner of owners">
+    <a routerLink="/detail/{{owner._id}}">
+      <span class="badge">{{owner.name}}</span> {{owner.email}}
+    </a>
+    <button class="delete" title="delete owner"
+      (click)="delete(owner)">x</button>
+  </li>
+</ul>

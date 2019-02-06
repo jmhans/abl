@@ -4,11 +4,19 @@ const BaseController = require('./base.controller');
 class OwnersController extends BaseController {
 
   constructor() {
-    super(Owner, 'owners');
+    super(Owner.Owner, 'owners');
   }
+  
 }
 
-module.exports = OwnersController
+class TeamsController extends BaseController {
+  constructor() {
+    super(Owner.Team, 'teams')
+  }
+
+}
+
+module.exports = { OwnersController: OwnersController, TeamsController: TeamsController}
 
 
 

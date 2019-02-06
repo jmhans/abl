@@ -40,7 +40,8 @@ export class OwnerListComponent implements OnInit {
   createNewOwner() {
     var owner: Owner = {
       name: '',
-      email: ''
+      email: '', 
+      teams: []
     };
 
     // By default, a newly-created owner will have the selected state.

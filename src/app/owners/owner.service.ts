@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Owner } from './owner';
+import { Team } from './owner';
 import { Http,Response } from '@angular/http';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -15,7 +16,8 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class OwnerService {
   private ownersUrl = '/api/owners';
-
+  private teamsUrl = '/api/teams';
+  
   constructor(
                private http: Http,  
                private httpC: HttpClient,
@@ -44,7 +46,21 @@ export class OwnerService {
       .catch(this.handleError);
   }
 
+  /** POST: add a new hero to the server */
+  addOwner (owner: Owner): Observable<Owner> {
+    return this.httpC.post<Owner>(this.ownersUrl, owner, httpOptions).pipe(
+      tap((owner: Owner) => this.log(`added owner w/ id=${owner._id}`)),
+      catchError(this.handleError2<Owner>('addOwner'))
+    );
+  }
   // get("/api/owners/:id") endpoint not used by Angular app
+  addTeam (team: Team): Observable<Team> {
+    return this.httpC.post<Team>(this.teamsUrl, team, httpOptions).pipe(
+      tap((team: Team) => this.log(`added team w/ id=${team._id}`)),
+      catchError(this.handleError2<Team>('addTeam'))
+    );
+  }
+  
   
   /** GET hero by id. Will 404 if id not found */
   getOwner(id: String): Observable<Owner> {
@@ -61,6 +77,17 @@ export class OwnerService {
       .toPromise()
       .then(response => response.json() as String)
       .catch(this.handleError);
+  }
+  
+  /** DELETE: delete the hero from the server */
+  deleteOwner2 (owner: Owner | string): Observable<Owner> {
+    const id = typeof owner === 'string' ? owner : owner._id;
+    const url = `${this.ownersUrl}/${id}`;
+
+    return this.httpC.delete<Owner>(url, httpOptions).pipe(
+      tap(_ => this.log(`deleted owner id=${id}`)),
+      catchError(this.handleError2<Owner>('deleteOwner'))
+    );
   }
 
   // put("/api/owners/:id")
@@ -94,6 +121,8 @@ export class OwnerService {
       catchError(this.handleError2<Owner[]>('searchOwners', []))
     );
   }
+  
+  
 
   private handleError(error: any) {
     let errMsg = (error.message) ? error.message :

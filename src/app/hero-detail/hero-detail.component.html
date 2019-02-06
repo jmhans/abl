@@ -29,11 +29,25 @@
     <label>name:
       <input [(ngModel)]="owner.name" placeholder="name"/>
     </label>
+
     <label>email:
       <input [(ngModel)]="owner.email" placeholder="email"/>
     </label>
+
+    <div>
+      <label *ngFor="let tm of owner.teams; let in = index">
+        <input [(ngModel)]="tm.name" name="teamname-{{in}}" placeholder="team name"/> 
+      </label>      
+    </div>
+
+    <label>New Team name:
+      <input #newTeamName placeholder="new team name"/>
+    </label>
+    <button (click)="addTeam(newTeamName.value); newTeamName.value='';">add team</button>
+
     {{owner | json}}
   </div>
+    
   <button (click)="goBack()">go back</button>
   <button (click)="saveOwner()">save</button>
 </div>

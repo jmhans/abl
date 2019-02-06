@@ -10,11 +10,13 @@ router.use(function timeLog(req, res, next) {
 });
 
 var PlayersController = require('../controllers/players.controller');
-var OwnersController = require('../controllers/owners.controller');
+var OwnersController = require('../controllers/owners.controller').OwnersController;
+var TeamsController = require('../controllers/owners.controller').TeamsController;
 var RostersController = require('../controllers/rosters.controller');
 
 router.use(new PlayersController().route());
 router.use(new OwnersController().route());
 router.use(new RostersController().route());
+router.use(new TeamsController().route());
 
 module.exports = router;
