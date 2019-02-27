@@ -1,0 +1,46 @@
+<!-- src/app/pages/admin/update-team/update-team.component.html -->
+<h1 class="text-center">{{ pageTitle }}</h1>
+
+ <ng-template [ngIf]="utils.isLoaded(loading)">
+  <div *ngIf="team" class="card">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="[]"
+            [queryParams]="{ tab: 'edit' }"
+            [ngClass]="{ 'active': utils.tabIs(tab, 'edit') }">Edit</a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="[]"
+            [queryParams]="{ tab: 'delete' }"
+            [ngClass]="{ 'active': utils.tabIs(tab, 'delete') }">Delete</a>
+        </li>
+      </ul>
+    </div>
+
+   <div class="card-body">
+      <!-- Edit event form -->
+      <app-team-form
+        *ngIf="utils.tabIs(tab, 'edit')"
+        [team]="team"></app-team-form>
+
+      <!-- Delete event -->
+      <app-delete-team
+        *ngIf="utils.tabIs(tab, 'delete')"
+        [team]="team"></app-delete-team>
+    </div>
+
+  </div>
+    <!-- Error loading event -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Error:</strong> Team data could not be retrieved. View <a routerLink="/abladmin" class="alert-link">Admin Teams</a>.
+  </p>
+  
+  
+  
+</ng-template>
+

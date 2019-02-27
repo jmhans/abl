@@ -4,6 +4,11 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 var mongoose = require('mongoose');
 
+const config2 = require('./server/config');
+const cors = require('cors');
+const methodOverride = require('method-override');
+
+
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
 
 var CONTACTS_COLLECTION = "contacts";
@@ -11,6 +16,8 @@ var PLAYERS_COLLECTION = "players";
 
 var app = express();
 app.use(bodyParser.json());
+app.use(methodOverride('X-HTTP-Method-Override'));
+app.use(cors());
 
 // Create link to Angular build directory
 var distDir = __dirname + "/dist/";
@@ -21,6 +28,11 @@ app.use(express.static(distDir));
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db = mongoose.connection;
 
+
+// Not actually sure if I want this to be called...
+require('./server/api')(app, config2);
+
+
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
   console.log("Database connection ready");
@@ -29,6 +41,7 @@ db.once('open', function () {
     var port = server.address().port;
     console.log("App now running on port", port);
   });
+
 
 })
 
@@ -43,3 +56,5 @@ app.use('/api', api);
 app.use('/', function (req, res) {
     res.sendFile(distDir+'/index.html');
 });
+
+

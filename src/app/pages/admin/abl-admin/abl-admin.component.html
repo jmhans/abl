@@ -1,0 +1,75 @@
+<!-- src/app/pages/admin/admin.component.html -->
+<h1 class="text-center">{{ pageTitle }}</h1>
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can mess with games below.</p>
+
+  <!-- Events -->
+  <ng-template [ngIf]="gamesList">
+    <ng-template [ngIf]="gamesList.length">
+      <!-- Search events -->
+      <label class="sr-only" for="search">Search</label>
+      <div class="search input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">Search</div>
+        </div>
+        <input
+          id="search"
+          type="text"
+          class="form-control"
+          [(ngModel)]="query"
+          (keyup)="searchGames()" />
+        <span class="input-group-append">
+          <button
+            class="btn btn-danger"
+            (click)="resetQuery()"
+            [disabled]="!query">&times;</button>
+        </span>
+      </div>
+
+      <!-- No search results -->
+      <p *ngIf="fs.noSearchResults(filteredGames, query)" class="alert alert-warning">
+        No games found for <em class="text-danger">{{ query }}</em>, sorry!
+      </p>
+
+      <!-- Events listing -->
+      <section class="list-group">
+        <div
+          *ngFor="let gm of fs.orderByDate(filteredGames, 'startDatetime')"
+          class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <a [routerLink]="['/game', gm._id]">
+              <h5 class="mb-1" [innerHTML]="gm.gamePk"></h5>
+            </a>
+<!--             <div class="event-icons">
+              <img
+                *ngIf="!event.viewPublic"
+                class="event-icon"
+                title="Private"
+                src="/assets/images/eye.svg">
+              <img
+                *ngIf="utils.eventPast(event.endDatetime)"
+                class="event-icon"
+                title="Event is over"
+                src="/assets/images/calendar.svg">
+            </div> -->
+          </div>
+          <p class="mb-1">
+            <strong>Date:</strong> {{gm.gamePk}} | {{ gm.teams.away.team | json }} vs. {{gm.teams.home.team.name | json}}
+          </p>
+        </div>
+      </section>
+    </ng-template>
+
+    <!-- No events available -->
+    <p *ngIf="!gamesList.length" class="alert alert-info">
+      No games have been created yet.
+    </p>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving event data.
+  </p>
+
+</ng-template>

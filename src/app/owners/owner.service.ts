@@ -3,11 +3,15 @@ import { Owner } from './owner';
 import { Team } from './owner';
 import { Http,Response } from '@angular/http';
 
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError as ObservableThrowError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { MessageService } from '../message.service';
+import { AuthService } from './../auth/auth.service';
+
+//maybe need ENV from config file. 
+
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -16,13 +20,19 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class OwnerService {
   private ownersUrl = '/api/owners';
+  private owners2Url = '/api2/owners';
   private teamsUrl = '/api/teams';
   
   constructor(
                private http: Http,  
                private httpC: HttpClient,
-               private messageService: MessageService
+               private messageService: MessageService, 
+               private auth: AuthService
                ) {}
+  
+  private get _authHeader(): string {
+    return `Bearer ${this.auth.accessToken}`;
+  }
 
   getOwners(): Promise < void | Owner[] > {
     return this.http.get(this.ownersUrl)
@@ -32,7 +42,9 @@ export class OwnerService {
   }
 
    getOwners2 (): Observable<Owner[]> {
-    return this.httpC.get<Owner[]>(`${this.ownersUrl}`)
+    return this.httpC.get<Owner[]>(`${this.ownersUrl}`, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader  )
+    })
       .pipe(
         tap(_ => this.log('fetched owners')),
         catchError(this.handleError2('getOwners2', []))
@@ -135,13 +147,28 @@ export class OwnerService {
 
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
+      
+       const errorMsg = error.message || 'Error: Unable to complete request.'; 
+        if (error.message && error.message.indexOf('No JWT present') > -1) {
+          this.auth.login();
 
+        } 
+      
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
 
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
+  }
+  
+  private handleError3(err: HttpErrorResponse | any): Observable<any> {
+    const errorMsg = err.message || 'Error: Unable to complete request.'; 
+    if (err.message && err.message.indexOf('No JWT present') > -1) {
+      this.auth.login();
+      
+    }
+    return ObservableThrowError(errorMsg);
   }
   
   

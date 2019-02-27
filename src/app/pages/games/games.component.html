@@ -1,0 +1,59 @@
+<!-- src/app/pages/games/games.component.html -->
+<h1 class="text-center">{{ pageTitle }}</h1>
+
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <ng-template [ngIf]="gamesList">
+    <ng-template [ngIf]="gamesList.length">
+
+      <!-- Search events -->
+      <label class="sr-only" for="search">Search</label>
+      <div class="search input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">Search</div>
+        </div>
+        <input
+          id="search"
+          type="text"
+          class="form-control"
+          [(ngModel)]="query"
+          (keyup)="searchGames()" />
+        <span class="input-group-append">
+          <button
+            class="btn btn-danger"
+            (click)="resetQuery()"
+            [disabled]="!query">&times;</button>
+        </span>
+      </div>
+
+      <!-- No search results -->
+      <p *ngIf="fs.noSearchResults(filteredGames, query)" class="alert alert-warning">
+        No games found for <em class="text-danger">{{ query }}</em>, sorry!
+      </p>
+
+      <!-- Events listing -->
+      <section class="list-group">
+        <a
+          *ngFor="let game of fs.orderByDate(filteredGames, 'startDatetime')"
+          [routerLink]="['/game', game._id]"
+          class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{game.awayTeam.name }} @ {{game.homeTeam.name}}</h5>
+            <small>{{ game.gameDate}}</small>
+          </div>
+        </a>
+      </section>
+    </ng-template>
+
+    <!-- No upcoming public events available -->
+    <p *ngIf="!gamesList.length" class="alert alert-info">
+      No upcoming public games available.
+    </p>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving game data.
+  </p>
+
+</ng-template>

@@ -8,4 +8,119 @@
   </a>
 </div>
 
-<app-hero-search></app-hero-search>
+<div>
+  <ul>
+    <li *ngFor="let gm of schedData">
+      {{gm.gamePk}}
+    </li>
+  </ul>
+</div>
+
+
+
+<ng-template [ngIf]="eventList">
+    <ng-template [ngIf]="eventList.length">
+
+      <!-- Search events -->
+      <label class="sr-only" for="search">Search</label>
+      <div class="search input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">Search</div>
+        </div>
+        <input
+          id="search"
+          type="text"
+          class="form-control"
+          [(ngModel)]="query"
+          (keyup)="searchEvents()" />
+        <span class="input-group-append">
+          <button
+            class="btn btn-danger"
+            (click)="resetQuery()"
+            [disabled]="!query">&times;</button>
+        </span>
+      </div>
+
+      <!-- No search results -->
+      <p *ngIf="fs.noSearchResults(filteredEvents, query)" class="alert alert-warning">
+        No events found for <em class="text-danger">{{ query }}</em>, sorry!
+      </p>
+
+      <!-- Events listing -->
+      <section class="list-group">
+        <a
+          *ngFor="let event of fs.orderByDate(filteredEvents, 'startDatetime')"
+          [routerLink]="['/event', event._id]"
+          class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1" [innerHTML]="event.title"></h5>
+            <small>{{ utils.eventDates(event.startDatetime, event.endDatetime) }}</small>
+          </div>
+        </a>
+      </section>
+    </ng-template>
+
+    <!-- No upcoming public events available -->
+    <p *ngIf="!eventList.length" class="alert alert-info">
+      No upcoming public events available.
+    </p>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving event data.
+  </p>
+
+
+<ng-template [ngIf]="teamList">
+    <ng-template [ngIf]="teamList.length">
+
+      <!-- Search events -->
+      <label class="sr-only" for="search">Search</label>
+      <div class="search input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">Search</div>
+        </div>
+        <input
+          id="search"
+          type="text"
+          class="form-control"
+          [(ngModel)]="query"
+          (keyup)="searchTeams()" />
+        <span class="input-group-append">
+          <button
+            class="btn btn-danger"
+            (click)="resetQuery()"
+            [disabled]="!query">&times;</button>
+        </span>
+      </div>
+
+      <!-- No search results -->
+      <p *ngIf="fs.noSearchResults(filteredTeams, query)" class="alert alert-warning">
+        No teams found for <em class="text-danger">{{ query }}</em>, sorry!
+      </p>
+
+      <!-- Events listing -->
+      <section class="list-group">
+        <a
+          *ngFor="let team of fs.orderByDate(filteredTeams, 'location')"
+          [routerLink]="['/team', team._id]"
+          class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1" [innerHTML]="team.nickname"></h5>
+            <small>{{ team.location }}</small>
+          </div>
+        </a>
+      </section>
+    </ng-template>
+
+    <!-- No upcoming public events available -->
+    <p *ngIf="!teamList.length" class="alert alert-info">
+      No public teams.
+    </p>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving team data.
+  </p>

@@ -1,0 +1,35 @@
+<!-- src/app/pages/game/game.component.html -->
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <h1 class="text-center">{{ pageTitle }}</h1>
+  <!-- Event -->
+  <ng-template [ngIf]="game">
+    <div class="card">
+      <!-- Event tab navigation -->
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="[]"
+              [queryParams]="{ tab: 'details' }"
+              [ngClass]="{ 'active': utils.tabIs(tab, 'details') }">Details</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Game detail tab -->
+      <app-game-detail
+        *ngIf="utils.tabIs(tab, 'details')"
+        [game]="game"></app-game-detail>
+
+
+    </div>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving information for this game.
+  </p>
+</ng-template>
+

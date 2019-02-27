@@ -1,0 +1,88 @@
+<!-- src/app/pages/admin/team-form/team-form.component.html -->
+<form [formGroup]="teamForm" (ngSubmit)="onSubmit()">
+  <!-- Title -->
+  <div class="form-group">
+    <label for="nickname">Nickname</label>
+    <input
+      id="nickname"
+      type="text"
+      class="form-control"
+      formControlName="nickname"
+      [maxlength]="tf.nicknameMax">
+    <div
+      *ngIf="formErrors.nickname"
+      class="small text-danger formErrors"
+      [innerHTML]="formErrors.nickname">
+    </div>
+  </div>
+
+  <!-- Location -->
+  <div class="form-group">
+    <label for="location">Location</label>
+    <input
+      id="location"
+      type="text"
+      class="form-control"
+      formControlName="location"
+      [maxlength]="tf.locMax">
+    <div
+      *ngIf="formErrors.location"
+      class="small text-danger formErrors"
+      [innerHTML]="formErrors.location">
+    </div>
+  </div>
+  <!-- Stadium -->
+  <div class="form-group">
+    <label for="stadium">Stadium</label>
+    <input
+      id="stadium"
+      type="text"
+      class="form-control"
+      formControlName="stadium"
+      [maxlength]="tf.textMax">
+    <div
+      *ngIf="formErrors.location"
+      class="small text-danger formErrors"
+      [innerHTML]="formErrors.stadium">
+    </div>
+  </div>
+  
+  <!-- Owner -->
+  <div class="form-group">
+    <label for="owner">Owner</label>
+    <select
+      class="form-control"
+      formControlName="owner"
+      id="owner"
+      >
+      <option *ngFor="let owner of formOwners" [ngValue]="owner">{{owner.name}}</option>
+    </select>
+    <div
+      *ngIf="formErrors.location"
+      class="small text-danger formErrors"
+      [innerHTML]="formErrors.owner">
+    </div>
+  </div>
+
+
+  <!-- Submit -->
+  <div class="form-group">
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [attr.disabled]="teamForm.invalid || submitting ? true : null"
+      [innerText]="submitBtnText"></button>
+      <!-- https://github.com/angular/angular/issues/11271#issuecomment-289806196 -->
+    <app-submitting *ngIf="submitting"></app-submitting>
+    <a
+      *ngIf="!submitting"
+      class="btn btn-link"
+      (click)="resetForm()"
+      tabindex="0">Reset Form</a>
+
+    <!-- API submission error -->
+    <p *ngIf="error" class="mt-3 alert alert-danger">
+      <strong>Error:</strong> There was a problem submitting the team. Please try again.
+    </p>
+  </div>
+</form>

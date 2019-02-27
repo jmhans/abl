@@ -1,0 +1,27 @@
+<!-- src/app/pages/admin/delete-event/delete-event.component.html -->
+<p class="lead">
+  You are deleting the "<strong [innerHTML]="team.nickname"></strong>" team.
+</p>
+
+<div class="form-group">
+  <label for="deleteTeam">Confirm team nickname:</label>
+  <input
+    type="text"
+    id="deleteTeam"
+    class="form-control"
+    [(ngModel)]="confirmDelete">
+</div>
+
+<!-- Delete button -->
+<p>
+  <button
+    class="btn btn-danger"
+    (click)="removeTeam()"
+    [disabled]="confirmDelete !== team.nickname || submitting">Delete Team</button>
+  <app-submitting *ngIf="submitting"></app-submitting>
+</p>
+
+<!-- Error deleting event -->
+<p *ngIf="error" class="alert alert-danger">
+  <strong>Oops!</strong> There was an error deleting this team. Please try again.
+</p>

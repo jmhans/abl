@@ -1,0 +1,47 @@
+<!-- src/app/pages/event/event.component.html -->
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <h1 class="text-center">{{ pageTitle }}</h1>
+  <!-- Event -->
+  <ng-template [ngIf]="team">
+    <div class="card">
+      <!-- Event tab navigation -->
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="[]"
+              [queryParams]="{ tab: 'details' }"
+              [ngClass]="{ 'active': utils.tabIs(tab, 'details') }">Details</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="[]"
+              [queryParams]="{ tab: 'roster' }"
+              [ngClass]="{ 'active': utils.tabIs(tab, 'roster') }">Roster</a>
+          </li>
+        </ul>
+      </div>
+
+      
+      <app-team-detail
+        *ngIf="utils.tabIs(tab, 'details')"
+        [team]="team"></app-team-detail>
+
+      <!-- Event RSVP tab -->
+      <app-roster
+        *ngIf="utils.tabIs(tab, 'roster')"
+        [teamId]="team._id"
+        ></app-roster>
+      
+      
+    </div>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving information for this team.
+  </p>
+</ng-template>

@@ -11,9 +11,19 @@ var ownerSchema = new Schema({
   teams: {type: [teamSchema], required: false}
 })
 
+var ablTeamSchema = new Schema({
+  nickname: {type: String, required: true}, 
+  location: {type: String, required: true},
+  owner: {type: Schema.Types.ObjectId, ref: 'Owner' , required: true},
+  stadium: {type: String, required: false}
+})
+
 const Team = mongoose.model('Team', teamSchema);
 const Owner = mongoose.model('Owner', ownerSchema);
+const AblTeam = mongoose.model('AblTeam', ablTeamSchema);
 
 module.exports = {Owner: Owner, 
-                  Team: Team
+                  Team: Team, 
+                  AblTeam: AblTeam
                  };
+

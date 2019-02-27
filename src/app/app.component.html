@@ -1,5 +1,15 @@
-<h1>Angular Router</h1>
-<nav class="navbar navbar-default">
+<!-- src/app/app.component.html -->
+<div class="layout-overflow">
+  <div
+    class="layout-canvas"
+    [ngClass]="{ 'nav-open': navOpen, 'nav-closed': !navOpen }"
+    [style.min-height]="minHeight">
+
+    <!-- HEADER -->
+    <app-header (navToggled)="navToggledHandler($event)"></app-header>
+
+<!--    <h1>Angular Router</h1>
+ <nav class="navbar navbar-default">
   <ul class="nav navbar-nav">
       <li><a routerLink="/owners" routerLinkActive="active">Owners</a></li>
       <li><a routerLink="/players" routerLinkActive="active">Players</a></li>
@@ -7,15 +17,21 @@
       <li><a routerLink="/owners/detail" routerLinkActive="active">Roster Detail</a></li>
       <li><a routerLink="/dashboard">Dashboard</a></li>
       <li><a routerLink="/owners2">OwnersList</a></li>
+      
     </ul>
   
   
-</nav>
-
-<router-outlet></router-outlet>
+</nav> -->
+    <!-- CONTENT -->
+    <div id="layout-view" class="layout-view">
+      <router-outlet></router-outlet>
+    </div>
 <app-messages></app-messages>
 
-<!-- 
-<div class="container">
-  <owner-list></owner-list>
-</div> -->
+    <!-- FOOTER -->
+    <app-footer></app-footer>
+
+  </div> <!-- /.layout-canvas -->
+</div> <!-- /.layout-overflow -->
+
+

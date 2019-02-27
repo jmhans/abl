@@ -1,0 +1,128 @@
+/*jshint esversion: 6 */
+
+const request = require('request');
+const AblTeam = require('./../models/owner').AblTeam;
+const Owner = require('./../models/owner').Owner;
+
+var AblTeamController = {
+  
+  _getById: function(req, res) {
+
+    AblTeam.findById(req.params.id).populate('owner').exec(function (err, team) {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!team) {
+        return res.status(400).send({message: 'Team not found.'});
+      }
+      res.send(team);
+    });
+   
+  },
+  
+  _getTeams: function(req, res) {
+    AblTeam.find({}).populate('owner').exec(function (err, teams) {
+      let teamsArr = [];
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (teams) {
+        teams.forEach(team => {
+          teamsArr.push(team);
+        });
+      }
+      res.send(teamsArr);
+    });
+  },
+  
+  _getOwners: function(req, res) {
+     Owner.find({}, (err, owners) => {
+      let ownersArr = [];
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (owners) {
+        owners.forEach(owner => {
+          ownersArr.push(owner);
+        });
+      }
+      res.send(ownersArr);
+    });
+  },
+  
+  _post: function(req, res) {
+    
+    Owner.findOne({_id: req.body.owner._id}, (err, existingOwner) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+
+      AblTeam.findOne({
+      nickname: req.body.nickname,
+      location: req.body.location,
+      }, (err, existingTeam) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (existingTeam) {
+        return res.status(409).send({message: 'You have already created a team with this nickname & location.'});
+      }
+      const team = new AblTeam({
+        nickname: req.body.nickname,
+        location: req.body.location, 
+        stadium: req.body.stadium, 
+        owner: existingOwner._id
+      });
+      team.save((err) => {
+        if (err) {
+          return res.status(500).send({message: err.message});
+        }
+        res.send(team);
+      });
+    });
+    });
+    
+    
+  },
+  _put: function(req, res) {
+    AblTeam.findById(req.params.id, (err, team) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!team) {
+        return res.status(400).send({message: 'Team not found.'});
+      }
+      team.nickname = req.body.nickname;
+      team.location = req.body.location;
+      team.stadium = req.body.stadium;
+      team.owner = req.body.owner._id;
+      
+      team.save(err => {
+        if (err) {
+          return res.status(500).send({message: err.message});
+        }
+        res.send(team);
+      });
+    });
+}, 
+  _delete: function(req, res) {
+    AblTeam.findById(req.params.id, (err, team) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!team) {
+        return res.status(400).send({message: 'Team not found.'});
+      }
+        team.remove(err => {
+          if (err) {
+            return res.status(500).send({message: err.message});
+          }
+          res.status(200).send({message: 'Team successfully deleted.'});
+        });
+    });
+  }
+
+}
+
+
+module.exports = AblTeamController
