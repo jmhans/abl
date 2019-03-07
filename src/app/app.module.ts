@@ -14,10 +14,13 @@ import { UtilsService } from './core/utils.service';
 import { FilterSortService } from './core/filter-sort.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { DataTablesModule } from 'angular-datatables';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PlayerDetailsComponent } from './players/player-details/player-details.component';
-import { PlayerListComponent } from './players/player-list/player-list.component';
 import { OwnerDetailsComponent } from './owners/owner-details/owner-details.component';
 import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 import { RosterListComponent } from './rosters/roster-list/roster-list.component';
@@ -52,14 +55,17 @@ import { UpdateTeamComponent } from './pages/admin/update-team/update-team.compo
 import { TeamFormComponent } from './pages/admin/team-form/team-form.component';
 import { CreateTeamComponent } from './pages/admin/create-team/create-team.component';
 import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.component';
+import { PlayersComponent } from './pages/players/players.component';
+import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
+import { RosterFormComponent } from './pages/admin/roster-form/roster-form.component';
+
+
 
 
 @NgModule({
   declarations: [
     AppComponent, 
     CallbackComponent,
-    PlayerDetailsComponent,
-    PlayerListComponent,
     OwnerDetailsComponent,
     OwnerListComponent,
     RosterListComponent,
@@ -90,7 +96,7 @@ import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.compo
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent
   ],
   imports: [
     BrowserModule,
@@ -103,7 +109,10 @@ import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.compo
       ), 
     OwnersModule,
     AppRoutingModule, 
-    BrowserAnimationsModule
+    BrowserAnimationsModule, 
+    DataTablesModule, 
+    DragDropModule,
+    NgbModule,
   ],
   providers: [ 
     Title, 

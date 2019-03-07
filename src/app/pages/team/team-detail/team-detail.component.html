@@ -15,10 +15,6 @@
   </li>
 </ul>
 
-<div class="card-body" *ngIf="team.description">
-  <p class="card-text lead">No information</p>
-</div>
-
 <div *ngIf="auth.isAdmin" class="card-footer text-right small">
   <a [routerLink]="['/abladmin/team/update', team._id]">Edit</a>
 </div>

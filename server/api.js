@@ -12,11 +12,12 @@ const Rsvp = require('./../models/Rsvp');
 const https = require('https');
 const request = require('request');
 const mlbGame = require('./../models/mlbGame');
-const Player = require('./../models/player');
+const Player = require('./../models/player').Player;
 
 const Game = require('./../models/Game');
 const MlbApiController = require('./../controllers/mlbapi.controller');
 const AblTeamController = require('./../controllers/ablteam.controller');
+const AblRosterController = require('./../controllers/abl.roster.controller');
 
 /*
  |--------------------------------------
@@ -267,6 +268,12 @@ module.exports = function(app, config) {
   app.delete('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._delete);
   app.get('/api3/teams', AblTeamController._getTeams);
   app.get('/api3/owners', AblTeamController._getOwners);
+  app.post('/api3/roster/new', AblRosterController._post);
+  app.get('/api3/rosterRecords', AblRosterController._getRosters);
+  app.get('/api3/team/:id/rosterRecords', jwtCheck, AblRosterController._getRosterRecordsForTeam);
+  app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
+  app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
+  app.put('/api3/lineup/:id', jwtCheck, AblRosterController._updateLineup);
   
   app.get("/api3/mlbGames", (req, res) => {
     mlbGame.find({}, (err, games) => {
@@ -296,6 +303,19 @@ module.exports = function(app, config) {
       res.send(playersArr);
     });
   })
+  app.get('/api3/player/:id', jwtCheck, (req, res) => {
+    Player.findById(req.params.id, (err, player) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!player) {
+        return res.status(400).send({message: 'Player not found.'});
+      }
+      res.send(player);
+    });
+  });
+  
+  
   
   app.get('/api3/game/:id', jwtCheck, (req, res) => {
     Game.findById(req.params.id, (err, game) => {
@@ -308,6 +328,7 @@ module.exports = function(app, config) {
       res.send(game);
     });
   });
+  
   
   
   

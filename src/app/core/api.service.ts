@@ -11,6 +11,8 @@ import { MlbGameModel } from './models/mlbgame.model';
 import { GameModel } from './models/game.model';
 import { AblTeamModel } from './models/abl.team.model';
 import { OwnerModel } from './models/owner.model';
+import { MlbPlayerModel } from './models/mlb.player.model';
+import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.record.model';
 
 
 @Injectable()
@@ -43,6 +45,15 @@ export class ApiService {
         catchError((error) => this._handleError(error))  
     );
   }
+  
+  getMlbPlayers$(): Observable<MlbPlayerModel[]> {
+    return this.http
+      .get<MlbPlayerModel[]>(`${this.base_api}mlbplayers`)
+      .pipe(
+        catchError((error) => this._handleError(error))  
+    );
+  }
+  
   getAblGames$(): Observable<GameModel[]> {
     return this.http
       .get<GameModel[]>(`${this.base_api}games`)
@@ -93,6 +104,17 @@ export class ApiService {
   getEventById$(id: string): Observable<EventModel> {
     return this.http
       .get<EventModel>(`${this.base_api}event/${id}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
+  // GET an event by ID (login required)
+  getPlayerById$(id: string): Observable<MlbPlayerModel> {
+    return this.http
+      .get<MlbPlayerModel>(`${this.base_api}player/${id}`, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(

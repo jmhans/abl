@@ -1,3 +1,58 @@
-<p>
-  roster works!
+<!-- src/app/pages/team/roster/roster.component.html -->
+<div class="card-body">
+  <h2 class="card-title text-center mb-0">Roster</h2>
+</div>
+
+<p *ngFor="let alert of alerts">
+  <ngb-alert [type]="alert.type" (close)="close(alert)">{{ alert.message }}</ngb-alert>
 </p>
+
+
+
+<div *ngIf="message" class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error</strong> Lineup not saved.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+
+<div cdkDropList class="example-list" (cdkDropListDropped)="dropLineupRecord($event)" *ngIf='lineup'>
+  <div class="example-box" 
+       *ngFor="let rosterRec of lineup.roster; index as i" 
+       cdkDrag
+       [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1)  }"
+       >{{ rosterRec.player.name }} | {{ rosterRec.lineupPosition }}
+    <div >
+      {{i}}
+    </div>
+    <div class="small">
+      <strong>ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
+      ({{rosterRec.player.stats.batting.gamesPlayed}} G, 
+      {{rosterRec.player.stats.batting.atBats}} AB,
+      {{rosterRec.player.stats.batting.hits}} H,
+      {{rosterRec.player.stats.batting.doubles}} 2B, 
+      {{rosterRec.player.stats.batting.triples}} 3B, 
+      {{rosterRec.player.stats.batting.homeRuns}} HR, 
+      {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB, 
+      {{rosterRec.player.stats.batting.hitByPitch}} HBP,
+      {{rosterRec.player.stats.batting.stolenBases}} SB, 
+      {{rosterRec.player.stats.batting.caughtStealing}} CS)
+      
+    </div>
+  </div>
+</div>
+
+<button (click)="_updateRoster()">
+  Update
+</button>
+
+<!-- <div *ngIf="auth.isAdmin" class="card-footer text-right small">
+  <a [routerLink]="['/abladmin/team/update', team._id]">Edit</a>
+</div> -->

@@ -3,7 +3,7 @@
 const request = require('request');
 const BASE_URL = "http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
-const Player = require('./../models/player');
+const Player = require('./../models/player').Player;
 
   function getPlayersInGame(gamePk) {
     const APIUrl = BASE_URL + "/game/" + gamePk + "/boxscore";

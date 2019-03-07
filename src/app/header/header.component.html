@@ -61,6 +61,12 @@
           routerLink="/admin/event/new"
           routerLinkActive="active">Create Event</a>
       </li>
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/players"
+          routerLinkActive="active">Players</a>
+      </li>
       
       
       

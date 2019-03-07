@@ -1,0 +1,10 @@
+<!-- src/app/pages/admin/manage-rosters/manage-rosters.component.html -->
+
+<h1 class="text-center">{{ pageTitle }}</h1>
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <ng-template [ngIf]="player">
+    <!-- Manage Player form -->
+    <app-roster-form [player]="player"></app-roster-form>
+  </ng-template>
+</ng-template>

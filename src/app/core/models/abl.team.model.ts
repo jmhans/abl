@@ -4,6 +4,7 @@ class AblTeamModel {
     public location: string, 
     public stadium: string,
     public owner: Object,
+    public roster?: Object,
     public _id?: string,
   ) { }
 }

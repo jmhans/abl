@@ -3,6 +3,7 @@
 const request = require('request');
 const AblTeam = require('./../models/owner').AblTeam;
 const Owner = require('./../models/owner').Owner;
+const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 
 var AblTeamController = {
   
@@ -51,7 +52,6 @@ var AblTeamController = {
   },
   
   _post: function(req, res) {
-    
     Owner.findOne({_id: req.body.owner._id}, (err, existingOwner) => {
       if (err) {
         return res.status(500).send({message: err.message});
@@ -84,6 +84,7 @@ var AblTeamController = {
     
     
   },
+    
   _put: function(req, res) {
     AblTeam.findById(req.params.id, (err, team) => {
       if (err) {

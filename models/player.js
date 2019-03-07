@@ -9,4 +9,5 @@ var playerSchema = new mongoose.Schema({
   stats: {type: mongoose.Schema.Types.Mixed, required: false}
 })
 
-module.exports = mongoose.model('Player', playerSchema);
+module.exports = {Player: mongoose.model('Player', playerSchema), 
+                  PlayerSchema: playerSchema};

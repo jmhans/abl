@@ -1,0 +1,48 @@
+<!-- src/app/pages/admin/roster-form/roster-form.component.html -->
+<div class="d-flex w-100 justify-content-between">
+  <h5 class="mb-1">{{player.name}}</h5>
+  <small>{{ player.position }}</small>
+  <small>{{ player.team }}</small>
+</div>
+
+
+<form [formGroup]="playerForm" (ngSubmit)="onSubmit()">
+  <!-- Title -->
+  <div class="form-group">
+    <label for="ablteam">ABL Team</label>
+    <select
+      class="form-control"
+      formControlName="ablteam"
+      id="ablteam"
+      required
+      >
+      <option *ngFor="let tm of formTeams" [ngValue]="tm">{{tm.nickname}}</option>
+    </select>
+    <div
+      *ngIf="formErrors.ablteam"
+      class="small text-danger formErrors"
+      [innerHTML]="formErrors.ablteam">
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="form-group">
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [attr.disabled]="playerForm.invalid || submitting ? true : null"
+      [innerText]="submitBtnText"></button>
+      <!-- https://github.com/angular/angular/issues/11271#issuecomment-289806196 -->
+<!--     <app-submitting *ngIf="submitting"></app-submitting> -->
+    <a
+      *ngIf="!submitting"
+      class="btn btn-link"
+      (click)="resetForm()"
+      tabindex="0">Reset Form</a>
+
+    <!-- API submission error -->
+    <p *ngIf="error" class="mt-3 alert alert-danger">
+      <strong>Error:</strong> There was a problem submitting the form. Please try again.
+    </p>
+  </div>
+</form>
