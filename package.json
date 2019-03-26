@@ -50,7 +50,7 @@
     "tslib": "^1.9.0",
     "typescript": "~3.1.6",
     "zone.js": "~0.8.26",
-    "dotenv": "^7.0.0",
+    "dotenv": "^7.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.13.5",
