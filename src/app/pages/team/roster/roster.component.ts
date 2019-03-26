@@ -21,6 +21,7 @@ interface Alert {
 })
 export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
+  editable: boolean;
   lineup: LineupModel;
   lineupSub: Subscription;
   loading: boolean;
@@ -35,6 +36,16 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._getRosterRecords();
+    this.editable = this._isTeamOwner();
+  }
+  
+  private _isTeamOwner() {
+    this.team.owners.forEach((owner) => {
+      if (this.auth.userProfile.sub == owner.userId) {
+        return true;
+      }
+    });
+    return false;
   }
 
   
@@ -104,6 +115,18 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
   
+  rosterChanged () {
+  var diffs = false;
+    if (this.lineup) {
+      for (var j =0; j<this.lineup.roster.length; j++) {
+        if (this.lineup.roster[j].rosterOrder != (j+1)) {
+          return true;
+        }
+      }  
+    }
+    
+    return false;
+  }
   
   abl(plyrStats) { 
     return (plyrStats.hits * 25 + 

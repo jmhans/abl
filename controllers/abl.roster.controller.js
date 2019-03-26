@@ -146,60 +146,83 @@ var AblRosterController = {
 
   },
   _addPlayerToTeam: function(req, res) {
-    Lineup.findOne({
-      ablTeam: new ObjectId(req.params.id)
-    }).exec((err, existingLineupRec) => {
+    
+    MlbPlayer.findById(req.body._id, (err, mlbPlayer) => {
+      
       if (err) {
         return res.status(500).send({
           message: err.message
         });
       }
-      if (existingLineupRec) {
-        var priorLineupRec = {
-          effectiveDate: existingLineupRec.effectiveDate,
-          roster: existingLineupRec.roster
+      mlbPlayer.ablTeam = new ObjectId(req.params.id)
+      mlbPlayer.save((err) => {
+        if (err) {
+          return res.status(500).send({
+            message: err.message
+          });
         }
-        existingLineupRec.priorRosters.push(priorLineupRec);
-        existingLineupRec.effectiveDate = new Date();
-        existingLineupRec.roster.push({
-          player: new ObjectId(req.body._id), 
-          lineupPosition: req.body.position, 
-          rosterOrder: existingLineupRec.roster.length + 1
-        });
-        existingLineupRec.save((err) => {
-          if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
-          }
-          res.send(existingLineupRec);
-        });
         
-      } else {
-
-        const RR = new Lineup({
-          ablTeam: new ObjectId(req.params.id),
-          roster: [{player: new ObjectId(req.body._id), 
-                    lineupPosition: req.body.position, 
-                    rosterOrder: 1}], 
-          effectiveDate: new Date(), 
-          priorRosters: []
-        });
-        RR.save((err) => {
-          if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
+        Lineup.findOne({
+        ablTeam: new ObjectId(req.params.id)
+      }).exec((err, existingLineupRec) => {
+        if (err) {
+          return res.status(500).send({
+            message: err.message
+          });
+        }
+        if (existingLineupRec) {
+          var priorLineupRec = {
+            effectiveDate: existingLineupRec.effectiveDate,
+            roster: existingLineupRec.roster
           }
-          res.send(RR);
-        });
+          existingLineupRec.priorRosters.push(priorLineupRec);
+          existingLineupRec.effectiveDate = new Date();
 
-      }
-      
+          existingLineupRec.roster.push({
+            player: mlbPlayer._id, 
+            lineupPosition: req.body.position, 
+            rosterOrder: existingLineupRec.roster.length + 1
+          });
+
+            existingLineupRec.save((err) => {
+              if (err) {
+                return res.status(500).send({
+                  message: err.message
+                });
+              }
+              res.send(existingLineupRec);
+            });
+
+        } else {
+
+          const RR = new Lineup({
+            ablTeam: new ObjectId(req.params.id),
+            roster: [{player: mlbPlayer._id, 
+                      lineupPosition: req.body.position, 
+                      rosterOrder: 1}], 
+            effectiveDate: new Date(), 
+            priorRosters: []
+          });
+          RR.save((err) => {
+            if (err) {
+              return res.status(500).send({
+                message: err.message
+              });
+            }
+            res.send(RR);
+          });
+
+        }
 
 
 
-    });
+
+      });
+      })
+            
+    })
+    
+
   }
   
   

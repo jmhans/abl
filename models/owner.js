@@ -23,10 +23,14 @@ var rosterRecordSchema = new Schema({
 
 var ablTeamSchema = new Schema({
   nickname: {type: String, required: true}, 
-  location: {type: String, required: true},
-  owner: {type: Schema.Types.ObjectId, ref: 'Owner' , required: true},
-  stadium: {type: String, required: false}, 
+  location: {type: String, required: false},
+  //owner: {type: Schema.Types.ObjectId, ref: 'Owner' , required: true},
+  stadium: {type: String, required: false},
+  userId: {type: String, required: false},
+  owners: [{ userId: {type: String, required: false} , name: {type: String, required: false }, email: {type: String, required: false}, verified: {type: Boolean, required: true}}]
 })
+
+
 
 const Team = mongoose.model('Team', teamSchema);
 const Owner = mongoose.model('Owner', ownerSchema);

@@ -5,6 +5,7 @@ const BASE_URL = "http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazo
 const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
 
+
   function getPlayersInGame(gamePk) {
     const APIUrl = BASE_URL + "/game/" + gamePk + "/boxscore";
     request(APIUrl, {
@@ -14,16 +15,32 @@ const Player = require('./../models/player').Player;
         return console.log(err);
       }
       
+      function _isPositionPlayer(plyr) {
+        if (plyr.allPositions) { 
+            for (var p = 1; p<plyr.allPositions.length; p++) {
+                if (plyr.allPositions[p].abbreviation != "P") {
+                  return true;
+                }
+            }
+          }
+        return false;
+      }
+     
+      
+      
+      
       function getTeamPlayers(teamType) {
-      var playersList = body.teams[teamType].players
-      var team = body.teams[teamType].team
+        var PositionPlayers = []
+        var players = body.teams[teamType].players
+
+        var team = body.teams[teamType].team
 
         
-        for (var playerKey in playersList) {
+        for (var playerKey in players) {
 
-          let player = playersList[playerKey]
-
-          var query = {
+          let player = players[playerKey]
+          if (_isPositionPlayer(player)) {
+            var query = {
               'mlbID': player.person.id
             }
             const plyr = {
@@ -44,6 +61,8 @@ const Player = require('./../models/player').Player;
 
             //return res.send("succesfully saved");
           })
+          }
+          
         }
       }
       
@@ -85,7 +104,6 @@ var MlbApiController = {
         return console.log(err);
       }
       const gamesList = body.dates.find(x => x.date == (year + "-" + month + "-" + day)).games
-      console.log(gamesList);
 
       gamesList.forEach((gm) => {
 

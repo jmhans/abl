@@ -1,5 +1,6 @@
 // src/app/pages/admin/team-form/team-form.service.ts
 import { Injectable } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
 
 @Injectable()
 export class TeamFormService {
@@ -8,7 +9,8 @@ export class TeamFormService {
   formErrors = {
     nickname: '',
     location: '',
-    stadium: ''
+    stadium: '',
+    ownerName: ''
   };
   // Min/maxlength validation
   textMin = 3;
@@ -30,10 +32,23 @@ export class TeamFormService {
       }, 
       stadium: {
       }, 
-      owner: {
-        required: `Owner is <strong>required</strong>.`
+      ownerName: {
+        required: `Owner name is <strong>required</strong>.`
+      }, 
+      owners: {
+        minLengthArray: 'Must have at least one owner.', 
+        
       }
     };
   }
+  
+  minLengthArray(min: number) {
+    return (c: AbstractControl): {[key: string]: any} => {
+        if (c.value.length >= min)
+            return null;
+
+        return { 'minLengthArray': {valid: false }};
+    }
+}
 
 }

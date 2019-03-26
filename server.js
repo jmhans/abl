@@ -7,6 +7,9 @@ var mongoose = require('mongoose');
 const config2 = require('./server/config');
 const cors = require('cors');
 const methodOverride = require('method-override');
+const dotenv = require('dotenv');
+
+var result = dotenv.config();
 
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test', {useNewUrlParser: true});
@@ -56,5 +59,3 @@ app.use('/api', api);
 app.use('/', function (req, res) {
     res.sendFile(distDir+'/index.html');
 });
-
-

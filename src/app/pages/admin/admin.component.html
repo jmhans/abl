@@ -1,75 +1,47 @@
-<!-- src/app/pages/admin/admin.component.html -->
+<!-- src/app/pages/admin/update-team/update-team.component.html -->
 <h1 class="text-center">{{ pageTitle }}</h1>
 
-<ng-template [ngIf]="utils.isLoaded(loading)">
-  <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can create and administer events below.</p>
+ <ng-template [ngIf]="utils.isLoaded(loading)">
+  <div *ngIf="team" class="card">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="[]"
+            [queryParams]="{ tab: 'edit' }"
+            [ngClass]="{ 'active': utils.tabIs(tab, 'edit') }">Edit</a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="[]"
+            [queryParams]="{ tab: 'delete' }"
+            [ngClass]="{ 'active': utils.tabIs(tab, 'delete') }">Delete</a>
+        </li>
+      </ul>
+    </div>
 
-  <!-- Events -->
-  <ng-template [ngIf]="eventList">
-    <ng-template [ngIf]="eventList.length">
-      <!-- Search events -->
-      <label class="sr-only" for="search">Search</label>
-      <div class="search input-group mb-3">
-        <div class="input-group-prepend">
-          <div class="input-group-text">Search</div>
-        </div>
-        <input
-          id="search"
-          type="text"
-          class="form-control"
-          [(ngModel)]="query"
-          (keyup)="searchEvents()" />
-        <span class="input-group-append">
-          <button
-            class="btn btn-danger"
-            (click)="resetQuery()"
-            [disabled]="!query">&times;</button>
-        </span>
-      </div>
+   <div class="card-body">
+      <!-- Edit event form -->
+      <app-team-form
+        *ngIf="utils.tabIs(tab, 'edit')"
+        [team]="team"
+        [activeOwner]="activeOwner"
+      ></app-team-form>
 
-      <!-- No search results -->
-      <p *ngIf="fs.noSearchResults(filteredEvents, query)" class="alert alert-warning">
-        No events found for <em class="text-danger">{{ query }}</em>, sorry!
-      </p>
+      <!-- Delete event -->
+      <app-delete-team
+        *ngIf="utils.tabIs(tab, 'delete')"
+        [team]="team"></app-delete-team>
+    </div>
 
-      <!-- Events listing -->
-      <section class="list-group">
-        <div
-          *ngFor="let event of fs.orderByDate(filteredEvents, 'startDatetime')"
-          class="list-group-item list-group-item-action flex-column align-items-start">
-          <div class="d-flex w-100 justify-content-between">
-            <a [routerLink]="['/event', event._id]">
-              <h5 class="mb-1" [innerHTML]="event.title"></h5>
-            </a>
-            <div class="event-icons">
-              <img
-                *ngIf="!event.viewPublic"
-                class="event-icon"
-                title="Private"
-                src="/assets/images/eye.svg">
-              <img
-                *ngIf="utils.eventPast(event.endDatetime)"
-                class="event-icon"
-                title="Event is over"
-                src="/assets/images/calendar.svg">
-            </div>
-          </div>
-          <p class="mb-1">
-            <strong>Date:</strong> {{ utils.eventDates(event.startDatetime, event.endDatetime) }}
-          </p>
-        </div>
-      </section>
-    </ng-template>
-
-    <!-- No events available -->
-    <p *ngIf="!eventList.length" class="alert alert-info">
-      No events have been created yet.
-    </p>
-  </ng-template>
-
-  <!-- Error loading events -->
+  </div>
+    <!-- Error loading event -->
   <p *ngIf="error" class="alert alert-danger">
-    <strong>Oops!</strong> There was an error retrieving event data.
+    <strong>Error:</strong> Team data could not be retrieved. View <a routerLink="/abladmin" class="alert-link">Admin Teams</a>.
   </p>
-
+  
+  
+  
 </ng-template>

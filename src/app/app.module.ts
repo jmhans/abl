@@ -58,6 +58,7 @@ import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.compo
 import { PlayersComponent } from './pages/players/players.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { RosterFormComponent } from './pages/admin/roster-form/roster-form.component';
+import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-form.component';
 
 
 
@@ -96,7 +97,7 @@ import { RosterFormComponent } from './pages/admin/roster-form/roster-form.compo
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent
   ],
   imports: [
     BrowserModule,

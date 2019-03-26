@@ -263,8 +263,8 @@ module.exports = function(app, config) {
   app.get("/api3/mlbGame/:dt", MlbApiController._get);
   
   app.get("/api3/team/:id", AblTeamController._getById);
-  app.post('/api3/team/new', jwtCheck, adminCheck, AblTeamController._post );
-  app.put('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._put);
+  app.post('/api3/team/new', jwtCheck, AblTeamController._post );
+  app.put('/api3/team/:id', jwtCheck, AblTeamController._put);
   app.delete('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._delete);
   app.get('/api3/teams', AblTeamController._getTeams);
   app.get('/api3/owners', AblTeamController._getOwners);
@@ -290,7 +290,7 @@ module.exports = function(app, config) {
     });
   })
   app.get("/api3/mlbPlayers", (req, res) => {
-    Player.find({}, (err, players) => {
+    Player.find({ablTeam: null}, (err, players) => {
       let playersArr = [];
       if (err) {
         return res.status(500).send({message: err.message});

@@ -1,0 +1,38 @@
+Owners
+<form [formGroup]="ownerForm">
+
+   <section class="list-group" formArrayName="owners">
+      <div *ngFor="let owner of ownerForm.get('owners').controls; let i = index;" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div [formGroupName]="i" class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">
+            <div *ngIf="ownerForm.controls.owners.controls[i].controls.verified.value">
+              Verified owner
+            </div>
+            <div *ngIf="!ownerForm.controls.owners.controls[i].controls.verified.value">
+              unverified owner
+            </div>
+            <div>
+              
+            <label for="name">Name</label> 
+            <input 
+                   id="name" 
+                   type="text" 
+                   class="form-control" 
+                   formControlName="name" 
+                   placeholder="owner name">
+            <label for="email">Email</label> 
+            <input id="email" 
+                   type="text" 
+                   class="form-control" 
+                   formControlName="email" 
+                   placeholder="email">
+              </div>
+          </h5>
+          
+        </div>
+        <button class="btn btn-danger" (click)="deleteOwner(owner)">x</button>
+      </div>      
+      <button class="btn btn-danger" (click)="addUnverifiedOwner()">Invite owner</button>
+    </section>
+
+</form>

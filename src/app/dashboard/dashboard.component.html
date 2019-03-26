@@ -1,72 +1,29 @@
-<h3>Top Owners</h3>
-<div class="grid grid-pad">
-  <a *ngFor="let owner of owners" class="col-1-4"
-      routerLink="/detail/{{owner._id}}">
-    <div class="module owner">
-      <h4>{{owner.name}}</h4>
-    </div>
-  </a>
-</div>
-
-<div>
-  <ul>
-    <li *ngFor="let gm of schedData">
-      {{gm.gamePk}}
-    </li>
-  </ul>
-</div>
 <h3>
-   Teams
+  Teams
 </h3>
 <ng-template [ngIf]="teamList">
-    <ng-template [ngIf]="teamList.length">
+  <ng-template [ngIf]="teamList.length">
 
-      <!-- Search events -->
-      <label class="sr-only" for="search">Search</label>
-      <div class="search input-group mb-3">
-        <div class="input-group-prepend">
-          <div class="input-group-text">Search</div>
+    <!-- Teams listing -->
+    <section class="list-group">
+      <a *ngFor="let team of fs.orderByDate(filteredTeams, 'location')" [routerLink]="['/team', team._id]" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{team.location + ' ' + team.nickname}}</h5>
+          <small *ngFor="let owner of team.owners">{{ owner.name }}</small>
         </div>
-        <input
-          id="search"
-          type="text"
-          class="form-control"
-          [(ngModel)]="query"
-          (keyup)="searchTeams()" />
-        <span class="input-group-append">
-          <button
-            class="btn btn-danger"
-            (click)="resetQuery()"
-            [disabled]="!query">&times;</button>
-        </span>
-      </div>
-
-      <!-- No search results -->
-      <p *ngIf="fs.noSearchResults(filteredTeams, query)" class="alert alert-warning">
-        No teams found for <em class="text-danger">{{ query }}</em>, sorry!
-      </p>
-
-      <!-- Events listing -->
-      <section class="list-group">
-        <a
-          *ngFor="let team of fs.orderByDate(filteredTeams, 'location')"
-          [routerLink]="['/team', team._id]"
-          class="list-group-item list-group-item-action flex-column align-items-start">
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{team.location + ' ' + team.nickname}}</h5>
-            <small>{{ team.owner.name }}</small>
-          </div>
-        </a>
-      </section>
-    </ng-template>
-
-    <!-- No upcoming public events available -->
-    <p *ngIf="!teamList.length" class="alert alert-info">
-      No public teams.
-    </p>
+      </a>
+    </section>
   </ng-template>
+  <a [routerLink]="['/create/team']"> Create new team </a>
 
-  <!-- Error loading events -->
-  <p *ngIf="error" class="alert alert-danger">
-    <strong>Oops!</strong> There was an error retrieving team data.
+
+  <!-- No upcoming public events available -->
+  <p *ngIf="!teamList.length" class="alert alert-info">
+    No public teams.
   </p>
+</ng-template>
+
+<!-- Error loading events -->
+<p *ngIf="error" class="alert alert-danger">
+  <strong>Oops!</strong> There was an error retrieving team data.
+</p>

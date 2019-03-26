@@ -1,4 +1,4 @@
-<h3>
+<!-- <h3>
    Players
 </h3>
 <table datatable 
@@ -10,7 +10,7 @@
       <th>Player Name</th>
       <th>Position</th>
       <th>Team</th>
-      <th>Button</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
@@ -18,12 +18,15 @@
       <td>{{player.name}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>
-      <td> <a
-          [routerLink]="['/abladmin/player/addToRoster', player._id]">Manage Player
-        </a>  </td>
+      <td><a 
+             *ngIf="auth.isAdmin"
+             [routerLink]="['/abladmin/player/addToRoster', player._id]">Manage Player
+        </a>
+        <p *ngIf="!auth.isAdmin">Not authorized</p>
+      </td>
     </tr>
   </tbody>
-</table>
+</table> -->
 
 
 <ng-template [ngIf]="playerList">
@@ -40,7 +43,7 @@
           type="text"
           class="form-control"
           [(ngModel)]="query"
-          (keyup)="searchTeams()" />
+          (keyup)="searchPlayers()" />
         <span class="input-group-append">
           <button
             class="btn btn-danger"
@@ -62,8 +65,27 @@
           class="list-group-item list-group-item-action flex-column align-items-start">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{player.name}}</h5>
-            <small>{{ player.position }}</small>
-            <small>{{ player.team }}</small>
+            <small>{{ player.position }} | {{ player.team }}</small>
+                <div class="small">
+                  <strong>ABL Runs: {{ abl(player.stats.batting) | number }}</strong> 
+                  ({{player.stats.batting.gamesPlayed}} G, 
+                  {{player.stats.batting.atBats}} AB,
+                  {{player.stats.batting.hits}} H,
+                  {{player.stats.batting.doubles}} 2B, 
+                  {{player.stats.batting.triples}} 3B, 
+                  {{player.stats.batting.homeRuns}} HR, 
+                  {{player.stats.batting.baseOnBalls + player.stats.batting.intentionalWalks}} BB/IBB, 
+                  {{player.stats.batting.hitByPitch}} HBP,
+                  {{player.stats.batting.stolenBases}} SB, 
+                  {{player.stats.batting.caughtStealing}} CS)
+
+                </div>
+            
+            
+            <a 
+             *ngIf="auth.isAdmin"
+             [routerLink]="['/abladmin/player/addToRoster', player._id]"> Manage Player
+            </a>
           </div>
         </a>
       </section>
@@ -79,4 +101,3 @@
   <p *ngIf="error" class="alert alert-danger">
     <strong>Oops!</strong> There was an error retrieving player data.
   </p>
-

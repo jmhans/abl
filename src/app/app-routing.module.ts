@@ -39,11 +39,13 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path: 'team/:id', component: TeamComponent, canActivate:[ AuthGuard ]}, 
                        {path: 'abladmin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AblAdminComponent }, 
                                                                                             {path: 'team/update/:id', component: UpdateTeamComponent},
+                                                                                            {path: 'team/update/:id/owner/:ownerId', component: UpdateTeamComponent},
                                                                                             {path: 'team/new', component: CreateTeamComponent}, 
                                                                                             {path: 'team/delete/:id', component: DeleteTeamComponent}, 
-                                                                                            {path: 'player/addToRoster/:id', component: ManageRostersComponent}]}, 
+                                                                                            {path: 'player/addToRoster/:id', component: ManageRostersComponent}]},
+                       {path: 'create/team', component: CreateTeamComponent, canActivate: [ AuthGuard ]}, 
                        {path: 'game/:id', component: GameComponent, canActivate: [ AuthGuard ] }, 
-                       {path: 'players', component: PlayersComponent, canActivate: [AuthGuard ]}
+                       {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]}
                        ];
 
 @NgModule({

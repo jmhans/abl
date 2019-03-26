@@ -11,11 +11,16 @@
     <strong>Home Stadium:</strong>{{ team.stadium }} 
   </li>
   <li class="list-group-item">
-    <strong>Team owner:</strong>{{ team.owner.name }} || {{ team.owner.email}} 
+    <strong>Team owners:</strong>
+    <span *ngFor="let owner of team.owners">{{ owner.name }} | {{ owner.email }} 
+      <span *ngIf="!owner.verified">This is me!<a 
+         [routerLink]="['/abladmin/team/update', team._id, 'owner', owner._id]"> Claim Team</a>
+      </span>
+    </span>
+    
   </li>
 </ul>
 
 <div *ngIf="auth.isAdmin" class="card-footer text-right small">
   <a [routerLink]="['/abladmin/team/update', team._id]">Edit</a>
 </div>
-

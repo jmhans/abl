@@ -6,7 +6,7 @@ import { ApiService } from './../../../core/api.service';
 import { UtilsService } from './../../../core/utils.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AblTeamModel } from './../../../core/models/abl.team.model';
+import { AblTeamModel, OwnerInterface} from './../../../core/models/abl.team.model';
 
 @Component({
   selector: 'app-update-team',
@@ -19,9 +19,11 @@ export class UpdateTeamComponent implements OnInit, OnDestroy {
   routeSub: Subscription;
   teamSub: Subscription;
   team: AblTeamModel;
+  activeOwner: OwnerInterface;
   loading: boolean;
   error: boolean;
   private _id: string;
+  private _ownerId: string;
   
   tabSub: Subscription;
   tab: string;
@@ -41,7 +43,9 @@ export class UpdateTeamComponent implements OnInit, OnDestroy {
     this.routeSub = this.route.params
       .subscribe(params => {
         this._id = params['id'];
+        this._ownerId = params['ownerId'];
         this._getAblTeam();
+        
       });
         // Subscribe to query params to watch for tab changes
     this.tabSub = this.route.queryParams
@@ -58,6 +62,9 @@ export class UpdateTeamComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.team = res;
+          if (this._ownerId) {
+            this.activeOwner = this.team.owners.find((owner) => {return (owner._id == this._ownerId)});
+          }
           this.loading = false;
         },
         err => {
@@ -73,6 +80,5 @@ export class UpdateTeamComponent implements OnInit, OnDestroy {
     this.teamSub.unsubscribe();
     this.tabSub.unsubscribe();
   }
-
 
 }

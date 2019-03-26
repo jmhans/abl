@@ -41,28 +41,63 @@
       formControlName="stadium"
       [maxlength]="tf.textMax">
     <div
-      *ngIf="formErrors.location"
+      *ngIf="formErrors.stadium"
       class="small text-danger formErrors"
       [innerHTML]="formErrors.stadium">
     </div>
   </div>
   
-  <!-- Owner -->
-  <div class="form-group">
-    <label for="owner">Owner</label>
-    <select
-      class="form-control"
-      formControlName="owner"
-      id="owner"
-      >
-      <option *ngFor="let owner of formOwners" [ngValue]="owner">{{owner.name}}</option>
-    </select>
-    <div
-      *ngIf="formErrors.location"
+Owners
+
+   <section class="list-group" formArrayName="owners">
+      <div *ngFor="let owner of teamForm.get('owners').controls; let i = index;" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div [formGroupName]="i" class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">
+            
+            <div>
+              
+              <span >
+                {{teamForm.controls.owners.controls[i].controls.name.value}} ({{teamForm.controls.owners.controls[i].controls.verified.value ? 'Verified' : 'Unverified: A link will be sent to verify ownership upon saving.' }})
+              </span>
+              <span *ngIf="!teamForm.controls.owners.controls[i].controls.verified.value">
+                <label for="email">Email</label> 
+                <input id="email" 
+                       type="text"
+                       formControlName="email" 
+                       placeholder="email">
+              </span>                     
+
+              <button class="btn btn-danger btn-xs" 
+                type="button"
+                (click)="deleteOwner(i)">x</button>
+<!--             <label for="name">Name</label> 
+            <input 
+                   id="name" 
+                   type="text" 
+                   class="form-control" 
+                   formControlName="name" 
+                   placeholder="owner name">
+            <label for="email">Email</label> 
+            <input id="email" 
+                   type="text" 
+                   class="form-control" 
+                   formControlName="email" 
+                   placeholder="email"> -->
+              </div>
+          </h5>
+          
+        </div>
+
+      </div>      
+      <button class="btn btn-success" 
+              type="button"
+              (click)="addOwner()">Invite another owner</button>
+     <div
+      *ngIf="formErrors.owners"
       class="small text-danger formErrors"
-      [innerHTML]="formErrors.owner">
+      [innerHTML]="formErrors.owners">
     </div>
-  </div>
+    </section>
 
 
   <!-- Submit -->

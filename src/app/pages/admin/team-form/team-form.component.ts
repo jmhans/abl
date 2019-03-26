@@ -1,10 +1,11 @@
 // src/app/pages/admin/team-form/team-form.component.ts
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
-import { AblTeamModel, FormTeamModel } from './../../../core/models/abl.team.model';
+import { AuthService } from './../../../auth/auth.service';
+import { AblTeamModel, FormTeamModel, OwnerInterface } from './../../../core/models/abl.team.model';
 import { OwnerModel } from './../../../core/models/owner.model';
 import { DatePipe } from '@angular/common';
 import { dateValidator } from './../../../core/forms/date.validator';
@@ -20,14 +21,16 @@ import { dateRangeValidator } from './../../../core/forms/date-range.validator';
 })
 export class TeamFormComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
+  @Input() activeOwner: OwnerInterface;
   isEdit: boolean;
   // FormBuilder form
   teamForm: FormGroup;
   // Model storing initial form values
   formTeam: FormTeamModel;
-  formOwners: OwnerModel[];
-  formOwner: OwnerModel;
-  formOwnerSub: Subscription; 
+  formOwners: FormArray;
+  submitOwners: OwnerInterface[];
+  
+ 
   // Form validation and disabled logic
   formErrors: any;
   formChangeSub: Subscription;
@@ -41,6 +44,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
+    private auth: AuthService,
     private datePipe: DatePipe,
     public tf: TeamFormService,
     private router: Router
@@ -52,45 +56,42 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     this.submitBtnText = this.isEdit ? 'Update Team' : 'Create Team';
     // Set initial form data
     this.formTeam = this._setFormTeam();
-    /*this.formPossibleOwners = */this._getOwners();
+    // /*this.formPossibleOwners = */this._getOwners();
     // Use FormBuilder to construct the form
     this._buildForm();
+
   }
+
+  
+  private _verifyCurrentOwner(id: string) {
+    var ownerRec = this.team.owners.find(function(owner) {return (owner._id == id)});
+    ownerRec.userId = this.auth.userProfile.sub;
+    ownerRec.verified = true;
+    ownerRec.name = this.auth.userProfile.name;
+  }
+  
+  
+  
 
   private _setFormTeam() {
     if (!this.isEdit) {
       // If creating a new team, create new
       // FormTeamModel with default null data
-      return new FormTeamModel(null, null, null, null); // Check the number of data elements in FormTeamModel...
+      return new FormTeamModel(null, null, null, [{userId: this.auth.userProfile.sub, name: this.auth.userProfile.name, email: '', verified: true}]); // Check the number of data elements in FormTeamModel...
     } else {
       // If editing existing team, create new
       // FormTeamModel from existing data
+      if (this.activeOwner) {
+        this._verifyCurrentOwner(this.activeOwner._id);
+      }
       return new FormTeamModel(
         this.team.nickname,
         this.team.location, 
         this.team.stadium, 
-        this.team.owner
+        this.team.owners
       );
     }
   }
-  
-  
-  private _getOwners() {
-
-    // Get all owners
-    this.formOwnerSub = this.api
-      .getOwners$()
-      .subscribe(
-        res => {
-          this.formOwners = res;
-        },
-        err => {
-          console.error(err);
-          this.error = true;
-        }
-      );
-  }
-
 
   private _buildForm() {
     this.teamForm = this.fb.group({
@@ -105,7 +106,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         Validators.maxLength(this.tf.locMax)
       ]], 
       stadium: [this.formTeam.stadium], 
-      owner: [this.formTeam.owner]
+      owners: this.fb.array( this.formTeam.owners.map((owner) => this.createFormOwner(owner)),  this.tf.minLengthArray(1) )
       })
     // Subscribe to form value changes
     this.formChangeSub = this.teamForm
@@ -157,11 +158,27 @@ export class TeamFormComponent implements OnInit, OnDestroy {
 
     // Convert form startDate/startTime and endDate/endTime
     // to JS dates and populate a new EventModel for submission
+    
+    var submitOwners: OwnerInterface[] = [];
+    this.formOwners = this.teamForm.get('owners') as FormArray;
+        
+    var items = this.formOwners.value;
+    
+    items.forEach((item) => {
+      submitOwners.push({
+        userId: item.userId, 
+        name: item.name, 
+        email: item.email, 
+        verified: item.verified
+      });
+    });
+    
+    
     return new AblTeamModel(
       this.teamForm.get('nickname').value,
       this.teamForm.get('location').value,
       this.teamForm.get('stadium').value,
-      this.teamForm.get('owner').value,
+      submitOwners, //{userId: this.auth.userProfile.sub, name: this.teamForm.get('ownerName').value},
       this.team ? this.team._id : null
     );
   }
@@ -203,6 +220,38 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   resetForm() {
     this.teamForm.reset();
   }
+  
+  createFormOwner(owner): FormGroup {
+    return this.fb.group({
+      name: owner.name,
+      email: owner.email,
+      userId: owner.userId, 
+      verified: owner.verified
+    })
+  }
+  
+  createOwner(): FormGroup {
+    return this.fb.group({
+      name: '',
+      email: '',
+      userId: '',
+      verified: false,
+    });
+  }
+  
+  addOwner(): void {
+    this.formOwners = this.teamForm.get('owners') as FormArray;
+    this.formOwners.push(this.createOwner());
+  }
+  
+  deleteOwner(i): void {
+    
+    this.formOwners = this.teamForm.get('owners') as FormArray;
+    this.formOwners.removeAt(i);
+  }
+  
+  
+  
 
   ngOnDestroy() {
     if (this.submitTeamSub) {

@@ -4,12 +4,13 @@ const request = require('request');
 const AblTeam = require('./../models/owner').AblTeam;
 const Owner = require('./../models/owner').Owner;
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
+const sgMail = require('@sendgrid/mail');
 
 var AblTeamController = {
   
   _getById: function(req, res) {
 
-    AblTeam.findById(req.params.id).populate('owner').exec(function (err, team) {
+    AblTeam.findById(req.params.id).exec(function (err, team) {
       if (err) {
         return res.status(500).send({message: err.message});
       }
@@ -22,7 +23,7 @@ var AblTeamController = {
   },
   
   _getTeams: function(req, res) {
-    AblTeam.find({}).populate('owner').exec(function (err, teams) {
+    AblTeam.find({}).exec(function (err, teams) {
       let teamsArr = [];
       if (err) {
         return res.status(500).send({message: err.message});
@@ -52,12 +53,8 @@ var AblTeamController = {
   },
   
   _post: function(req, res) {
-    Owner.findOne({_id: req.body.owner._id}, (err, existingOwner) => {
-      if (err) {
-        return res.status(500).send({message: err.message});
-      }
 
-      AblTeam.findOne({
+    AblTeam.findOne({
       nickname: req.body.nickname,
       location: req.body.location,
       }, (err, existingTeam) => {
@@ -68,18 +65,36 @@ var AblTeamController = {
         return res.status(409).send({message: 'You have already created a team with this nickname & location.'});
       }
       const team = new AblTeam({
-        nickname: req.body.nickname,
+        nickname: req.body.nickname || "Team " + req.body.owners[0].email,
         location: req.body.location, 
         stadium: req.body.stadium, 
-        owner: existingOwner._id
+        owners: req.body.owners
       });
       team.save((err) => {
         if (err) {
           return res.status(500).send({message: err.message});
         }
+        team.owners.forEach((owner) => {
+          if (!owner.verified && owner.email != '') {
+            //Send an email invitation with the right link.
+            
+            // using SendGrid's v3 Node.js Library
+            // https://github.com/sendgrid/sendgrid-nodejs
+
+//             sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            
+//             const msg = {
+//               to: owner.email,
+//               from: 'jmhans@hotmail.com',
+//               subject: 'Sending with SendGrid is Fun',
+//               text: 'and easy to do anywhere, even with Node.js',
+//               html: '<strong>and easy to do anywhere, even with Node.js</strong>' + JSON.stringify(team),
+//             };
+//             sgMail.send(msg);
+             }
+        })
         res.send(team);
       });
-    });
     });
     
     
@@ -96,7 +111,7 @@ var AblTeamController = {
       team.nickname = req.body.nickname;
       team.location = req.body.location;
       team.stadium = req.body.stadium;
-      team.owner = req.body.owner._id;
+      team.owners = req.body.owners;
       
       team.save(err => {
         if (err) {

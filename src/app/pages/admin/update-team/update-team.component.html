@@ -26,7 +26,9 @@
       <!-- Edit event form -->
       <app-team-form
         *ngIf="utils.tabIs(tab, 'edit')"
-        [team]="team"></app-team-form>
+        [team]="team"
+        [activeOwner]="activeOwner"
+      ></app-team-form>
 
       <!-- Delete event -->
       <app-delete-team
@@ -43,4 +45,3 @@
   
   
 </ng-template>
-
