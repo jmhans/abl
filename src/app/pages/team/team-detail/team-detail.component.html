@@ -13,7 +13,7 @@
   <li class="list-group-item">
     <strong>Team owners:</strong>
     <span *ngFor="let owner of team.owners">{{ owner.name }} | {{ owner.email }} 
-      <span *ngIf="!owner.verified">This is me!<a 
+      <span *ngIf="!owner.verified"> This is me!<a 
          [routerLink]="['/abladmin/team/update', team._id, 'owner', owner._id]"> Claim Team</a>
       </span>
     </span>

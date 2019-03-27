@@ -6,7 +6,68 @@ const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
 
 
-  function getPlayersInGame(gamePk) {
+function _isPositionPlayer(plyr) {
+  if (plyr.allPositions) { 
+      for (var p = 1; p<plyr.allPositions.length; p++) {
+          if (plyr.allPositions[p].abbreviation != "P") {
+            return true;
+          }
+      }
+    }
+  return false;
+}
+
+
+function appendPlayerRecord(player, team, gamePk, gameDt) {
+    
+    if (_isPositionPlayer(player)) {
+      var query = {
+        'mlbID': player.person.id
+      }
+      Player.findOne(query).exec((err, _playerRecord) => {
+          if (_playerRecord) {
+            // We have a player record.
+            var playerGame = _playerRecord.games.find((gm) => {return gm.gamePk == gamePk})
+            if (playerGame) {
+              // Game record already exists for player. Update it. 
+              playerGame.stats = player.stats;
+              playerGame.positions = player.allPositions;
+            } else {
+              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions})
+            }
+
+          } else {
+            // Create a new player record. 
+              _playerRecord = new Player({
+                mlbID: player.person.id,
+                lastUpdate: '', 
+                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions}]
+              })
+          }
+          if (gameDt >= _playerRecord.lastUpdate) {
+                _playerRecord.name = player.person.fullName, 
+                _playerRecord.team = team.abbreviation, 
+                _playerRecord.status = player.status.description, 
+                _playerRecord.stats = player.seasonStats, 
+                _playerRecord.position = player.position.abbreviation
+          }
+          _playerRecord.save((err) => {
+            if (err) {
+
+            }
+            //return res.send("successfully saved");
+          });
+
+      })
+      
+      
+
+    }  
+}
+
+
+
+function getPlayersInGame(gamePk, gameDt) {
     const APIUrl = BASE_URL + "/game/" + gamePk + "/boxscore";
     request(APIUrl, {
       json: true
@@ -14,21 +75,7 @@ const Player = require('./../models/player').Player;
       if (err) {
         return console.log(err);
       }
-      
-      function _isPositionPlayer(plyr) {
-        if (plyr.allPositions) { 
-            for (var p = 1; p<plyr.allPositions.length; p++) {
-                if (plyr.allPositions[p].abbreviation != "P") {
-                  return true;
-                }
-            }
-          }
-        return false;
-      }
-     
-      
-      
-      
+    
       function getTeamPlayers(teamType) {
         var PositionPlayers = []
         var players = body.teams[teamType].players
@@ -37,32 +84,8 @@ const Player = require('./../models/player').Player;
 
         
         for (var playerKey in players) {
-
           let player = players[playerKey]
-          if (_isPositionPlayer(player)) {
-            var query = {
-              'mlbID': player.person.id
-            }
-            const plyr = {
-              $set: {
-                mlbID: player.person.id,
-                position: player.position.abbreviation,
-                name: player.person.fullName, 
-                team: team.abbreviation, 
-                status: player.status.description, 
-                stats: player.seasonStats, 
-                allPositions: player.allPositions
-              }
-            }
-            Player.findOneAndUpdate(query, plyr, {
-              upsert: true
-            }, function(err, doc) {
-            if (err) console.log(err);
-
-            //return res.send("succesfully saved");
-          })
-          }
-          
+          appendPlayerRecord(player, team, gamePk, gameDt);
         }
       }
       
@@ -75,6 +98,7 @@ const Player = require('./../models/player').Player;
 
 
   }
+
 
 
 
@@ -94,7 +118,7 @@ var MlbApiController = {
     var day = pad(inputDate.getDate(), 2);
     var month = pad(inputDate.getMonth() + 1, 2);
     var year = inputDate.getFullYear();
-
+    
     const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
 
     request(APIUrl, {
@@ -119,7 +143,7 @@ var MlbApiController = {
           
           //return res.send("succesfully saved");
         });
-      getPlayersInGame(gm.gamePk);
+      getPlayersInGame(gm.gamePk, gm.gameDate);
           
       });
       res.status(200).send(gamesList);

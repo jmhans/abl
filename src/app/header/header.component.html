@@ -23,7 +23,7 @@
   
   <nav id="nav" class="nav" role="navigation">
     <ul class="nav-list">
-      <li>
+<!--       <li>
         <a
           routerLink="/"
           routerLinkActive="active"
@@ -41,7 +41,7 @@
           routerLink="/admin"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Admin</a>
-      </li>
+      </li> -->
       <li>
         <a
           *ngIf="auth.loggedIn && auth.isAdmin"
@@ -54,13 +54,13 @@
       <li><a routerLink="/owners/roster" routerLinkActive="active">Rosters</a></li>
       <li><a routerLink="/owners/detail" routerLinkActive="active">Roster Detail</a></li> -->
       <li><a routerLink="/dashboard">Dashboard</a></li>
-      <li><a routerLink="/owners2">OwnersList</a></li>
+<!--       <li><a routerLink="/owners2">OwnersList</a></li>
       <li>
         <a
           *ngIf="auth.loggedIn && auth.isAdmin"
           routerLink="/admin/event/new"
           routerLinkActive="active">Create Event</a>
-      </li>
+      </li> -->
       <li>
         <a
           *ngIf="auth.loggedIn"
