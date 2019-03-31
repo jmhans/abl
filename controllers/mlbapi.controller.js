@@ -64,7 +64,7 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
                // _playerRecord.positionLog = player.allPositions.reduce(updatePosLog, _playerRecord.positionLog) //incrementArrayItems(_playerRecord.positionLog, posLog);
           }
           // Update positionLog based on gamecounts
-          _playerRecord.positionLog = _playerRecord.games.reduce(calcPosLog, []);
+          _playerRecord.positionLog = _playerRecord.games.reduce(calcPosLog, [{position: _playerRecord.position, ct:0}]);
           _playerRecord.save((err) => {
             if (err) {
 
@@ -95,6 +95,7 @@ function calcPosLog(preLog, gameRec) {
       }
     }
   }
+  
   return (preLog) ;
 }
 
