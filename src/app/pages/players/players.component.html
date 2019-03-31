@@ -1,4 +1,4 @@
-<!-- <h3>
+<h3>
    Players
 </h3>
 <table datatable 
@@ -7,9 +7,21 @@
        class="row-border hover">
   <thead>
     <tr>
-      <th>Player Name</th>
-      <th>Position</th>
-      <th>Team</th>
+    <th>Player Name</th>
+    <th>Position</th>
+    <th>Team</th>
+    <th>Status</th>
+    <th>ABL Runs</th>
+     <th>G</th>
+     <th>AB</th>
+     <th>H</th>
+     <th>2B</th>
+     <th>3B</th>
+     <th>HR</th>
+     <th>BB + IBB</th>
+     <th>HBP</th>
+     <th>SB</th>
+     <th>CS</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -18,22 +30,34 @@
       <td>{{player.name}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>
-      <td><a 
+      <td>{{player.status}}</td>
+      <td> {{abl(player.stats.batting) | number }} </td>
+      <td> {{player.stats.batting.gamesPlayed}}</td>
+      <td> {{player.stats.batting.atBats }}</td>
+      <td>{{player.stats.batting.hits}}</td>
+      <td> {{player.stats.batting.doubles}} </td>
+      <td>{{player.stats.batting.triples}}</td>
+      <td>{{player.stats.batting.homeRuns}}</td>
+      <td>{{player.stats.batting.baseOnBalls + player.stats.batting.intentionalWalks}}</td>
+      <td>{{player.stats.batting.hitByPitch}}</td>
+      <td> {{player.stats.batting.stolenBases}}</td>
+      <td>{{player.stats.batting.caughtStealing}}</td>
+      <td>            <a 
              *ngIf="auth.isAdmin"
-             [routerLink]="['/abladmin/player/addToRoster', player._id]">Manage Player
-        </a>
+             [routerLink]="['/abladmin/player/addToRoster', player._id]"> Manage Player
+            </a>
         <p *ngIf="!auth.isAdmin">Not authorized</p>
       </td>
     </tr>
   </tbody>
-</table> -->
+</table>
 
 
-<ng-template [ngIf]="playerList">
-    <ng-template [ngIf]="playerList.length">
+<!-- <ng-template [ngIf]="playerList">
+    <ng-template [ngIf]="playerList.length"> -->
 
       <!-- Search events -->
-      <label class="sr-only" for="search">Search</label>
+<!--       <label class="sr-only" for="search">Search</label>
       <div class="search input-group mb-3">
         <div class="input-group-prepend">
           <div class="input-group-text">Search</div>
@@ -50,15 +74,15 @@
             (click)="resetQuery()"
             [disabled]="!query">&times;</button>
         </span>
-      </div>
+      </div> -->
 
       <!-- No search results -->
-      <p *ngIf="fs.noSearchResults(filteredPlayers, query)" class="alert alert-warning">
+<!--       <p *ngIf="fs.noSearchResults(filteredPlayers, query)" class="alert alert-warning">
         No teams found for <em class="text-danger">{{ query }}</em>, sorry!
-      </p>
+      </p> -->
 
       <!-- Player listing -->
-      <section class="list-group">
+<!--       <section class="list-group">
         <a
           *ngFor="let player of fs.orderByDate(filteredPlayers, 'name')"
           [routerLink]="['/player', player._id]"
@@ -89,13 +113,13 @@
           </div>
         </a>
       </section>
-    </ng-template>
+    </ng-template> -->
 
     <!-- No upcoming public events available -->
-    <p *ngIf="!playerList.length" class="alert alert-info">
+<!--     <p *ngIf="!playerList.length" class="alert alert-info">
       No public players.
     </p>
-  </ng-template>
+  </ng-template> -->
 
   <!-- Error loading events -->
   <p *ngIf="error" class="alert alert-danger">

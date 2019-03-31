@@ -7,5 +7,9 @@
 @import 'base';
 
 @import './../../../node_modules/bootstrap/scss/bootstrap-reboot';
-@import './../../../node_modules/bootstrap/scss/bootstrap-grid'
+@import './../../../node_modules/bootstrap/scss/bootstrap-grid';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

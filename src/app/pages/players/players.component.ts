@@ -42,7 +42,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     
     this.dtOptions = {
       pagingType: 'full_numbers', 
-      pageLength: 2, 
+      pageLength: 50, 
     }
     this._getPlayerList();
   }
@@ -91,15 +91,20 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.error = true;
   }
   abl(plyrStats) { 
-    return (plyrStats.hits * 25 + 
-       plyrStats.doubles * 10 + 
-            plyrStats.triples * 20 +
-            plyrStats.homeRuns * 40 + 
-            plyrStats.baseOnBalls * 10 + 
-            plyrStats.intentionalWalks * 10 + 
-            plyrStats.stolenBases * 7 + 
-            plyrStats.caughtStealing * (-7)  + 
-            (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
+    if(plyrStats.atBats >0) {
+      return (plyrStats.hits * 25 + 
+         plyrStats.doubles * 10 + 
+              plyrStats.triples * 20 +
+              plyrStats.homeRuns * 40 + 
+              plyrStats.baseOnBalls * 10 + 
+              plyrStats.intentionalWalks * 10 + 
+              plyrStats.stolenBases * 7 + 
+              plyrStats.caughtStealing * (-7)  + 
+              (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5  
+    } else {
+      return 0;
+    }
+    
   }
   
 

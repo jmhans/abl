@@ -17,7 +17,10 @@ var playerSchema = new mongoose.Schema({
     stats: {type: mongoose.Schema.Types.Mixed, required: false}, 
     positions: {type: [], required: false}
   }], 
-  lastUpdate: {type: String, required: false}
+  lastUpdate: {type: String, required: false}, 
+  positionLog: [{position: String,
+                 ct: Number
+                }]
 })
 
 module.exports = {Player: mongoose.model('Player', playerSchema), 

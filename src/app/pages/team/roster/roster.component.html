@@ -28,13 +28,19 @@
        *ngFor="let rosterRec of lineup.roster; index as i" 
        cdkDrag
        [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1)  }"
-       >{{ rosterRec.player.name }} | {{ rosterRec.lineupPosition }}
-    <div >
-      {{i}}
-    </div>
-    <div class="small">
+       >
+      {{ rosterRec.player.name }} | {{ rosterRec.lineupPosition }}
+     <mat-form-field>
+      <mat-label>Position</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let pos of rosterRec.player.positionLog" [value]="rosterRec.lineupPosition">
+          {{pos.position}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
       <strong>ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
-      ({{rosterRec.player.stats.batting.gamesPlayed}} G, 
+      <span class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
       {{rosterRec.player.stats.batting.atBats}} AB,
       {{rosterRec.player.stats.batting.hits}} H,
       {{rosterRec.player.stats.batting.doubles}} 2B, 
@@ -44,8 +50,9 @@
       {{rosterRec.player.stats.batting.hitByPitch}} HBP,
       {{rosterRec.player.stats.batting.stolenBases}} SB, 
       {{rosterRec.player.stats.batting.caughtStealing}} CS)
+      </span>
+<!--       {{rosterRec.player.positionLog | json}} -->
       
-    </div>
   </div>
 </div>
 

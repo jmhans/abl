@@ -4,23 +4,30 @@ const request = require('request');
 const BASE_URL = "http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
-
-
+const POSITION_MAP = { 'LF': 'OF', 
+                  'RF': 'OF', 
+                  'CF': 'OF',
+                  'PR': '',
+                  'PH': ''
+                 }
+  
+  
+  
 function _isPositionPlayer(plyr) {
+  
   if (plyr.allPositions) { 
-      for (var p = 1; p<plyr.allPositions.length; p++) {
-          if (plyr.allPositions[p].abbreviation != "P") {
-            return true;
-          }
-      }
-    }
+    
+    nonPitcherPosList = plyr.allPositions.filter((posRec) => {return posRec.abbreviation != 'P'});
+
+    return (nonPitcherPosList.length > 0);
+  }
   return false;
 }
 
 
 function appendPlayerRecord(player, team, gamePk, gameDt) {
-    
     if (_isPositionPlayer(player)) {
+   
       var query = {
         'mlbID': player.person.id
       }
@@ -33,7 +40,8 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
               playerGame.stats = player.stats;
               playerGame.positions = player.allPositions;
             } else {
-              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions})
+              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions.map((pos) => {return pos.abbreviation;})})
+ 
             }
 
           } else {
@@ -41,16 +49,22 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
               _playerRecord = new Player({
                 mlbID: player.person.id,
                 lastUpdate: '', 
-                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions}]
+                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions.map((pos) => {return pos.abbreviation;})}],
+                positionLog : []
               })
           }
           if (gameDt >= _playerRecord.lastUpdate) {
-                _playerRecord.name = player.person.fullName, 
-                _playerRecord.team = team.abbreviation, 
-                _playerRecord.status = player.status.description, 
-                _playerRecord.stats = player.seasonStats, 
-                _playerRecord.position = player.position.abbreviation
+                _playerRecord.name = player.person.fullName;
+                _playerRecord.team = team.abbreviation; 
+                _playerRecord.status = player.status.description; 
+                _playerRecord.stats = player.seasonStats; 
+                _playerRecord.position = player.position.abbreviation;
+                _playerRecord.lastUpdate = gameDt;
+            
+               // _playerRecord.positionLog = player.allPositions.reduce(updatePosLog, _playerRecord.positionLog) //incrementArrayItems(_playerRecord.positionLog, posLog);
           }
+          // Update positionLog based on gamecounts
+          _playerRecord.positionLog = _playerRecord.games.reduce(calcPosLog, []);
           _playerRecord.save((err) => {
             if (err) {
 
@@ -65,6 +79,42 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
     }  
 }
 
+function calcPosLog(preLog, gameRec) {
+  for( posRec=0; posRec < gameRec.positions.length; posRec++) {
+    var translatePos = POSITION_MAP[gameRec.positions[posRec]];
+  
+    if (typeof(translatePos) == 'undefined') { translatePos = gameRec.positions[posRec];}
+
+    if (translatePos != ''){
+
+      logRec = preLog.find((logItem) => logItem.position == gameRec.positions[posRec]);
+      if (logRec) {
+        logRec.ct++
+      } else {
+        preLog.push({position: gameRec.positions[posRec], ct: 1})
+      }
+    }
+  }
+  return (preLog) ;
+}
+
+function updatePosLog(prePosLog, posRecord) {
+  var translatePos = POSITION_MAP[posRecord.abbreviation];
+  
+  if (typeof(translatePos) == 'undefined') { translatePos = posRecord.abbreviation;}
+  
+  if (translatePos != ''){
+    var logRecord = prePosLog.find((itm)=> { return itm.position == translatePos;});
+      if (!logRecord) { 
+        prePosLog.push({position: translatePos, ct: 1})
+      } else
+      {
+        logRecord.ct++;
+      }
+  }
+    
+  return prePosLog;
+}
 
 
 function getPlayersInGame(gamePk, gameDt) {
@@ -115,37 +165,45 @@ var MlbApiController = {
     const gm_date = req.params.dt;
 
     var inputDate = new Date(gm_date)
-    var day = pad(inputDate.getDate(), 2);
+    var day = pad(inputDate.getDate()+1, 2);
     var month = pad(inputDate.getMonth() + 1, 2);
     var year = inputDate.getFullYear();
     
     const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
-
     request(APIUrl, {
       json: true
     }, (err, resp, body) => {
       if (err) {
         return console.log(err);
       }
-      const gamesList = body.dates.find(x => x.date == (year + "-" + month + "-" + day)).games
+      //console.log(body);
 
-      gamesList.forEach((gm) => {
+      var gamesList = [];
+      var dateItem = body.dates.find(x => x.date == (year + "-" + month + "-" + day))
 
-        var query = {
-          'gamePk': gm.gamePk
-        };
-        mlbGame.findOneAndUpdate(query, gm, {
-          upsert: true
-        }, function(err, doc) {
-          if (err) return res.send(500, {
-            error: err
+      if (dateItem) {
+        gamesList = dateItem.games
+
+        gamesList.forEach((gm) => {
+
+          var query = {
+            'gamePk': gm.gamePk
+          };
+          mlbGame.findOneAndUpdate(query, gm, {
+            upsert: true
+          }, function(err, doc) {
+            if (err) return res.send(500, {
+              error: err
+            });
+
+            //return res.send("succesfully saved");
           });
-          
-          //return res.send("succesfully saved");
+        getPlayersInGame(gm.gamePk, gm.gameDate);
+
         });
-      getPlayersInGame(gm.gamePk, gm.gameDate);
-          
-      });
+        
+      }
+
       res.status(200).send(gamesList);
     })
 

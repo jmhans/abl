@@ -2,6 +2,7 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {MatSelectModule} from '@angular/material/select';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -15,7 +16,8 @@ import { FilterSortService } from './core/filter-sort.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DataTablesModule } from 'angular-datatables';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop'
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -103,6 +105,8 @@ import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-for
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    MatSelectModule,
+    FlexLayoutModule,
     HttpModule, 
     HttpClientModule,
     HttpClientInMemoryWebApiModule.forRoot(

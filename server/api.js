@@ -336,3 +336,4 @@ module.exports = function(app, config) {
   app.use('/api2', jwtCheck, api);
 
 };
+
