@@ -9,6 +9,7 @@ const POSITION_MAP = { 'LF': 'OF',
                   'CF': 'OF',
                   'PR': '',
                   'PH': ''
+                      
                  }
 const POSSIBLE_POSITIONS = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH'];
 const QUALIFYING_GAMES_FOR_POSITION = 10;
@@ -33,16 +34,19 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
       var query = {
         'mlbID': player.person.id
       }
+      var shortPositions = player.allPositions.map((pos) => {return pos.abbreviation;})
       Player.findOne(query).exec((err, _playerRecord) => {
-          if (_playerRecord) {
+          
+        if (_playerRecord) {
             // We have a player record.
             var playerGame = _playerRecord.games.find((gm) => {return gm.gamePk == gamePk})
+            
             if (playerGame) {
               // Game record already exists for player. Update it. 
               playerGame.stats = player.stats;
-              playerGame.positions = player.allPositions;
+              playerGame.positions = shortPositions;
             } else {
-              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions.map((pos) => {return pos.abbreviation;})})
+              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions:shortPositions})
  
             }
 
@@ -51,7 +55,7 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
               _playerRecord = new Player({
                 mlbID: player.person.id,
                 lastUpdate: '', 
-                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: player.allPositions.map((pos) => {return pos.abbreviation;})}],
+                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
                 positionLog : []
               })
           }
@@ -60,7 +64,7 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
                 _playerRecord.team = team.abbreviation; 
                 _playerRecord.status = player.status.description; 
                 _playerRecord.stats = player.seasonStats; 
-                _playerRecord.position = player.position.abbreviation;
+                _playerRecord.position = POSITION_MAP[player.position.abbreviation] || player.position.abbreviation;
                 _playerRecord.lastUpdate = gameDt;
             
           }
@@ -81,9 +85,7 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
 }
 
 function calcAvailablePositions(plyrRec) {
-  if(plyrRec.name == "Christian Yelich") {
-    console.log((POSITION_MAP[plyrRec.position] || plyrRec.position))
-  }
+
   return POSSIBLE_POSITIONS.filter((pp)=> {
     return  (pp == (POSITION_MAP[plyrRec.position] || plyrRec.position)) ||
             (pp == plyrRec.commish_position) ||

@@ -83,9 +83,10 @@ export class RosterComponent implements OnInit, OnDestroy {
   _updateRoster() {
     var diffs = false;
     for (var j =0; j<this.lineup.roster.length; j++) {
-      if (this.lineup.roster[j].rosterOrder != (j+1)) {
+      var rr = this.lineup.roster[j]
+      if (rr.rosterOrder != (j+1) || rr.lineupPosition != rr.originalPosition) {
         diffs = true;
-        this.lineup.roster[j].rosterOrder = j+1;
+        rr.rosterOrder = j+1;
       }
     }
     if (diffs) {
