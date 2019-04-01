@@ -56,6 +56,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       .getLineupByTeamId$(this.team._id)
       .subscribe(
         res => {
+          res.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
           this.lineup = res;
           this.loading = false;
         }, 
@@ -119,7 +120,10 @@ export class RosterComponent implements OnInit, OnDestroy {
   var diffs = false;
     if (this.lineup) {
       for (var j =0; j<this.lineup.roster.length; j++) {
-        if (this.lineup.roster[j].rosterOrder != (j+1)) {
+        if (
+          this.lineup.roster[j].rosterOrder != (j+1) ||
+          this.lineup.roster[j].originalPosition != this.lineup.roster[j].lineupPosition
+           ) {
           return true;
         }
       }  
@@ -140,5 +144,8 @@ export class RosterComponent implements OnInit, OnDestroy {
             (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
   }
   
+  
 
 }
+
+

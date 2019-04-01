@@ -3,6 +3,7 @@ interface Roster {
   player: string
   lineupPosition: string
   rosterOrder: number
+  originalPosition? : string
 }
 
 class LineupModel {

@@ -10,6 +10,8 @@ const POSITION_MAP = { 'LF': 'OF',
                   'PR': '',
                   'PH': ''
                  }
+const POSSIBLE_POSITIONS = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH'];
+const QUALIFYING_GAMES_FOR_POSITION = 10;
   
   
   
@@ -61,10 +63,9 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
                 _playerRecord.position = player.position.abbreviation;
                 _playerRecord.lastUpdate = gameDt;
             
-               // _playerRecord.positionLog = player.allPositions.reduce(updatePosLog, _playerRecord.positionLog) //incrementArrayItems(_playerRecord.positionLog, posLog);
           }
           // Update positionLog based on gamecounts
-          _playerRecord.positionLog = _playerRecord.games.reduce(calcPosLog, [{position: _playerRecord.position, ct:0}]);
+          _playerRecord.positionLog = calcAvailablePositions(_playerRecord)
           _playerRecord.save((err) => {
             if (err) {
 
@@ -79,43 +80,24 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
     }  
 }
 
-function calcPosLog(preLog, gameRec) {
-  for( posRec=0; posRec < gameRec.positions.length; posRec++) {
-    var translatePos = POSITION_MAP[gameRec.positions[posRec]];
-  
-    if (typeof(translatePos) == 'undefined') { translatePos = gameRec.positions[posRec];}
-
-    if (translatePos != ''){
-
-      logRec = preLog.find((logItem) => logItem.position == gameRec.positions[posRec]);
-      if (logRec) {
-        logRec.ct++
-      } else {
-        preLog.push({position: gameRec.positions[posRec], ct: 1})
-      }
-    }
+function calcAvailablePositions(plyrRec) {
+  if(plyrRec.name == "Christian Yelich") {
+    console.log((POSITION_MAP[plyrRec.position] || plyrRec.position))
   }
+  return POSSIBLE_POSITIONS.filter((pp)=> {
+    return  (pp == (POSITION_MAP[plyrRec.position] || plyrRec.position)) ||
+            (pp == plyrRec.commish_position) ||
+            (plyrRec.games.filter((gm)=> {
+                translatedPosArr = gm.positions.map((gp) => {POSITION_MAP[gp] || gp})
+                return (translatedPosArr.indexOf(pp) > -1);
+              }).length >= QUALIFYING_GAMES_FOR_POSITION);
+  })
   
-  return (preLog) ;
+  
 }
 
-function updatePosLog(prePosLog, posRecord) {
-  var translatePos = POSITION_MAP[posRecord.abbreviation];
-  
-  if (typeof(translatePos) == 'undefined') { translatePos = posRecord.abbreviation;}
-  
-  if (translatePos != ''){
-    var logRecord = prePosLog.find((itm)=> { return itm.position == translatePos;});
-      if (!logRecord) { 
-        prePosLog.push({position: translatePos, ct: 1})
-      } else
-      {
-        logRecord.ct++;
-      }
-  }
-    
-  return prePosLog;
-}
+
+
 
 
 function getPlayersInGame(gamePk, gameDt) {

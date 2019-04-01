@@ -6,7 +6,8 @@ var playerGameSchema = new mongoose.Schema()
 var playerSchema = new mongoose.Schema({
   name: {type: String, required: false}, 
   mlbID: {type: String, required: true}, 
-  position: {type: String, required: false}, 
+  position: {type: String, required: false},
+  commish_position: {type: String, required: false}, 
   team:{type: String, required: false}, 
   status:{type: String, required: false}, 
   stats: {type: mongoose.Schema.Types.Mixed, required: false},
@@ -18,9 +19,7 @@ var playerSchema = new mongoose.Schema({
     positions: {type: [], required: false}
   }], 
   lastUpdate: {type: String, required: false}, 
-  positionLog: [{position: String,
-                 ct: Number
-                }]
+  positionLog: {type: [String], required: false}
 })
 
 module.exports = {Player: mongoose.model('Player', playerSchema), 

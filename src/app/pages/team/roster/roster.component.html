@@ -25,19 +25,27 @@
 
 <div cdkDropList class="example-list" (cdkDropListDropped)="dropLineupRecord($event)" *ngIf='lineup'>
   <div class="example-box" 
-       *ngFor="let rosterRec of lineup.roster; index as i" 
+       *ngFor="let rosterRec of lineup.roster; index as i;" 
        cdkDrag
-       [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1)  }"
+       [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
+          rosterRec.lineupPosition != rosterRec.originalPosition  }"
        >
-      {{ rosterRec.player.name }} | {{ rosterRec.lineupPosition }}
-     <mat-form-field>
+      
+    <select [(ngModel)]="rosterRec.lineupPosition">
+      <option *ngFor="let pos of rosterRec.player.positionLog"  [value]="pos">{{pos}}</option>
+    </select>
+    {{ rosterRec.player.name }} | 
+    
+
+<!--      <mat-form-field>
       <mat-label>Position</mat-label>
-      <mat-select>
-        <mat-option *ngFor="let pos of rosterRec.player.positionLog" [value]="rosterRec.lineupPosition">
-          {{pos.position}}
+      <mat-select [(value)]="rosterRec.submitLineupPosition">
+        <mat-option *ngFor="let pos of rosterRec.player.positionLog " [value]="pos">
+          {{pos}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
+       <mat-hint>{{rosterRec.player.positionLog | json}}</mat-hint>
+    </mat-form-field> -->
 
       <strong>ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
       <span class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
