@@ -55,34 +55,38 @@ Owners
           <h5 class="mb-1">
             
             <div>
-              
-              <span >
-                {{teamForm.controls.owners.controls[i].controls.name.value}} ({{teamForm.controls.owners.controls[i].controls.verified.value ? 'Verified' : 'Unverified: A link will be sent to verify ownership upon saving.' }})
+              <span *ngIf="teamForm.controls.owners.controls[i].controls.verified.value">
+                Name: {{teamForm.controls.owners.controls[i].controls.name.value}}
               </span>
+
               <span *ngIf="!teamForm.controls.owners.controls[i].controls.verified.value">
-                <label for="email">Email</label> 
-                <input id="email" 
-                       type="text"
-                       formControlName="email" 
-                       placeholder="email">
+                <strong>Unverified</strong>: User will need to log in and claim team to be able to manage team.
+                <div>
+                  <span  class='col-4'>
+                    <label for="name">Name: </label> 
+                    <input id="name" 
+                           type="text"
+                           formControlName="name" 
+                           placeholder="name">
+  <!--                   <label for="email">Email</label> 
+                    <input id="email" 
+                           type="text"
+                           formControlName="email" 
+                           placeholder="email"> -->
+                     
+                  </span>
+                  <span class="col-4"></span>
+                  <span class='col-4'>
+                    Is this you? <button class="btn btn-info btn-xs" type="button" (click)="_verifyCurrentOwner(i)">Claim Team</button>
+                  </span>
+
+                </div>
               </span>                     
 
-              <button class="btn btn-danger btn-xs" 
-                type="button"
-                (click)="deleteOwner(i)">x</button>
-<!--             <label for="name">Name</label> 
-            <input 
-                   id="name" 
-                   type="text" 
-                   class="form-control" 
-                   formControlName="name" 
-                   placeholder="owner name">
-            <label for="email">Email</label> 
-            <input id="email" 
-                   type="text" 
-                   class="form-control" 
-                   formControlName="email" 
-                   placeholder="email"> -->
+             <button class="btn btn-danger btn-xs" 
+                      type="button"
+                      (click)="deleteOwner(i)"> Delete Owner</button>
+
               </div>
           </h5>
           

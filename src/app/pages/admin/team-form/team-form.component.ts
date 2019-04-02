@@ -70,6 +70,19 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     ownerRec.name = this.auth.userProfile.name;
   }
   
+  private _verifyOwnerRecord(formOwnerIndex: number) {
+        
+    //this.formOwners = this.teamForm.get('owners') as FormArray;
+    if (this.auth.userProfile) {
+      this.formOwners[formOwnerIndex].userId = this.auth.userProfile.sub;
+      this.formOwners[formOwnerIndex].verified = true;
+      this.formOwners[formOwnerIndex].name = this.auth.userProfile.name;  
+    }
+    else {
+      // Raise an error message saying they are not logged in. 
+    }
+    
+  }
   
   
 
@@ -94,6 +107,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   }
 
   private _buildForm() {
+    this.formOwners = this.fb.array(this.formTeam.owners.map((owner) => this.createFormOwner(owner)), this.tf.minLengthArray(1));
     this.teamForm = this.fb.group({
       nickname: [this.formTeam.nickname, [
         Validators.required,
@@ -106,7 +120,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         Validators.maxLength(this.tf.locMax)
       ]], 
       stadium: [this.formTeam.stadium], 
-      owners: this.fb.array( this.formTeam.owners.map((owner) => this.createFormOwner(owner)),  this.tf.minLengthArray(1) )
+      owners: this.formOwners 
       })
     // Subscribe to form value changes
     this.formChangeSub = this.teamForm
@@ -160,7 +174,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     // to JS dates and populate a new EventModel for submission
     
     var submitOwners: OwnerInterface[] = [];
-    this.formOwners = this.teamForm.get('owners') as FormArray;
+    //this.formOwners = this.teamForm.get('owners') as FormArray;
         
     var items = this.formOwners.value;
     
@@ -240,13 +254,13 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   }
   
   addOwner(): void {
-    this.formOwners = this.teamForm.get('owners') as FormArray;
+    //this.formOwners = this.teamForm.get('owners') as FormArray;
     this.formOwners.push(this.createOwner());
   }
   
   deleteOwner(i): void {
     
-    this.formOwners = this.teamForm.get('owners') as FormArray;
+    //this.formOwners = this.teamForm.get('owners') as FormArray;
     this.formOwners.removeAt(i);
   }
   
