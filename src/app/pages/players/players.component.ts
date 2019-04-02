@@ -1,5 +1,5 @@
 // src/app/pages/player/players.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -10,6 +10,7 @@ import { MlbPlayerModel } from './../../core/models/mlb.player.model';
 import { RosterRecordModel } from './../../core/models/roster.record.model';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { RosterService } from './../../core/services/roster.service';
+import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-players',
@@ -30,6 +31,22 @@ export class PlayersComponent implements OnInit, OnDestroy {
   rosterUpdateSub: Subscription;
   submitting: boolean;
   
+  displayedColumns: string[] = ['name', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
+  dataSource: MatTableDataSource<MlbPlayerModel>;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+  
+  
+  
   constructor(private title: Title, 
               public utils: UtilsService, 
               private api: ApiService, 
@@ -45,6 +62,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       pageLength: 50, 
     }
     this._getPlayerList();
+
   }
   
   private _getPlayerList() {
@@ -55,6 +73,24 @@ export class PlayersComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.playerList = res;
+          this.dataSource = new MatTableDataSource(this.playerList);
+          this.dataSource.paginator = this.paginator;
+          
+           this.dataSource.sortingDataAccessor = (item, property) => {
+            
+             switch(property) {
+
+                case 'abl': return this.abl(item.stats['batting']);
+                default: 
+                  if (typeof item[property] == 'undefined') {
+                    return item.stats['batting'][property];
+                  } else {
+                    return item[property];
+                  }
+              }
+            };
+
+          this.dataSource.sort = this.sort;
           this.filteredPlayers = res;
           this.loading = false;
           this.dtTrigger.next();

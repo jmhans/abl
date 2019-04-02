@@ -29,7 +29,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   saveLineupSub: Subscription;
   message: string = '';
   alerts: Alert[] = [];
-
+  availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
   constructor(  public auth: AuthService,
                 public rosterService: RosterService
                 ) { }

@@ -32,7 +32,7 @@
        >
       
     <select [(ngModel)]="rosterRec.lineupPosition">
-      <option *ngFor="let pos of rosterRec.player.positionLog"  [value]="pos">{{pos}}</option>
+      <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
     {{ rosterRec.player.name }} | {{ rosterRec.player.team }} 
     

@@ -3,6 +3,12 @@ import { NgModule } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatSortModule} from '@angular/material/sort';
+import {MatFormFieldModule} from '@angular/material';
+import {MatInputModule} from '@angular/material';
+
 import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -104,6 +110,11 @@ import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-for
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
+    MatTableModule,
+    MatPaginatorModule, 
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
     FlexLayoutModule,
     HttpModule, 
     HttpClientModule,
