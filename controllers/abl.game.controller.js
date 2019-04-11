@@ -3,6 +3,7 @@
 const request = require('request');
 const AblGame = require('./../models/Game');
 var AblRosterController = require('./abl.roster.controller');
+var StatlineController = require('./statline.controller');
 const Statline = require('./../models/statline');
 
 const ABL_STARTERS = ['1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF', 'C', 'DH']
@@ -17,28 +18,7 @@ var AblGameController = {
         return (playerPosition == lineupSlot)
     }
   }, 
-    
-  
-  _processGame: function (gameObj) {
-    /* gameDate: { type: Date, required: true },
-    awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
-    homeTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
-    description: String,
-    awayTeamRoster: [{type: gamePlayerSchema}], 
-    homeTeamRoster: [{type: gamePlayerSchema}],
-    awayScore: { type: Number, required: false},
-    homeScore: { type: Number, required: false},
-    winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
-    loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false} */ 
-    
-    //Retrieve rosters for teams
-    
-    const day = gameObj.gameDate
-    console.log(day);
-    var nextDay = day
-    nextDay.setDate(day.getDate() +1)
-   
-    _getDailyStats = function(statlineObj) {
+    _getDailyStats: function(statlineObj) {
       var retObj = {};
       if (typeof(statlineObj.stats) != 'undefined') {
         retObj = {
@@ -87,20 +67,45 @@ var AblGameController = {
       }
 
       return retObj;
-    }
+    },  
+  
+  _processGame: function (gameObj) {
+    /* gameDate: { type: Date, required: true },
+    awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
+    homeTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
+    description: String,
+    awayTeamRoster: [{type: gamePlayerSchema}], 
+    homeTeamRoster: [{type: gamePlayerSchema}],
+    awayScore: { type: Number, required: false},
+    homeScore: { type: Number, required: false},
+    winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
+    loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false} */ 
     
+    //Retrieve rosters for teams
+    
+
+   
+
+    
+    const day = gameObj.gameDate
+
+    var nextDay = new Date(day.toISOString());
+    nextDay.setDate(day.getDate() +1)
+
     
     AblRosterController._getRosterForTeamAndDate(gameObj.awayTeam._id, new Date('2019-04-06')).then((resp) => {
       var potentialPlayers = resp
       var finalRoster = []
       // need to retrieve player's stats for the day...
-      Statline.find({gameDate: {$gte: '2019-04-05', $lt: '2019-04-06'}}, (err, stats) => {
+
+      
+      Statline.find({gameDate: {$gte: day.toISOString().substring(0, 10), $lt: nextDay.toISOString().substring(0, 10)}}, (err, stats) => {
         console.log(stats.length + " stat records found.");
         
         for (var plyrCt = 0; plyrCt<potentialPlayers.length; plyrCt++) {
           var plyr = potentialPlayers[plyrCt];
           plyr.dailyStats =  stats.filter((statline) => {return(statline.mlbId == plyr.player.mlbID);})
-            .map(_getDailyStats)
+            .map(AblGameController._getDailyStats)
             .reduce(function getSum(total, thisRec) {
               for(var propertyName in thisRec) {
                 // propertyName is what you want
@@ -170,6 +175,22 @@ var AblGameController = {
       res.send(game);
     });
    
+  },
+  _getAllGames: function(req, res) {
+    AblGame.find({}).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, games) {
+      var gamesArr = []
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!games) {
+        return res.status(400).send({message: 'No games found.'});
+      } else {
+        games.forEach(gm => {
+          gamesArr.push(gm);
+        });
+      }
+      return res.send(gamesArr)
+    })
   },
   
   

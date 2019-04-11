@@ -56,7 +56,9 @@ export class ApiService {
   
   getAblGames$(): Observable<GameModel[]> {
     return this.http
-      .get<GameModel[]>(`${this.base_api}games`)
+      .get<GameModel[]>(`${this.base_api}games`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
       .pipe(
         catchError((error) => this._handleError(error))  
     );

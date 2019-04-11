@@ -32,7 +32,7 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path:'owners2', component: OwnersComponent}, 
                        {path: 'dashboard', component: DashboardComponent}, 
                        {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-                       {path: 'games', component: GamesComponent}, 
+                       {path: 'games', canActivate: [AuthGuard], component: GamesComponent}, 
                        {path: 'detail/:id', component: HeroDetailComponent}, 
                        {path: 'callback', component: CallbackComponent}, 
                        {path: 'admin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AdminComponent }, 
