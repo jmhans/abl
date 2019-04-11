@@ -256,6 +256,28 @@ export class ApiService {
       );
   }
   
+   // POST new event (admin only)
+  postGame$(game: GameModel): Observable<GameModel> {
+    return this.http
+      .post<GameModel>(`${this.base_api}game/new`,game, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+
+  // PUT existing event (admin only)
+  editGame$(id: string,game: GameModel): Observable<GameModel> {
+    return this.http
+      .put<GameModel>(`${this.base_api}game/${id}`, game, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
 
   private _handleError(err: HttpErrorResponse | any): Observable<any> {
     const errorMsg = err.message || 'Error: Unable to complete request.';

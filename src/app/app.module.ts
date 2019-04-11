@@ -67,6 +67,10 @@ import { PlayersComponent } from './pages/players/players.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { RosterFormComponent } from './pages/admin/roster-form/roster-form.component';
 import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-form.component';
+import { GameFormComponent } from './pages/admin/game-form/game-form.component';
+import { CreateGameComponent } from './pages/admin/game/create-game/create-game.component';
+import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.component';
+import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 
 
 @NgModule({
@@ -103,7 +107,7 @@ import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-for
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent
   ],
   imports: [
     BrowserModule,

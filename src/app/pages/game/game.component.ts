@@ -67,7 +67,7 @@ export class GameComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.game = res;
-          this._setPageTitle(this.game.awayTeam.name + ' at ' + this.game.homeTeam.name);
+          this._setPageTitle(this.game.awayTeam.nickname + ' at ' + this.game.homeTeam.nickname);
           this.loading = false;
         },
         err => {

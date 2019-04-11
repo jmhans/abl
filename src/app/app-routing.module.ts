@@ -22,6 +22,9 @@ import { UpdateEventComponent } from './pages/admin/update-event/update-event.co
 import { UpdateTeamComponent } from './pages/admin/update-team/update-team.component';
 import { CreateTeamComponent } from './pages/admin/create-team/create-team.component';
 import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.component';
+import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.component';
+import { CreateGameComponent } from './pages/admin/game/create-game/create-game.component';
+import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 
 
@@ -44,8 +47,13 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path: 'abladmin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AblAdminComponent }, 
                                                                                             {path: 'player/addToRoster/:id', component: ManageRostersComponent}]},
                        {path: 'create/team', component: CreateTeamComponent, canActivate: [ AuthGuard ]}, 
-                       {path: 'game/:id', component: GameComponent, canActivate: [ AuthGuard ] }, 
+                        {path: 'create/game', component: CreateGameComponent, canActivate: [ AuthGuard ]}, 
+                        {path: 'game', canActivate:[ AuthGuard ], children: [ {path: ':id', component: GameComponent}, 
+                                                                            {path: 'update/:id', component: UpdateGameComponent},
+                                                                            {path: 'update/:id/owner/:ownerId', component: UpdateGameComponent}, 
+                                                                            {path: 'delete/:id', component: DeleteGameComponent}]},
                        {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]}
+                       
                        ];
 
 @NgModule({

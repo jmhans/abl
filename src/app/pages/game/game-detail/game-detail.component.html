@@ -5,12 +5,15 @@
 
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <strong>When:</strong>{{ game.date }}
-  </li>
-  <li class="list-group-item">
-    {{ game.awayTeam.name }} @ {{ game.homeTeam.name }}
+    <strong>When:</strong>{{ game.gameDate }}
   </li>
 </ul>
+
+<ul class="list-group list-group-flush">
+  <li *ngFor="let plyr of game.awayTeamRoster" class="list-group-item">
+  {{plyr.player.name}} | {{plyr.lineupPosition}} | {{plyr.playedPosition}} | {{plyr.box | json }}</li>
+</ul>
+
 
 <div *ngIf="auth.isAdmin" class="card-footer text-right small">
   <!-- To do: create an /admin/game/update route and service

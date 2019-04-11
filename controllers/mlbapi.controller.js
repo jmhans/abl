@@ -4,6 +4,7 @@ const request = require('request');
 const BASE_URL = "http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
+const Statline = require('./../models/statline');
 const POSITION_MAP = { 'LF': 'OF', 
                   'RF': 'OF', 
                   'CF': 'OF',
@@ -39,24 +40,24 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
           
         if (_playerRecord) {
             // We have a player record.
-            var playerGame = _playerRecord.games.find((gm) => {return gm.gamePk == gamePk})
+//             var playerGame = _playerRecord.games.find((gm) => {return gm.gamePk == gamePk})
             
-            if (playerGame) {
-              // Game record already exists for player. Update it. 
-              playerGame.stats = player.stats;
-              playerGame.positions = shortPositions;
-            } else {
-              _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions:shortPositions})
+//             if (playerGame) {
+//               // Game record already exists for player. Update it. 
+//               playerGame.stats = player.stats;
+//               playerGame.positions = shortPositions;
+//             } else {
+//               _playerRecord.games.push({gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions:shortPositions})
  
-            }
+//             }
 
           } else {
             // Create a new player record. 
               _playerRecord = new Player({
                 mlbID: player.person.id,
                 lastUpdate: '', 
-                games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
-                positionLog : []
+                //games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
+                //positionLog : []
               })
           }
           if (gameDt >= _playerRecord.lastUpdate) {
@@ -69,7 +70,7 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
             
           }
           // Update positionLog based on gamecounts
-          _playerRecord.positionLog = calcAvailablePositions(_playerRecord)
+          //_playerRecord.positionLog = calcAvailablePositions(_playerRecord)
           _playerRecord.save((err) => {
             if (err) {
 
@@ -83,6 +84,38 @@ function appendPlayerRecord(player, team, gamePk, gameDt) {
 
     }  
 }
+
+function updateStatlineRecord(player, team, gamePk, gameDt) {
+  
+    if (_isPositionPlayer(player)) {
+    var shortPositions = player.allPositions.map((pos) => {return pos.abbreviation;})
+      var query = {
+        'mlbId': player.person.id, 
+        'gameDate': gameDt, 
+        'gamePk': gamePk, 
+        
+      }
+      
+       var _statline = {
+                mlbId: player.person.id,
+                gameDate: gameDt, 
+                gamePk: gamePk, 
+                stats: player.stats,
+                positions: shortPositions
+              };
+      
+      Statline.findOneAndUpdate(query, _statline, { upsert: true }, function (err, doc) {
+        if (err) {
+          return err;
+        }
+        return doc;
+      })
+
+    }  
+}
+
+
+
 
 function calcAvailablePositions(plyrRec) {
 
@@ -121,6 +154,7 @@ function getPlayersInGame(gamePk, gameDt) {
         for (var playerKey in players) {
           let player = players[playerKey]
           appendPlayerRecord(player, team, gamePk, gameDt);
+          updateStatlineRecord(player, team, gamePk, gameDt);
         }
       }
       

@@ -12,14 +12,14 @@ var playerSchema = new mongoose.Schema({
   status:{type: String, required: false}, 
   stats: {type: mongoose.Schema.Types.Mixed, required: false},
   ablTeam: {type: mongoose.Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
-  games: [ {
-    gameDate: {type: String, required: true}, 
-    gamePk: {type: String, required: true}, 
-    stats: {type: mongoose.Schema.Types.Mixed, required: false}, 
-    positions: {type: [], required: false}
-  }], 
+//   games: [ {
+//     gameDate: {type: String, required: true}, 
+//     gamePk: {type: String, required: true}, 
+//     stats: {type: mongoose.Schema.Types.Mixed, required: false}, 
+//     positions: {type: [], required: false}
+//   }], 
   lastUpdate: {type: String, required: false}, 
-  positionLog: {type: [String], required: false}
+  //positionLog: {type: [String], required: false}
 })
 
 module.exports = {Player: mongoose.model('Player', playerSchema), 

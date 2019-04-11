@@ -1,21 +1,25 @@
+import { AblTeamModel } from './abl.team.model'
+import { Roster } from './lineup.model'
+
 class GameModel {
     constructor(
-    public gameDate: Date,
+    public gameDate: string,
     public awayTeam: AblTeamModel,
     public homeTeam: AblTeamModel,
     public description?: string,
     public _id?: string,
+    public awayTeamRoster?: Roster[], 
+    public homeTeamRoster?: Roster[]
   ) { }
 }
 
-class AblTeamModel {
+class FormGameModel {
   constructor(
-  public name: string, 
-  public location: string, 
-  public stadium: string, 
-  public owner: string, 
-  public _id?: string, 
+    public gameDate: string,
+    public awayTeam: AblTeamModel,
+    public homeTeam: AblTeamModel, 
+    public description?: string
   ) { }
 }
 
-export { GameModel, AblTeamModel };
+export { GameModel, FormGameModel  };

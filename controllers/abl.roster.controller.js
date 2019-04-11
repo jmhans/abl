@@ -102,6 +102,51 @@ var AblRosterController = {
       res.send(lineup);
     })
   }, 
+
+  _getLineupForTeamAndDate: function (req, res) {
+    
+    const gmDt = new Date(req.params.dt)
+    
+    Lineup.findOne({
+      ablTeam: new ObjectId(req.params.id)
+    }).populate('roster.player priorRosters.player').exec(function(err, lineup) {
+      console.log(lineup.effectiveDate);
+      if (lineup.effectiveDate < gmDt) {
+          res.send(lineup);
+      } else {
+        var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
+        for (s = sortedPR.length - 1; s>=0; s--) {
+          if (sortedPR[s].effectiveDate < gmDate) {
+            res.send(sortedPR[s]);
+          }
+        }
+        
+      }
+    })
+
+  }, 
+  _getRosterForTeamAndDate: function(teamId, gmDate) {
+    return new Promise(function(resolve, reject){
+      Lineup.findOne({
+        ablTeam: new ObjectId(teamId)
+      }).populate('roster.player priorRosters.player').exec(function(err, lineup) {
+        console.log(lineup.effectiveDate);
+        if (lineup.effectiveDate < gmDate) {
+            resolve(lineup.roster);
+        } else {
+          var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
+          for (s = sortedPR.length - 1; s>=0; s--) {
+            if (sortedPR[s].effectiveDate < gmDate) {
+              resolve(sortedPR[s]);
+            }
+          }
+
+        }
+      })   
+    });
+
+
+  },
   
   _updateLineup: function(req, res) {
     Lineup.findById(new ObjectId(req.params.id), (err, LineupRec) => {

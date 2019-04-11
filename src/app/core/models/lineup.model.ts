@@ -25,4 +25,4 @@ class LineupAddPlayerModel {
 
  
 
-export { LineupModel, LineupAddPlayerModel };
+export { LineupModel, LineupAddPlayerModel, Roster };

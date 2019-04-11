@@ -13,10 +13,12 @@ var PlayersController = require('../controllers/players.controller');
 var OwnersController = require('../controllers/owners.controller').OwnersController;
 var TeamsController = require('../controllers/owners.controller').TeamsController;
 var RostersController = require('../controllers/rosters.controller');
+var StatlineController = require('../controllers/statline.controller');
 
 router.use(new PlayersController().route());
 router.use(new OwnersController().route());
 router.use(new RostersController().route());
 router.use(new TeamsController().route());
+router.use(new StatlineController().route());
 
 module.exports = router;

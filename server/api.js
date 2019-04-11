@@ -13,11 +13,15 @@ const https = require('https');
 const request = require('request');
 const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
+const Statline = require('./../models/statline');
 
 const Game = require('./../models/Game');
 const MlbApiController = require('./../controllers/mlbapi.controller');
 const AblTeamController = require('./../controllers/ablteam.controller');
+const AblGameController = require('./../controllers/abl.game.controller');
 const AblRosterController = require('./../controllers/abl.roster.controller');
+const StatlineController = require('./../controllers/statline.controller');
+
 
 /*
  |--------------------------------------
@@ -79,20 +83,7 @@ module.exports = function(app, config) {
     });
   });
   
-  app.get('/api3/games', (req, res) => {
-    Game.find({gameDate: { $gte: new Date() }}, (err, games) => {
-      let gamesArr = [];
-      if (err) {
-        return res.status(500).send({message: err.message});
-      }
-      if (games) {
-        games.forEach(game => {
-          gamesArr.push(game);
-        });
-      }
-      res.send(gamesArr);
-    });
-  });
+  app.get('/api3/games', makeGet(Game));
   
   
   app.get('/api3/events/admin', jwtCheck, adminCheck, (req, res) => {
@@ -274,6 +265,9 @@ module.exports = function(app, config) {
   app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
   app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
   app.put('/api3/lineup/:id', jwtCheck, AblRosterController._updateLineup);
+  app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
+  
+
   
   app.get("/api3/mlbGames", (req, res) => {
     mlbGame.find({}, (err, games) => {
@@ -316,24 +310,36 @@ module.exports = function(app, config) {
   });
   
   
+  app.get('/api3/game/:id', jwtCheck, AblGameController._getById);
   
-  app.get('/api3/game/:id', jwtCheck, (req, res) => {
-    Game.findById(req.params.id, (err, game) => {
-      if (err) {
-        return res.status(500).send({message: err.message});
-      }
-      if (!game) {
-        return res.status(400).send({message: 'Game not found.'});
-      }
-      res.send(game);
-    });
-  });
+  app.post('/api3/game/new', jwtCheck, AblGameController._post );
+  app.put('/api3/game/:id', jwtCheck, AblGameController._put);
   
+  app.get("/api3/statlines", makeGet(Statline));
+  
+  
+  function makeGet(model) {
+    return function(req, res) {
+      model.find({}, (err, results) => {
+        let resultsArr = [];
+        if (err) {
+          return res.status(500).send({message: err.message});
+        }
+        if (results) {
+          results.forEach((result) => {
+            resultsArr.push(result);
+          });
+        }
+        res.send(resultsArr);
+      });
+    } 
+  }
+    
   
   
   
   var api = require('../routes/api.route');
-  app.use('/api2', jwtCheck, api);
+  app.use('/api2', api);
 
 };
 
