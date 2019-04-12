@@ -110,16 +110,29 @@ var AblRosterController = {
     Lineup.findOne({
       ablTeam: new ObjectId(req.params.id)
     }).populate('roster.player priorRosters.player').exec(function(err, lineup) {
+      if (err) {
+        return res.status(500).send({
+          message: err.message
+        });
+      }
+      if (!lineup) {
+        return res.status(400).send({message: 'No lineup found for that date.'});
+      }
       console.log(lineup.effectiveDate);
       if (lineup.effectiveDate < gmDt) {
-          res.send(lineup);
+          return res.status(200).send(lineup);
       } else {
-        var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
-        for (s = sortedPR.length - 1; s>=0; s--) {
-          if (sortedPR[s].effectiveDate < gmDate) {
-            res.send(sortedPR[s]);
+        if (lineup.priorRosters.length > 0 ) {
+          var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
+          for (s = sortedPR.length - 1; s>=0; s--) {
+            if (sortedPR[s].effectiveDate < gmDate) {
+              return res.status(200).send(sortedPR[s]);
+            }
           }
+        } else {
+          return res.status(400).send({message: 'No lineup found for that date.'});
         }
+
         
       }
     })
