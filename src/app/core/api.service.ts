@@ -19,6 +19,7 @@ import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.reco
 export class ApiService {
   
   private base_api= '/api3/'
+  private data_api = '/data/'
 
   constructor(
     private http: HttpClient,
@@ -258,7 +259,7 @@ export class ApiService {
       );
   }
   
-   // POST new event (admin only)
+   // POST new game (admin only)
   postGame$(game: GameModel): Observable<GameModel> {
     return this.http
       .post<GameModel>(`${this.base_api}game/new`,game, {
@@ -279,6 +280,17 @@ export class ApiService {
         catchError((error) => this._handleError(error))
       );
   }
+  
+  getData$(flname: string):Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.data_api}${flname}`, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error)) 
+    )
+  }
+  
   
 
   private _handleError(err: HttpErrorResponse | any): Observable<any> {

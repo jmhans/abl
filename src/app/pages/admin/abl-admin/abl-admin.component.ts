@@ -7,6 +7,7 @@ import { UtilsService } from './../../../core/utils.service';
 import { FilterSortService } from './../../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
 import { MlbGameModel } from './../../../core/models/mlbgame.model';
+import { GameModel } from './../../../core/models/game.model';
 
 @Component({
   selector: 'app-abl-admin',
@@ -15,9 +16,9 @@ import { MlbGameModel } from './../../../core/models/mlbgame.model';
 })
 export class AblAdminComponent implements OnInit, OnDestroy {
   pageTitle = 'ABL Admin';
-  gamesSub: Subscription;
-  gamesList: MlbGameModel[];
-  filteredGames: MlbGameModel[];
+  dataSub: Subscription;
+  gamesList: any[];
+  filteredGames: any[];
   loading: boolean;
   error: boolean;
   query = '';
@@ -32,27 +33,64 @@ export class AblAdminComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    this._getGamesList();
+    this._getDataFiles();
   }
 
-  private _getGamesList() {
+  private _getDataFiles() {
     this.loading = true;
-    // Get all (admin) games
-    this.gamesSub = this.api
-      .getAdminGames$()
+    this.dataSub = this.api
+      .getData$('gamesList')
       .subscribe(
         res => {
           this.gamesList = res;
           this.filteredGames = res;
-          this.loading = false;
-        },
+          this.loading = false
+        }, 
         err => {
           console.error(err);
           this.loading = false;
           this.error = true;
         }
-      );
+     );
   }
+  
+  private _uploadAllData() {
+    this.gamesList.forEach((gm) => {
+      
+//      const newGm = new GameModel(gm.gameDate, {"_id": gm.awayTeam}, {"_id": gm.homeTeam});
+      
+      this.api
+        .postGame$(gm)
+        .subscribe(
+          res => {
+            console.log(res)
+          }, 
+          err => {
+            console.error(err);
+          }
+        )
+    })
+  }
+  
+  
+//   private _getGamesList() {
+//     this.loading = true;
+//     // Get all (admin) games
+//     this.gamesSub = this.api
+//       .getAdminGames$()
+//       .subscribe(
+//         res => {
+//           this.gamesList = res;
+//           this.filteredGames = res;
+//           this.loading = false;
+//         },
+//         err => {
+//           console.error(err);
+//           this.loading = false;
+//           this.error = true;
+//         }
+//       );
+//   }
 
   searchGames() {
     this.filteredGames = this.fs.search(this.gamesList, this.query, '_id', 'mediumDate');
@@ -64,7 +102,7 @@ export class AblAdminComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.gamesSub.unsubscribe();
+    this.dataSub.unsubscribe();
   }
 
 }

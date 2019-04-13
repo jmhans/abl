@@ -21,6 +21,7 @@ const AblTeamController = require('./../controllers/ablteam.controller');
 const AblGameController = require('./../controllers/abl.game.controller');
 const AblRosterController = require('./../controllers/abl.roster.controller');
 const StatlineController = require('./../controllers/statline.controller');
+const BulkAddController = require('./../controllers/bulkadd.controller');
 
 
 /*
@@ -316,7 +317,7 @@ module.exports = function(app, config) {
   app.put('/api3/game/:id', jwtCheck, AblGameController._put);
   
   app.get("/api3/statlines", makeGet(Statline));
-  
+  app.get("/data/:flname", jwtCheck, BulkAddController._getFile);
   
   function makeGet(model) {
     return function(req, res) {

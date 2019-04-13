@@ -1,6 +1,10 @@
 <!-- src/app/pages/admin/admin.component.html -->
 <h1 class="text-center">{{ pageTitle }}</h1>
-
+          <button
+            class="btn btn-info"
+            type="button"
+            (click)="_uploadAllData()"
+            >Upload</button>
 <ng-template [ngIf]="utils.isLoaded(loading)">
   <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can mess with games below.</p>
 
@@ -55,7 +59,7 @@
             </div> -->
           </div>
           <p class="mb-1">
-            <strong>Date:</strong> {{gm.gamePk}} | {{ gm.teams.away.team | json }} vs. {{gm.teams.home.team.name | json}}
+            <strong>Date:</strong>{{gm | json}}
           </p>
         </div>
       </section>

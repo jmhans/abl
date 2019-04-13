@@ -6,6 +6,8 @@ var AblRosterController = require('./abl.roster.controller');
 var StatlineController = require('./statline.controller');
 const Statline = require('./../models/statline');
 
+const ObjectId = require('mongoose').Types.ObjectId;
+
 const ABL_STARTERS = ['1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF', 'C', 'DH']
 
 var AblGameController = {
@@ -208,8 +210,8 @@ var AblGameController = {
         return res.status(409).send({message: 'You have already created a game with those details.'});
       }
       const game = new AblGame({
-        awayTeam: req.body.awayTeam._id,
-        homeTeam: req.body.homeTeam._id, 
+        awayTeam: (typeof req.body.awayTeam === "object") ? req.body.awayTeam._id : new ObjectId(req.body.awayTeam), 
+        homeTeam: (typeof req.body.homeTeam === "object") ? req.body.homeTeam._id : new ObjectId(req.body.homeTeam), 
         gameDate: req.body.gameDate, 
         description: req.body.description
       });
