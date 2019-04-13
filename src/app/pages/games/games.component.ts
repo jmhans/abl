@@ -7,6 +7,7 @@ import { UtilsService } from './../../core/utils.service';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
 import { GameModel } from './../../core/models/game.model';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-games',
@@ -21,6 +22,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   loading: boolean;
   error: boolean;
   query: '';
+  seriesDates: string[] = [];
 
   constructor(
     private title: Title,
@@ -32,6 +34,12 @@ export class GamesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
     this._getGamesList();
+    var startDt = new Date("2019-04-09");
+    for (var sr = 1; sr<=5; sr++) {
+      var dt = new Date(startDt.toISOString());
+      dt.setDate(startDt.getDate() + 7 *(sr - 1))
+      this.seriesDates.push(dt.toISOString())  
+    }
   }
 
   private _getGamesList() {

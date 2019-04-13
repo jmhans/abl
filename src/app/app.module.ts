@@ -7,7 +7,8 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatFormFieldModule} from '@angular/material';
-import {MatInputModule} from '@angular/material';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatInputModule, MatNativeDateModule} from '@angular/material';
 
 import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
@@ -118,6 +119,8 @@ import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.
     MatPaginatorModule, 
     MatSortModule,
     MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatInputModule,
     FlexLayoutModule,
     HttpModule, 

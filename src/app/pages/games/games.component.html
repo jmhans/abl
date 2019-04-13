@@ -1,6 +1,19 @@
 <!-- src/app/pages/games/games.component.html -->
 <h1 class="text-center">{{ pageTitle }}</h1>
 
+<select>
+  <option *ngFor="let dt of seriesDates" [value]="dt" >
+    {{dt | date : "mediumDate"}}
+  </option>
+</select>
+
+<mat-form-field>
+  <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+
+
 
 <ng-template [ngIf]="utils.isLoaded(loading)">
   <ng-template [ngIf]="gamesList">
