@@ -7,7 +7,8 @@ import { UtilsService } from './../../core/utils.service';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
 import { GameModel } from './../../core/models/game.model';
-import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'app-games',
@@ -22,7 +23,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   loading: boolean;
   error: boolean;
   query: '';
-  seriesDates: string[] = [];
+  modelDate: FormControl;
 
   constructor(
     private title: Title,
@@ -34,12 +35,13 @@ export class GamesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
     this._getGamesList();
-    var startDt = new Date("2019-04-09");
-    for (var sr = 1; sr<=5; sr++) {
-      var dt = new Date(startDt.toISOString());
-      dt.setDate(startDt.getDate() + 7 *(sr - 1))
-      this.seriesDates.push(dt.toISOString())  
-    }
+    this.modelDate = new FormControl(new Date());
+    
+  }
+  
+  private _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
+    //
+    this.filteredGames = this.fs.search(this.gamesList, this.modelDate.value, '_id', 'mediumDate')
   }
 
   private _getGamesList() {

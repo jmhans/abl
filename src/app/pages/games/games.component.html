@@ -1,14 +1,8 @@
 <!-- src/app/pages/games/games.component.html -->
 <h1 class="text-center">{{ pageTitle }}</h1>
 
-<select>
-  <option *ngFor="let dt of seriesDates" [value]="dt" >
-    {{dt | date : "mediumDate"}}
-  </option>
-</select>
-
 <mat-form-field>
-  <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+  <input matInput [matDatepicker]="picker" placeholder="Choose a date" [formControl]="modelDate" (dateChange)="_dateChanged('change', $event)">
   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker></mat-datepicker>
 </mat-form-field>
