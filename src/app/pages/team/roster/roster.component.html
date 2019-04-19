@@ -34,7 +34,6 @@
     <select [(ngModel)]="rosterRec.lineupPosition">
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
-    <span *ngIf='rosterRec.player.name'>
       {{ rosterRec.player.name }} | {{ rosterRec.player.team }} || {{rosterRec.rosterOrder}} and {{i+1}}
 
 
@@ -60,8 +59,6 @@
         {{rosterRec.player.stats.batting.stolenBases}} SB, 
         {{rosterRec.player.stats.batting.caughtStealing}} CS)
         </span>
-      
-      </span>
 <!--       {{rosterRec.player.positionLog | json}} -->
       
   </div>
