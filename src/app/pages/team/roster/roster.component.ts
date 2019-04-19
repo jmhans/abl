@@ -104,8 +104,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.error = false;
     this.loading = false;
     this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
-    // this.lineup = res; //Need to populate data on response. 
-    
+    this.lineup = res; 
   }
   
   private _handleUpdateError(err) {
