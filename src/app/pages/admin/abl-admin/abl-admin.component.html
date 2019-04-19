@@ -5,12 +5,49 @@
             type="button"
             (click)="_uploadAllData()"
             >Upload</button>
-<ng-template [ngIf]="utils.isLoaded(loading)">
-  <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can mess with games below.</p>
 
+
+  <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can mess with games below.</p>
+  
+  
+<div>
+  <mat-form-field>
+  <mat-label>Data Model</mat-label>
+  <mat-select [(ngModel)]="selectedDataType">
+    <mat-option *ngFor="let type of dataTypes" [value]="type">
+      {{type}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+</div>
+
+
+<mat-form-field class="example-full-width">
+    <input matInput placeholder="Data file name" [(ngModel)]="datafile">
+  </mat-form-field>
+  
+            <button
+            class="btn btn-info"
+            (click)="_loadData()"
+            (type)="button">Load from file</button>
+  
+  <mat-form-field class="example-full-width">
+    <textarea matInput placeholder="enter records" [(ngModel)]="dataEntry"></textarea>
+  </mat-form-field>
+
+ <button
+            class="btn btn-info"
+            (click)="_createRec()"
+            (type)="button">Create</button>
+
+{{dataEntry}}
+<ng-template [ngIf]="utils.isLoaded(loading)">
+
+  
+  
   <!-- Events -->
-  <ng-template [ngIf]="gamesList">
-    <ng-template [ngIf]="gamesList.length">
+  <ng-template [ngIf]="dataList">
+    <ng-template [ngIf]="dataList.length">
       <!-- Search events -->
       <label class="sr-only" for="search">Search</label>
       <div class="search input-group mb-3">
@@ -45,6 +82,10 @@
             <a [routerLink]="['/game', gm._id]">
               <h5 class="mb-1" [innerHTML]="gm.gamePk"></h5>
             </a>
+             <button
+            class="btn btn-info"
+            (click)="_saveRecToDB(gm)"
+            (type)="button">Save</button>
 <!--             <div class="event-icons">
               <img
                 *ngIf="!event.viewPublic"
@@ -66,7 +107,7 @@
     </ng-template>
 
     <!-- No events available -->
-    <p *ngIf="!gamesList.length" class="alert alert-info">
+    <p *ngIf="!dataList.length" class="alert alert-info">
       No games have been created yet.
     </p>
   </ng-template>

@@ -291,6 +291,17 @@ export class ApiService {
     )
   }
   
+     // POST new game (admin only)
+  postData$(model: string, data: any[]): Observable<any[]> {
+    return this.http
+      .post<any[]>(`${this.data_api}${model}`,data, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
   
 
   private _handleError(err: HttpErrorResponse | any): Observable<any> {

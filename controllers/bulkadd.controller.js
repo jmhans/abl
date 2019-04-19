@@ -6,6 +6,60 @@ const AblGame = require('./../models/Game');
 
 const gamesList = require("./../data/gamesList.json");
 
+class BaseHandler {
+  constructor() {
+    this.model = ''
+    } 
+
+  _postData(req, res, next) {
+  // req.params.model is the model to use.
+    
+    switch(req.params.model) {
+      case 'games':
+        this.model = require('./../models/Game');
+        break;
+      case 'lineups': 
+        this.model = require('./../models/lineup').Lineup;
+        break;
+      default:
+        
+    }
+    
+    
+    
+    var promArr = [];
+    
+    if (Array.isArray(req.body)) {
+      req.body.forEach((itm) => {
+        var prom = new Promise((resolve, reject) => {
+          this.model.create(itm, (err, post) => {
+            if (err) reject();
+            resolve(post);
+          })
+        })
+        promArr.push(prom);
+      })
+    } else {
+      var prom = new Promise((resolve, reject)=> {
+        this.model.create(req.body, (err, post) => {
+          if (err) reject();
+          resolve(post)
+        })
+      })
+      promArr.push(prom)
+    }
+    
+    Promise.all(promArr).then((values) => {
+      res.json(values)
+    })
+    
+    
+  }
+
+}
+
+
+
 
 var BulkAddController = {
   _addGames : function() {
@@ -51,7 +105,8 @@ var BulkAddController = {
       res.send(data)
     }
   }
+
   
   
 }
-module.exports = BulkAddController
+module.exports = {BulkAdd: BulkAddController, BulkLoad: BaseHandler}

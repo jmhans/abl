@@ -16,12 +16,17 @@ import { GameModel } from './../../../core/models/game.model';
 })
 export class AblAdminComponent implements OnInit, OnDestroy {
   pageTitle = 'ABL Admin';
+  saveSub: Subscription;
   dataSub: Subscription;
-  gamesList: any[];
+  dataList: any[] = [];
   filteredGames: any[];
   loading: boolean;
   error: boolean;
   query = '';
+  datafile: string = '';
+  dataEntry:string = '';
+  dataTypes: string[] = ['games', 'lineups'];
+  selectedDataType: string;
 
   constructor(
     private title: Title,
@@ -33,16 +38,63 @@ export class AblAdminComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    this._getDataFiles();
+    //this._getDataFiles();
   }
 
+  private _loadData() {
+    this.loading = true;
+    this.dataSub = this.api
+      .getData$(this.datafile)
+      .subscribe(
+        res => {
+          this.dataList = res;
+          this.filteredGames = res;
+          this.loading = false;
+        }, 
+      err => {
+        console.log(err);
+        this.loading = false;
+        this.error = true;
+      }
+      )
+  }
+  
+  private _createRec() {
+    
+    var obj = JSON.parse(this.dataEntry)
+    
+    console.log(obj);
+    if (Array.isArray(obj)) {
+      obj.forEach((objRec) => {this.dataList.push(objRec)})
+    } else {
+      this.dataList.push(obj);
+    }
+    console.log(this.dataList);
+    this.resetQuery();
+    this.loading = false;
+  }
+  
+  private _saveRecToDB(rec) {
+    this.saveSub = this.api
+      .postData$(this.selectedDataType, rec)
+      .subscribe(
+        res => {
+          rec.saved = true
+          console.log(res)
+        },
+        err => {
+          console.error(err);
+        }
+    )
+  }
+  
   private _getDataFiles() {
     this.loading = true;
     this.dataSub = this.api
       .getData$('gamesList')
       .subscribe(
         res => {
-          this.gamesList = res;
+          this.dataList = res;
           this.filteredGames = res;
           this.loading = false
         }, 
@@ -55,12 +107,15 @@ export class AblAdminComponent implements OnInit, OnDestroy {
   }
   
   private _uploadAllData() {
-    this.gamesList.forEach((gm) => {
+    // use the generic postData api call...
+    
+    
+    this.dataList.forEach((data) => {
       
 //      const newGm = new GameModel(gm.gameDate, {"_id": gm.awayTeam}, {"_id": gm.homeTeam});
       
       this.api
-        .postGame$(gm)
+        .postData$(this.selectedDataType, data)
         .subscribe(
           res => {
             console.log(res)
@@ -93,15 +148,16 @@ export class AblAdminComponent implements OnInit, OnDestroy {
 //   }
 
   searchGames() {
-    this.filteredGames = this.fs.search(this.gamesList, this.query, '_id', 'mediumDate');
+    this.filteredGames = this.fs.search(this.dataList, this.query, '_id', 'mediumDate');
   }
 
   resetQuery() {
     this.query = '';
-    this.filteredGames = this.gamesList;
+    this.filteredGames = this.dataList;
   }
 
   ngOnDestroy() {
+    if (this.saveSub) { this.saveSub.unsubscribe();}
     this.dataSub.unsubscribe();
   }
 
