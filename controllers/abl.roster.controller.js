@@ -198,7 +198,11 @@ var AblRosterController = {
               message: err.message
             });
           }
-          res.send(LineupRec);
+          LineupRec.populate('roster.player', function(err) {
+            res.send(LineupRec);
+          });
+          
+          
         });
       });
 
