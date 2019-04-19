@@ -29,7 +29,7 @@
        cdkDrag
        [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
           rosterRec.lineupPosition != rosterRec.originalPosition  }"
-       >
+       *ngIf='rosterRec.player.name'>
       
     <select [(ngModel)]="rosterRec.lineupPosition">
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
