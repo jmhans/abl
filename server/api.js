@@ -342,7 +342,7 @@ module.exports = function(app, config) {
   
   
   //One time use: 
-  AblRosterController._updatePlayerRecordsFromRosters();
+//   AblRosterController._updatePlayerRecordsFromRosters();
   // Delete after completing.
   
   

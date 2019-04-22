@@ -285,43 +285,43 @@ var AblRosterController = {
     })
     
 
-  }, 
-  _updatePlayerRecordsFromRosters: function() {
+  } 
+//   _updatePlayerRecordsFromRosters: function() {
     
-    Lineup.find({}, (err, lineups)=> {
-      if (err) {
-        console.log ("Error finding lineups");
-      }
+//     Lineup.find({}, (err, lineups)=> {
+//       if (err) {
+//         console.log ("Error finding lineups");
+//       }
       
-      lineups.forEach((lineup) => {
-        lineup.roster.forEach((plyr) => {
-          console.log(plyr.player);
-          MlbPlayer.findById(plyr.player, (err, mlbPlayer) => { 
-            if (err) {
-              console.log(plyr);
-              console.log(err);
-            } else {
-              console.log(mlbPlayer);
-              mlbPlayer.ablTeam = new ObjectId(lineup.ablTeam)
-              mlbPlayer.save((err) => {
-                if (err) {
-                  console.log(mlbPlayer.name + ": ERROR");
-                  console.log(err);
-                }
-                else {
-                  console.log(mlbPlayer.name + " updated.")     
-                }
+//       lineups.forEach((lineup) => {
+//         lineup.roster.forEach((plyr) => {
+//           console.log(plyr.player);
+//           MlbPlayer.findById(plyr.player, (err, mlbPlayer) => { 
+//             if (err) {
+//               console.log(plyr);
+//               console.log(err);
+//             } else {
+//               console.log(mlbPlayer);
+//               mlbPlayer.ablTeam = new ObjectId(lineup.ablTeam)
+//               mlbPlayer.save((err) => {
+//                 if (err) {
+//                   console.log(mlbPlayer.name + ": ERROR");
+//                   console.log(err);
+//                 }
+//                 else {
+//                   console.log(mlbPlayer.name + " updated.")     
+//                 }
                 
-              }) 
-            }
+//               }) 
+//             }
           
-          })
-        })
-      })
-    })
+//           })
+//         })
+//       })
+//     })
     
     
-  }
+//   }
   
   
   
