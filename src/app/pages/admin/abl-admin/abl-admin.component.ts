@@ -158,7 +158,7 @@ export class AblAdminComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.saveSub) { this.saveSub.unsubscribe();}
-    this.dataSub.unsubscribe();
+    if (this.dataSub) { this.dataSub.unsubscribe();}
   }
 
 }
