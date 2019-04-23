@@ -184,7 +184,7 @@ var MlbApiController = {
     const gm_date = req.params.dt;
 
     var inputDate = new Date(gm_date)
-    var day = pad(inputDate.getDate()+1, 2);
+    var day = pad(inputDate.getDate(), 2);
     var month = pad(inputDate.getMonth() + 1, 2);
     var year = inputDate.getFullYear();
     

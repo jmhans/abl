@@ -56,9 +56,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       .getLineupByTeamId$(this.team._id)
       .subscribe(
         res => {
-          res.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
-          this.lineup = res;
-          this.loading = false;
+          this._handleLineupSuccess(res);
         }, 
         err => {
           console.error(err);
@@ -67,6 +65,11 @@ export class RosterComponent implements OnInit, OnDestroy {
         }
      );
   }
+  
+  private _setLineup(subLineup) {
+
+  }
+  
   
 
   ngOnDestroy() {
@@ -93,17 +96,18 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.saveLineupSub = this.rosterService
         .updateLineup$(this.lineup._id, this.lineup)
         .subscribe(
-          data => this._handleUpdateSuccess(data),
+          data => this._handleLineupSuccess(data),
           err => this._handleUpdateError(err)
       )      
     }
 
   }
   
-  private _handleUpdateSuccess(res) {
+  private _handleLineupSuccess(res) {
     this.error = false;
     this.loading = false;
     this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
+    res.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
     this.lineup = res; 
   }
   

@@ -55,7 +55,7 @@ export class TeamComponent implements OnInit, OnDestroy {
     // Subscribe to query params to watch for tab changes
     this.tabSub = this.route.queryParams
       .subscribe(queryParams => {
-        this.tab = queryParams['tab'] || 'details';
+        this.tab = queryParams['tab'] || 'roster';
       });
   }
 
@@ -67,14 +67,14 @@ export class TeamComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.team = res;
-          this._setPageTitle('Team');
+          this._setPageTitle(this.team.nickname);
           this.loading = false;
         },
         err => {
           console.error(err);
           this.loading = false;
           this.error = true;
-          this._setPageTitle('Something');
+          this._setPageTitle('Error');
         }
       );
   }
