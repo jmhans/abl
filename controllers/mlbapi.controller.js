@@ -182,12 +182,13 @@ var MlbApiController = {
     }
 
     const gm_date = req.params.dt;
-
+    
     var inputDate = new Date(gm_date)
+    console.log(inputDate);
     var day = pad(inputDate.getDate(), 2);
     var month = pad(inputDate.getMonth() + 1, 2);
     var year = inputDate.getFullYear();
-    
+    console.log(month + "/" + day + "/" + year);
     const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
     request(APIUrl, {
       json: true
