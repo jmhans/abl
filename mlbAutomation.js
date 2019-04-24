@@ -10,7 +10,7 @@ var pad = function(num, size) {
 }
 
 
-var day = pad(today.getUTCDate(), 2); 
+var day = pad(today.getUTCDate()-1, 2); 
 var month = pad(today.getUTCMonth() + 1, 2);
 var year = today.getUTCFullYear();
 

@@ -94,8 +94,6 @@
 </div>
 
 
-<!-- 
-
 <h3>
    Players
 </h3>
@@ -126,7 +124,7 @@
   <tbody>
     <tr *ngFor="let player of playerList">
       <td>{{player.name}}</td>
-      <td>{{player.positionLog.join()}}</td>
+      <td>{{player.position}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>
       <td> {{abl(player.stats.batting) | number }} </td>
@@ -148,7 +146,7 @@
       </td>
     </tr>
   </tbody>
-</table> -->
+</table>
 
 
 <!-- <ng-template [ngIf]="playerList">

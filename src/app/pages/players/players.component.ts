@@ -60,6 +60,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.dtOptions = {
       pagingType: 'full_numbers', 
       pageLength: 50, 
+      responsive: true
     }
     this._getPlayerList();
 
