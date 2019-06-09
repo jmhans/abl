@@ -75,6 +75,10 @@ export class GamesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.gamesListSub.unsubscribe();
   }
+  
+  hasProp(o, name) {
+  return o.hasOwnProperty(name);
+}
 
 }
 

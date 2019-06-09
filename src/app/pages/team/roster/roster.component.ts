@@ -56,7 +56,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       .getLineupByTeamId$(this.team._id)
       .subscribe(
         res => {
-          this._handleLineupSuccess(res);
+          this._handleLineupSuccess(res, false);
         }, 
         err => {
           console.error(err);
@@ -96,17 +96,19 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.saveLineupSub = this.rosterService
         .updateLineup$(this.lineup._id, this.lineup)
         .subscribe(
-          data => this._handleLineupSuccess(data),
+          data => this._handleLineupSuccess(data, true),
           err => this._handleUpdateError(err)
       )      
     }
 
   }
   
-  private _handleLineupSuccess(res) {
+  private _handleLineupSuccess(res, update) {
     this.error = false;
     this.loading = false;
-    this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
+    if (update) {
+      this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
+    }
     res.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
     this.lineup = res; 
   }

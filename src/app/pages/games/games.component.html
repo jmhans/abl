@@ -45,9 +45,9 @@
           [routerLink]="['/game', game._id]"
           class="list-group-item list-group-item-action flex-column align-items-start">
           <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{game.awayTeam.nickname }} @ {{game.homeTeam.nickname}}</h5>
+<!--             <h5 class="mb-1" *ngIf="hasProp(game.awayTeam, 'nickname')">{{ game.awayTeam.nickname }} @ {{ game.homeTeam.nickname }}</h5> -->
             {{game | json}}
-            <small>{{ game.gameDate}}</small>
+<!--             <small>{{ game.gameDate}}</small> -->
           </div>
         </a>
       </section>

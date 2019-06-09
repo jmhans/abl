@@ -38,9 +38,9 @@ export function dateValidator(): ValidatorFn {
     // This is done this way to account for new Date() shifting invalid
     // date strings. This way we know the string is a correct date first.
     const date = new Date(dateStr);
-    if (date <= now) {
-      return invalidObj;
-    }
+//     if (date <= now) {
+//       return invalidObj;
+//     }
     return null;
   };
 }

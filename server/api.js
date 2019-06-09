@@ -269,7 +269,7 @@ module.exports = function(app, config) {
   app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
   app.put('/api3/lineup/:id', jwtCheck, AblRosterController._updateLineup);
   app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
-  app.get('/api3/games', jwtCheck, AblGameController._getAllGames);
+  app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
 
   
   app.get("/api3/mlbGames", (req, res) => {
