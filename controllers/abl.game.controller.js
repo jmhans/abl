@@ -84,11 +84,7 @@ var AblGameController = {
     loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false} */ 
     
     //Retrieve rosters for teams
-    
-
-   
-
-    
+        
     const day = gameObj.gameDate
 
     var nextDay = new Date(day.toISOString());
@@ -96,63 +92,7 @@ var AblGameController = {
 
     
     AblRosterController._getRosterForTeamAndDate(gameObj.awayTeam._id, new Date('2019-04-06')).then((resp) => {
-      var potentialPlayers = resp
-      var finalRoster = []
-      // need to retrieve player's stats for the day...
-
       
-      Statline.find({gameDate: {$gte: day.toISOString().substring(0, 10), $lt: nextDay.toISOString().substring(0, 10)}}, (err, stats) => {
-        console.log(stats.length + " stat records found.");
-        
-        for (var plyrCt = 0; plyrCt<potentialPlayers.length; plyrCt++) {
-          var plyr = potentialPlayers[plyrCt];
-          plyr.dailyStats =  stats.filter((statline) => {return(statline.mlbId == plyr.player.mlbID);})
-            .map(AblGameController._getDailyStats)
-            .reduce(function getSum(total, thisRec) {
-              for(var propertyName in thisRec) {
-                // propertyName is what you want
-                // you can get the value like this: myObject[propertyName]
-                switch(propertyName) {
-                  case 'mlbId':
-                    total.mlbId = thisRec.mlbId;
-                    break;
-                  case 'gamePk':
-                  case 'gameDate':
-                  case 'position(s)':
-                    total[propertyName].push(thisRec[propertyName])
-                    break;
-                  default:
-                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
-                } 
-                
-              }
-
-              return total;
-            }, {'gamePk':[], 'gameDate':[], 'position(s)': []});
-        }
-        
-        for (var starter = 0; starter<ABL_STARTERS.length; starter++) {
-          var starters = [];
-          for (plyrCt = 0; plyrCt<potentialPlayers.length; plyrCt++) {
-            var potentialPlayer = potentialPlayers[plyrCt];
-            
-            if (!potentialPlayer.played && AblGameController.canPlayPosition(potentialPlayer.lineupPosition, ABL_STARTERS[starter])) {
-              // need to check to see if player played (e.g. 'g'>0). 
-              finalRoster.push({'player': potentialPlayer.player, 'lineupPosition': potentialPlayer.lineupPosition, 'rosterOrder': potentialPlayer.rosterOrder, 'playedPosition': ABL_STARTERS[starter], 'box': potentialPlayer.dailyStats});
-              potentialPlayer.played = true;
-            }
-          }
-         
-          
-        }
-
-        gameObj.awayTeamRoster = finalRoster;
-        gameObj.save(err => {
-          if (err) {
-            return '';
-          }
-        })
-      })
          
     });
 
@@ -193,6 +133,84 @@ var AblGameController = {
       }
       return res.send(gamesArr)
     })
+  },
+  
+  _getRoster: function(gameObj, rosterType) {
+    var targetTeamId = '';
+    switch(rosterType) {
+      case "H":
+        targetTeamId = gameObj.homeTeam._id
+        break;
+      case "A":
+        targetTeamId = gameObj.awayTeam._id
+        break;
+      default:
+        // code block
+        targetTeamId = gameObj.homeTeam._id
+    }
+    
+    AblRosterController._getRosterForTeamAndDate(targetTeamId, gameObj.gameDate).then((resp) => {
+      var potentialPlayers = resp
+      var finalRoster = []
+      // need to retrieve player's stats for the day...
+
+      
+      Statline.find({gameDate: {$gte: day.toISOString().substring(0, 10), $lt: nextDay.toISOString().substring(0, 10)}}, (err, stats) => {
+        console.log(stats.length + " stat records found.");
+        
+        for (var plyrCt = 0; plyrCt<potentialPlayers.length; plyrCt++) {
+          var plyr = potentialPlayers[plyrCt];
+          plyr.dailyStats =  stats.filter((statline) => {return(statline.mlbId == plyr.player.mlbID);})
+            .map(AblGameController._getDailyStats)
+            .reduce(function getSum(total, thisRec) {
+              for(var propertyName in thisRec) {
+                // propertyName is what you want
+                // you can get the value like this: myObject[propertyName]
+                switch(propertyName) {
+                  case 'mlbId':
+                    total.mlbId = thisRec.mlbId;
+                    break;
+                  case 'gamePk':
+                  case 'gameDate':
+                  case 'position(s)':
+                    total[propertyName].push(thisRec[propertyName])
+                    break;
+                  default:
+                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+                } 
+                
+              }
+
+              return total;
+            }, {'gamePk':[], 'gameDate':[], 'position(s)': []});
+        }
+        
+        for (var starter = 0; starter<ABL_STARTERS.length; starter++) {
+          var posPAs = 0
+          var starters = [];
+          for (plyrCt = 0; plyrCt<potentialPlayers.length; plyrCt++) {
+            var potentialPlayer = potentialPlayers[plyrCt];
+            
+            if (!potentialPlayer.played && AblGameController.canPlayPosition(potentialPlayer.lineupPosition, ABL_STARTERS[starter]) && posPAs < 2) {
+              // need to check to see if player played (e.g. 'g'>0). 
+              finalRoster.push({'player': potentialPlayer.player, 'lineupPosition': potentialPlayer.lineupPosition, 'rosterOrder': potentialPlayer.rosterOrder, 'playedPosition': ABL_STARTERS[starter], 'box': potentialPlayer.dailyStats});
+              potentialPlayer.played = true;
+              posPAs += AblGameController.plateAppearances(potentialPlayer.dailyStats)
+            }
+          }
+         
+          
+        }
+
+        gameObj.awayTeamRoster = finalRoster;
+        gameObj.save(err => {
+          if (err) {
+            return '';
+          }
+        })
+      })
+    }); 
+      
   },
   
   
@@ -248,7 +266,9 @@ var AblGameController = {
     });
   }, 
 
- 
+ plateAppearances: function(statline) {
+  return statline.baseOnBalls + statline.intentionalWalks + statline.atBats + statline.sacBunts + statline.sacFlies
+}
 
 }
 
