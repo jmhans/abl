@@ -118,7 +118,7 @@ var AblRosterController = {
       if (!lineup) {
         return res.status(400).send({message: 'No lineup found for that date.'});
       }
-      console.log(lineup.effectiveDate);
+      console.log("Effective date of lineup:" + lineup.effectiveDate);
       if (lineup.effectiveDate < gmDt) {
           return res.status(200).send(lineup);
       } else {

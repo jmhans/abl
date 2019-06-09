@@ -71,6 +71,24 @@ var AblGameController = {
       return retObj;
     },  
   
+  _saveGameRoster: function(roster, gameObj, rosterType) {
+    switch(rosterType) {
+      case "H":
+        gameObj.homeTeamRoster = roster;
+        break;
+      case "A":
+        gameObj.awayTeamRoster = roster;
+        break;
+      default:
+        // code block
+    }
+    gameObj.save(err => {
+      if (err) {
+        return '';
+      }
+    })
+  },
+  
   _processGame: function (gameObj) {
     /* gameDate: { type: Date, required: true },
     awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
@@ -84,17 +102,10 @@ var AblGameController = {
     loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false} */ 
     
     //Retrieve rosters for teams
-        
-    const day = gameObj.gameDate
 
-    var nextDay = new Date(day.toISOString());
-    nextDay.setDate(day.getDate() +1)
 
-    
-    AblRosterController._getRosterForTeamAndDate(gameObj.awayTeam._id, new Date('2019-04-06')).then((resp) => {
-      
-         
-    });
+    this._getRoster(gameObj, "H")
+    this._getRoster(gameObj, "A")
 
     
     // ABL_STARTERS
@@ -149,7 +160,13 @@ var AblGameController = {
         targetTeamId = gameObj.homeTeam._id
     }
     
-    AblRosterController._getRosterForTeamAndDate(targetTeamId, gameObj.gameDate).then((resp) => {
+            
+    const day = gameObj.gameDate
+
+    var nextDay = new Date(day.toISOString());
+    nextDay.setDate(day.getDate() +1)
+    
+    AblRosterController._getRosterForTeamAndDate(targetTeamId, new Date(day.toISOString)).then((resp) => {
       var potentialPlayers = resp
       var finalRoster = []
       // need to retrieve player's stats for the day...
@@ -201,13 +218,10 @@ var AblGameController = {
          
           
         }
+        
+        AblGameController._saveGameRoster( finalRoster, gameObj, rosterType);
 
-        gameObj.awayTeamRoster = finalRoster;
-        gameObj.save(err => {
-          if (err) {
-            return '';
-          }
-        })
+
       })
     }); 
       
