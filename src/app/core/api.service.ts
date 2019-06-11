@@ -281,6 +281,17 @@ export class ApiService {
       );
   }
   
+    // DELETE existing game (admin only)
+  deleteGame$(id: string): Observable<any> {
+    return this.http
+      .delete(`${this.base_api}game/${id}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
   getData$(flname: string):Observable<any[]> {
     return this.http
       .get<any[]>(`${this.data_api}${flname}`, {

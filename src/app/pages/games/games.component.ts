@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { GameModel } from './../../core/models/game.model';
 import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {FormControl} from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-games',
@@ -22,26 +23,29 @@ export class GamesComponent implements OnInit, OnDestroy {
   filteredGames: GameModel[];
   loading: boolean;
   error: boolean;
-  query: '';
+  query: string = '';
   modelDate: FormControl;
 
   constructor(
     private title: Title,
     public utils: UtilsService,
     private api: ApiService,
-    public fs: FilterSortService
+    public fs: FilterSortService, 
+    private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
     this._getGamesList();
-    this.modelDate = new FormControl(new Date());
+    this.modelDate = new FormControl(/*new Date()*/);
     
   }
   
   private _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
     //
-    this.filteredGames = this.fs.search(this.gamesList, this.modelDate.value, '_id', 'mediumDate')
+    //this.filteredGames = this.fs.search(this.gamesList, this.datePipe.transform(this.modelDate.value, 'mediumDate'), '_id', 'mediumDate')
+    this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
+    this.searchGames();
   }
 
   private _getGamesList() {
@@ -65,9 +69,11 @@ export class GamesComponent implements OnInit, OnDestroy {
 
   searchGames() {
     this.filteredGames = this.fs.search(this.gamesList, this.query, '_id', 'mediumDate');
+    
   }
 
   resetQuery() {
+    this.modelDate.reset();
     this.query = '';
     this.filteredGames = this.gamesList;
   }

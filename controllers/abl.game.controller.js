@@ -145,6 +145,23 @@ var AblGameController = {
       return res.send(gamesArr)
     })
   },
+  _delete: function(req, res) {
+    AblGame.findById(req.params.id, (err, gm) => {
+      if (err) {
+        return res.status(500).send({message: err.message});
+      }
+      if (!gm) {
+        return res.status(400).send({message: 'Game not found.'});
+      }
+        gm.remove(err => {
+          if (err) {
+            return res.status(500).send({message: err.message});
+          }
+          res.status(200).send({message: 'Game successfully deleted.'});
+        });
+    });
+  }
+  ,
   
   _getRoster: function(gameObj, rosterType) {
     var targetTeamId = '';

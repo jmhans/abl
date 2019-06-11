@@ -32,7 +32,7 @@ export class FilterSortService {
       for (const key in item) {
         if (item.hasOwnProperty(key)) {
           if (!excludeProps || excludeProps.indexOf(key) === -1) {
-            const thisVal = item[key];
+            const thisVal = item[key] || '';
             if (
               // Value is a string and NOT a UTC date
               typeof thisVal === 'string' &&
@@ -40,7 +40,9 @@ export class FilterSortService {
               thisVal.toLowerCase().indexOf(lQuery) !== -1
             ) {
               return true;
-            } else if (
+            } else {
+              if(thisVal.toString().match(isoDateRegex)) {   console.log(this.datePipe.transform(thisVal, dateF).toLowerCase());}
+              if (
               // Value is a Date object or UTC string
               (thisVal instanceof Date || thisVal.toString().match(isoDateRegex)) &&
               // https://angular.io/api/common/DatePipe
@@ -49,6 +51,7 @@ export class FilterSortService {
             ) {
               return true;
             }
+                   }
           }
         }
       }

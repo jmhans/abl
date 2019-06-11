@@ -46,7 +46,8 @@
           class="list-group-item list-group-item-action flex-column align-items-start">
           <div class="d-flex w-100 justify-content-between">
 <!--             <h5 class="mb-1" *ngIf="hasProp(game.awayTeam, 'nickname')">{{ game.awayTeam.nickname }} @ {{ game.homeTeam.nickname }}</h5> -->
-            {{game | json}}
+            <strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong> | 
+            {{game.gameDate}}
 <!--             <small>{{ game.gameDate}}</small> -->
           </div>
         </a>

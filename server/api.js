@@ -270,7 +270,7 @@ module.exports = function(app, config) {
   app.put('/api3/lineup/:id', jwtCheck, AblRosterController._updateLineup);
   app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
   app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
-
+  app.delete('/api3/game/:id', jwtCheck, adminCheck, AblGameController._delete);
   
   app.get("/api3/mlbGames", (req, res) => {
     mlbGame.find({}, (err, games) => {
