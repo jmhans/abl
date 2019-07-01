@@ -1,5 +1,5 @@
 import { AblTeamModel } from './abl.team.model'
-import { Roster } from './lineup.model'
+import { Roster, PopulatedRoster } from './lineup.model'
 
 class GameModel {
     constructor(
@@ -22,4 +22,16 @@ class FormGameModel {
   ) { }
 }
 
-export { GameModel, FormGameModel  };
+interface PopulatedGameModel {
+    gameDate: string
+    awayTeam: AblTeamModel
+    homeTeam: AblTeamModel
+    description?: string
+    _id?: string
+    awayTeamRoster?: PopulatedRoster[] 
+    homeTeamRoster?: PopulatedRoster[]
+}
+
+
+
+export { GameModel, FormGameModel, PopulatedGameModel  };

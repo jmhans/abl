@@ -23,6 +23,13 @@ class LineupAddPlayerModel {
   ) { }
 }
 
+interface PopulatedRoster {
+  player: object 
+  lineupPosition: string
+  rosterOrder: number
+  originalPosition?: string
+}
+
  
 
-export { LineupModel, LineupAddPlayerModel, Roster };
+export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster };

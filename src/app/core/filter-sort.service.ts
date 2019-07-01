@@ -17,6 +17,37 @@ export class FilterSortService {
     const check = !!(array.length && item0 !== null && Object.prototype.toString.call(item0) === '[object Object]');
     return check;
   }
+  
+  private _hasNestedProperty(obj: any, patternMatch: string, excludeProps? : string | string[], dateFormat? : string): boolean {
+    
+    const isoDateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/; // ISO UTC
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (!excludeProps || excludeProps.indexOf(key) === -1) {
+          const thisVal = obj[key] || ''
+          if (
+            // Value is a string and NOT a UTC date
+            typeof thisVal === 'string' &&
+            !thisVal.match(isoDateRegex) &&
+            thisVal.toLowerCase().indexOf(patternMatch) !== -1
+          ) {
+            return true;
+          } else if (typeof thisVal === 'object') {
+            return this._hasNestedProperty(thisVal, patternMatch, excludeProps, dateFormat);
+          } else if (
+              // Value is a Date object or UTC string
+              (thisVal instanceof Date || thisVal.toString().match(isoDateRegex)) &&
+              // https://angular.io/api/common/DatePipe
+              // Matching date format string passed in as param (or default to 'medium')
+              this.datePipe.transform(thisVal, dateFormat).toLowerCase().indexOf(patternMatch) !== -1
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+    return false;
+    }
 
   search(array: any[], query: string, excludeProps?: string|string[], dateFormat?: string) {
     // Match query to strings and Date objects / ISO UTC strings
@@ -29,32 +60,7 @@ export class FilterSortService {
     const isoDateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/; // ISO UTC
     const dateF = dateFormat ? dateFormat : 'medium';
     const filteredArray = array.filter(item => {
-      for (const key in item) {
-        if (item.hasOwnProperty(key)) {
-          if (!excludeProps || excludeProps.indexOf(key) === -1) {
-            const thisVal = item[key] || '';
-            if (
-              // Value is a string and NOT a UTC date
-              typeof thisVal === 'string' &&
-              !thisVal.match(isoDateRegex) &&
-              thisVal.toLowerCase().indexOf(lQuery) !== -1
-            ) {
-              return true;
-            } else {
-              if(thisVal.toString().match(isoDateRegex)) {   console.log(this.datePipe.transform(thisVal, dateF).toLowerCase());}
-              if (
-              // Value is a Date object or UTC string
-              (thisVal instanceof Date || thisVal.toString().match(isoDateRegex)) &&
-              // https://angular.io/api/common/DatePipe
-              // Matching date format string passed in as param (or default to 'medium')
-              this.datePipe.transform(thisVal, dateF).toLowerCase().indexOf(lQuery) !== -1
-            ) {
-              return true;
-            }
-                   }
-          }
-        }
-      }
+      return this._hasNestedProperty(item, lQuery, excludeProps, dateFormat);
     });
     return filteredArray;
   }

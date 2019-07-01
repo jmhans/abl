@@ -26,6 +26,7 @@ const BulkAdd = BulkAddController.BulkAdd;
 const BulkLoad = BulkAddController.BulkLoad;
 
 
+
 /*
  |--------------------------------------
  | Authentication Middleware
@@ -319,6 +320,7 @@ module.exports = function(app, config) {
   app.put('/api3/game/:id', jwtCheck, AblGameController._put);
   
   app.get("/api3/statlines", makeGet(Statline));
+  app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));
   app.get("/data/:flname", jwtCheck, BulkAdd._getFile);
   var bl = new BulkLoad();
   app.post("/data/:model", jwtCheck,  (...args) => bl._postData(...args));
