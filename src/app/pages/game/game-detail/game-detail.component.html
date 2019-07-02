@@ -9,7 +9,7 @@
   </li>
 </ul>
 
-<ul fxFlex="33%" class="list-group list-group-flush">
+<!-- <ul fxFlex="33%" class="list-group list-group-flush">
   <li *ngFor="let plyr of game.awayTeamRoster" class="list-group-item">
   {{plyr.player.name}} | {{plyr.lineupPosition}} | {{plyr.playedPosition}} | {{plyr.box | json }}</li>
 </ul>
@@ -18,12 +18,19 @@
   <li *ngFor="let plyr of game.homeTeamRoster" class="list-group-item">
   {{plyr.player.name}} | {{plyr.lineupPosition}} | {{plyr.playedPosition}} | {{plyr.box | json }}</li>
 </ul>
-
+ -->
 
 <ul fxFlex="33%" class="list-group list-group-flush">
   
   <li *ngFor="let sl of potentialStatlines" class="list-group-item">
     {{sl | json}}
+  </li>
+</ul>
+
+<ul fxFlex="33%" class="list-group list-group-flush">
+  
+  <li *ngFor="let ro of rosters" class="list-group-item">
+    {{ro | json}}
   </li>
 </ul>
 
