@@ -26,7 +26,7 @@ export class GameDetailComponent {
   
   @Input() game: PopulatedGameModel;
   rosters: LineupModel[];
-  potentialStatlines: potentialSL[];
+  potentialStatlines: object;
   rosterObs: Observable<LineupModel>;
   statsSub: Subscription;
   RosterSub: Subscription;
@@ -49,17 +49,23 @@ export class GameDetailComponent {
   }
   
   _getRosters() {
-
+    
+    this.potentialStatlines = {};
+    
     const teams = [this.game.awayTeam._id, this.game.homeTeam._id]
-
-    from(teams).subscribe((tm) => {
+    teams.map((team)=> {this.potentialStatlines[team] = []});
+    
+    
+    const statsSub = from(teams).subscribe((tm) => {
+      this.potentialStatlines[tm] = []
       this.rosterService.getLineupByTeamId$(tm)
         .subscribe(res => {
           from(res.roster).subscribe((plyr) => {
             this.ablGame.getGameStatsForPlayer$(plyr.player["mlbID"], this.game.gameDate)
               .subscribe( statRes => {
-                console.log(statRes)
-                this.potentialStatlines[tm].plyrs.push(statRes)
+                
+                this.potentialStatlines[tm].push(statRes)
+                console.log(this.potentialStatlines[tm])
             })
           })
           //this.rosters.push(res);

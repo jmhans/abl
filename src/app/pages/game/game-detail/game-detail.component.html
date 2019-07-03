@@ -20,17 +20,19 @@
 </ul>
  -->
 
+Away Team: 
 <ul fxFlex="33%" class="list-group list-group-flush">
   
-  <li *ngFor="let sl of potentialStatlines" class="list-group-item">
+  <li *ngFor="let sl of potentialStatlines[game.awayTeam._id]" class="list-group-item">
     {{sl | json}}
   </li>
 </ul>
 
+
+Home Team
 <ul fxFlex="33%" class="list-group list-group-flush">
-  
-  <li *ngFor="let ro of rosters" class="list-group-item">
-    {{ro | json}}
+  <li *ngFor="let sl of potentialStatlines[game.homeTeam._id]" class="list-group-item">
+    {{sl | json}}
   </li>
 </ul>
 
