@@ -10,7 +10,9 @@ import { MlbPlayerModel } from './../../core/models/mlb.player.model';
 import { RosterRecordModel } from './../../core/models/roster.record.model';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { RosterService } from './../../core/services/roster.service';
-import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-players',
@@ -34,8 +36,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['name', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();

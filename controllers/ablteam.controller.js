@@ -4,7 +4,6 @@ const request = require('request');
 const AblTeam = require('./../models/owner').AblTeam;
 const Owner = require('./../models/owner').Owner;
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
-const sgMail = require('@sendgrid/mail');
 
 var AblTeamController = {
   
@@ -76,21 +75,7 @@ var AblTeamController = {
         }
         team.owners.forEach((owner) => {
           if (!owner.verified && owner.email != '') {
-            //Send an email invitation with the right link.
-            
-            // using SendGrid's v3 Node.js Library
-            // https://github.com/sendgrid/sendgrid-nodejs
 
-//             sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-            
-//             const msg = {
-//               to: owner.email,
-//               from: 'jmhans@hotmail.com',
-//               subject: 'Sending with SendGrid is Fun',
-//               text: 'and easy to do anywhere, even with Node.js',
-//               html: '<strong>and easy to do anywhere, even with Node.js</strong>' + JSON.stringify(team),
-//             };
-//             sgMail.send(msg);
              }
         })
         res.send(team);

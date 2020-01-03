@@ -6,15 +6,13 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
-import {MatFormFieldModule} from '@angular/material';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatInputModule, MatNativeDateModule} from '@angular/material';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
-
-import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-import { InMemoryDataService }  from './in-memory-data.service';
 
 import { DatePipe } from '@angular/common';
 import { ApiService } from './core/api.service';
@@ -125,9 +123,6 @@ import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.
     FlexLayoutModule,
     HttpModule, 
     HttpClientModule,
-    HttpClientInMemoryWebApiModule.forRoot(
-      InMemoryDataService, {dataEncapsulation: false, passThruUnknownUrl: true}
-      ), 
     OwnersModule,
     AppRoutingModule, 
     BrowserAnimationsModule, 
