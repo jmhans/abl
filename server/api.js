@@ -255,7 +255,8 @@ module.exports = function(app, config) {
   });
   
   
-  app.get("/api3/mlbGame/:dt", MlbApiController._get);
+//   app.get("/api3/mlbGame/:dt", MlbApiController._get);
+//   app.get("/api3/mlbPlayers/:dt", MlbApiController._getPlayers);
   
   app.get("/api3/team/:id", AblTeamController._getById);
   app.post('/api3/team/new', jwtCheck, AblTeamController._post );

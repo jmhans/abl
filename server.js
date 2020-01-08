@@ -11,9 +11,6 @@ const dotenv = require('dotenv');
 
 var result = dotenv.config();
 
-
-
-
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test', {useNewUrlParser: true});
 
 //var CONTACTS_COLLECTION = "contacts";
@@ -23,8 +20,6 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test', {u
   // const bulkAdd = require('./controllers/bulkadd.controller')
   // bulkAdd._addGames();
 // REMOVE WHEN DONE
-
-
 
 var app = express();
 app.use(bodyParser.json());

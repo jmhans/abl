@@ -1,6 +1,9 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 
 const request = require('request');
+const axios = require('axios');
+var express = require('express');
+var router = express.Router();
 const BASE_URL = "http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
 const Player = require('./../models/player').Player;
@@ -173,8 +176,61 @@ function getPlayersInGame(gamePk, gameDt) {
 
 var MlbApiController = {
 
-  _get: function(req, res, next) {
+//   _get: function(req, res, next) {
 
+//     var pad = function(num, size) {
+//       var s = num + "";
+//       while (s.length < size) s = "0" + s;
+//       return s;
+//     }
+
+//     const gm_date = req.params.dt;
+    
+//     var inputDate = new Date(gm_date)
+//     var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
+//     var month = pad(inputDate.getUTCMonth() + 1, 2);
+//     var year = inputDate.getUTCFullYear();
+//     const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
+//     request(APIUrl, {
+//       json: true
+//     }, (err, resp, body) => {
+//       if (err) {
+//         return console.log(err);
+//       }
+//       //console.log(body);
+
+//       var gamesList = [];
+//       var dateItem = body.dates.find(x => x.date == (year + "-" + month + "-" + day))
+
+//       if (dateItem) {
+//         gamesList = dateItem.games
+
+//         gamesList.forEach((gm) => {
+
+//           var query = {
+//             'gamePk': gm.gamePk
+//           };
+//           mlbGame.findOneAndUpdate(query, gm, {
+//             upsert: true
+//           }, function(err, doc) {
+//             if (err) return res.send(500, {
+//               error: err
+//             });
+
+//             //return res.send("succesfully saved");
+//           });
+//         getPlayersInGame(gm.gamePk, gm.gameDate);
+
+//         });
+        
+//       }
+
+//       res.status(200).send(gamesList);
+//     })
+
+//   },
+  
+ _get: function (req, res, next) {
     var pad = function(num, size) {
       var s = num + "";
       while (s.length < size) s = "0" + s;
@@ -187,47 +243,105 @@ var MlbApiController = {
     var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
     var month = pad(inputDate.getUTCMonth() + 1, 2);
     var year = inputDate.getUTCFullYear();
-    const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
-    request(APIUrl, {
-      json: true
-    }, (err, resp, body) => {
-      if (err) {
-        return console.log(err);
-      }
-      //console.log(body);
+    
+      const MLBBoxscores = require('mlbboxscores');
 
-      var gamesList = [];
-      var dateItem = body.dates.find(x => x.date == (year + "-" + month + "-" + day))
+      var options = {
+        path: 'year_2019/month_07/day_23/'
+      };
 
-      if (dateItem) {
-        gamesList = dateItem.games
+      var mlbboxscores = new MLBBoxscores(options);
+      mlbboxscores.get((err, boxscores) => {
 
-        gamesList.forEach((gm) => {
+        res.status(200).send(boxscores)
+      });
+    
 
-          var query = {
-            'gamePk': gm.gamePk
-          };
-          mlbGame.findOneAndUpdate(query, gm, {
-            upsert: true
-          }, function(err, doc) {
-            if (err) return res.send(500, {
-              error: err
-            });
+    
+  },
+  
 
-            //return res.send("succesfully saved");
-          });
-        getPlayersInGame(gm.gamePk, gm.gameDate);
+  
+  _getPlayers: function (req, res, next) {
+    var pad = function(num, size) {
+      var s = num + "";
+      while (s.length < size) s = "0" + s;
+      return s;
+    }
 
-        });
-        
-      }
+    const gm_date = req.params.dt;
+    
+    var inputDate = new Date(gm_date)
+    var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
+    var month = pad(inputDate.getUTCMonth() + 1, 2);
+    var year = inputDate.getUTCFullYear();
+    const Mlbplayers = require('mlbplayers');
 
-      res.status(200).send(gamesList);
-    })
+      var options = {
+          path: 'year_2019/month_07/day_23/'
+      };
 
-  }, 
+      var mlbplayers = new Mlbplayers(options);
+
+      mlbplayers.get(function (err, players) {
+        res.status(200).send(players)
+
+        //... do something
+      });
+    
+  }
+  
+  
+
+  
+  
 
 }
 
 
-module.exports = MlbApiController
+const MLBStatsAPI = require('mlb-stats-api');
+
+
+class mlbAPI {
+  
+  constructor() {
+    this.mlbStats = new MLBStatsAPI();
+  }
+  
+
+
+  async _getGame(gmPk) {
+    
+    try {
+      const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
+      return response;
+      } catch (err) {
+        console.error(`Error in _getGame: ${err}`);
+      }
+    }
+
+  async _getBoxHttp(req, res, next) {
+    
+      try {
+        // If credentials exist
+          const gm = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: req.params.id }}); //await this._getGame(529572);
+          return res.send(gm.data);
+       } catch (err) {
+        console.error(`Error in getGameHttp(): ${err}`);
+        return res.status(500).send({message: err.message});
+
+      }
+
+  } 
+  
+ 
+  
+  
+  route() {
+    router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args))
+    return router;
+  }
+}
+
+
+module.exports = mlbAPI
