@@ -314,7 +314,7 @@ class mlbAPI {
     
     try {
       const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
-      return response;
+      return response.data;
       } catch (err) {
         console.error(`Error in _getGame: ${err}`);
       }
@@ -323,22 +323,138 @@ class mlbAPI {
   async _getBoxHttp(req, res, next) {
     
       try {
-        // If credentials exist
           const gm = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: req.params.id }}); //await this._getGame(529572);
-          return res.send(gm.data);
+          return res.send(gm);
        } catch (err) {
         console.error(`Error in getGameHttp(): ${err}`);
         return res.status(500).send({message: err.message});
 
       }
 
-  } 
+  }
+  async _getSchedule(dt) {
+    try {
+          const sched = await this.mlbStats.getSchedule({ params: { date: dt, sportId: 1 }}); //await this._getGame(529572);
+          return sched.data;
+       } catch (err) {
+        console.error(`Error in getSchedule(): ${err}`);
+      }
+  }
   
- 
+  async _getResourceHttp(req, res, next) {
+    try {
+      var fn;
+      switch (req.params.resource) {
+        case "game": 
+          fn = this.mlbStats.getGameBoxscore
+          break;
+        case "schedule": 
+          fn = this.mlbStats.getSchedule
+          break;
+        default: 
+
+      }
+
+
+      const results = await fn({params: req.query});
+      return res.send(results.data)  
+    } catch (err) {
+      console.error(`Error in getResourceHttp(): ${err}`);
+      return res.status(500).send({message: err.message});
+    }
+  
+    
+  }
+  
+  async _getSimpleBox(gmPk) {
+    
+    try {
+      const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
+      return {gamePk: gmPk, boxscore: this.simplifyBox(response.data)};
+      } catch (err) {
+        console.error(`Error in _getSimpleBox: ${err}`);
+      }
+    }
+  
+  simplifyBox(bx) {
+    return {
+      "teams": {
+        "away": {
+          "team": bx.teams.away.team, 
+          "teamCode": bx.teams.away.teamCode, 
+          "abbreviation": bx.teams.away.abbreviation,
+          "players": bx.teams.away.batters.reduce((allBatters, thisBatter)=> {
+            allBatters.push(bx.teams.away.players["ID" + thisBatter]);
+            return allBatters;
+          }, [])
+        },
+        "home": {
+          "team": bx.teams.home.team, 
+          "teamCode": bx.teams.home.teamCode, 
+          "abbreviation": bx.teams.home.abbreviation,
+          "players": bx.teams.home.batters.reduce((allBatters, thisBatter)=> {
+            allBatters.push(this.simplifyBatter(bx.teams.home.players["ID" + thisBatter]));
+            return allBatters;
+          }, [])
+        }, 
+        
+      }
+           
+    }
+  }
+  
+  simplifyBatter(batter) {
+    return {
+      "person": batter.person, 
+      "position": batter.position, 
+      "stats": {
+        "batting": batter.stats.batting, 
+        "fielding": batter.stats.fielding
+      }, 
+      "allPositions": batter.allPositions
+    }
+  }
+  
+  
+  
+  
+  async _getBoxesForDate(dt) {
+    try {
+      const sched = await this._getSchedule(dt);
+      if (sched) {
+        console.log(sched.dates);
+        return sched.dates[0].games.reduce(async (prevProm, gmRec)=> {
+          const collection = await prevProm;
+          const gmBox = await this._getSimpleBox(gmRec.gamePk);
+            collection.push(gmBox);
+          return collection;
+                 
+        }, Promise.resolve([]));    
+      }
+      
+    } catch (err) {
+      console.error(`Error in _getBoxesForDate: ${err}`);
+    }
+  }
+  
+  async _getBoxesHttp(req, res, next) {
+    
+      try {
+          const boxes = await this._getBoxesForDate( req.query.date ); //await this._getGame(529572);
+          return res.send(boxes);
+       } catch (err) {
+        console.error(`Error in getGameHttp(): ${err}`);
+        return res.status(500).send({message: err.message});
+
+      }
+
+  }
   
   
   route() {
-    router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args))
+    router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args));
+    router.get('/mlb2/:resource', (...args) => this._getResourceHttp(...args));
+    router.get('/mlb/boxes', (...args) => this._getBoxesHttp(...args));
     return router;
   }
 }
