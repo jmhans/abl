@@ -1,7 +1,7 @@
 const request = require('request');
 
 
-var today = new Date()
+var today = new Date("2019-07-23")
 
 var pad = function(num, size) {
   var s = num + "";

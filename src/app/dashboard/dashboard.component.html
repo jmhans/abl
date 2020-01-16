@@ -9,7 +9,7 @@
       <a *ngFor="let team of fs.orderByDate(filteredTeams, 'location')" [routerLink]="['/team', team._id]" class="list-group-item list-group-item-action flex-column align-items-start">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{team.location + ' ' + team.nickname}}</h5>
-          <small *ngFor="let owner of team.owners">{{ owner.name }}</small>
+          <span *ngFor="let owner of team.owners">{{ owner.name }}</span>
         </div>
       </a>
     </section>
