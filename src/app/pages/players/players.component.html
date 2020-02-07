@@ -1,4 +1,4 @@
-<mat-form-field>
+<!-- <mat-form-field>
   <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
 </mat-form-field>
 
@@ -91,7 +91,7 @@
   </table>
 
   <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
-</div>
+</div> -->
 
 
 <h3>
@@ -104,6 +104,8 @@
   <thead>
     <tr>
     <th>Player Name</th>
+    <th>MLB Id</th>
+    <th>ABL Id</th>
     <th>Position</th>
     <th>Team</th>
     <th>Status</th>
@@ -124,6 +126,8 @@
   <tbody>
     <tr *ngFor="let player of playerList">
       <td>{{player.name}}</td>
+      <td>{{player.mlbID}}</td>
+      <td>{{player._id}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>

@@ -28,7 +28,7 @@ async function getTeamPlayers(teams, teamType, gm) {
 
   try {
     var plyrs = [];
-    for (var pk = 0; pk<playerKeys.length; pk++) { 
+    for (var pk = 0; pk<playerKeys.length; pk++) { // I don't think this is working because of the in within the async function.
       let player = players[playerKeys[pk]]
       const plyr = await new PlayersController()._updatePlayer(player, team , gm); // appendPlayerRecord(player, team, gm);
       const sl = await new StatlineController()._updateStatline(player, gm);  //updateStatlineRecord(player, team, gamePk, gameDt);
@@ -75,8 +75,10 @@ var MlbApiController = {
       while (s.length < size) s = "0" + s;
       return s;
     }
+
+    const gm_date = req.params.dt;
     
-    var inputDate = new Date(req.params.dt)
+    var inputDate = new Date(gm_date)
     var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
     var month = pad(inputDate.getUTCMonth() + 1, 2);
     var year = inputDate.getUTCFullYear();
@@ -120,6 +122,9 @@ var MlbApiController = {
 
   },
   
+ 
+  
+
 }
 
 
@@ -272,6 +277,9 @@ class mlbAPI {
       }
 
   }
+  
+
+
   
   
   route() {
