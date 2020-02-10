@@ -85,7 +85,9 @@
              <button
             class="btn btn-info"
             (click)="_saveRecToDB(gm)"
-            (type)="button">Save</button>
+            (type)="button"
+              *ngIf="!gm.saved"
+                     >Save</button>
 <!--             <div class="event-icons">
               <img
                 *ngIf="!event.viewPublic"

@@ -106,6 +106,7 @@
     <th>Player Name</th>
     <th>MLB Id</th>
     <th>ABL Id</th>
+    <th>ABL Team</th>
     <th>Position</th>
     <th>Team</th>
     <th>Status</th>
@@ -128,6 +129,7 @@
       <td>{{player.name}}</td>
       <td>{{player.mlbID}}</td>
       <td>{{player._id}}</td>
+      <td>{{player.ablTeam ? player.ablTeam.nickname : ''}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>

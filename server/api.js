@@ -287,20 +287,38 @@ module.exports = function(app, config) {
       res.send(gamesArr);
     });
   })
-  app.get("/api3/mlbPlayers", (req, res) => {
-    Player.find({ablTeam: null}, (err, players) => {
-      let playersArr = [];
-      if (err) {
-        return res.status(500).send({message: err.message});
-      }
-      if (players) {
-        players.forEach((player) => {
-          playersArr.push(player);
-        });
-      }
-      res.send(playersArr);
+//   app.get("/api3/mlbPlayers", (req, res) => {
+//     Player.find({ablTeam: null}, (err, players) => {
+//       let playersArr = [];
+//       if (err) {
+//         return res.status(500).send({message: err.message});
+//       }
+//       if (players) {
+//         players.forEach((player) => {
+//           playersArr.push(player);
+//         });
+//       }
+//       res.send(playersArr);
+//     });
+//   })
+  
+  app.get("/api3/mlbPlayers", (req, res, next) => {
+    
+    Player.aggregate([
+        {$lookup: {from: "activeRosterRecords", localField:"_id", foreignField:"roster.player", as: "ablRoster"}}, 
+        {$unwind: {path: "$ablRoster", preserveNullAndEmptyArrays:true}}, 
+        {$addFields: {"ablTeam": "$ablRoster.ablTeam"}}, 
+        {$project: {"ablRoster":0}},
+        {$lookup: {from: "ablteams", localField:"ablTeam", foreignField:"_id", as: "ablTeam"}},
+        {$unwind: {path: "$ablTeam", preserveNullAndEmptyArrays:true}}
+    ], function(err, players) {
+      if (err) return next(err);
+
+      res.send(players);
     });
+    
   })
+  
   app.get('/api3/player/:id', jwtCheck, (req, res) => {
     Player.findById(req.params.id, (err, player) => {
       if (err) {
