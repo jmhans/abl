@@ -24,7 +24,8 @@ Away Team:
 <ul fxFlex="33%" class="list-group list-group-flush">
   
   <li *ngFor="let sl of potentialStatlines[game.awayTeam._id]" class="list-group-item">
-    {{sl | json}}
+    {{sl.player ? sl.player.name : ''}}: 
+    {{sl.stats.batting ? (sl.stats.batting.hits + "/" +  sl.stats.batting.atBats) : '0/0' }}
   </li>
 </ul>
 
@@ -32,7 +33,8 @@ Away Team:
 Home Team
 <ul fxFlex="33%" class="list-group list-group-flush">
   <li *ngFor="let sl of potentialStatlines[game.homeTeam._id]" class="list-group-item">
-    {{sl | json}}
+    {{sl.player ? sl.player.name : ''}}: 
+    {{sl.stats.batting ? (sl.stats.batting.hits + "/" +  sl.stats.batting.atBats) : '0/0' }}
   </li>
 </ul>
 

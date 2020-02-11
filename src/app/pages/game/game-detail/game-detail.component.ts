@@ -53,7 +53,7 @@ export class GameDetailComponent {
     this.potentialStatlines = {};
     
     const teams = [this.game.awayTeam._id, this.game.homeTeam._id]
-    teams.map((team)=> {this.potentialStatlines[team] = []});
+    // teams.map((team)=> {this.potentialStatlines[team] = []});
     
     
     const statsSub = from(teams).subscribe((tm) => {
@@ -63,9 +63,13 @@ export class GameDetailComponent {
           from(res.roster).subscribe((plyr) => {
             this.ablGame.getGameStatsForPlayer$(plyr.player["mlbID"], this.game.gameDate)
               .subscribe( statRes => {
+                if (statRes.length > 0) {
+                  this.potentialStatlines[tm].push({player: plyr.player, stats: statRes[0].stats})  
+                } else {
+                  this.potentialStatlines[tm].push({player: plyr.player, stats: []})
+                }
                 
-                this.potentialStatlines[tm].push(statRes)
-                console.log(this.potentialStatlines[tm])
+                // console.log(this.potentialStatlines[tm])
             })
           })
           //this.rosters.push(res);
