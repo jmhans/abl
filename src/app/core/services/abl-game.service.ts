@@ -51,5 +51,16 @@ export class AblGameService {
       );
   }
   
+  getGameRosters$(gameId: string): Observable<[]> {
+    
+    return this.http
+      .get<[]>(`${this.base_api}game/${gameId}/rosters`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
 
 }

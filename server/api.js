@@ -333,6 +333,7 @@ module.exports = function(app, config) {
   
   
   app.get('/api3/game/:id', jwtCheck, AblGameController._getById);
+  app.get('/api3/game/:id/rosters', (...args) => AblGameController._getRosters(...args))
   
   app.post('/api3/game/new', jwtCheck, AblGameController._post );
   app.put('/api3/game/:id', jwtCheck, AblGameController._put);
