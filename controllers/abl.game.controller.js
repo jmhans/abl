@@ -89,32 +89,6 @@ var AblGameController = {
     })
   },
 
-  _processGame: function(gameObj) {
-    /* gameDate: { type: Date, required: true },
-    awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
-    homeTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true}, 
-    description: String,
-    awayTeamRoster: [{type: gamePlayerSchema}], 
-    homeTeamRoster: [{type: gamePlayerSchema}],
-    awayScore: { type: Number, required: false},
-    homeScore: { type: Number, required: false},
-    winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
-    loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false} */
-
-    //Retrieve rosters for teams
-
-
-    this._getRoster(gameObj, "H")
-    this._getRoster(gameObj, "A")
-
-
-    // ABL_STARTERS
-    //     for (var starter = 0; starter<ABL_STARTERS.length; starter++) {
-    //       gameObj.awayTeamRoster
-    //     }
-
-
-  },
 
   _getById: function(req, res) {
     AblGame.findById(req.params.id).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, game) {
@@ -128,7 +102,7 @@ var AblGameController = {
           message: 'Game not found.'
         });
       }
-      AblGameController._processGame(game);
+      // AblGameController._processGame(game);
       res.send(game);
     });
 
@@ -194,104 +168,6 @@ var AblGameController = {
     });
   },
 
-  _getRoster: function(gameObj, rosterType) {
-    var targetTeamId = '';
-    switch (rosterType) {
-      case "H":
-        targetTeamId = gameObj.homeTeam._id
-        break;
-      case "A":
-        targetTeamId = gameObj.awayTeam._id
-        break;
-      default:
-        // code block
-        targetTeamId = gameObj.homeTeam._id
-    }
-
-
-    const day = gameObj.gameDate
-
-    var nextDay = new Date(day.toISOString());
-    nextDay.setDate(day.getDate() + 1)
-
-    AblRosterController._getRosterForTeamAndDate(targetTeamId, new Date(day.toISOString)).then((resp) => {
-      var potentialPlayers = resp
-      var finalRoster = []
-      // need to retrieve player's stats for the day...
-
-
-      Statline.find({
-        gameDate: {
-          $gte: day.toISOString().substring(0, 10),
-          $lt: nextDay.toISOString().substring(0, 10)
-        }
-      }, (err, stats) => {
-        console.log(stats.length + " stat records found.");
-
-        for (var plyrCt = 0; plyrCt < potentialPlayers.length; plyrCt++) {
-          var plyr = potentialPlayers[plyrCt];
-          plyr.dailyStats = stats.filter((statline) => {
-              return (statline.mlbId == plyr.player.mlbID);
-            })
-            .map(AblGameController._getDailyStats)
-            .reduce(function getSum(total, thisRec) {
-              for (var propertyName in thisRec) {
-                // propertyName is what you want
-                // you can get the value like this: myObject[propertyName]
-                switch (propertyName) {
-                  case 'mlbId':
-                    total.mlbId = thisRec.mlbId;
-                    break;
-                  case 'gamePk':
-                  case 'gameDate':
-                  case 'position(s)':
-                    total[propertyName].push(thisRec[propertyName])
-                    break;
-                  default:
-                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
-                }
-
-              }
-
-              return total;
-            }, {
-              'gamePk': [],
-              'gameDate': [],
-              'position(s)': []
-            });
-        }
-
-        for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-          var posPAs = 0
-          var starters = [];
-          for (plyrCt = 0; plyrCt < potentialPlayers.length; plyrCt++) {
-            var potentialPlayer = potentialPlayers[plyrCt];
-
-            if (!potentialPlayer.played && AblGameController.canPlayPosition(potentialPlayer.lineupPosition, ABL_STARTERS[starter]) && posPAs < 2) {
-              // need to check to see if player played (e.g. 'g'>0). 
-              finalRoster.push({
-                'player': potentialPlayer.player,
-                'lineupPosition': potentialPlayer.lineupPosition,
-                'rosterOrder': potentialPlayer.rosterOrder,
-                'playedPosition': ABL_STARTERS[starter],
-                'box': potentialPlayer.dailyStats
-              });
-              potentialPlayer.played = true;
-              posPAs += AblGameController.plateAppearances(potentialPlayer.dailyStats)
-            }
-          }
-
-
-        }
-
-        AblGameController._saveGameRoster(finalRoster, gameObj, rosterType);
-
-
-      })
-    });
-
-  },
-
   _getRostersForGame: async function(gmID) {
 
     try {
@@ -299,8 +175,8 @@ var AblGameController = {
       var gm = await AblGame.findById(gmID);
       const day = gm.gameDate
 
-      var homeTeamLineup = await AblRosterController._getRosterForTeamAndDate2(gm.homeTeam._id, new Date(day.toISOString()))
-      var awayTeamLineup = await AblRosterController._getRosterForTeamAndDate2(gm.awayTeam._id, new Date(day.toISOString()))
+      var homeTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.homeTeam._id, new Date(day.toISOString()))
+      var awayTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.awayTeam._id, new Date(day.toISOString()))
 
       var lineups_with_stats = await this._getStatsForLineups([homeTeamLineup, awayTeamLineup], day);
 
@@ -403,38 +279,6 @@ var AblGameController = {
 
   },
 
-
-  _getStartersFromLinueup: function(lineup) {
-    var finalRoster = [];
-    for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-      var posPAs = 0
-      var starters = [];
-      for (var plyrCt = 0; plyrCt < lineup.length; plyrCt++) {
-        var potentialPlayer = lineup[plyrCt];
-
-        if (!potentialPlayer.played && this.canPlayPosition(potentialPlayer.lineupPosition, ABL_STARTERS[starter]) && posPAs < 2) {
-          // need to check to see if player played (e.g. 'g'>0). 
-          if (potentialPlayer.dailyStats && potentialPlayer.dailyStats.g > 0) {
-
-
-            finalRoster.push({
-              'player': potentialPlayer.player,
-              'lineupPosition': potentialPlayer.lineupPosition,
-              'rosterOrder': potentialPlayer.rosterOrder,
-              'playedPosition': ABL_STARTERS[starter],
-              'box': potentialPlayer.dailyStats
-            });
-            potentialPlayer.played = true;
-            posPAs += this.plateAppearances(potentialPlayer.dailyStats)
-          }
-        }
-      }
-
-
-    }
-
-    return finalRoster;
-  },
 
   _post: function(req, res) {
 

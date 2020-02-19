@@ -138,29 +138,7 @@ var AblRosterController = {
     })
 
   }, 
-  _getRosterForTeamAndDate: function(teamId, gmDate) {
-    return new Promise(function(resolve, reject) {
-      Lineup.findOne({
-        ablTeam: new ObjectId(teamId)
-      }).populate('roster.player priorRosters.player').exec(function(err, lineup) {
-        console.log(lineup.effectiveDate);
-        if (lineup.effectiveDate < gmDate) {
-            resolve(lineup.roster);
-        } else {
-          var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
-          for (s = sortedPR.length - 1; s>=0; s--) {
-            if (sortedPR[s].effectiveDate < gmDate) {
-              resolve(sortedPR[s]);
-            }
-          }
-
-        }
-      })   
-    });
-
-
-  }, 
-  _getRosterForTeamAndDate2: async function(teamId, gmDate) {
+  _getRosterForTeamAndDate: async function (teamId, gmDate) {
     try {
       var lineup = await Lineup.findOne({ablTeam: new ObjectId(teamId)}).populate('roster.player priorRosters.player').exec();
       if (lineup) {
