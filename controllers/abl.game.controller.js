@@ -227,9 +227,10 @@ var AblGameController = {
   },
 
   _getStatsForLineups: async function(lineups, current_date) {
-
+    
     var nextDay = new Date(current_date.toISOString());
     nextDay.setDate(current_date.getDate() + 1)
+    console.log("Searching stats between " + current_date + " and " + nextDay);
     var dailyStats = await Statline.find({
       gameDate: {
         $gte: current_date.toISOString().substring(0, 10),

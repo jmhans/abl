@@ -15,7 +15,8 @@
     <ul class="list-group list-group-flush">
 
       <li *ngFor="let plyr of rosters.awayTeam" class="list-group-item">
-        {{plyr.player ? plyr.player.player.name : ''}}: 
+        <span *ngIf="plyr.player"> {{plyr.player.player.name}}</span>
+        <span *ngIf="plyr.player"> ({{plyr.player.player.position}} - {{plyr.player.player.team}}) : </span>
         {{plyr.dailyStats ? ( plyr.dailyStats.h + "/" +  plyr.dailyStats.ab) : '0/0' }}
       </li>
     </ul>
@@ -25,7 +26,8 @@
   <strong>Home Team</strong>
     <ul class="list-group list-group-flush">
       <li *ngFor="let plyr of rosters.homeTeam" class="list-group-item">
-        {{plyr.player ? plyr.player.player.name : ''}}: 
+        <span *ngIf="plyr.player"> {{plyr.player.player.name}}</span>
+        <span *ngIf="plyr.player"> ({{plyr.player.player.position}} - {{plyr.player.player.team}}) : </span>
         {{plyr.dailyStats ? ( plyr.dailyStats.h + "/" +  plyr.dailyStats.ab) : '0/0' }}
       </li>
     </ul>  
