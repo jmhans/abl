@@ -52,25 +52,34 @@ export class GameDetailComponent {
     
     this.potentialStatlines = {};
     
-    const teams = [this.game.awayTeam._id, this.game.homeTeam._id]
-    teams.map((team)=> {this.potentialStatlines[team] = []});
+    const statsSub = this.ablGame.getGameRosters$(this.game._id)
+      .subscribe(res => {
+        this.rosters = res;
+      })
+    
+//     const teams = [this.game.awayTeam._id, this.game.homeTeam._id]
+//     // teams.map((team)=> {this.potentialStatlines[team] = []});
     
     
-    const statsSub = from(teams).subscribe((tm) => {
-      this.potentialStatlines[tm] = []
-      this.rosterService.getLineupByTeamId$(tm)
-        .subscribe(res => {
-          from(res.roster).subscribe((plyr) => {
-            this.ablGame.getGameStatsForPlayer$(plyr.player["mlbID"], this.game.gameDate)
-              .subscribe( statRes => {
+//     const statsSub = from(teams).subscribe((tm) => {
+//       this.potentialStatlines[tm] = []
+//       this.rosterService.getLineupByTeamId$(tm)
+//         .subscribe(res => {
+//           from(res.roster).subscribe((plyr) => {
+//             this.ablGame.getGameStatsForPlayer$(plyr.player["mlbID"], this.game.gameDate)
+//               .subscribe( statRes => {
+//                 if (statRes.length > 0) {
+//                   this.potentialStatlines[tm].push({player: plyr.player, stats: statRes[0].stats})  
+//                 } else {
+//                   this.potentialStatlines[tm].push({player: plyr.player, stats: []})
+//                 }
                 
-                this.potentialStatlines[tm].push(statRes)
-                console.log(this.potentialStatlines[tm])
-            })
-          })
-          //this.rosters.push(res);
-        })
-    });
+//                 // console.log(this.potentialStatlines[tm])
+//             })
+//           })
+//           //this.rosters.push(res);
+//         })
+//     });
 
   }
   
@@ -80,31 +89,7 @@ export class GameDetailComponent {
   
   
   
-//   getStats() {
-//     var obsArr = []
-    
-    
-    
-    
-//     this.game.awayTeamRoster.forEach((rosterRec) => {
-//       this.statsSub = this.ablGame
-//       .getGameStatsForPlayer$(rosterRec.player["mlbID"], this.game.gameDate)
-//       .subscribe(
-//         res => {
-//           res.forEach((sl)=> {
-//             this.potentialStatlines.push(sl);  
-//           })
-//           this.loading = false;
-//         },
-//         err => {
-//           console.error(err);
-//           this.loading = false;
-//           this.error = true;
-//         }
-//       );
-//     })
-    
-//   }
+
   
   
   ngOnDestroy() {

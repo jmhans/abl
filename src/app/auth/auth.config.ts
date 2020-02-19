@@ -11,7 +11,7 @@ interface AuthConfig {
 };
 
 export const AUTH_CONFIG: AuthConfig = {
-  CLIENT_ID: 'EHKa7RHnXAJgasX4KcBjKl3y1IceDa2H',
+  CLIENT_ID: 'i2hAayrg7ZuV8PTQRQqL3XVKFupx4PM0',
   CLIENT_DOMAIN: 'actuarialgames.auth0.com', // e.g., you.auth0.com
   AUDIENCE: 'https://actuarialgames.auth0.com/api/v2/', // e.g., http://localhost:8083/api/
   REDIRECT: `${environment.BASE_URI}/callback`,

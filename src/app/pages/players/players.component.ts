@@ -32,8 +32,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
   actionPlayer: MlbPlayerModel;
   rosterUpdateSub: Subscription;
   submitting: boolean;
+  takenFilter: boolean;
   
-  displayedColumns: string[] = ['name', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
+  displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
 
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;

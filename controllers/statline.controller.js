@@ -2,6 +2,21 @@ const Statline = require('../models/statline');
 const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();
+const ablConfig = require('../server/ablConfig');
+
+
+// function _isPositionPlayer(plyr) {
+  
+//   if (plyr.allPositions) { 
+    
+//     nonPitcherPosList = plyr.allPositions.filter((posRec) => {return posRec.abbreviation != 'P'});
+
+//     return (nonPitcherPosList.length > 0);
+//   }
+//   return false;
+// }
+
+
 class StatlineController extends BaseController {
 
   constructor() {
@@ -33,6 +48,34 @@ class StatlineController extends BaseController {
       });
 
    }
+  
+  async _updateStatline(plyr, gm) {
+    if (ablConfig._isPositionPlayer(plyr)) {
+    var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
+      var query = {
+        'mlbId': plyr.person.id, 
+        'gameDate': gm.gameDate, 
+        'gamePk': gm.gamePk, 
+        
+      }
+      
+       var _statline = {
+                mlbId: plyr.person.id,
+                gameDate: gm.gameDate, 
+                gamePk: gm.gamePk, 
+                stats: plyr.stats,
+                positions: shortPositions
+              };
+      try {
+        const doc = await this.model.findOneAndUpdate(query, _statline, { upsert: true });
+        return doc;
+      } catch (err) {
+        console.error(`Error in _updateStatline:${err}`);
+      }
+
+
+    }  
+  }
   
     
 //   route() {

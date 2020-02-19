@@ -43,6 +43,7 @@ _update (req, res, next) {
   });
 }
 
+
 _delete(req, res, next) {
   this.model.findByIdAndRemove(req.params.id, req.body, function (err, post) {
     if (err) return next(err);

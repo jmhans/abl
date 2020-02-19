@@ -28,6 +28,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   // Model storing initial form values
   formTeam: FormTeamModel;
   formOwners: FormArray;
+  formOwnerControl: OwnerInterface;
   submitOwners: OwnerInterface[];
   
  
@@ -74,9 +75,11 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         
     //this.formOwners = this.teamForm.get('owners') as FormArray;
     if (this.auth.userProfile) {
-      this.formOwners[formOwnerIndex].userId = this.auth.userProfile.sub;
-      this.formOwners[formOwnerIndex].verified = true;
-      this.formOwners[formOwnerIndex].name = this.auth.userProfile.name;  
+      this.formOwners.controls[formOwnerIndex].patchValue({
+        userId: this.auth.userProfile.sub,
+        verified: true, 
+        name: this.auth.userProfile.name 
+      });
     }
     else {
       // Raise an error message saying they are not logged in. 

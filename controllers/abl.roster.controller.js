@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 
 const request = require('request');
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
@@ -138,27 +138,28 @@ var AblRosterController = {
     })
 
   }, 
-  _getRosterForTeamAndDate: function(teamId, gmDate) {
-    return new Promise(function(resolve, reject){
-      Lineup.findOne({
-        ablTeam: new ObjectId(teamId)
-      }).populate('roster.player priorRosters.player').exec(function(err, lineup) {
-        console.log(lineup.effectiveDate);
-        if (lineup.effectiveDate < gmDate) {
-            resolve(lineup.roster);
+  _getRosterForTeamAndDate: async function (teamId, gmDate) {
+    try {
+      var lineup = await Lineup.findOne({ablTeam: new ObjectId(teamId)}).populate('roster.player priorRosters.player').exec();
+      if (lineup) {
+    
+        if (new Date(lineup.effectiveDate) < gmDate) {
+          return lineup.roster;
         } else {
           var sortedPR = lineup.priorRosters.sort(function(a,b) {return (a.effectiveDate - b.effectiveDate);})
           for (s = sortedPR.length - 1; s>=0; s--) {
             if (sortedPR[s].effectiveDate < gmDate) {
-              resolve(sortedPR[s]);
+              return(sortedPR[s]);
             }
           }
-
-        }
-      })   
-    });
-
-
+        } 
+      } else {
+        console.log("didn't find a lineup");
+      } 
+    } catch(err) {
+      console.error(`Error in _getRosterForTeamAndDate2:${err}`);
+    }
+   
   },
   
   _updateLineup: function(req, res) {
@@ -286,43 +287,6 @@ var AblRosterController = {
     
 
   } 
-//   _updatePlayerRecordsFromRosters: function() {
-    
-//     Lineup.find({}, (err, lineups)=> {
-//       if (err) {
-//         console.log ("Error finding lineups");
-//       }
-      
-//       lineups.forEach((lineup) => {
-//         lineup.roster.forEach((plyr) => {
-//           console.log(plyr.player);
-//           MlbPlayer.findById(plyr.player, (err, mlbPlayer) => { 
-//             if (err) {
-//               console.log(plyr);
-//               console.log(err);
-//             } else {
-//               console.log(mlbPlayer);
-//               mlbPlayer.ablTeam = new ObjectId(lineup.ablTeam)
-//               mlbPlayer.save((err) => {
-//                 if (err) {
-//                   console.log(mlbPlayer.name + ": ERROR");
-//                   console.log(err);
-//                 }
-//                 else {
-//                   console.log(mlbPlayer.name + " updated.")     
-//                 }
-                
-//               }) 
-//             }
-          
-//           })
-//         })
-//       })
-//     })
-    
-    
-//   }
-  
   
   
 }
