@@ -174,7 +174,7 @@ var AblGameController = {
 
       var gm = await AblGame.findById(gmID);
       const day = gm.gameDate
-
+      console.log(gm.gameDate);
       var homeTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.homeTeam._id, new Date(day.toISOString()))
       var awayTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.awayTeam._id, new Date(day.toISOString()))
 
@@ -233,8 +233,8 @@ var AblGameController = {
     console.log("Searching stats between " + current_date + " and " + nextDay);
     var dailyStats = await Statline.find({
       gameDate: {
-        $gte: current_date.toISOString().substring(0, 10),
-        $lt: nextDay.toISOString().substring(0, 10)
+        $gte: current_date.toISOString().substring(0, 10) + "T08:00:00Z",
+        $lt: nextDay.toISOString().substring(0, 10) + "T08:00:00Z"
       }
     })
 
@@ -242,6 +242,10 @@ var AblGameController = {
 
     return lineups.map((lineup) => {
       return lineup.map((plyr) => {
+        if (plyr.player.mlbID == "519203") { 
+          console.log(dailyStats.filter((sl)=> {return (sl.mlbId == plyr.player.mlbID);}))
+          //console.log(dailyStats.filter((sl)=> {return (sl.mlbId == plyr.player.mlbID)}))
+        }
         var player_stats = dailyStats.filter((statline) => {
             return (statline.mlbId == plyr.player.mlbID);
           })
