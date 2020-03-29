@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
-import { LineupModel } from './../../../core/models/lineup.model';
+import { LineupModel , LineupCollectionModel} from './../../../core/models/lineup.model';
 import { MlbPlayerModel } from './../../../core/models/mlb.player.model';
 import { Subscription, Subject } from 'rxjs';
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
@@ -21,8 +21,10 @@ interface Alert {
 })
 export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
-  editable: boolean;
-  lineup: LineupModel;
+  
+  lineup: LineupCollectionModel;
+  active_roster : LineupModel;
+  active_roster_is_current: boolean;
   lineupSub: Subscription;
   loading: boolean;
   error: boolean;
@@ -36,18 +38,31 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._getRosterRecords();
-    this.editable = this._isTeamOwner();
   }
   
-  private _isTeamOwner() {
-    this.team.owners.forEach((owner) => {
-      if (this.auth.userProfile.sub == owner.userId) {
-        return true;
-      }
-    });
-    return false;
+  
+  _isTeamOwner() {
+    const userSub = this.auth.userProfile.sub;
+    const ownerMatch = this.team.owners.find((o)=> {return o.userId == userSub});
+    
+    if (ownerMatch) {
+      return true;
+    } else {
+      return false;
+    }
+    
+
+  }
+  
+  _isAdmin() {
+    const userSub = this.auth.userProfile.sub; 
+    const roles = userSub["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
+    return (roles.indexOf("admin") > -1)
   }
 
+  editable() {
+    return this._isTeamOwner() && (this.active_roster_is_current || this._isAdmin);
+  }
   
   private _getRosterRecords() {
     this.loading = true;
@@ -66,12 +81,15 @@ export class RosterComponent implements OnInit, OnDestroy {
      );
   }
   
-  private _setLineup(subLineup) {
+//   active_lineup() {
+//    return this.active_lineup_idx == 0 ? this.lineup : this.lineup.priorRosters[this.active_lineup_idx - 1];
+//   }
 
+  toggleLineup(event : any) {
+    this.active_roster_is_current = (event.value ==0)
+    this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[event.value - 1];
+    
   }
-  
-  
-
   ngOnDestroy() {
     this.lineupSub.unsubscribe();
     if (this.saveLineupSub) {
@@ -83,25 +101,15 @@ export class RosterComponent implements OnInit, OnDestroy {
     moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
   }
   
-  _updateRoster() {
-    var diffs = false;
-    for (var j =0; j<this.lineup.roster.length; j++) {
-      var rr = this.lineup.roster[j]
-      if (rr.rosterOrder != (j+1) || rr.lineupPosition != rr.originalPosition) {
-        diffs = true;
-        rr.rosterOrder = j+1;
-      }
+  
+  private _updateRoster(result) {
+    if (result.success) {
+      this._handleLineupSuccess(result.data, true);
+    } else {
+      this._handleUpdateError(result.err);
     }
-    if (diffs) {
-      this.saveLineupSub = this.rosterService
-        .updateLineup$(this.lineup._id, this.lineup)
-        .subscribe(
-          data => this._handleLineupSuccess(data, true),
-          err => this._handleUpdateError(err)
-      )      
-    }
-
   }
+  
   
   private _handleLineupSuccess(res, update) {
     this.error = false;
@@ -109,8 +117,12 @@ export class RosterComponent implements OnInit, OnDestroy {
     if (update) {
       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
     }
-    res.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
-    this.lineup = res; 
+    var activeRec = res;
+    
+    activeRec.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
+    activeRec.priorRosters.forEach((roster)=> {roster.roster.forEach((rr)=> {rr.originalPosition = rr.lineupPosition} )})
+    this.lineup = activeRec; 
+    this.active_roster = this.active_roster ? this.active_roster : this.lineup
   }
   
   private _handleUpdateError(err) {
@@ -122,6 +134,22 @@ export class RosterComponent implements OnInit, OnDestroy {
   close(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
+  
+  formatLabel(lineup) {
+    
+    return (value: number)=> {
+      if (lineup) {
+        
+        const dt = new Date(value > 0 ? lineup.priorRosters[value-1]["effectiveDate"] : lineup.effectiveDate);
+        return  dt.toLocaleDateString()
+      } 
+      
+    }
+
+    
+  }
+  
+  
   
   rosterChanged () {
   var diffs = false;

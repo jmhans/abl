@@ -27,7 +27,6 @@ export class GameDetailComponent {
   @Input() game: PopulatedGameModel;
   rosters: LineupModel[];
   potentialStatlines: object;
-  rosterObs: Observable<LineupModel>;
   statsSub: Subscription;
   RosterSub: Subscription;
   loading: boolean;
@@ -52,48 +51,16 @@ export class GameDetailComponent {
     
     this.potentialStatlines = {};
     
-    const statsSub = this.ablGame.getGameRosters$(this.game._id)
+    this.statsSub = this.ablGame.getGameRosters$(this.game._id)
       .subscribe(res => {
         this.rosters = res;
       })
     
-//     const teams = [this.game.awayTeam._id, this.game.homeTeam._id]
-//     // teams.map((team)=> {this.potentialStatlines[team] = []});
-    
-    
-//     const statsSub = from(teams).subscribe((tm) => {
-//       this.potentialStatlines[tm] = []
-//       this.rosterService.getLineupByTeamId$(tm)
-//         .subscribe(res => {
-//           from(res.roster).subscribe((plyr) => {
-//             this.ablGame.getGameStatsForPlayer$(plyr.player["mlbID"], this.game.gameDate)
-//               .subscribe( statRes => {
-//                 if (statRes.length > 0) {
-//                   this.potentialStatlines[tm].push({player: plyr.player, stats: statRes[0].stats})  
-//                 } else {
-//                   this.potentialStatlines[tm].push({player: plyr.player, stats: []})
-//                 }
-                
-//                 // console.log(this.potentialStatlines[tm])
-//             })
-//           })
-//           //this.rosters.push(res);
-//         })
-//     });
-
   }
-  
-  _handleRoster(roster) {
-    
-  }
-  
-  
-  
-
   
   
   ngOnDestroy() {
-    this.RosterSub.unsubscribe();
+   // this.RosterSub.unsubscribe();
     this.statsSub.unsubscribe();
   }
 

@@ -2,10 +2,12 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
+import {MatSliderModule} from '@angular/material/slider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -70,6 +72,8 @@ import { GameFormComponent } from './pages/admin/game-form/game-form.component';
 import { CreateGameComponent } from './pages/admin/game/create-game/create-game.component';
 import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.component';
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
+import { PlayerGameLineComponent } from './player-game-line/player-game-line.component';
+import { TeamRosterComponent } from './team-roster/team-roster.component';
 
 
 @NgModule({
@@ -106,7 +110,7 @@ import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent
   ],
   imports: [
     BrowserModule,
@@ -114,8 +118,10 @@ import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.
     ReactiveFormsModule,
     MatSelectModule,
     MatTableModule,
-    MatPaginatorModule, 
+    MatPaginatorModule,
+    MatCardModule,
     MatSortModule,
+    MatSliderModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,

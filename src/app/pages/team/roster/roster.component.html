@@ -22,51 +22,38 @@
   </button>
 </div>
 
-
-<div cdkDropList class="example-list" (cdkDropListDropped)="dropLineupRecord($event)" *ngIf='lineup'>
-  <div class="example-box" 
-       *ngFor="let rosterRec of lineup.roster; index as i;" 
-       cdkDrag
-       [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-          rosterRec.lineupPosition != rosterRec.originalPosition  }"
-       >
-      
-    <select [(ngModel)]="rosterRec.lineupPosition">
-      <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
-    </select>
-      {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
-
-
-  <!--      <mat-form-field>
-        <mat-label>Position</mat-label>
-        <mat-select [(value)]="rosterRec.submitLineupPosition">
-          <mat-option *ngFor="let pos of rosterRec.player.positionLog " [value]="pos">
-            {{pos}}
-          </mat-option>
-        </mat-select>
-         <mat-hint>{{rosterRec.player.positionLog | json}}</mat-hint>
-      </mat-form-field> -->
-
-        <strong>ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
-        <span class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
-        {{rosterRec.player.stats.batting.atBats}} AB,
-        {{rosterRec.player.stats.batting.hits}} H,
-        {{rosterRec.player.stats.batting.doubles}} 2B, 
-        {{rosterRec.player.stats.batting.triples}} 3B, 
-        {{rosterRec.player.stats.batting.homeRuns}} HR, 
-        {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB, 
-        {{rosterRec.player.stats.batting.hitByPitch}} HBP,
-        {{rosterRec.player.stats.batting.stolenBases}} SB, 
-        {{rosterRec.player.stats.batting.caughtStealing}} CS)
-        </span>
-<!--       {{rosterRec.player.positionLog | json}} -->
-      
-  </div>
-</div>
+<mat-card class="example-result-card" *ngIf='lineup'>
+  
+  <mat-card-content>
+       <mat-slider
+        class="example-margin"
+        [disabled]="false"
+        [invert]="true"
+        [max]="lineup.priorRosters.length"
+        [min]="0"
+        [step]="1"
+        [thumbLabel]="true"
+        [tickInterval]="1"
+        [vertical]="false"
+        [displayWith]="formatLabel(lineup)"
+        (change)="toggleLineup($event)"
+                   >
+    </mat-slider>
+    Selected Date: {{active_roster.effectiveDate | date:'mediumDate'}}
+  </mat-card-content>
+</mat-card>
 
 
+<span *ngIf='lineup'> Prior Rosters: {{lineup.priorRosters.length}}</span>
+<span *ngIf="lineup">
+<app-team-roster [lineupId]="lineup._id"
+                 [lineup]="active_roster" 
+                 [editable]="editable()"
+                 (updated)="_updateRoster($event)"
+                 ></app-team-roster>
+</span>
 
-<button (click)="_updateRoster()">
+<!-- <button (click)="_updateRoster()" *ngIf="editable()">
   Update
-</button>
+</button> -->
 

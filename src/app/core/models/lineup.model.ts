@@ -8,13 +8,24 @@ interface Roster {
 
 class LineupModel {
   constructor(
+    public _id: string, 
+    public ablTeam: object, 
+    public roster: Roster[], 
+    public effectiveDate: Date
+  ) { }
+}
+
+class LineupCollectionModel {
+    constructor(
+    public _id: string, 
     public ablTeam: object, 
     public roster: Roster[], 
     public effectiveDate: Date, 
-    public priorRosters?: object[], 
-    public _id?: string
+    public priorRosters?: LineupModel[]
   ) { }
 }
+
+
 
 class LineupAddPlayerModel {
   constructor(
@@ -30,6 +41,19 @@ interface PopulatedRoster {
   originalPosition?: string
 }
 
+interface SubmitLineup {
+  _id?: string;  
+  effectiveDate: Date;
+  roster: [{
+    "_id": string;
+    "player": string;
+    "lineupPosition": string;
+    "rosterOrder": number;
+           }];
+
+}
+
+
  
 
-export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster };
+export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel};

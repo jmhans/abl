@@ -1,0 +1,5 @@
+        <strong *ngIf="player.played">{{player.playedPosition}}</strong>
+        <span *ngIf="player.player"> {{player.player.player.name}}</span>
+        <span *ngIf="player.player"> ({{player.player.player.position}} - {{player.player.player.team}}) : </span>
+        <span *ngIf="player.dailyStats.g">{{player.dailyStats ? ( player.dailyStats.h + "/" +  player.dailyStats.ab) : '0/0' }}</span>
+        <span *ngIf="!player.dailyStats.g">DNP</span>
