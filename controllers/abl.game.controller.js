@@ -174,17 +174,19 @@ var AblGameController = {
 
       var gm = await AblGame.findById(gmID);
       const day = gm.gameDate
-
+      console.log(gm.gameDate);
       var homeTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.homeTeam._id, new Date(day.toISOString()))
       var awayTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.awayTeam._id, new Date(day.toISOString()))
-
+      
       var lineups_with_stats = await this._getStatsForLineups([homeTeamLineup, awayTeamLineup], day);
 
       var lineups_with_starters = await this._getStarters(lineups_with_stats);
 
      return {
        homeTeam: lineups_with_starters[0],
-       awayTeam: lineups_with_starters[1]
+       awayTeam: lineups_with_starters[1],
+       home_score: this._getABLScores(lineups_with_starters[0]),
+       away_score: this._getABLScores(lineups_with_starters[1])
      }
     } catch (err) {
       console.log("Error in _getRostersForGame:" + err);
@@ -202,7 +204,8 @@ var AblGameController = {
 
     return lineups.map((lineup) => {
       for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-        var posPAs = 0
+        var posPAs = 0;
+        var posGs = 0;
         var starters = [];
         for (var plyrCt = 0; plyrCt < lineup.length; plyrCt++) {
           var potentialPlayer = lineup[plyrCt];
@@ -215,32 +218,72 @@ var AblGameController = {
               potentialPlayer.played = true;
               potentialPlayer.playedPosition = ABL_STARTERS[starter];
               posPAs += this.plateAppearances(potentialPlayer.dailyStats)
+              posGs += potentialPlayer.dailyStats.g
             }
           }
         }
+        if (posPAs < 2) {
+          // Need to supplement. Was there anybody that had a game? 
+          if (posGs > 0) {
+            lineup.push({"player": {"player": {name: "supp"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 2 - posPAs, h: 0}})
+          } else {
+            lineup.push({"player": {"player": {name: "four"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 4, h: 0}})
+          }
+          
+        }
+        
+        
       }
-
+      
       return lineup;
-
 
     })
   },
+  
+  _getABLScores: function(lineup) {
+    return lineup.reduce((total, curPlyr) => {
+      
+      if (curPlyr.played) {
+      total.abl_points += 
+            25 * curPlyr.dailyStats.h + 
+            10 * curPlyr.dailyStats["2b"] + 
+            20 * curPlyr.dailyStats["3b"] + 
+            30 * curPlyr.dailyStats.hr + 
+            10 * curPlyr.dailyStats.bb + 
+            10 * curPlyr.dailyStats.ibb + 
+            10 * curPlyr.dailyStats.hbp + 
+            7 * (curPlyr.dailyStats.sb - curPlyr.dailyStats.cs + 
+            5 * curPlyr.dailyStats.sac + curPlyr.dailyStats.sf);
+        
+        total.e += curPlyr.dailyStats.e;
+        
+        total.ab += curPlyr.dailyStats.ab; 
+      }
+      
+      return  total;
+      
+    }, {abl_points: 0, e: 0, ab: 0})
+  },
 
   _getStatsForLineups: async function(lineups, current_date) {
-
+    
     var nextDay = new Date(current_date.toISOString());
     nextDay.setDate(current_date.getDate() + 1)
+    console.log("Searching stats between " + current_date + " and " + nextDay);
     var dailyStats = await Statline.find({
       gameDate: {
-        $gte: current_date.toISOString().substring(0, 10),
-        $lt: nextDay.toISOString().substring(0, 10)
+        $gte: current_date.toISOString().substring(0, 10) + "T08:00:00Z",
+        $lt: nextDay.toISOString().substring(0, 10) + "T08:00:00Z"
       }
     })
 
     console.log(dailyStats.length + " stat records found.");
-
+        
     return lineups.map((lineup) => {
+      
+      
       return lineup.map((plyr) => {
+
         var player_stats = dailyStats.filter((statline) => {
             return (statline.mlbId == plyr.player.mlbID);
           })

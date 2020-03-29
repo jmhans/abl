@@ -67,7 +67,12 @@
           routerLink="/players"
           routerLinkActive="active">Players</a>
       </li>
-      
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/games"
+          routerLinkActive="active">Games</a>
+      </li>
       
       
     </ul>

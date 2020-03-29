@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.record.model';
-import { LineupModel, LineupAddPlayerModel } from './../models/lineup.model';
+import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
@@ -83,6 +83,14 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
-  
+  updateRosterRecord$(lineupId: string, lineup: SubmitLineup ): Observable<LineupCollectionModel> {
+    return this.http
+      .put<LineupCollectionModel>(`${this.base_api}lineup_roster/${lineupId}`, lineup, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
 
 }

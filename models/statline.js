@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 var statLineSchema = new Schema({
   player: {type: Schema.Types.ObjectId, ref:'Player', required: false}, 
   mlbId: {type: String, required: true}, 
-  gameDate: {type: String, required: true}, 
+  gameDate: {type: Date, required: true}, 
   gamePk: {type: String, required: false}, 
   stats: {type: Schema.Types.Mixed, required: false},
   positions: [{type: String, required: false}],
