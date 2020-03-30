@@ -20,10 +20,18 @@ import { LineupModel, SubmitLineup } from './../core/models/lineup.model';
 // }
 
 const submitObj = ({_id, effectiveDate, roster })=>{
+  var output = {_id: _id, effectiveDate: effectiveDate, roster: []}
+  
   roster.forEach((r)=> {
-    r.player = r.player._id
+    //r.player = r.player._id
+    output.roster.push({
+      _id: r._id,
+      player: r.player._id,
+      lineupPosition: r.lineupPosition, 
+      rosterOrder: r.rosterOrder, 
+                       })
   })
-  return ({_id, effectiveDate, roster}) 
+  return output; 
 };
 
 

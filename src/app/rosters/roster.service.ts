@@ -1,51 +1,70 @@
 import { Injectable } from '@angular/core';
 import {  Roster } from './roster';
-import {  Http,  Response } from '@angular/http';
+import {  HttpClient,  HttpErrorResponse , HttpHeaders} from '@angular/common/http';
 
-@Injectable()
+import { AuthService } from './../auth/auth.service';
+import { MessageService } from '../message.service';
+import { Observable, of, throwError as ObservableThrowError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
+
+@Injectable({ providedIn: 'root' })
 export class RosterService {
   private rostersUrl = '/api/rosters';
 
-  constructor(private http: Http) {}
-
-  getRosters(): Promise < void | Roster[] > {
-    return this.http.get(this.rostersUrl)
-      .toPromise()
-      .then(response => response.json() as Roster[])
-      .catch(this.handleError);
+  constructor(private http: HttpClient, 
+              private messageService: MessageService, 
+              private auth: AuthService) {}
+  
+  private get _authHeader(): string {
+    return `Bearer ${this.auth.accessToken}`;
+  }
+  
+  
+  getRosters(): Observable < Roster[] > {
+    return this.http.get<Roster[]>(`${this.rostersUrl}`, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader  )
+    })
+      .pipe(
+        tap(_ => this.log('fetched rosters')),
+        catchError(this.handleError('getRosters', []))
+    );
   }
 
   // post("/api/rosters")
-  createRoster(newRoster: Roster): Promise < void | Roster > {
-    return this.http.post(this.rostersUrl, newRoster)
-      .toPromise()
-      .then(response => response.json() as Roster)
-      .catch(this.handleError);
+  createRoster(newRoster: Roster): Observable < Roster > {
+    return this.http.post<Roster>(this.rostersUrl, newRoster, httpOptions).pipe(
+      tap((roster: Roster)=> this.log(`added owner w/ id=${roster._id}`)),
+      catchError(this.handleError<Roster>('createRoster'))
+    );
   }
 
-  // get("/api/rosters/:id") endpoint not used by Angular app
+  private handleError<T> (operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+      
+       const errorMsg = error.message || 'Error: Unable to complete request.'; 
+        if (error.message && error.message.indexOf('No JWT present') > -1) {
+          this.auth.login();
+
+        } 
+      
+      // TODO: better job of transforming error for user consumption
+      this.log(`${operation} failed: ${error.message}`);
+
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
+  }
   
-  // delete("/api/rosters/:id")
-//   deleteRoster(delRosterId: String): Promise < void | String > {
-//     return this.http.delete(this.rostersUrl + '/' + delRosterId)
-//       .toPromise()
-//       .then(response => response.json() as String)
-//       .catch(this.handleError);
-//   }
-
-  // put("/api/rosters/:id")
-//   updateRoster(putRoster: Roster): Promise < void | Roster > {
-//     var putUrl = this.rostersUrl + '/' + putRoster._id;
-//     return this.http.put(putUrl, putRoster)
-//       .toPromise()
-//       .then(response => response.json() as Roster)
-//       .catch(this.handleError);
-//   }
-
-  private handleError(error: any) {
-    let errMsg = (error.message) ? error.message :
-      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg); // log to console instead
+    /** Log a HeroService message with the MessageService */
+  private log(message: string) {
+    this.messageService.add(`RosterService: ${message}`);
   }
 
 

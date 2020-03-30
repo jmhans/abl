@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Owner } from './owner';
 import { Team } from './owner';
-import { Http,Response } from '@angular/http';
 
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
@@ -24,7 +23,7 @@ export class OwnerService {
   private teamsUrl = '/api/teams';
   
   constructor(
-               private http: Http,  
+//               private http: Http,  
                private httpC: HttpClient,
                private messageService: MessageService, 
                private auth: AuthService
@@ -32,13 +31,6 @@ export class OwnerService {
   
   private get _authHeader(): string {
     return `Bearer ${this.auth.accessToken}`;
-  }
-
-  getOwners(): Promise < void | Owner[] > {
-    return this.http.get(this.ownersUrl)
-      .toPromise()
-      .then(response => response.json() as Owner[])
-      .catch(this.handleError);
   }
 
    getOwners2 (): Observable<Owner[]> {
@@ -50,15 +42,8 @@ export class OwnerService {
         catchError(this.handleError2('getOwners2', []))
       );
   }
-  // post("/api/owners")
-  createOwner(newOwner: Owner): Promise < void | Owner > {
-    return this.http.post(this.ownersUrl, newOwner)
-      .toPromise()
-      .then(response => response.json() as Owner)
-      .catch(this.handleError);
-  }
 
-  /** POST: add a new hero to the server */
+  /** POST: add a new Owner to the server */
   addOwner (owner: Owner): Observable<Owner> {
     return this.httpC.post<Owner>(this.ownersUrl, owner, httpOptions).pipe(
       tap((owner: Owner) => this.log(`added owner w/ id=${owner._id}`)),
@@ -83,14 +68,7 @@ export class OwnerService {
     );
   }
 
-  // delete("/api/owners/:id")
-  deleteOwner(delOwnerId: String): Promise < void | String > {
-    return this.http.delete(this.ownersUrl + '/' + delOwnerId)
-      .toPromise()
-      .then(response => response.json() as String)
-      .catch(this.handleError);
-  }
-  
+ 
   /** DELETE: delete the hero from the server */
   deleteOwner2 (owner: Owner | string): Observable<Owner> {
     const id = typeof owner === 'string' ? owner : owner._id;
@@ -102,14 +80,6 @@ export class OwnerService {
     );
   }
 
-  // put("/api/owners/:id")
-  updateOwner(putOwner: Owner): Promise < void | Owner > {
-    var putUrl = this.ownersUrl + '/' + putOwner._id;
-    return this.http.put(putUrl, putOwner)
-      .toPromise()
-      .then(response => response.json() as Owner)
-      .catch(this.handleError);
-  }
   
     /** PUT: update the hero on the server */
   updateOwner2 (owner: Owner): Observable<any> {

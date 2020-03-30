@@ -13,7 +13,6 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 
-import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
 
 import { DatePipe } from '@angular/common';
@@ -127,7 +126,6 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     MatNativeDateModule,
     MatInputModule,
     FlexLayoutModule,
-    HttpModule, 
     HttpClientModule,
     OwnersModule,
     AppRoutingModule, 

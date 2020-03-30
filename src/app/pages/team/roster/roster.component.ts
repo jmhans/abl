@@ -8,6 +8,9 @@ import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 
+import { FormControl } from '@angular/forms';
+
+
 interface Alert {
   type: string;
   message: string;
@@ -24,7 +27,9 @@ export class RosterComponent implements OnInit, OnDestroy {
   
   lineup: LineupCollectionModel;
   active_roster : LineupModel;
+  active_roster_index: number = 0;
   active_roster_is_current: boolean;
+  active_effective_date: FormControl;
   lineupSub: Subscription;
   loading: boolean;
   error: boolean;
@@ -86,8 +91,10 @@ export class RosterComponent implements OnInit, OnDestroy {
 //   }
 
   toggleLineup(event : any) {
-    this.active_roster_is_current = (event.value ==0)
-    this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[event.value - 1];
+    
+    this.active_roster_index = event.value;
+    this.active_roster_is_current = (this.active_roster_index == 0)
+    this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[this.active_roster_index - 1];
     
   }
   ngOnDestroy() {
@@ -122,8 +129,10 @@ export class RosterComponent implements OnInit, OnDestroy {
     activeRec.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
     activeRec.priorRosters.forEach((roster)=> {roster.roster.forEach((rr)=> {rr.originalPosition = rr.lineupPosition} )})
     this.lineup = activeRec; 
-    this.active_roster = this.active_roster ? this.active_roster : this.lineup
+    this.active_roster = this.active_roster_index > 0 ? this.lineup.priorRosters[this.active_roster_index - 1] : this.lineup
+    this.active_effective_date = new FormControl(new Date(this.active_roster.effectiveDate));
   }
+  
   
   private _handleUpdateError(err) {
     console.error(err);
