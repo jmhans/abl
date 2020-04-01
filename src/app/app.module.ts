@@ -34,11 +34,11 @@ import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 import { RosterListComponent } from './rosters/roster-list/roster-list.component';
 import { RosterDetailsComponent } from './rosters/roster-details/roster-details.component';
 import { OwnersModule } from './owners/owners.module';
-import { HeroesComponent } from './heroes/heroes.component';
-import { HeroDetailComponent } from './hero-detail/hero-detail.component';
+
+
 import { MessagesComponent } from './messages/messages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-//import { HeroSearchComponent } from './hero-search/hero-search.component';
+
 import { AuthService } from './auth/auth.service';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
@@ -83,11 +83,8 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     OwnerListComponent,
     RosterListComponent,
     RosterDetailsComponent,
-    HeroesComponent,
-    HeroDetailComponent,
     MessagesComponent,
     DashboardComponent,
-   // HeroSearchComponent,
     HeaderComponent,
     FooterComponent,
     AdminComponent,

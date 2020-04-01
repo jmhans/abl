@@ -2,9 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 import { RosterListComponent } from './rosters/roster-list/roster-list.component';
-import { HeroesComponent } from './heroes/heroes.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { HeroDetailComponent } from './hero-detail/hero-detail.component';
 import { OwnersComponent } from './owners/owners.component';
 import { CallbackComponent } from './pages/callback/callback.component';
 import { AuthGuard } from './auth/auth.guard';
@@ -33,7 +31,6 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path: 'dashboard', component: DashboardComponent}, 
                        {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
                        {path: 'games', canActivate: [AuthGuard], component: GamesComponent}, 
-                       {path: 'detail/:id', component: HeroDetailComponent}, 
                        {path: 'callback', component: CallbackComponent}, 
                        {path: 'admin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AdminComponent }, 
                                                                                           {path: 'event/new', component: CreateEventComponent}, 
