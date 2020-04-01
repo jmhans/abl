@@ -52,8 +52,6 @@ interface SubmitLineup {
            }];
 
 }
-
-
  
 
 export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel};

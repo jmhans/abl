@@ -38,7 +38,7 @@ import { HeroesComponent } from './heroes/heroes.component';
 import { HeroDetailComponent } from './hero-detail/hero-detail.component';
 import { MessagesComponent } from './messages/messages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { HeroSearchComponent } from './hero-search/hero-search.component';
+//import { HeroSearchComponent } from './hero-search/hero-search.component';
 import { AuthService } from './auth/auth.service';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
@@ -87,7 +87,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     HeroDetailComponent,
     MessagesComponent,
     DashboardComponent,
-    HeroSearchComponent,
+   // HeroSearchComponent,
     HeaderComponent,
     FooterComponent,
     AdminComponent,

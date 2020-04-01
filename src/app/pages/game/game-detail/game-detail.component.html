@@ -2,7 +2,7 @@
 
 <ng-container>
 <div class="card-body">
-  <h2 class="card-title text-center mb-0">    <strong>When:</strong>{{ game.gameDate | date : mediumDate}}</h2>
+  <h2 class="card-title text-center mb-0">    <strong>When:</strong>{{ game.gameDate | date : "mediumDate"}}</h2>
 </div>
 <hr />
   
@@ -10,7 +10,7 @@
   
   <div class="card-body">
     
-<div class="d-flex justify-content-around">
+<div class="d-flex justify-content-around" *ngIf="rosters">
   <div><strong> Away Team:</strong>
     <span>{{rosters.away_score | json}}</span>
     <ul class="list-group list-group-flush">

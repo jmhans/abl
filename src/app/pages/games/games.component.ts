@@ -41,7 +41,7 @@ export class GamesComponent implements OnInit, OnDestroy {
     
   }
   
-  private _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
+  _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
     //
     //this.filteredGames = this.fs.search(this.gamesList, this.datePipe.transform(this.modelDate.value, 'mediumDate'), '_id', 'mediumDate')
     this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
