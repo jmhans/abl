@@ -46,6 +46,7 @@ export class TeamRosterComponent implements OnInit {
   @Input() editable: boolean;
   @Output() updated = new EventEmitter<{success: boolean, data?: LineupModel, err?: string}>();
   
+  
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
   

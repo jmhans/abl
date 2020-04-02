@@ -26,6 +26,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
   
   lineup: LineupCollectionModel;
+  edit_lineup: boolean;
   active_roster : LineupModel;
   active_roster_index: number = 0;
   active_roster_is_current: boolean;

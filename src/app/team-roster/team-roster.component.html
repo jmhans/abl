@@ -2,18 +2,19 @@
      [cdkDropListDisabled] = !editable 
      (cdkDropListDropped)="dropLineupRecord($event)" 
      *ngIf='lineup'>
-  <div class="example-box" 
+  <div class="example-box alt" 
        *ngFor="let rosterRec of lineup.roster; index as i;" 
        cdkDrag
        [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
           rosterRec.lineupPosition != rosterRec.originalPosition  }"
        >
-      
-    <select [(ngModel)]="rosterRec.lineupPosition">
+       
+    <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
+    <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
+    
       {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
-
 
   <!--      <mat-form-field>
         <mat-label>Position</mat-label>

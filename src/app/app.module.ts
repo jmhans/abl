@@ -8,6 +8,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -118,6 +119,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     MatCardModule,
     MatSortModule,
     MatSliderModule,
+    MatSlideToggleModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
