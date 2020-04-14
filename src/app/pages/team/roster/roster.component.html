@@ -25,7 +25,7 @@
 <mat-card class="example-result-card" *ngIf='lineup'>
   
   <mat-card-content>
-        <section>
+        <section *ngIf="!edit_lineup">
           Oldest<mat-slider
             class="example-margin"
             [disabled]="edit_lineup"
@@ -38,26 +38,24 @@
             [vertical]="false"
             [displayWith]="formatLabel(lineup)"
             (change)="toggleLineup($event)"
+            [(ngModel)] = "active_roster_index"
                        >
           </mat-slider> Most Recent
         </section>
 
     
     <section class="example-section">
-      <mat-slide-toggle
-          class="example-margin"
-          [color]="primary"
-          [checked]="false"
-          [disabled]="false"
-          [(ngModel)]="edit_lineup">
-        Edit
-      </mat-slide-toggle>
+
     </section>
     
-    <section *ngIf="edit_lineup">
+    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="!create_lineup">Create New</button>
+    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="create_lineup">Cancel Create</button>
+    
+    
+    <section *ngIf="create_lineup">
       <mat-form-field>
-        <mat-label>Change Lineup Effective Date</mat-label>
-        <input matInput [matDatepicker]="picker" [formControl]="active_effective_date">
+        <mat-label>Set Effective Date</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="current_roster.effectiveDate">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -69,14 +67,38 @@
     
 
 
-<span *ngIf='lineup'> Prior Rosters: {{lineup.priorRosters.length}}</span>
-<span *ngIf="lineup">
+<span *ngIf='current_roster'> 
+  Prior Rosters: {{lineup.priorRosters.length}}
+  {{current_roster.effectiveDate | date: "mediumDate"}}
+  {{current_roster.lineupId}}
+</span>
+
+<span *ngIf="current_roster">
 <app-team-roster [lineupId]="lineup._id"
-                 [lineup]="active_roster" 
-                 [editable]="editable() && edit_lineup"
+                 [lineup]="current_roster"
+                 [originalLineup] = "active_roster"
+                 [editable]="editable() && edit_lineup || create_lineup"
                  (updated)="_updateRoster($event)"
                  ></app-team-roster>
 </span>
+
+
+<mat-card class="example-result-card" *ngIf='lineup'>
+  <mat-card-content>
+        <section>
+          <mat-slide-toggle
+              class="example-margin"
+              [color]="primary"
+              [checked]="false"
+              [disabled]="!_isAdmin()"
+              [(ngModel)]="edit_lineup">
+            Edit (Admin only)
+          </mat-slide-toggle>
+        </section>
+  </mat-card-content>
+</mat-card>
+
+
 
 <!-- <button (click)="_updateRoster()" *ngIf="editable()">
   Update

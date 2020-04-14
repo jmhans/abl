@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
-import { LineupModel , LineupCollectionModel} from './../../../core/models/lineup.model';
-import { MlbPlayerModel } from './../../../core/models/mlb.player.model';
+import { LineupModel , LineupCollectionModel, LineupFormModel} from './../../../core/models/lineup.model';
 import { Subscription, Subject } from 'rxjs';
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
@@ -26,11 +25,12 @@ export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
   
   lineup: LineupCollectionModel;
+  current_roster: LineupFormModel;
   edit_lineup: boolean;
+  create_lineup: boolean;
   active_roster : LineupModel;
   active_roster_index: number = 0;
   active_roster_is_current: boolean;
-  active_effective_date: FormControl;
   lineupSub: Subscription;
   loading: boolean;
   error: boolean;
@@ -60,9 +60,15 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   }
   
+  _createNew() {
+    this.create_lineup = !this.create_lineup;
+    this._set_Active_Roster(-1);
+  }
+  
+  
   _isAdmin() {
-    const userSub = this.auth.userProfile.sub; 
-    const roles = userSub["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
+    const userProf = this.auth.userProfile; 
+    const roles = userProf["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
     return (roles.indexOf("admin") > -1)
   }
 
@@ -87,17 +93,37 @@ export class RosterComponent implements OnInit, OnDestroy {
      );
   }
   
-//   active_lineup() {
-//    return this.active_lineup_idx == 0 ? this.lineup : this.lineup.priorRosters[this.active_lineup_idx - 1];
-//   }
+  _set_Active_Roster(idx) {
+    this.active_roster_index = idx;
+    this.active_roster_is_current = (this.active_roster_index <= 0)
 
-  toggleLineup(event : any) {
+    if (idx > -1) {
+
+      this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[this.active_roster_index - 1];  
+
+      this.current_roster = new LineupFormModel(
+        this.lineup._id, 
+        this.active_roster._id, 
+        this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
+        this.active_roster.effectiveDate);
+    } else {
+      // Create new lineup: 
+      this.current_roster = new LineupFormModel(
+        this.lineup._id, 
+        null, 
+        this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
+        new Date()
+      );
+    }
     
-    this.active_roster_index = event.value;
-    this.active_roster_is_current = (this.active_roster_index == 0)
-    this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[this.active_roster_index - 1];
+    
     
   }
+
+  toggleLineup(event : any) {
+    this._set_Active_Roster(event.value);
+  }
+  
   ngOnDestroy() {
     this.lineupSub.unsubscribe();
     if (this.saveLineupSub) {
@@ -125,13 +151,9 @@ export class RosterComponent implements OnInit, OnDestroy {
     if (update) {
       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
     }
-    var activeRec = res;
-    
-    activeRec.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
-    activeRec.priorRosters.forEach((roster)=> {roster.roster.forEach((rr)=> {rr.originalPosition = rr.lineupPosition} )})
-    this.lineup = activeRec; 
-    this.active_roster = this.active_roster_index > 0 ? this.lineup.priorRosters[this.active_roster_index - 1] : this.lineup
-    this.active_effective_date = new FormControl(new Date(this.active_roster.effectiveDate));
+    this.lineup = res;
+    this._set_Active_Roster(this.active_roster_index);
+        
   }
   
   

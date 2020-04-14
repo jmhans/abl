@@ -1,6 +1,12 @@
 /*jshint esversion: 8 */
 
 const request = require('request');
+const BaseController = require('./base.controller');
+
+var express = require('express');
+var router = express.Router();
+
+
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const AblTeam = require('./../models/owner').AblTeam;
 const MlbPlayer = require('./../models/player').Player;
@@ -9,85 +15,6 @@ const Lineup = require('./../models/lineup').Lineup;
 const ObjectId = require('mongoose').Types.ObjectId;
 
 var AblRosterController = {
-
-  _post: function(req, res) {
-    AblRosterRecord.findOne({
-      player: {
-        _id: req.body.player._id
-      }
-    }, (err, existingRosterRec) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (existingRosterRec) {
-        // change existing RosterRecord to inactive. 
-      }
-      AblTeam.findById(req.body.ablTeamId, (err, ablTeam) => {
-        if (err) {
-          return res.status(500).send({
-            message: err.message
-          });
-        }
-        const RR = new AblRosterRecord({
-          player: req.body.player,
-          rosterPosition: req.body.player.position, //Use the default position from the player's MLB record.  
-          rosterOrder: 100, //Change to find the biggest current number and put this person there. 
-          ablTeam: ablTeam._id, // need to find an ablteam model and extract its ID. 
-          startDatetime: new Date(),
-          active: true
-        });
-        RR.save((err) => {
-          if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
-          }
-          res.send(RR);
-        });
-      });
-
-
-
-    });
-  },
-  _getRosters: function(req, res) {
-    AblRosterRecord.find({}, (err, rosterRecords) => {
-      let rosterRecArr = [];
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (rosterRecords) {
-        rosterRecords.forEach(rosterRec => {
-          rosterRecArr.push(rosterRec);
-        });
-      }
-      res.send(rosterRecArr);
-    })
-  },
-
-  _getRosterRecordsForTeam: function(req, res) {
-    console.log(req.params.id);
-    AblRosterRecord.find({
-      ablTeam: new ObjectId(req.params.id)
-    }).populate('player').exec(function(err, rosterRecords) {
-      let rosterRecsArr = [];
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (rosterRecsArr) {
-        rosterRecords.forEach(rosterRecord => {
-          rosterRecsArr.push(rosterRecord);
-        });
-      }
-      res.send(rosterRecsArr);
-    });
-  },
 
   _getLineupForTeam: function(req, res) {
 
@@ -99,6 +26,15 @@ var AblRosterController = {
           message: err.message
         });
       }
+      console.log(lineup.priorRosters.map((pr)=> {return pr.effectiveDate}));
+      if(lineup.priorRosters) {
+        lineup.priorRosters.sort((a,b)=> {
+          var aDt = new Date(a.effectiveDate);
+          var bDt = new Date(b.effectiveDate);
+          return bDt - aDt;
+        })
+      }
+      console.log(lineup.priorRosters.map((pr)=> {return pr.effectiveDate}));
       res.send(lineup);
     })
   },
@@ -126,7 +62,7 @@ var AblRosterController = {
       } else {
         if (lineup.priorRosters.length > 0) {
           var sortedPR = lineup.priorRosters.sort(function(a, b) {
-            return (a.effectiveDate - b.effectiveDate);
+            return (new Date(b.effectiveDate) - new Date(a.effectiveDate));
           })
           for (s = sortedPR.length - 1; s >= 0; s--) {
             if (sortedPR[s].effectiveDate < gmDate) {
@@ -156,7 +92,7 @@ var AblRosterController = {
 
         } else {
           var sortedPR = lineup.priorRosters.sort(function(a, b) {
-            return (a.effectiveDate - b.effectiveDate);
+            return (new Date(b.effectiveDate) - new Date(a.effectiveDate));
           })
           for (s = sortedPR.length - 1; s >= 0; s--) {
             if (sortedPR[s].effectiveDate < gmDate) {
@@ -187,13 +123,6 @@ var AblRosterController = {
           LineupRec.effective_date = req.body.effective_date;
           LineupRec.roster = req.body.roster;
 
-          //                   var priorLineupRec = {
-          //           effectiveDate: LineupRec.effectiveDate,
-          //           roster: LineupRec.roster
-          //         }
-          //             LineupRec.priorRosters.push(priorLineupRec);
-          //             LineupRec.effectiveDate = new Date();
-          //             LineupRec.roster = req.body.roster;
         } else {
           // Updating a prior roster record.
           updateRecord = LineupRec.priorRosters.find((pr) => {
@@ -233,54 +162,7 @@ var AblRosterController = {
       });
     });
   },
-
-  _updateLineup: function(req, res) {
-    Lineup.findById(new ObjectId(req.params.id), (err, LineupRec) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (LineupRec) {
-        var priorLineupRec = {
-          effectiveDate: LineupRec.effectiveDate,
-          roster: LineupRec.roster
-        }
-        LineupRec.priorRosters.push(priorLineupRec);
-        LineupRec.effectiveDate = new Date();
-        LineupRec.roster = req.body.roster;
-
-      } else {
-        AblTeam.findById(req.body.ablTeamId, (err, ablTeam) => {
-          if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
-          }
-          const LineupRec = new Lineup({
-            ablTeam: ablTeam._id,
-            roster: req.body.roster,
-            effectiveDate: new Date(),
-            priorRosters: []
-          });
-        })
-      }
-
-      LineupRec.save((err) => {
-        if (err) {
-          return res.status(500).send({
-            message: err.message
-          });
-        }
-        LineupRec.populate('roster.player', function(err) {
-          res.send(LineupRec);
-        });
-
-
-      });
-    });
-
-  },
+  
   _addPlayerToTeam: function(req, res) {
 
     MlbPlayer.findById(req.body._id, (err, mlbPlayer) => {
@@ -366,14 +248,199 @@ var AblRosterController = {
 
 }
 
+class altABLRosterController extends BaseController{
+
+  constructor() {
+    super(Lineup, 'lineups');
+  }
+
+
+  async _getGame(gmPk) {
+
+    try {
+      const response = await this.mlbStats.getGameBoxscore({
+        pathParams: {
+          gamePk: gmPk
+        }
+      });
+      return response.data;
+    } catch (err) {
+      console.error(`Error in _getGame: ${err}`);
+    }
+  }
+
+  async _getLineup(req, res, next) {
+    try {
+      const lineup = await this._getLineupForTeam(req.params.id);
+      return res.send(lineup);
+    } catch (err) {
+      return res.status(500).send({message: err.message});
+    }
+  }
+  
+  async _getLineupForTeam(tm) {
+    try {
+      const lineup = await Lineup.findOne({ ablTeam: new ObjectId(tm) }); 
+      const orgLineup = await this._organizeLineup(lineup);
+      return orgLineup
+      
+    } catch(err) {
+      console.error(`Error in _getLineupForTeam: ${err}`)
+    }
+  }
+  
+  async _organizeLineup(lineup) {
+      var populatedLineup = await lineup.populate('roster.player priorRosters.roster.player').execPopulate(); 
+      if (populatedLineup.priorRosters) {
+        populatedLineup.priorRosters.sort((a,b)=> {
+          return (new Date(b.effectiveDate) - new Date(a.effectiveDate))
+        })
+      }
+      
+      return populatedLineup;    
+  }
+  
+  async _getLineupById(id) {
+    try {
+      const lineup = await Lineup.findById(new ObjectId(id)); 
+      const orgLineup = await this._organizeLineup(lineup);
+      return orgLineup
+
+    } catch(err) {
+      console.error(`Error in _getLineupForTeam: ${err}`)
+    }
+  }
+  
+  
+  async _getLineupForTeamAndDate(req, res, next) {
+    try {
+      const lineup = await this._getLineupForTeam(req.body.id);
+      const gmDt = new Date(req.params.dt)
+      
+      if (lineup.effectiveDate < gmDt) {
+        return res.status(200).send(lineup);
+      } else { 
+        if (lineup.priorRosters.length >0) {
+          var sortedPR = lineup.priorRosters.sort((a,b)=> {return (new Date(b.effectiveDate) - new Date(a.effectiveDate))});
+          for (s = sortedPR.length - 1; s>=0; s--) {
+            if (sortedPR[s].effectiveDate < gmDt) {
+              return res.status(200).send(sortedPR[s]);
+            }  
+          }
+        } else {
+          return res.status(400).send({message: 'No lineup found for that date.'})
+        }
+      }
+    } catch (err) {
+      return res.status(500).send({message: err.message});
+    }
+  }
+  
+  async _newUpdateLineup(req, res, next) {
+    try {
+      var LineupRec = await this._getLineupById(req.params.id);
+      if (LineupRec) {
+        var updateRecord;
+        if (req.body._id == LineupRec._id) {
+          // Updating the active roster record. 
+          LineupRec.effective_date = req.body.effective_date;
+          LineupRec.roster = req.body.roster;
+
+        } else {
+          // Updating a prior roster record.
+          updateRecord = LineupRec.priorRosters.find((pr) => {
+            return pr._id == req.body._id
+          });
+          
+          updateRecord.effective_date = req.body.effective_date;
+          updateRecord.roster = req.body.roster;
+        }
+
+      } else {
+        var ablTeam = await AblTeam.findById(req.body.ablTeamId);
+        const LineupRec = new Lineup({
+          ablTeam: ablTeam._id,
+          roster: req.body.roster,
+          effective_date: new Date(),
+          priorRosters: []
+        });
+      }
+
+      var savedLineupRec = await LineupRec.save(); 
+      var populatedLineupRec = await LineupRec.populate('roster.player priorRosters.roster.player').execPopulate();
+      return res.send(populatedLineupRec);
+      
+    } catch(err) {
+        return res.status(500).send({
+          message: err.message
+        });
+    }
+  }
+  
+  async _addPlayerToTeam(req, res, next) {
+    try {
+      var mlbPlayer = await MlbPlayer.findById(req.body._id);
+      mlbPlayer.ablTeam = new ObjectId(req.params.id);
+      var savedMlbPlayer = await mlbPlayer.save();
+      var existingLineupRec = await Lineup.findOne({ablTeam: mlbPlayer.ablTeam});
+      if (existingLineupRec) {
+        var priorLineupRec = {
+          effectiveDate: existingLineupRec.effectiveDate,
+          roster: existingLineupRec.roster
+        }
+        existingLineupRec.priorRosters.push(priorLineupRec);
+        existingLineupRec.effectiveDate = new Date();
+
+        existingLineupRec.roster.push({
+          player: mlbPlayer._id,
+          lineupPosition: req.body.position,
+          rosterOrder: existingLineupRec.roster.length + 1
+        });
+
+        var savedExistingLineupRec = await existingLineupRec.save();
+        return res.send(savedExistingLineupRec);
+        
+      } else {
+
+        const RR = new Lineup({
+          ablTeam: new ObjectId(req.params.id),
+          roster: [{
+            player: mlbPlayer._id,
+            lineupPosition: req.body.position,
+            rosterOrder: 1
+          }],
+          effectiveDate: new Date(),
+          priorRosters: []
+        });
+        
+        var savedRR = await RR.save();
+        return res.send(savedRR);
+        
+      }
+    } catch(err) {
+      return res.status(500).send({message : err.message})
+    }
+   
+  }
+  
+  
+
+   
+  route() {
+    router.post('/team/:id/addPlayer', (...args) => this._addPlayerToTeam(...args));
+    router.get('/team/:id/lineup' , (...args) => this._getLineup(...args));
+    router.put('/lineup_roster/:id', (...args) => this._newUpdateLineup(...args));
+    router.get('/team/:id/lineup/:dt', (...args) => this._getLineupForTeamAndDate(...args));
+    return router;
+  }
+}
+
+//  app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
+//  app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
+//  app.put('/api3/lineup_roster/:id', jwtCheck, AblRosterController._newUpdateLineup);
+//  app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
+  
 
 
 
-
-
-
-
-
-
-
-module.exports = AblRosterController
+module.exports = {AblRosterController: AblRosterController, altABLRosterController: altABLRosterController}

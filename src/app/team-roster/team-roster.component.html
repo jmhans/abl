@@ -2,29 +2,24 @@
      [cdkDropListDisabled] = !editable 
      (cdkDropListDropped)="dropLineupRecord($event)" 
      *ngIf='lineup'>
+  
+  {{lineupId}}
+  {{lineup.rosterId}}
   <div class="example-box alt" 
        *ngFor="let rosterRec of lineup.roster; index as i;" 
        cdkDrag
        [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-          rosterRec.lineupPosition != rosterRec.originalPosition  }"
+          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition  }"
        >
        
     <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
-    
+      {{originalLineup.roster[i].lineupPosition}}
       {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
 
-  <!--      <mat-form-field>
-        <mat-label>Position</mat-label>
-        <mat-select [(value)]="rosterRec.submitLineupPosition">
-          <mat-option *ngFor="let pos of rosterRec.player.positionLog " [value]="pos">
-            {{pos}}
-          </mat-option>
-        </mat-select>
-         <mat-hint>{{rosterRec.player.positionLog | json}}</mat-hint>
-      </mat-form-field> -->
+
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
         <span  *ngIf="rosterRec.player.stats" class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
@@ -43,6 +38,6 @@
   </div>
 </div>
 
-<button (click)="_updateRosterRecord()" *ngIf="editable">
+<button mat-button (click)="_updateRosterRecord()" *ngIf="editable">
   Update
 </button>

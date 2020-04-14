@@ -11,7 +11,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class RosterService {
-  private base_api= '/api3/'
+  private base_api= '/api2/'
   
   
   constructor(    
@@ -25,15 +25,6 @@ export class RosterService {
   
   
   // POST new roster record (authorized only)
-  postRosterRecord$(rosterRec: CreateRosterRecordModel): Observable<RosterRecordModel> {
-    return this.http
-      .post<RosterRecordModel>(`${this.base_api}roster/new`, rosterRec, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
   
   private _handleError(err: HttpErrorResponse | any): Observable<any> {
     const errorMsg = err.message || 'Error: Unable to complete request.';
@@ -43,16 +34,6 @@ export class RosterService {
     return ObservableThrowError(errorMsg);
   }
   
-
-  getRostersByTeamId$(teamId: string): Observable<RosterRecordModel[]> {
-    return this.http
-      .get<RosterRecordModel[]>(`${this.base_api}team/${teamId}/rosterRecords`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
    
   getLineupByTeamId$(teamId: string): Observable<LineupModel> {
     return this.http
@@ -74,15 +55,6 @@ export class RosterService {
       );
   }
   
-  updateLineup$(id:string, lineup: LineupModel ): Observable<LineupModel> {
-    return this.http
-      .put<LineupModel>(`${this.base_api}lineup/${id}`, lineup, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
   updateRosterRecord$(lineupId: string, lineup: SubmitLineup ): Observable<LineupCollectionModel> {
     return this.http
       .put<LineupCollectionModel>(`${this.base_api}lineup_roster/${lineupId}`, lineup, {

@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -74,6 +76,7 @@ import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { PlayerGameLineComponent } from './player-game-line/player-game-line.component';
 import { TeamRosterComponent } from './team-roster/team-roster.component';
+//import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 
 @NgModule({
@@ -108,6 +111,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     TeamFormComponent,
     CreateTeamComponent, 
     DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent
+    //, LineupFormComponent
   ],
   imports: [
     BrowserModule,
@@ -132,6 +136,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     DataTablesModule, 
     DragDropModule,
     NgbModule,
+    MatButtonModule,
   ],
   providers: [ 
     Title, 
