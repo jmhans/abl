@@ -28,7 +28,7 @@
     "@hapi/hoek": "^9.0.4",
     "@ng-bootstrap/ng-bootstrap": "^6.0.2",
     "angular-datatables": "^9.0.1",
-    "auth0-js": "^9.13.0",
+    "auth0-js": "^9.13.2",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.4.1",
