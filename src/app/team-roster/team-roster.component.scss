@@ -55,3 +55,20 @@
 .dirty-box {
   background-color: #fcffc1;
 }
+
+body { 
+  font-family: Roboto, Arial, sans-serif;
+  margin: 0;
+}
+
+
+.alt {
+  .mat-form-field {
+    width: auto !important;
+  }
+
+  .mat-select-value {
+    max-width: 100%;
+    width: auto;
+  }  
+}

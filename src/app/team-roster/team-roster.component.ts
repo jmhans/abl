@@ -2,28 +2,21 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Subscription, Subject } from 'rxjs';
 import { RosterService } from './../core/services/roster.service';
-import { LineupModel, SubmitLineup } from './../core/models/lineup.model';
+import { LineupModel, SubmitLineup, LineupFormModel } from './../core/models/lineup.model';
 
-
-// interface LineupInterface {
-//   _id: string; 
-//   effectiveDate: Date;
-//   ablTeam: {};
-//   roster: [{
-//     "_id": string;
-//     "player": string;
-//     "ablTeam": string; //Make it a team object...
-//     "lineupPosition": string;
-//     "rosterOrder": number;
-//     "originalPosition": string;
-//            }];  
-// }
-
-const submitObj = ({_id, effectiveDate, roster })=>{
+const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
+  var output = {_id: rosterId, effectiveDate: effectiveDate, roster: []}
+  
   roster.forEach((r)=> {
-    r.player = r.player._id
+    //r.player = r.player._id
+    output.roster.push({
+      _id: r._id,
+      player: r.player._id,
+      lineupPosition: r.lineupPosition, 
+      rosterOrder: r.rosterOrder, 
+                       })
   })
-  return ({_id, effectiveDate, roster}) 
+  return output; 
 };
 
 
@@ -34,9 +27,12 @@ const submitObj = ({_id, effectiveDate, roster })=>{
 })
 export class TeamRosterComponent implements OnInit {
   @Input() lineupId: string;
-  @Input() lineup: LineupModel;
+  @Input() lineup: LineupFormModel;
+  @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
   @Output() updated = new EventEmitter<{success: boolean, data?: LineupModel, err?: string}>();
+  
+  formLineup: LineupFormModel;
   
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
@@ -44,6 +40,7 @@ export class TeamRosterComponent implements OnInit {
   constructor( public rosterService: RosterService) { }
 
   ngOnInit() {
+    
   }
   
   dropLineupRecord(event: CdkDragDrop<any>) {
@@ -51,12 +48,10 @@ export class TeamRosterComponent implements OnInit {
   }
   
   _getSubmitRoster() {
-    var diffs = false;
-    
+       
     for (var j =0; j<this.lineup.roster.length; j++) {
       var rr = this.lineup.roster[j]
-      if (rr.rosterOrder != (j+1) || rr.lineupPosition != rr.originalPosition) {
-        diffs = true;
+      if (rr.rosterOrder != (j+1) || rr.lineupPosition != this.originalLineup.roster[j].lineupPosition) {
         rr.rosterOrder = j+1;
       }
 

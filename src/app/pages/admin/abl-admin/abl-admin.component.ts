@@ -41,7 +41,7 @@ export class AblAdminComponent implements OnInit, OnDestroy {
     //this._getDataFiles();
   }
 
-  private _loadData() {
+  _loadData() {
     this.loading = true;
     this.dataSub = this.api
       .getData$(this.datafile)
@@ -59,7 +59,7 @@ export class AblAdminComponent implements OnInit, OnDestroy {
       )
   }
   
-  private _createRec() {
+  _createRec() {
     
     var obj = JSON.parse(this.dataEntry)
     
@@ -106,13 +106,9 @@ export class AblAdminComponent implements OnInit, OnDestroy {
      );
   }
   
-  private _uploadAllData() {
-    // use the generic postData api call...
-    
+  _uploadAllData() {
     
     this.dataList.forEach((data) => {
-      
-//      const newGm = new GameModel(gm.gameDate, {"_id": gm.awayTeam}, {"_id": gm.homeTeam});
       
       this.api
         .postData$(this.selectedDataType, data)
@@ -127,25 +123,7 @@ export class AblAdminComponent implements OnInit, OnDestroy {
     })
   }
   
-  
-//   private _getGamesList() {
-//     this.loading = true;
-//     // Get all (admin) games
-//     this.gamesSub = this.api
-//       .getAdminGames$()
-//       .subscribe(
-//         res => {
-//           this.gamesList = res;
-//           this.filteredGames = res;
-//           this.loading = false;
-//         },
-//         err => {
-//           console.error(err);
-//           this.loading = false;
-//           this.error = true;
-//         }
-//       );
-//   }
+
 
   searchGames() {
     this.filteredGames = this.fs.search(this.dataList, this.query, '_id', 'mediumDate');

@@ -25,6 +25,14 @@ class LineupCollectionModel {
   ) { }
 }
 
+class LineupFormModel {
+    constructor(
+    public lineupId: string,
+    public rosterId: string, 
+    public roster: Roster[], 
+    public effectiveDate: Date
+  ) { }
+}
 
 
 class LineupAddPlayerModel {
@@ -52,8 +60,6 @@ interface SubmitLineup {
            }];
 
 }
-
-
  
 
-export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel};
+export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel, LineupFormModel};

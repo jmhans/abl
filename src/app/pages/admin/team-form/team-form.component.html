@@ -50,7 +50,7 @@
 Owners
 
    <section class="list-group" formArrayName="owners">
-      <div *ngFor="let owner of teamForm.get('owners').controls; let i = index;" class="list-group-item list-group-item-action flex-column align-items-start">
+      <div *ngFor="let owner of teamForm.get('owners')['controls']; let i = index;" class="list-group-item list-group-item-action flex-column align-items-start">
         <div [formGroupName]="i" class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">
             

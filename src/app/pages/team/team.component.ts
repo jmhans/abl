@@ -56,6 +56,7 @@ export class TeamComponent implements OnInit, OnDestroy {
     this.tabSub = this.route.queryParams
       .subscribe(queryParams => {
         this.tab = queryParams['tab'] || 'roster';
+        console.log(queryParams);
       });
   }
 

@@ -19,7 +19,7 @@ const Game = require('./../models/Game');
 const MlbApiController = require('./../controllers/mlbapi.controller');
 const AblTeamController = require('./../controllers/ablteam.controller');
 const AblGameController = require('./../controllers/abl.game.controller');
-const AblRosterController = require('./../controllers/abl.roster.controller');
+const AblRosterController = require('./../controllers/abl.roster.controller').AblRosterController;
 const StatlineController = require('./../controllers/statline.controller');
 const BulkAddController = require('./../controllers/bulkadd.controller');
 const BulkAdd = BulkAddController.BulkAdd;
@@ -263,12 +263,8 @@ module.exports = function(app, config) {
   app.delete('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._delete);
   app.get('/api3/teams', AblTeamController._getTeams);
   app.get('/api3/owners', AblTeamController._getOwners);
-  app.post('/api3/roster/new', AblRosterController._post);
-  app.get('/api3/rosterRecords', AblRosterController._getRosters);
-  app.get('/api3/team/:id/rosterRecords', jwtCheck, AblRosterController._getRosterRecordsForTeam);
   app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
   app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
-  app.put('/api3/lineup/:id', jwtCheck, AblRosterController._updateLineup);
   app.put('/api3/lineup_roster/:id', jwtCheck, AblRosterController._newUpdateLineup);
   app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
   app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
@@ -288,20 +284,7 @@ module.exports = function(app, config) {
       res.send(gamesArr);
     });
   })
-//   app.get("/api3/mlbPlayers", (req, res) => {
-//     Player.find({ablTeam: null}, (err, players) => {
-//       let playersArr = [];
-//       if (err) {
-//         return res.status(500).send({message: err.message});
-//       }
-//       if (players) {
-//         players.forEach((player) => {
-//           playersArr.push(player);
-//         });
-//       }
-//       res.send(playersArr);
-//     });
-//   })
+
   
   app.get("/api3/mlbPlayers", (req, res, next) => {
     

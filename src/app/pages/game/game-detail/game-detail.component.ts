@@ -15,6 +15,13 @@ import { map, mergeMap } from 'rxjs/operators';
     plyrs: StatlineModel[]
   }
 
+interface gameRosters {
+  away_score: {} 
+  home_score: {}
+  awayTeam: {}
+  homeTeam: {}
+}
+
 @Component({
   selector: 'app-game-detail',
   templateUrl: './game-detail.component.html',
@@ -25,7 +32,7 @@ import { map, mergeMap } from 'rxjs/operators';
 export class GameDetailComponent {
   
   @Input() game: PopulatedGameModel;
-  rosters: LineupModel[];
+  rosters: gameRosters;
   potentialStatlines: object;
   statsSub: Subscription;
   RosterSub: Subscription;
@@ -41,12 +48,11 @@ export class GameDetailComponent {
   ) { }
   
   ngOnInit() {
-    this.rosters = [];
     this._getRosters();
     //this.getStats();
     
   }
-  
+
   _getRosters() {
     
     this.potentialStatlines = {};

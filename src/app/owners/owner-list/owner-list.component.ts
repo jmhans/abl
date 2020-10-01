@@ -19,14 +19,13 @@ export class OwnerListComponent implements OnInit {
 
   ngOnInit() {
      this.ownerService
-      .getOwners()
-      .then((owners: Owner[]) => {
-        this.owners = owners.map((owner) => {
-          return owner;
-        });
+      .getOwners2()
+      .subscribe((owners: Owner[]) => {
+        this.owners = owners
       });
   }
-
+  
+ 
   private getIndexOfOwner = (ownerId: String) => {
     return this.owners.findIndex((owner) => {
       return owner._id === ownerId;

@@ -22,12 +22,15 @@ export class RosterDetailsComponent {
   constructor (private rosterService: RosterService) {}
 
   createRoster(roster: Roster) {
-    this.rosterService.createRoster(roster).then((newRoster: Roster) => {
+    this.rosterService.createRoster(roster).subscribe((newRoster: Roster) => {
       this.createHandler(newRoster);
     });
   }
   addPlayer(roster: Roster) {
     roster.players.push('');
   }
-
+  
+  
+  
+  
 }

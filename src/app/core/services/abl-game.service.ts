@@ -51,7 +51,7 @@ export class AblGameService {
       );
   }
   
-  getGameRosters$(gameId: string): Observable<[]> {
+  getGameRosters$(gameId: string): Observable<any> {
     
     return this.http
       .get<[]>(`${this.base_api}game/${gameId}/rosters`, {

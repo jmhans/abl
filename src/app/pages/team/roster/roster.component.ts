@@ -1,12 +1,18 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
-import { LineupModel , LineupCollectionModel} from './../../../core/models/lineup.model';
-import { MlbPlayerModel } from './../../../core/models/mlb.player.model';
+import { LineupModel , LineupCollectionModel, LineupFormModel} from './../../../core/models/lineup.model';
 import { Subscription, Subject } from 'rxjs';
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
+import { Router, ActivatedRoute } from '@angular/router';
+import { UtilsService } from './../../../core/utils.service';
+
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+
+import { FormControl } from '@angular/forms';
+
 
 interface Alert {
   type: string;
@@ -22,8 +28,21 @@ interface Alert {
 export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
   
+  editTimeLimit: string = "12:00:00";
+  editTimeLimitInantz: string = "America/Chicago"
+  
+  
   lineup: LineupCollectionModel;
+  current_roster: LineupFormModel;
+  paramSub: Subscription;
+  roster_date: Date;
+  roster_deadline: Date;
+  roster_editable: boolean;
+  edit_lineup: boolean;
+  
+  create_lineup: boolean;
   active_roster : LineupModel;
+  active_roster_index: number = 0;
   active_roster_is_current: boolean;
   lineupSub: Subscription;
   loading: boolean;
@@ -31,15 +50,43 @@ export class RosterComponent implements OnInit, OnDestroy {
   saveLineupSub: Subscription;
   message: string = '';
   alerts: Alert[] = [];
+  events: string[] = [];
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
-  constructor(  public auth: AuthService,
-                public rosterService: RosterService
+  constructor(  private router: Router, 
+                private route: ActivatedRoute,
+                public auth: AuthService,
+                public rosterService: RosterService,
+                private utils: UtilsService,
                 ) { }
 
   ngOnInit() {
-    this._getRosterRecords();
+    this._routeSubs();
+
   }
   
+  private _routeSubs() {
+    
+    // Subscribe to query params to watch for tab changes
+     var that = this;
+    this.paramSub = this.route.queryParams
+      .subscribe(queryParams => {
+        this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
+          console.log(this.roster_date);
+          var mnth = this.roster_date.getMonth()+1;
+        
+          var globalrosterDeadline = new Date(this.roster_date.getFullYear() + "-" + mnth.toString() + "-" + this.roster_date.getDate() + " " + this.editTimeLimit)
+          this.roster_deadline = this.utils.changeTimezone(globalrosterDeadline, this.editTimeLimitInantz)
+          console.log(this.roster_deadline); 
+
+        this._getRosterRecords();
+      });
+  }
+  
+    
+
+  addEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    this.events.push(`${type}: ${event.value}`);
+  }
   
   _isTeamOwner() {
     const userSub = this.auth.userProfile.sub;
@@ -54,16 +101,35 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   }
   
+  editable() {
+   return this._isTeamOwner() && ((new Date() < this.roster_deadline) || this.edit_lineup)
+  }
+  
+  
+  _date_changed(ev) {
+    console.log(ev);
+    
+    this.router.navigate(
+      [], 
+      {
+        relativeTo: this.route,
+        queryParams: { dt: ev.value.toISOString() },
+        queryParamsHandling: 'merge'
+      });
+  }
+  _createNew() {
+    this.create_lineup = !this.create_lineup;
+    this._set_Active_Roster(-1);
+  }
+  
+  
   _isAdmin() {
-    const userSub = this.auth.userProfile.sub; 
-    const roles = userSub["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
+    const userProf = this.auth.userProfile; 
+    const roles = userProf["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
     return (roles.indexOf("admin") > -1)
   }
 
-  editable() {
-    return this._isTeamOwner() && (this.active_roster_is_current || this._isAdmin);
-  }
-  
+ 
   private _getRosterRecords() {
     this.loading = true;
     
@@ -81,15 +147,37 @@ export class RosterComponent implements OnInit, OnDestroy {
      );
   }
   
-//   active_lineup() {
-//    return this.active_lineup_idx == 0 ? this.lineup : this.lineup.priorRosters[this.active_lineup_idx - 1];
-//   }
-
-  toggleLineup(event : any) {
-    this.active_roster_is_current = (event.value ==0)
-    this.active_roster = this.active_roster_is_current ? this.lineup : this.lineup.priorRosters[event.value - 1];
+  _set_Active_Roster(idx) {
+    var i = 0;
+    if (this.roster_date < new Date(this.lineup.effectiveDate)) {
+      while (this.roster_date < new Date(this.lineup.priorRosters[i].effectiveDate) && i<this.lineup.priorRosters.length) {
+        i++
+      }
+      this.active_roster = this.lineup.priorRosters[i]
+      this.current_roster = new LineupFormModel(
+          this.lineup._id, 
+          this.active_roster._id, 
+          this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
+          this.active_roster.effectiveDate
+      );
+    } else {
+      this.active_roster = this.lineup
+      this.current_roster = new LineupFormModel(
+        this.lineup._id, 
+        null, 
+        this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
+        this.roster_deadline
+      );
+    }
+    
+    
     
   }
+
+  toggleLineup(event : any) {
+    this._set_Active_Roster(event.value);
+  }
+  
   ngOnDestroy() {
     this.lineupSub.unsubscribe();
     if (this.saveLineupSub) {
@@ -110,6 +198,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     }
   }
   
+
   
   private _handleLineupSuccess(res, update) {
     this.error = false;
@@ -117,13 +206,11 @@ export class RosterComponent implements OnInit, OnDestroy {
     if (update) {
       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
     }
-    var activeRec = res;
-    
-    activeRec.roster.forEach((rr) => {rr.originalPosition = rr.lineupPosition});
-    activeRec.priorRosters.forEach((roster)=> {roster.roster.forEach((rr)=> {rr.originalPosition = rr.lineupPosition} )})
-    this.lineup = activeRec; 
-    this.active_roster = this.active_roster ? this.active_roster : this.lineup
+    this.lineup = res;
+    this._set_Active_Roster(this.active_roster_index);
+        
   }
+  
   
   private _handleUpdateError(err) {
     console.error(err);

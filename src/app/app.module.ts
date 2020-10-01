@@ -8,12 +8,14 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import {MatTabsModule} from '@angular/material/tabs';
 
-import { HttpModule } from '@angular/http';
 import { HttpClientModule }    from '@angular/common/http';
 
 import { DatePipe } from '@angular/common';
@@ -35,11 +37,11 @@ import { OwnerListComponent } from './owners/owner-list/owner-list.component';
 import { RosterListComponent } from './rosters/roster-list/roster-list.component';
 import { RosterDetailsComponent } from './rosters/roster-details/roster-details.component';
 import { OwnersModule } from './owners/owners.module';
-import { HeroesComponent } from './heroes/heroes.component';
-import { HeroDetailComponent } from './hero-detail/hero-detail.component';
+
+
 import { MessagesComponent } from './messages/messages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { HeroSearchComponent } from './hero-search/hero-search.component';
+
 import { AuthService } from './auth/auth.service';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
@@ -74,6 +76,7 @@ import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { PlayerGameLineComponent } from './player-game-line/player-game-line.component';
 import { TeamRosterComponent } from './team-roster/team-roster.component';
+//import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 
 @NgModule({
@@ -84,11 +87,8 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     OwnerListComponent,
     RosterListComponent,
     RosterDetailsComponent,
-    HeroesComponent,
-    HeroDetailComponent,
     MessagesComponent,
     DashboardComponent,
-    HeroSearchComponent,
     HeaderComponent,
     FooterComponent,
     AdminComponent,
@@ -111,6 +111,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     TeamFormComponent,
     CreateTeamComponent, 
     DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent
+    //, LineupFormComponent
   ],
   imports: [
     BrowserModule,
@@ -122,12 +123,12 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     MatCardModule,
     MatSortModule,
     MatSliderModule,
+    MatSlideToggleModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatInputModule,
     FlexLayoutModule,
-    HttpModule, 
     HttpClientModule,
     OwnersModule,
     AppRoutingModule, 
@@ -135,6 +136,8 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     DataTablesModule, 
     DragDropModule,
     NgbModule,
+    MatButtonModule,
+    MatTabsModule
   ],
   providers: [ 
     Title, 

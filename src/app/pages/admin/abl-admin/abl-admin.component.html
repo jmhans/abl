@@ -29,7 +29,7 @@
             <button
             class="btn btn-info"
             (click)="_loadData()"
-            (type)="button">Load from file</button>
+            >Load from file</button>
   
   <mat-form-field class="example-full-width">
     <textarea matInput placeholder="enter records" [(ngModel)]="dataEntry"></textarea>
@@ -38,7 +38,7 @@
  <button
             class="btn btn-info"
             (click)="_createRec()"
-            (type)="button">Create</button>
+            >Create</button>
 
 {{dataEntry}}
 <ng-template [ngIf]="utils.isLoaded(loading)">

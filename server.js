@@ -11,7 +11,7 @@ const dotenv = require('dotenv');
 
 var result = dotenv.config();
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test', {useNewUrlParser: true});
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test', {useNewUrlParser: true,useUnifiedTopology: true});
 
 //var CONTACTS_COLLECTION = "contacts";
 //var PLAYERS_COLLECTION = "players";

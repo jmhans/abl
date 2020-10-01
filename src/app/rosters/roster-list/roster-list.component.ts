@@ -20,10 +20,8 @@ export class RosterListComponent implements OnInit {
   ngOnInit() {
      this.rosterService
       .getRosters()
-      .then((rosters: Roster[]) => {
-        this.rosters = rosters.map((roster) => {
-          return roster;
-        });
+      .subscribe((rosters: Roster[]) => {
+        this.rosters = rosters;
       });
   }
 
