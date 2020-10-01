@@ -3,8 +3,6 @@
      (cdkDropListDropped)="dropLineupRecord($event)" 
      *ngIf='lineup'>
   
-  {{lineupId}}
-  {{lineup.rosterId}}
   <div class="example-box alt" 
        *ngFor="let rosterRec of lineup.roster; index as i;" 
        cdkDrag

@@ -172,21 +172,35 @@ var AblGameController = {
 
     try {
 
-      var gm = await AblGame.findById(gmID);
+      var gm = await AblGame.findById(gmID).populate('homeTeam awayTeam');
       const day = gm.gameDate
       console.log(gm.gameDate);
-      var homeTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.homeTeam._id, new Date(day.toISOString()))
-      var awayTeamLineup = await AblRosterController._getRosterForTeamAndDate(gm.awayTeam._id, new Date(day.toISOString()))
+      console.log(gm);
       
-      var lineups_with_stats = await this._getStatsForLineups([homeTeamLineup, awayTeamLineup], day);
+      var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
+                                                                        return lineup;}));
+      
+      
+      var lineups_with_stats = await this._getStatsForLineups(lineups, day);
 
       var lineups_with_starters = await this._getStarters(lineups_with_stats);
-
+      
+      const homeScore = this._getABLScores(lineups_with_starters[0], true);
+      const awayScore = this._getABLScores(lineups_with_starters[1], false);
+      
+      console.log(gm.homeTeam);
+      const result = {
+        winner: homeScore.abl_runs > awayScore.abl_runs ? gm.homeTeam : gm.awayTeam, 
+        loser: homeScore.abl_runs > awayScore.abl_runs ? gm.awayTeam: gm.homeTeam
+                     }
+      console.log(result);
+      
      return {
        homeTeam: lineups_with_starters[0],
        awayTeam: lineups_with_starters[1],
-       home_score: this._getABLScores(lineups_with_starters[0]),
-       away_score: this._getABLScores(lineups_with_starters[1])
+       home_score: homeScore,
+       away_score: awayScore, 
+       result: result
      }
     } catch (err) {
       console.log("Error in _getRostersForGame:" + err);
@@ -240,7 +254,7 @@ var AblGameController = {
     })
   },
   
-  _getABLScores: function(lineup) {
+  _getABLScores: function(lineup, homeTeam = false) {
     return lineup.reduce((total, curPlyr) => {
       
       if (curPlyr.played) {
@@ -257,12 +271,13 @@ var AblGameController = {
         
         total.e += curPlyr.dailyStats.e;
         
-        total.ab += curPlyr.dailyStats.ab; 
+        total.ab += curPlyr.dailyStats.ab;
+        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
       }
       
       return  total;
       
-    }, {abl_points: 0, e: 0, ab: 0})
+    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0})
   },
 
   _getStatsForLineups: async function(lineups, current_date) {

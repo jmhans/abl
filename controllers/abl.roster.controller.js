@@ -341,39 +341,56 @@ class altABLRosterController extends BaseController{
       var LineupRec = await this._getLineupById(req.params.id);
       if (LineupRec) {
         var updateRecord;
-        if (req.body._id == LineupRec._id) {
-          // Updating the active roster record. 
-          LineupRec.effective_date = req.body.effective_date;
+        console.log(req.body._id);
+        if (!req.body._id) {
+          // Create a new lineup rec within the existing one & shift the current to the prior list
+          console.log(req.body.effectiveDate);
+          var priorLineupRec = {
+              effectiveDate: LineupRec.effectiveDate,
+              roster: LineupRec.roster, 
+              _id: LineupRec._id
+            }
+          LineupRec.priorRosters.push(priorLineupRec)
+          LineupRec.effectiveDate = req.body.effectiveDate;
           LineupRec.roster = req.body.roster;
-
-        } else {
-          // Updating a prior roster record.
-          updateRecord = LineupRec.priorRosters.find((pr) => {
-            return pr._id == req.body._id
-          });
           
-          updateRecord.effective_date = req.body.effective_date;
-          updateRecord.roster = req.body.roster;
-        }
+        } else {
+          // Update an existing roster record within the current Lineup record. 
+          
+          if (req.body._id == LineupRec._id) {
+            // Updating the active roster record. 
+            LineupRec.effectiveDate = req.body.effectiveDate;
+            LineupRec.roster = req.body.roster;
 
+          } else {
+            // Updating a prior roster record.
+            updateRecord = LineupRec.priorRosters.find((pr) => {
+              return pr._id == req.body._id
+            });
+
+            updateRecord.effectiveDate = req.body.effectiveDate;
+            updateRecord.roster = req.body.roster;
+          }
+
+        }
       } else {
         var ablTeam = await AblTeam.findById(req.body.ablTeamId);
         const LineupRec = new Lineup({
           ablTeam: ablTeam._id,
           roster: req.body.roster,
-          effective_date: new Date(),
+          effectiveDate: new Date(),
           priorRosters: []
         });
       }
 
-      var savedLineupRec = await LineupRec.save(); 
+      var savedLineupRec = await LineupRec.save();
       var populatedLineupRec = await LineupRec.populate('roster.player priorRosters.roster.player').execPopulate();
       return res.send(populatedLineupRec);
-      
-    } catch(err) {
-        return res.status(500).send({
-          message: err.message
-        });
+
+    } catch (err) {
+      return res.status(500).send({
+        message: err.message
+      });
     }
   }
   

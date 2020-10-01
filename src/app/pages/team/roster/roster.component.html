@@ -24,8 +24,16 @@
 
 <mat-card class="example-result-card" *ngIf='lineup'>
   
+  <mat-form-field color="accent" appearance="fill">
+    <mat-label>Roster Date</mat-label>
+    <input matInput [matDatepicker]="roster_date" (dateChange)="_date_changed($event)">
+    <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
+    <mat-datepicker #roster_date></mat-datepicker>
+  </mat-form-field>
+  
+  
   <mat-card-content>
-        <section *ngIf="!edit_lineup">
+<!--         <section *ngIf="!edit_lineup">
           Oldest<mat-slider
             class="example-margin"
             [disabled]="edit_lineup"
@@ -41,15 +49,27 @@
             [(ngModel)] = "active_roster_index"
                        >
           </mat-slider> Most Recent
-        </section>
+        </section> -->
 
     
-    <section class="example-section">
-
-    </section>
+<!--     <section class="example-section">
+      <mat-tab-group mat-align-tabs="start" *ngIf="lineup">
+        <mat-tab >
+           <ng-template mat-tab-label>
+              {{lineup.priorRosters[active_roster_index -1].effectiveDate}}
+            </ng-template>
+          Content 1</mat-tab>
+        <mat-tab>
+           <ng-template mat-tab-label>
+              {{current_roster.effectiveDate}}
+            </ng-template>
+          Content 2</mat-tab>
+        <mat-tab label="New">Content 3</mat-tab>
+      </mat-tab-group>
+    </section> -->
     
-    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="!create_lineup">Create New</button>
-    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="create_lineup">Cancel Create</button>
+<!--     <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="!create_lineup">Create New</button>
+    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="create_lineup">Cancel Create</button> -->
     
     
     <section *ngIf="create_lineup">
@@ -70,14 +90,14 @@
 <span *ngIf='current_roster'> 
   Prior Rosters: {{lineup.priorRosters.length}}
   {{current_roster.effectiveDate | date: "mediumDate"}}
-  {{current_roster.lineupId}}
 </span>
 
 <span *ngIf="current_roster">
+  Editable: {{roster_editable}}
 <app-team-roster [lineupId]="lineup._id"
                  [lineup]="current_roster"
                  [originalLineup] = "active_roster"
-                 [editable]="editable() && edit_lineup || create_lineup"
+                 [editable]="editable()"
                  (updated)="_updateRoster($event)"
                  ></app-team-roster>
 </span>
