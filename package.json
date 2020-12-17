@@ -34,7 +34,7 @@
     "bootstrap": "^4.4.1",
     "core-js": "^3.6.4",
     "cors": "^2.8.5",
-    "datatables.net": "^1.10.20",
+    "datatables.net": "^1.10.22",
     "datatables.net-responsive": "^2.2.3",
     "datatables.net-responsive-dt": "^2.2.3",
     "dotenv": "^8.2.0",
