@@ -13,7 +13,7 @@
     <div class="form-group">
       <label for="roster-players">Players</label>
       <div *ngFor="let player of roster.players">
-           <input class="form-control" name="roster-players" [(ngModel)]="player" placeholder="player name" />
+<!--            <input class="form-control" name="roster-players" [(ngModel)]="player" placeholder="player name" /> -->
       </div>
       <button class="btn btn-primary" (click)="addPlayer(roster)">Add Player</button>
     </div>
