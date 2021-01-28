@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OwnerListComponent } from './owners/owner-list/owner-list.component';
-import { RosterListComponent } from './rosters/roster-list/roster-list.component';
+//import { RosterListComponent } from './rosters/roster-list/roster-list.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { OwnersComponent } from './owners/owners.component';
 import { CallbackComponent } from './pages/callback/callback.component';
