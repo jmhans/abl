@@ -10,8 +10,7 @@ const methodOverride = require('method-override');
 const dotenv = require('dotenv');
 
 var result = dotenv.config();
-
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test', {useNewUrlParser: true,useUnifiedTopology: true});
+mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://heroku_wm40bx9r:<PASSWORD>@cluster-wm40bx9r.5twxx.mongodb.net', {useNewUrlParser: true,useUnifiedTopology: true});
 
 //var CONTACTS_COLLECTION = "contacts";
 //var PLAYERS_COLLECTION = "players";
