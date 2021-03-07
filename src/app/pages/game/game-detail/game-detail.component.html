@@ -6,7 +6,7 @@
   
 </div>
 <hr /> -->
-  <mat-card class="example-card">
+  <mat-card>
   <mat-card-header>
     <mat-card-title>Game</mat-card-title>
     <mat-card-subtitle><strong>When:</strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-subtitle>
@@ -17,7 +17,8 @@
 
   <mat-card-content>
     <div class="d-flex justify-content-around" *ngIf="rosters">
-        <div><strong> Away Team:</strong>
+      <div>
+        <strong> Away Team:</strong>
         <span>{{rosters.away_score | json}}</span>
         <ul class="list-group list-group-flush">
 
@@ -28,7 +29,7 @@
 
       </div>
       <div>
-      <strong>Home Team</strong>
+        <strong>Home Team</strong>
         <span>{{rosters.home_score | json}}</span>
         <ul class="list-group list-group-flush">
           <li *ngFor="let plyr of rosters.homeTeam" class="list-group-item">

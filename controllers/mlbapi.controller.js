@@ -7,13 +7,108 @@ var   router = express.Router();
 const BASE_URL = "https://statsapi.mlb.com/api/v1";//"http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
 
+const BaseController = require('./base.controller');
+
 const ablConfig = require('./../server/ablConfig');
 
 var   StatlineController = require('../controllers/statline.controller');
 var   PlayersController = require('../controllers/players.controller');
 
 
-async function getTeamPlayers(teams, teamType, gm) {
+    var pad = function(num, size) {
+      var s = num + "";
+      while (s.length < size) s = "0" + s;
+      return s;
+    }
+
+
+class altMlbApiController extends BaseController{
+
+  constructor() {
+    super(mlbGame, 'mlbgame');
+  }
+  
+  async _getGames(req, res, next) {
+    try {
+      const games = await this._getGamesForDate(req.params.gm_dt);
+      return res.send(games);
+    } catch (err) {
+      return res.status(500).send({message: err.message});
+    }
+  }
+  
+  
+  async _getGamesForDate(gm_date) {
+    try {
+      var inputDate = new Date(gm_date)
+      var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
+      var month = pad(inputDate.getUTCMonth() + 1, 2);
+      var year = inputDate.getUTCFullYear();
+      const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
+      var retBody = await axios.get(APIUrl);      
+      var gamesList = [];
+      
+      var dateItem = retBody.data.dates.find(x=>x.date == (year + "-" + month + "-" + day));
+      
+      if (dateItem) {
+        gamesList = dateItem.games
+        this._loadGamesToDB(gamesList);
+      }
+      return gamesList
+      
+    } catch(err) {
+      console.error(`Error in _getGames: ${err}`)
+    }
+  }
+  
+  async _loadGamesToDB(gamesList) {
+    try {
+            gamesList.forEach((gm) => {
+
+          var query = {
+            'gamePk': gm.gamePk
+          };
+          mlbGame.findOneAndUpdate(query, gm, {
+            upsert: true
+          }, function(err, doc) {
+            if (err) return res.send(500, {
+              error: err
+            });
+
+            //return res.send("succesfully saved");
+          });
+        this.loadPlayersInGame(gm);
+
+        });
+    } catch(err) {
+      console.error(`Error in _loadGamesToDB: ${err}`)
+    }
+  }
+  
+  
+  
+ async loadPlayersInGame(gm) {
+    const APIUrl = BASE_URL + "/game/" + gm.gamePk + "/boxscore";
+    request(APIUrl, {
+      json: true
+    }, async (err, resp, body) => {
+      if (err) {
+        return console.log(err);
+      }    
+      
+      try {
+        const awayPlayers = await this.loadTeamPlayers(body.teams, "away", gm);
+        const homePlayers = await this.loadTeamPlayers(body.teams, "home", gm);
+        console.log(awayPlayers.length + " away team players and " + homePlayers.length + " home team players logged.")
+        return {away: awayPlayers, home: homePlayers};
+
+      } catch (err) {
+        
+      }
+    })
+ }
+  
+ async loadTeamPlayers(teams, teamType, gm) {
   var PositionPlayers = []
   var players = teams[teamType].players
 
@@ -28,7 +123,7 @@ async function getTeamPlayers(teams, teamType, gm) {
 
   try {
     var plyrs = [];
-    for (var pk = 0; pk<playerKeys.length; pk++) { // I don't think this is working because of the in within the async function.
+    for (var pk = 0; pk<playerKeys.length; pk++) { 
       let player = players[playerKeys[pk]]
       const plyr = await new PlayersController()._updatePlayer(player, team , gm); // appendPlayerRecord(player, team, gm);
       const sl = await new StatlineController()._updateStatline(player, gm);  //updateStatlineRecord(player, team, gamePk, gameDt);
@@ -40,92 +135,19 @@ async function getTeamPlayers(teams, teamType, gm) {
     console.error(`Error in getTeamPlayers:${err}`)
   }
 }
-
-
- function getPlayersInGame(gm) {
-    const APIUrl = BASE_URL + "/game/" + gm.gamePk + "/boxscore";
-    request(APIUrl, {
-      json: true
-    }, async (err, resp, body) => {
-      if (err) {
-        return console.log(err);
-      }    
-      
-      try {
-        const awayPlayers = await getTeamPlayers(body.teams, "away", gm);
-        const homePlayers = await getTeamPlayers(body.teams, "home", gm);
-        console.log(awayPlayers.length + " away team players and " + homePlayers.length + " home team players logged.")
-        return {away: awayPlayers, home: homePlayers};
-
-      } catch (err) {
-        
-      }
-    })
- }
-
-
-
-
-var MlbApiController = {
-
-  _get: function(req, res, next) {
-
-    var pad = function(num, size) {
-      var s = num + "";
-      while (s.length < size) s = "0" + s;
-      return s;
-    }
-
-    const gm_date = req.params.dt;
+  
     
-    var inputDate = new Date(gm_date)
-    var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
-    var month = pad(inputDate.getUTCMonth() + 1, 2);
-    var year = inputDate.getUTCFullYear();
-    const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
-    request(APIUrl, {
-      json: true
-    }, (err, resp, body) => {
-      if (err) {
-        return console.log(err);
-      }
-      //console.log(body);
 
-      var gamesList = [];
-      var dateItem = body.dates.find(x => x.date == (year + "-" + month + "-" + day))
-
-      if (dateItem) {
-        gamesList = dateItem.games
-
-        gamesList.forEach((gm) => {
-
-          var query = {
-            'gamePk': gm.gamePk
-          };
-          mlbGame.findOneAndUpdate(query, gm, {
-            upsert: true
-          }, function(err, doc) {
-            if (err) return res.send(500, {
-              error: err
-            });
-
-            //return res.send("succesfully saved");
-          });
-        getPlayersInGame(gm);
-
-        });
-        
-      }
-
-      res.status(200).send(gamesList);
-    })
-
-  },
-  
+   
+  route() {
+    router.get('/' + this.routeString + '/:gm_dt' , (...args) => this._getGames(...args));
+    return router;
+  }
  
-  
-
 }
+
+
+
 
 
 const MLBStatsAPI = require('mlb-stats-api');
@@ -291,4 +313,4 @@ class mlbAPI {
 }
 
 
-module.exports = MlbApiController //mlbAPI
+module.exports =  {altMlbApiController, mlbAPI} //mlbAPI
