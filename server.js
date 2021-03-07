@@ -10,15 +10,8 @@ const methodOverride = require('method-override');
 const dotenv = require('dotenv');
 
 var result = dotenv.config();
-mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://heroku_wm40bx9r:<PASSWORD>@cluster-wm40bx9r.5twxx.mongodb.net', {useNewUrlParser: true,useUnifiedTopology: true});
+mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true,useUnifiedTopology: true});
 
-//var CONTACTS_COLLECTION = "contacts";
-//var PLAYERS_COLLECTION = "players";
-
-// ONE TIME USE...
-  // const bulkAdd = require('./controllers/bulkadd.controller')
-  // bulkAdd._addGames();
-// REMOVE WHEN DONE
 
 var app = express();
 app.use(bodyParser.json());
@@ -28,8 +21,6 @@ app.use(cors());
 // Create link to Angular build directory
 var distDir = __dirname + "/dist/";
 app.use(express.static(distDir));
-
-//app.use(require('./routes/routes'));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db = mongoose.connection;

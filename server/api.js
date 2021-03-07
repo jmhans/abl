@@ -16,7 +16,6 @@ const Player = require('./../models/player').Player;
 const Statline = require('./../models/statline');
 
 const Game = require('./../models/Game');
-const MlbApiController = require('./../controllers/mlbapi.controller');
 const AblTeamController = require('./../controllers/ablteam.controller');
 const AblGameController = require('./../controllers/abl.game.controller');
 const AblRosterController = require('./../controllers/abl.roster.controller').AblRosterController;
@@ -253,9 +252,6 @@ module.exports = function(app, config) {
       });
     });
   });
-  
-  
-   app.get("/api3/mlbGame/:dt", MlbApiController._get);
   
   app.get("/api3/team/:id", AblTeamController._getById);
   app.post('/api3/team/new', jwtCheck, AblTeamController._post );

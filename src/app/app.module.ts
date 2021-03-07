@@ -76,6 +76,7 @@ import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { PlayerGameLineComponent } from './player-game-line/player-game-line.component';
 import { TeamRosterComponent } from './team-roster/team-roster.component';
+import { GameTeamDetailComponent } from './pages/game/game-detail/game-team-detail/game-team-detail.component';
 //import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 
@@ -110,7 +111,7 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent
     //, LineupFormComponent
   ],
   imports: [

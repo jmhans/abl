@@ -15,7 +15,8 @@ var TeamsController = require('../controllers/owners.controller').TeamsControlle
 var RostersController = require('../controllers/rosters.controller');
 var StatlineController = require('../controllers/statline.controller');
 var AblRosterController = require('../controllers/abl.roster.controller').altABLRosterController;
-//var MLBAPI = require('../controllers/mlbapi.controller');
+var MLBAPI = require('../controllers/mlbapi.controller').altMlbApiController;
+var MLBAPI2 = require('../controllers/mlbapi.controller').mlbAPI;
 
 router.use(new PlayersController().route());
 router.use(new OwnersController().route());
@@ -23,7 +24,8 @@ router.use(new RostersController().route());
 router.use(new TeamsController().route());
 router.use(new StatlineController().route());
 router.use(new AblRosterController().route());
-//router.use(new MLBAPI().route());
+router.use(new MLBAPI().route());
+router.use(new MLBAPI2().route());
 
 
 module.exports = router;
