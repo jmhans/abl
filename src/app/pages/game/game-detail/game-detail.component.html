@@ -16,27 +16,9 @@
   </mat-card-header>
 
   <mat-card-content>
-    <div class="d-flex justify-content-around" *ngIf="rosters">
-      <div>
-        <strong> Away Team:</strong>
-        <span>{{rosters.away_score | json}}</span>
-        <ul class="list-group list-group-flush">
-
-          <li *ngFor="let plyr of rosters.awayTeam" class="list-group-item">
-                <app-player-game-line [player]="plyr"> </app-player-game-line>
-          </li>
-        </ul>
-
-      </div>
-      <div>
-        <strong>Home Team</strong>
-        <span>{{rosters.home_score | json}}</span>
-        <ul class="list-group list-group-flush">
-          <li *ngFor="let plyr of rosters.homeTeam" class="list-group-item">
-             <app-player-game-line *ngIf="plyr.played" [player]="plyr"> </app-player-game-line>
-          </li>
-        </ul>  
-      </div>
+    <div class="d-flex justify-content-between" *ngIf="rosters">
+      <app-game-team-detail class="flex-fill" [teamLoc]="Away" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score"></app-game-team-detail>   
+      <app-game-team-detail class="flex-fill" [teamLoc]="Home" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"></app-game-team-detail>   
     </div>
   </mat-card-content>
   <mat-card-actions>
