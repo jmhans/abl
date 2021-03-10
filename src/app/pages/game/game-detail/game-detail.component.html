@@ -16,7 +16,7 @@
   </mat-card-header>
 
   <mat-card-content>
-    <div class="d-flex justify-content-between" *ngIf="rosters">
+    <div class="d-flex" *ngIf="rosters">
       <app-game-team-detail class="flex-fill" [teamLoc]="Away" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score"></app-game-team-detail>   
       <app-game-team-detail class="flex-fill" [teamLoc]="Home" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"></app-game-team-detail>   
     </div>

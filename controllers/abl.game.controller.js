@@ -20,6 +20,12 @@ var AblGameController = {
         return (playerPosition == lineupSlot)
     }
   },
+  
+  _ablScore: function(statrec) {
+
+  }, 
+  
+  
   _getDailyStats: function(statlineObj) {
     var retObj = {};
     if (typeof(statlineObj.stats) != 'undefined') {
@@ -42,6 +48,7 @@ var AblGameController = {
         'sf': statlineObj.stats.batting.sacFlies,
         'e': statlineObj.stats.fielding.errors,
         'position(s)': statlineObj.positions
+        
       }
 
     } else {
@@ -67,7 +74,20 @@ var AblGameController = {
       }
 
     }
-
+        var ablPts = 
+        25 * (retObj.h || 0) + 
+        10 * (retObj["2b"] || 0)+ 
+        20 * (retObj["3b"] || 0) + 
+        30 * (retObj.hr || 0) + 
+        10 * (retObj.bb || 0) + 
+        10 * (retObj.ibb || 0)+ 
+        10 * (retObj.hbp || 0) + 
+        7 * (retObj.sb - retObj.cs || 0) + 
+        5 * (retObj.sac + retObj.sf || 0);
+    
+     var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
+    retObj.abl_points = ablPts;
+    retObj.abl_score = ablruns;
     return retObj;
   },
 
@@ -239,9 +259,9 @@ var AblGameController = {
         if (posPAs < 2) {
           // Need to supplement. Was there anybody that had a game? 
           if (posGs > 0) {
-            lineup.push({"player": {"player": {name: "supp"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 2 - posPAs, h: 0}})
+            lineup.push({"player": {"player": {name: "supp"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
           } else {
-            lineup.push({"player": {"player": {name: "four"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 4, h: 0}})
+            lineup.push({"player": {"player": {name: "four"}}, played: true, playedPosition : ABL_STARTERS[starter], dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
           }
           
         }
@@ -258,20 +278,20 @@ var AblGameController = {
     return lineup.reduce((total, curPlyr) => {
       
       if (curPlyr.played) {
-      total.abl_points += 
-            25 * curPlyr.dailyStats.h + 
-            10 * curPlyr.dailyStats["2b"] + 
-            20 * curPlyr.dailyStats["3b"] + 
-            30 * curPlyr.dailyStats.hr + 
-            10 * curPlyr.dailyStats.bb + 
-            10 * curPlyr.dailyStats.ibb + 
-            10 * curPlyr.dailyStats.hbp + 
-            7 * (curPlyr.dailyStats.sb - curPlyr.dailyStats.cs + 
-            5 * curPlyr.dailyStats.sac + curPlyr.dailyStats.sf);
+      total.abl_points += (curPlyr.dailyStats.abl_points || 0);
+//              25 * (curPlyr.dailyStats.h || 0) + 
+//              10 * (curPlyr.dailyStats["2b"] || 0)+ 
+//              20 * (curPlyr.dailyStats["3b"] || 0) + 
+//              30 * (curPlyr.dailyStats.hr || 0) + 
+//              10 * (curPlyr.dailyStats.bb || 0) + 
+//              10 * (curPlyr.dailyStats.ibb || 0)+ 
+//              10 * (curPlyr.dailyStats.hbp || 0) + 
+//              7 * (curPlyr.dailyStats.sb - curPlyr.dailyStats.cs || 0) + 
+//              5 * (curPlyr.dailyStats.sac + curPlyr.dailyStats.sf || 0);
         
-        total.e += curPlyr.dailyStats.e;
+        total.e += (curPlyr.dailyStats.e || 0);
         
-        total.ab += curPlyr.dailyStats.ab;
+        total.ab += (curPlyr.dailyStats.ab || 0);
         total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
       }
       
@@ -316,6 +336,12 @@ var AblGameController = {
                 case 'position(s)':
                   total[propertyName].push(thisRec[propertyName])
                   break;
+                case 'abl_score': 
+                  total.abl_score.abl_points += ( thisRec.abl_points || 0);
+                  total.abl_score.e += (thisRec.e || 0);
+                  total.abl_score.ab += (thisRec.ab || 0);
+                  total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
+                  break;
                 default:
                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
               }
@@ -326,7 +352,8 @@ var AblGameController = {
           }, {
             'gamePk': [],
             'gameDate': [],
-            'position(s)': []
+            'position(s)': [], 
+            'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
           });
         return {
           player: plyr,

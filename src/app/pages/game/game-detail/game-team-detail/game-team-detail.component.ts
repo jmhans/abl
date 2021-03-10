@@ -22,7 +22,7 @@ export class GameTeamDetailComponent implements OnInit {
   @Input() roster: gameTeam ;
   @Input() teamLoc: string;
   @Input() teamScore: {};
-    displayedColumns: string[] = ['position', 'name', 'hits', 'atbats'];
+    displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
 
   constructor() { }
 
