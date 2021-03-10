@@ -39,7 +39,6 @@ export class GameDetailComponent {
   loading: boolean;
   error: boolean;
   
-
   constructor(
     public utils: UtilsService,
     public auth: AuthService, 
