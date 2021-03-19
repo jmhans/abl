@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
-    "build": "ng build --output-path dist",
+    "build": "ng build --output-path dist --source-map=false",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -27,6 +27,7 @@
     "@angular/router": "^11.1.1",
     "@hapi/hoek": "^9.0.4",
     "@ng-bootstrap/ng-bootstrap": "^9.0.2",
+    "angular-bootstrap-md": "^11.0.0",
     "angular-datatables": "^11.1.1",
     "auth0-js": "^9.13.0",
     "axios": "^0.21.1",
@@ -80,7 +81,6 @@
     "karma-coverage-istanbul-reporter": "^2.1.1",
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.5.3",
-    "node-sass": "^4.13.1",
     "protractor": "^7.0.0",
     "ts-node": "^8.8.1",
     "tslint": "^6.1.3"

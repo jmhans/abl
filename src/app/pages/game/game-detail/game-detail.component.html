@@ -8,17 +8,19 @@
 <hr /> -->
   <mat-card>
   <mat-card-header>
-    <mat-card-title>Game</mat-card-title>
-    <mat-card-subtitle><strong>When:</strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-subtitle>
-    <div *ngIf="rosters">
-    Winner: {{rosters.result.winner.nickname}}
-  </div>
+    <mat-card-title><strong>When: </strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-title>
+    <mat-card-subtitle>
+      <div *ngIf="rosters">
+        Winner: {{rosters.result.winner.nickname}}
+      </div>
+    </mat-card-subtitle>
+    
   </mat-card-header>
 
   <mat-card-content>
-    <div class="d-flex" *ngIf="rosters">
-      <app-game-team-detail class="flex-fill" [teamLoc]="Away" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score"></app-game-team-detail>   
-      <app-game-team-detail class="flex-fill" [teamLoc]="Home" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"></app-game-team-detail>   
+    <div class="d-flex table-responsive" *ngIf="rosters">
+      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Away'" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score"></app-game-team-detail>   
+      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Home'" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"></app-game-team-detail>   
     </div>
   </mat-card-content>
   <mat-card-actions>

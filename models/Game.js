@@ -23,7 +23,8 @@ const gameSchema = new Schema({
   awayScore: { type: Number, required: false},
   homeScore: { type: Number, required: false},
   winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
-  loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}
+  loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false},
+  active: [{type: gamePlayerSchema}]
                               
 });
 
