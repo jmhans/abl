@@ -48,37 +48,37 @@
             </tr>
             <tr>
               <td scope="row" colspan =2>Regulation Totals</td>
-              <td><em> {{teamScore.final.g }} </em> </td>
-              <td><em> {{teamScore ?  teamScore.regulation.ab : 0 }} </em></td>
-              <td> <em>{{teamScore ?  teamScore.regulation.h : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation['2b'] : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation['3b'] : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.hr : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.bb: 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.hbp : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.sac : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.sf : 0 }}</em> </td>
-              <td ><em>{{teamScore ?  teamScore.regulation.sb : 0 }} </em></td>
-              <td ><em>{{teamScore ?  teamScore.regulation.cs : 0 }}</em> </td>
-              <td ><em>{{teamScore ?  teamScore.regulation.e : 0 }}</em> </td>
-              <td ><em>{{(teamScore ? teamScore.regulation.abl_runs : 0) | number:'1.2-2' }}</em> </td>
+              <td><em> {{teamScore.regulation?.g }} </em> </td>
+              <td><em> {{teamScore ?  teamScore.regulation?.ab : 0 }} </em></td>
+              <td> <em>{{teamScore ?  teamScore.regulation?.h : 0 }} </em></td>
+              <td ><em>{{teamScore.regulation ?  teamScore.regulation['2b'] : 0 }} </em></td>
+              <td ><em>{{teamScore.regulation ?  teamScore.regulation['3b'] : 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.hr : 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.bb: 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.hbp : 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.sac : 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.sf : 0 }}</em> </td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.sb : 0 }} </em></td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.cs : 0 }}</em> </td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.e : 0 }}</em> </td>
+              <td ><em>{{(teamScore ? teamScore.regulation?.abl_runs : 0) | number:'1.2-2' }}</em> </td>
             </tr>
             <tr>
               <th scope="row" colspan =2>Game Totals</th>
-              <th>  {{teamScore.final.g }} </th>
-              <th> {{teamScore ?  teamScore.final.ab : 0 }} </th>
-              <th> {{teamScore ?  teamScore.final.h : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final['2b'] : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final['3b'] : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.hr : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.bb: 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.hbp : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.sac : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.sf : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.sb : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.cs : 0 }} </th>
-              <th >{{teamScore ?  teamScore.final.e : 0 }} </th>
-              <th >{{(teamScore ? teamScore.final.abl_runs : 0) | number:'1.2-2' }} </th>
+              <th>  {{teamScore.final?.g }} </th>
+              <th> {{teamScore ?  teamScore.final?.ab : 0 }} </th>
+              <th> {{teamScore ?  teamScore.final?.h : 0 }} </th>
+              <th >{{teamScore.final ?  teamScore.final['2b'] : 0 }} </th>
+              <th >{{teamScore.final ?  teamScore.final['3b'] : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.hr : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.bb: 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.hbp : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.sac : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.sf : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.sb : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.cs : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.e : 0 }} </th>
+              <th >{{(teamScore ? teamScore.final?.abl_runs : 0) | number:'1.2-2' }} </th>
             </tr>
             <tr>
               <th scope="row" colspan =16 class="text-center">

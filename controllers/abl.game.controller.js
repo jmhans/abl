@@ -346,42 +346,41 @@ var AblGameController = {
 
       var gm = await AblGame.findById(gmID).populate('homeTeam awayTeam');
       const day = gm.gameDate
-      console.log(gm.gameDate);
-      console.log(gm);
       
+            
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
                                                                         return lineup;}));
+        var lineups_with_stats = await this._getStatsForLineups(lineups, day);
+      
+        var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
+        var homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
+        var awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+
+        while (Math.abs(homeScore - awayScore) < 0.5) {
+          lineups_with_starters[0].startNextPlayer("XTRA");  
+          lineups_with_starters[1].startNextPlayer("XTRA"); 
+          homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
+          awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+        }
+
+        const result = {
+          winner: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.homeTeam : gm.awayTeam, 
+          loser: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.awayTeam: gm.homeTeam
+        }
+        lineups_with_starters[0].order()
+        lineups_with_starters[1].order()
+
+       return {
+         homeTeam: lineups_with_starters[0],
+         awayTeam: lineups_with_starters[1],
+         home_score: homeScore,
+         away_score: awayScore, 
+         result: result
+        } 
+       
       
       
-      var lineups_with_stats = await this._getStatsForLineups(lineups, day);
-      var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
-      var homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-      var awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
-      
-      while (Math.abs(homeScore - awayScore) < 0.5) {
-        console.log("Looking at extras");
-        lineups_with_starters[0].startNextPlayer("XTRA");  
-        lineups_with_starters[1].startNextPlayer("XTRA"); 
-        homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-        awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
-      }
-      
-      console.log(gm.homeTeam);
-      const result = {
-        winner: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.homeTeam : gm.awayTeam, 
-        loser: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.awayTeam: gm.homeTeam
-                     }
-      lineups_with_starters[0].order()
-      lineups_with_starters[1].order()
-      
-     return {
-       homeTeam: lineups_with_starters[0],
-       awayTeam: lineups_with_starters[1],
-       home_score: homeScore,
-       away_score: awayScore, 
-       result: result
-     }
-    } catch (err) {
+          } catch (err) {
       console.log("Error in _getRostersForGame:" + err);
     }
 

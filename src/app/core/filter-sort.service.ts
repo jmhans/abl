@@ -33,7 +33,9 @@ export class FilterSortService {
           ) {
             return true;
           } else if (typeof thisVal === 'object') {
-            return this._hasNestedProperty(thisVal, patternMatch, excludeProps, dateFormat);
+            if (this._hasNestedProperty(thisVal, patternMatch, excludeProps, dateFormat)) {
+              return true
+            };
           } else if (
               // Value is a Date object or UTC string
               (thisVal instanceof Date || thisVal.toString().match(isoDateRegex)) &&
@@ -64,6 +66,8 @@ export class FilterSortService {
     });
     return filteredArray;
   }
+  
+
 
   noSearchResults(arr: any[], query: string): boolean {
     // Check if array searched by query returned any results

@@ -44,7 +44,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
     //
     //this.filteredGames = this.fs.search(this.gamesList, this.datePipe.transform(this.modelDate.value, 'mediumDate'), '_id', 'mediumDate')
-    this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
+    //this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
     this.searchGames();
   }
 
@@ -68,7 +68,11 @@ export class GamesComponent implements OnInit, OnDestroy {
   }
 
   searchGames() {
-    this.filteredGames = this.fs.search(this.gamesList, this.query, '_id', 'mediumDate');
+    var searchInput = this.gamesList
+    if (this.modelDate.value) { 
+      searchInput = this.gamesList.filter((g)=> {return this.datePipe.transform(g.gameDate, 'mediumDate') == this.datePipe.transform(this.modelDate.value, 'mediumDate')})
+    }
+    this.filteredGames = this.fs.search(searchInput, this.query, '_id', 'mediumDate');
     
   }
 

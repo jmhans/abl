@@ -11,7 +11,7 @@
     <mat-card-title><strong>When: </strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-title>
     <mat-card-subtitle>
       <div *ngIf="rosters">
-        Winner: {{rosters.result.winner.nickname}}
+        Winner: {{rosters.result?.winner?.nickname}}
       </div>
     </mat-card-subtitle>
     
