@@ -26,7 +26,13 @@ const gameSchema = new Schema({
   loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false},
   active: [{type: gamePlayerSchema}], 
   status: String, 
-  results: {}
+  results: {
+        status: String,
+        scores: [{team: String, location: String, regulation: {}, final: {}  }] ,
+        winner: {}, 
+        loser: {},
+        attestations: [{attester: String, time: Date}]
+      }
                               
 });
 

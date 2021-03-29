@@ -80,6 +80,8 @@ export class GameDetailComponent {
     
     this.potentialStatlines = {};
     
+    console.log(this.auth.userProfile)
+    
     this.statsSub = this.ablGame.getGameRosters$(this.game._id)
       .subscribe(res => {
         this.rosters = res;
@@ -95,7 +97,8 @@ export class GameDetailComponent {
           {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final  }
         ], 
         winner: this.rosters.result.winner, 
-        loser: this.rosters.result.loser
+        loser: this.rosters.result.loser, 
+        attestations: [{attester: this.auth.userProfile.sub, time: new Date()}]
       };
     
     this.submitSub = this.ablGame.editGame$(this.game._id, gameResultsObj)

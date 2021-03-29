@@ -40,6 +40,7 @@ interface GameResultsModel  {
         scores: {team: string, location: string, regulation: {}, final: {}  }[] 
         winner: {} 
         loser: {}
+        attestations: {attester: string, time: Date}[]
       }
 
 
