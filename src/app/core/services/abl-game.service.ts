@@ -4,6 +4,9 @@ import { AuthService } from './../../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { GameModel , GameResultsModel} from './../models/game.model';
+
+
 import { StatlineModel } from './../models/statline.model';
 
 @Injectable({
@@ -55,6 +58,17 @@ export class AblGameService {
     
     return this.http
       .get<[]>(`${this.base_api}game/${gameId}/rosters`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
+    // PUT existing event (admin only)
+  editGame$(id: string,game: GameResultsModel): Observable<GameModel> {
+    return this.http
+      .put<GameModel>(`${this.base_api}game/${id}/results`, game, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(

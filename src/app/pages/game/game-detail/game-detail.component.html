@@ -19,12 +19,12 @@
 
   <mat-card-content>
     <div class="d-flex table-responsive" *ngIf="rosters">
-      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Away'" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score"></app-game-team-detail>   
-      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Home'" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"></app-game-team-detail>   
+      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Away'" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score" [status]="rosters.status"></app-game-team-detail>   
+      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Home'" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"  [status]="rosters.status"></app-game-team-detail>   
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button>SAVE</button>
+    <button mat-button (click)="_saveResult()">SAVE</button>
     <button mat-button>DELETE</button>
   </mat-card-actions>
 </mat-card>

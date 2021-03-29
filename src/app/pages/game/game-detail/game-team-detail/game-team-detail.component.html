@@ -25,11 +25,11 @@
 
             </tr>
           </thead>
-          <tbody>
+          <tbody *ngIf="status=='Final'">
             <tr  *ngFor="let player of roster | myfilter : true ; index as i" [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')">
               
               <th scope="row">{{player.playedPosition}}</th>
-              <td>{{player.player.player.name}} <small>({{player.player.player.position}} - {{player.player.player.team}})</small></td>
+              <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
               <td>{{player.dailyStats ?  player.dailyStats.g : 0 }} </td>
               <td> {{player.dailyStats ?  player.dailyStats.ab : 0 }} </td>
               <td> {{player.dailyStats ?  player.dailyStats.h : 0 }} </td>
@@ -90,26 +90,26 @@
 
 
           </tbody>
-            <tbody *ngIf="showBench" >
+            <tbody *ngIf="showBench || status != 'Final'" >
               
-            <tr *ngFor="let player of roster | myfilter : false ; index as i" [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')">
+            <tr *ngFor="let player of roster | myfilter : false ; index as i" [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')">
               
-              <th scope="row">{{player.playedPosition || "B"}}</th>
-              <td>{{player.player.player.name}} <small>({{player.player.player.position}} - {{player.player.player.team}})</small></td>
-              <td>{{player.dailyStats ?  player.dailyStats.g : 0 }} </td>
-              <td> {{player.dailyStats ?  player.dailyStats.ab : 0 }} </td>
-              <td> {{player.dailyStats ?  player.dailyStats.h : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats['2b'] : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats['3b'] : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.hr : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.bb: 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.hbp : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sac : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sf : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sb : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.cs : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.e : 0 }} </td>
-              <td >{{(player.dailyStats ?  player.dailyStats.abl_score?.abl_runs : 0) | number:'1.2-2' }} </td>
+              <th scope="row">{{player.playedPosition || (status == 'Final' ? "B" : player.lineupPosition)}}</th>
+              <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
+              <td>{{ player.dailyStats?.g }} </td>
+              <td> {{ player.dailyStats?.ab }} </td>
+              <td> {{ player.dailyStats?.h }} </td>
+              <td >{{ player.dailyStats ? player.dailyStats['2b'] : '' }} </td>
+              <td >{{ player.dailyStats ? player.dailyStats['3b'] : '' }} </td>
+              <td >{{  player.dailyStats?.hr }} </td>
+              <td >{{ player.dailyStats?.bb}} </td>
+              <td >{{ player.dailyStats?.hbp  }} </td>
+              <td >{{ player.dailyStats?.sac  }} </td>
+              <td >{{ player.dailyStats?.sf  }} </td>
+              <td >{{ player.dailyStats?.sb  }} </td>
+              <td >{{ player.dailyStats?.cs  }} </td>
+              <td >{{ player.dailyStats?.e  }} </td>
+              <td >{{ player.dailyStats?.abl_score?.abl_runs  | number:'1.2-2' }} </td>
 
             </tr>
 

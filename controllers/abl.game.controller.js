@@ -117,21 +117,29 @@ class lineupArray extends Array {
         var posGs = 0;
         
         var possibles = this.bench().filter((plyr)=> {
-          return canPlayPosition(plyr.player.lineupPosition, pos)
+          return canPlayPosition(plyr.lineupPosition, pos)
         }); 
+        var curPlyrRec;
+    
     
         while (posPAs < 2) {
           
           if (possibles.length > 0) {
             var nextPlyr = possibles[0]
-            if ( nextPlyr.dailyStats && nextPlyr.dailyStats.g > 0) {
 
-              nextPlyr.playedPosition = pos
-              nextPlyr.ablstatus = 'active'
-              nextPlyr.lineupOrder = this.active().length
+            if ( nextPlyr.dailyStats && nextPlyr.dailyStats.g > 0) {
+              curPlyrRec = this[this.indexOf(nextPlyr)];
+                           
+              curPlyrRec.playedPosition = pos
+              curPlyrRec.ablstatus = 'active'
+              curPlyrRec.lineupOrder = this.active().length
               
-              posPAs += new statline(nextPlyr.dailyStats).plateAppearances; //this.plateAppearances(nextPlyr.dailyStats)
-              posGs += nextPlyr.dailyStats.g
+              //nextPlyr.playedPosition = pos
+              //nextPlyr.ablstatus = 'active'
+              //nextPlyr.lineupOrder = this.active().length
+              
+              posPAs += new statline(curPlyrRec.dailyStats).plateAppearances; //this.plateAppearances(nextPlyr.dailyStats)
+              posGs += curPlyrRec.dailyStats.g
             } 
             possibles.splice(0, 1); // First player has been evaluated. Remove him from list for next loop. 
             
@@ -139,10 +147,10 @@ class lineupArray extends Array {
             // Still not enough Plate Appearances. Add in Supplemental. 
 
             if (posGs > 0) {
-              this.push({"player": {"player": {name: "supp"}}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
+              this.push({"player": {name: "supp"}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
               posPAs = 2
             } else {
-              this.push({"player": {"player": {name: "four"}}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
+              this.push({"player": {name: "four"}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
               posPAs = 4
             }
 
@@ -171,10 +179,6 @@ var AblGameController = {
         return (playerPosition == lineupSlot)
     }
   },
-  
-  _ablScore: function(statrec) {
-
-  }, 
   
 
   
@@ -347,39 +351,55 @@ var AblGameController = {
       var gm = await AblGame.findById(gmID).populate('homeTeam awayTeam');
       const day = gm.gameDate
       
-            
+      var homeScore = {regulation: {}, final: {}}; 
+      var awayScore = {regulation: {}, final: {} }; 
+      var result = {};
+      
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
                                                                         return lineup;}));
-        var lineups_with_stats = await this._getStatsForLineups(lineups, day);
-      
-        var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
-        var homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-        var awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
 
-        while (Math.abs(homeScore - awayScore) < 0.5) {
-          lineups_with_starters[0].startNextPlayer("XTRA");  
-          lineups_with_starters[1].startNextPlayer("XTRA"); 
-          homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-          awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
-        }
+          if (new Date(day) <= new Date()) {
+            // This game should be done by now. 
+            
+            var lineups_with_stats = await this._getStatsForLineups(lineups, day);
+            var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
+            
+            homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
+            awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+            while (Math.abs(homeScore - awayScore) < 0.5) {
+              lineups_with_starters[0].startNextPlayer("XTRA");  
+              lineups_with_starters[1].startNextPlayer("XTRA"); 
+              homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
+              awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+            }
+            
+            result = {
+              winner: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.homeTeam : gm.awayTeam, 
+              loser: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.awayTeam: gm.homeTeam
+            }
+            
+            lineups_with_starters[0].order()
+            lineups_with_starters[1].order()
+            return {
+             homeTeam: lineups_with_starters[0],
+             awayTeam: lineups_with_starters[1],
+             home_score: homeScore,
+             away_score: awayScore, 
+             result: result, 
+             status: "Final"
+            } 
 
-        const result = {
-          winner: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.homeTeam : gm.awayTeam, 
-          loser: homeScore.final.abl_runs > awayScore.final.abl_runs ? gm.awayTeam: gm.homeTeam
-        }
-        lineups_with_starters[0].order()
-        lineups_with_starters[1].order()
-
-       return {
-         homeTeam: lineups_with_starters[0],
-         awayTeam: lineups_with_starters[1],
-         home_score: homeScore,
-         away_score: awayScore, 
-         result: result
-        } 
+          } else {
+            return {
+             homeTeam: lineups[0],
+             awayTeam: lineups[1],
+             home_score: homeScore,
+             away_score: awayScore, 
+             result: result,
+             status: "Scheduled"
+            }
+          }
        
-      
-      
           } catch (err) {
       console.log("Error in _getRostersForGame:" + err);
     }
@@ -394,7 +414,6 @@ var AblGameController = {
   
   
   _getActiveStarters: function (lineups) {
-      
     return lineups.map((lineup) => {
       var newLineup = new lineupArray(...lineup)
 
@@ -465,10 +484,15 @@ var AblGameController = {
             'position(s)': [], 
             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
           });
-        return {
-          player: plyr,
-          dailyStats: player_stats
-        }
+        
+        plyr.stats = {};
+        plyr.dailyStats = player_stats;
+        
+        return plyr;
+//         return {
+//           player: plyr,
+//           dailyStats: player_stats
+//         }
       });
     });
 
@@ -538,6 +562,24 @@ var AblGameController = {
       });
     });
   },
+  
+  _updateResults: async (req, res) => {
+    
+       try {
+          const updatedGame = await AblGame.findByIdAndUpdate(
+              req.params.id,
+              { $set: { results: req.body } },
+              { new: true }
+          );
+          res.json({
+              updatedGame
+          });
+      } catch (e) {
+          return res.status(422).send({
+              error: { message: 'e', resend: true }
+          });
+      } 
+  }
 
 
 

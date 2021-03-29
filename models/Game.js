@@ -24,7 +24,9 @@ const gameSchema = new Schema({
   homeScore: { type: Number, required: false},
   winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
   loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false},
-  active: [{type: gamePlayerSchema}]
+  active: [{type: gamePlayerSchema}], 
+  status: String, 
+  results: {}
                               
 });
 

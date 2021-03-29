@@ -48,10 +48,11 @@ export class GameTeamDetailComponent implements OnInit {
   @Input() roster: gameTeam ;
   @Input() teamLoc: string;
   @Input() teamScore: ablgameScore;
+  @Input() status: string;
   showBench: boolean = false;
   
   
-  activeFilter: {ablstatus: 'active'}
+
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
 
   constructor() { }

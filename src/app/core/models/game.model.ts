@@ -9,7 +9,10 @@ class GameModel {
     public description?: string,
     public _id?: string,
     public awayTeamRoster?: Roster[], 
-    public homeTeamRoster?: Roster[]
+    public homeTeamRoster?: Roster[],
+    public status?: any,
+    public attestations?: any[],
+    public results?: any
   ) { }
 }
 
@@ -30,8 +33,14 @@ interface PopulatedGameModel {
     _id?: string
     awayTeamRoster?: PopulatedRoster[] 
     homeTeamRoster?: PopulatedRoster[]
+    status: any
 }
+interface GameResultsModel  {
+        status: string
+        scores: {team: string, location: string, regulation: {}, final: {}  }[] 
+        winner: {} 
+        loser: {}
+      }
 
 
-
-export { GameModel, FormGameModel, PopulatedGameModel  };
+export { GameModel, FormGameModel, PopulatedGameModel, GameResultsModel  };

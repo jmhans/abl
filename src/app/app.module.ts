@@ -15,6 +15,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
+import { ButtonsModule, WavesModule, CollapseModule } from 'angular-bootstrap-md'
+import { IconsModule } from 'angular-bootstrap-md'
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -57,6 +59,7 @@ import { UpdateEventComponent } from './pages/admin/update-event/update-event.co
 import { EventFormComponent } from './pages/admin/event-form/event-form.component';
 import { AblAdminComponent } from './pages/admin/abl-admin/abl-admin.component';
 import { GameComponent } from './pages/game/game.component';
+import { TeamGameComponent } from './pages/team/game/game.component';
 import { GameDetailComponent } from './pages/game/game-detail/game-detail.component';
 import { GamesComponent } from './pages/games/games.component';
 import { TeamComponent } from './pages/team/team.component';
@@ -112,7 +115,7 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent
     //, LineupFormComponent
   ],
   imports: [
@@ -139,7 +142,9 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     DragDropModule,
     NgbModule,
     MatButtonModule,
-    MatTabsModule
+    MatTabsModule,
+    ButtonsModule, WavesModule, CollapseModule,
+    IconsModule 
   ],
   providers: [ 
     Title, 

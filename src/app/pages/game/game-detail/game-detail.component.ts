@@ -15,11 +15,34 @@ import { map, mergeMap } from 'rxjs/operators';
     plyrs: StatlineModel[]
   }
 
+
+interface rosterScoreRecord {
+  abl_runs : Number
+  abl_points : Number
+  e : Number
+  ab : Number
+  g : Number
+  h : Number
+  hr : Number
+  bb : Number
+  hbp : Number
+  sac : Number
+  sf : Number
+  sb : Number
+  cs : Number
+}
+
+interface rosterGameScoreRecord {
+  regulation: rosterScoreRecord
+  final: rosterScoreRecord
+}
+
 interface gameRosters {
-  away_score: {} 
-  home_score: {}
+  away_score: rosterGameScoreRecord
+  home_score: rosterGameScoreRecord
   awayTeam: {}
   homeTeam: {}
+  result: {winner: {}, loser: {}}
 }
 
 @Component({
@@ -36,6 +59,7 @@ export class GameDetailComponent {
   potentialStatlines: object;
   statsSub: Subscription;
   RosterSub: Subscription;
+  submitSub: Subscription;
   loading: boolean;
   error: boolean;
   
@@ -63,10 +87,30 @@ export class GameDetailComponent {
     
   }
   
+  _saveResult() {
+    var gameResultsObj = {
+       status: 'final', 
+        scores: [
+          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final  }, 
+          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final  }
+        ], 
+        winner: this.rosters.result.winner, 
+        loser: this.rosters.result.loser
+      };
+    
+    this.submitSub = this.ablGame.editGame$(this.game._id, gameResultsObj)
+      .subscribe(res => {
+        console.log(`Document updated: ${res}` );
+      })
+  }
+  
+  
   
   ngOnDestroy() {
    // this.RosterSub.unsubscribe();
     this.statsSub.unsubscribe();
+    if (this.submitSub) { this.submitSub.unsubscribe()}
+    
   }
 
 
