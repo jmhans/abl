@@ -10,9 +10,8 @@ class GameModel {
     public _id?: string,
     public awayTeamRoster?: Roster[], 
     public homeTeamRoster?: Roster[],
-    public status?: any,
     public attestations?: any[],
-    public results?: any
+    public results?: GameResultsModel
   ) { }
 }
 

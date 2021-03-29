@@ -22,9 +22,9 @@
             <div class="col"><strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong></div>
             <div class="col">{{game.gameDate | date:'longDate'}}</div>
             <div class="col"> 
-              <span *ngIf="game.status == 'Final'">
+              <span *ngIf="game.results.status == 'final'">
                 <button type="button" mdbBtn (click)="attest(game)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
-                <button type="button" mdbBtn (click)="protest(game)"  mdbWavesEffect><mdb-icon far class="red-text" size="lg" icon="times-circle"></mdb-icon> Reject</button>
+                <!--button type="button" mdbBtn (click)="protest(game)"  mdbWavesEffect><mdb-icon far class="red-text" size="lg" icon="times-circle"></mdb-icon> Reject</button-->
               </span>
 
             </div>
