@@ -14,7 +14,8 @@
     <strong>Team owners:</strong>
     <ul class="list-group list-group-flush">
       <li class="list-group-item" *ngFor="let owner of team.owners" >
-        <span class="col-8">{{ owner.name }} {{owner.email ? "|" : ''}} {{ owner.email }}</span>
+        <span class="col-4" *ngIf="!owner.verified">Placeholder Owner Name:</span>
+        <span class="col-4">{{ owner.name }} {{owner.email ? "|" : ''}} {{ owner.email }}</span>
         <span class="col-4" *ngIf="!owner.verified">Is this you? <a [routerLink]="['/team/update', team._id, 'owner', owner._id]"> Claim Team</a></span>
           
         
