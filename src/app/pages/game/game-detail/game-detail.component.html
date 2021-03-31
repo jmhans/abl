@@ -24,8 +24,12 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="_saveResult()">Attest to Boxscore</button>
-    
+    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
+      <i class="far fa-check-square"></i> Attest to Boxscore
+    </button>
+    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+      <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
+    </button>
   </mat-card-actions>
 </mat-card>
 

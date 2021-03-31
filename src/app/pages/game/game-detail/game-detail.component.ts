@@ -107,6 +107,10 @@ export class GameDetailComponent {
       })
   }
   
+  _userInGame() {
+    return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+  }
+  
   
   
   ngOnDestroy() {
