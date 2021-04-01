@@ -10,7 +10,6 @@ class GameModel {
     public _id?: string,
     public awayTeamRoster?: Roster[], 
     public homeTeamRoster?: Roster[],
-    public attestations?: any[],
     public results?: GameResultsModel
   ) { }
 }
@@ -33,13 +32,14 @@ interface PopulatedGameModel {
     awayTeamRoster?: PopulatedRoster[] 
     homeTeamRoster?: PopulatedRoster[]
     status: any
+    results?: GameResultsModel
 }
 interface GameResultsModel  {
         status: string
         scores: {team: string, location: string, regulation: {}, final: {}  }[] 
         winner: {} 
         loser: {}
-        attestations: {attester: string, time: Date}[]
+        attestations: {attester: string, attesterType: string, time: Date}[]
       }
 
 

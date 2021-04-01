@@ -19,15 +19,22 @@
 
   <mat-card-content>
     <div class="d-flex table-responsive" *ngIf="rosters">
-      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Away'" [roster]="rosters.awayTeam" [teamScore]="rosters.away_score" [status]="rosters.status"></app-game-team-detail>   
-      <app-game-team-detail class="p-1 boxscore flex-fill" [teamLoc]="'Home'" [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"  [status]="rosters.status"></app-game-team-detail>   
+      <span class="p-1 boxscore flex-fill">        
+        Away Team:<strong> {{game.awayTeam.nickname}}</strong>
+        <app-game-team-detail  [roster]="rosters.awayTeam" [teamScore]="rosters.away_score" [status]="rosters.status"></app-game-team-detail>   
+      </span>
+      <span class="p-1 boxscore flex-fill">
+        Home Team:<strong> {{game.homeTeam.nickname}}</strong>
+        <app-game-team-detail  [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"  [status]="rosters.status"></app-game-team-detail>   
+      </span>
+      
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
+    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
       <i class="far fa-check-square"></i> Attest to Boxscore
     </button>
-    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
       <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
     </button>
   </mat-card-actions>

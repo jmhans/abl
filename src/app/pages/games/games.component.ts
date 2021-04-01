@@ -11,6 +11,11 @@ import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/da
 import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
+
+
+
+
+
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -67,6 +72,17 @@ export class GamesComponent implements OnInit, OnDestroy {
       );
   }
 
+  getGameAttester(allAttestations, loc) {
+    return allAttestations.find((a)=> {return a.attesterType == loc });
+  }
+  
+  getGameScore(gm, loc) {
+    if (gm.results && gm.results.scores) {
+        return gm.results.scores.find((g)=> {return g.location == loc})    
+    }
+  }
+  
+  
   searchGames() {
     var searchInput = this.gamesList
     if (this.modelDate.value) { 

@@ -90,7 +90,9 @@ export class GameDetailComponent {
   }
   
   _saveResult() {
-    var gameResultsObj = {
+    var gameResultsObj = this.game.results
+    if (!this.game.results) {
+      gameResultsObj = {
        status: 'final', 
         scores: [
           {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final  }, 
@@ -98,8 +100,12 @@ export class GameDetailComponent {
         ], 
         winner: this.rosters.result.winner, 
         loser: this.rosters.result.loser, 
-        attestations: [{attester: this.auth.userProfile.sub, time: new Date()}]
+        attestations: []
       };
+    } 
+    
+    gameResultsObj.attestations.push({attester: this.auth.userProfile.sub, attesterType: this._userInGame(), time: new Date()})
+
     
     this.submitSub = this.ablGame.editGame$(this.game._id, gameResultsObj)
       .subscribe(res => {
@@ -108,7 +114,19 @@ export class GameDetailComponent {
   }
   
   _userInGame() {
-    return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+    var home = this.game.homeTeam.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
+    var away = this.game.awayTeam.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
+    
+    if (home) {
+      return "home"
+    } else if (away) {
+      return "away"
+    }
+    // return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+  }
+  
+  _userHasAttested() {
+    return this.game.results.attestations.find((a)=> { return this.auth.userProfile.sub == a.attester})
   }
   
   

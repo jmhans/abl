@@ -46,7 +46,6 @@ interface gameTeam {
 export class GameTeamDetailComponent implements OnInit {
 
   @Input() roster: gameTeam ;
-  @Input() teamLoc: string;
   @Input() teamScore: ablgameScore;
   @Input() status: string;
   showBench: boolean = false;

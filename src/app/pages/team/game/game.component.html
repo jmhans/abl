@@ -25,6 +25,15 @@
               <span *ngIf="game.results.status == 'final'">
                 <button type="button" mdbBtn (click)="attest(game)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
                 <!--button type="button" mdbBtn (click)="protest(game)"  mdbWavesEffect><mdb-icon far class="red-text" size="lg" icon="times-circle"></mdb-icon> Reject</button-->
+<!--                     <button *ngIf="_userInGame()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
+                      <i class="far fa-check-square"></i> Attest to Boxscore
+                    </button>
+                    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+                      <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
+                    </button> -->
+                
+                
+                
               </span>
 
             </div>

@@ -31,7 +31,7 @@ const gameSchema = new Schema({
         scores: [{team: String, location: String, regulation: {}, final: {}  }] ,
         winner: {}, 
         loser: {},
-        attestations: [{attester: String, time: Date}]
+        attestations: [{attester: String, attesterType: String, time: Date}]
       }
                               
 });

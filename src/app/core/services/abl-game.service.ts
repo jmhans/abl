@@ -76,5 +76,9 @@ export class AblGameService {
       );
   }
   
+//   attestGame$(id: string, game: GameResultsModel): Observable<GameModel> {
+    
+//   }
+  
 
 }

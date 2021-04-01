@@ -44,10 +44,16 @@
           *ngFor="let game of fs.orderByDate(filteredGames, 'startDatetime')"
           [routerLink]="['/game', game._id]"
           class="list-group-item list-group-item-action flex-column align-items-start">
-          
           <div class="row">
             <div class="col"><strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong></div>
             <div class="col">{{game.gameDate | date:'longDate'}}</div>
+            <div class="col" ><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></div>
+            <div class="col" ><span *ngIf="getGameScore(game, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span></div>
+            <div class="col">Away<span *ngIf="getGameAttester(game.results?.attestations, 'away') as attestation; then thenBlock else elseBlock"> </span></div>
+            <div class="col">Home<span *ngIf="getGameAttester(game.results?.attestations, 'home') as attestation; then thenBlock else elseBlock"> </span></div>
+            <ng-template #thenBlock> Attested!</ng-template>
+            <ng-template #elseBlock> did not attest</ng-template>
+            
           </div>
 
         </a>
