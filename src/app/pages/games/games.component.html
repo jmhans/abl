@@ -39,7 +39,7 @@
       </p>
 
       <!-- Events listing -->
-      <section class="list-group">
+<!--       <section class="list-group">
         <a
           *ngFor="let game of fs.orderByDate(filteredGames, 'startDatetime')"
           [routerLink]="['/game', game._id]"
@@ -52,12 +52,33 @@
             <div class="col">Away<span *ngIf="getGameAttester(game.results?.attestations, 'away') as attestation; then thenBlock else elseBlock"> </span></div>
             <div class="col">Home<span *ngIf="getGameAttester(game.results?.attestations, 'home') as attestation; then thenBlock else elseBlock"> </span></div>
             <ng-template #thenBlock> Attested!</ng-template>
-            <ng-template #elseBlock> did not attest</ng-template>
+            <ng-template #elseBlock> Nope!</ng-template>
             
           </div>
 
         </a>
-      </section>
+      </section> -->
+      
+      <table mdbTable class="table table-responsive table-sm">
+        <thead>
+          <tr>
+            <th *ngFor="let head of headings" scope="col">{{head}} </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr mdbTableCol *ngFor="let game of fs.orderByDate(filteredGames, 'gameDate')">
+            <th scope="row"><strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong></th>
+            <td>{{game.gameDate | date:'longDate'}}</td>
+            <td><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></td>
+            <td><span *ngIf="getGameScore(game, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span></td>
+            <td><span *ngIf="getGameAttester(game.results?.attestations, 'away') as attestation; then thenBlock else elseBlock"> </span></td>
+            <td><span *ngIf="getGameAttester(game.results?.attestations, 'home') as attestation; then thenBlock else elseBlock"> </span></td>
+            <ng-template #thenBlock>Attested!</ng-template>
+            <ng-template #elseBlock>Nope!</ng-template>
+          </tr>
+        </tbody>
+      </table>
+     
     </ng-template>
 
     <!-- No upcoming public events available -->

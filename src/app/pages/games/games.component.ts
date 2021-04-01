@@ -12,10 +12,6 @@ import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
 
-
-
-
-
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -30,7 +26,12 @@ export class GamesComponent implements OnInit, OnDestroy {
   error: boolean;
   query: string = '';
   modelDate: FormControl;
+  
 
+  headings = ['Description', 'Date', 'Away Score', 'Home Score', 'Away Attestation', 'Home Attestation'];
+  
+  
+  
   constructor(
     private title: Title,
     public utils: UtilsService,
