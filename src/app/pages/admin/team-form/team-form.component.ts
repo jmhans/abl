@@ -249,12 +249,14 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   
   createOwner(): FormGroup {
     return this.fb.group({
-      name: '',
+      name:  '',
       email: '',
       userId: '',
       verified: false,
     });
   }
+  
+  
   
   addOwner(): void {
     //this.formOwners = this.teamForm.get('owners') as FormArray;

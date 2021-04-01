@@ -1,5 +1,7 @@
 <!-- src/app/pages/event/event.component.html -->
 
+
+
 <ng-template [ngIf]="utils.isLoaded(loading)">
   <h1 class="text-center">{{ pageTitle }}</h1>
   <!-- Event -->
@@ -22,6 +24,13 @@
               [queryParams]="{ tab: 'roster' }"
               [ngClass]="{ 'active': utils.tabIs(tab, 'roster') }">Roster</a>
           </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="[]"
+              [queryParams]="{ tab: 'games' }"
+              [ngClass]="{ 'active': utils.tabIs(tab, 'games') }">Games</a>
+          </li>
         </ul>
       </div>
 
@@ -35,6 +44,10 @@
         *ngIf="utils.tabIs(tab, 'roster')"
         [team]="team"
         ></app-roster>
+      <app-team-games
+        *ngIf="utils.tabIs(tab, 'games')"
+        [team]="team"
+        ></app-team-games>
       
       
     </div>

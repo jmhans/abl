@@ -11,6 +11,7 @@ import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/da
 import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
+
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
@@ -25,7 +26,12 @@ export class GamesComponent implements OnInit, OnDestroy {
   error: boolean;
   query: string = '';
   modelDate: FormControl;
+  
 
+  headings = ['Description', 'Date', 'Away Score', 'Home Score', 'Away Attestation', 'Home Attestation'];
+  
+  
+  
   constructor(
     private title: Title,
     public utils: UtilsService,
@@ -44,7 +50,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   _dateChanged(type: string, event: MatDatepickerInputEvent<Date>) {
     //
     //this.filteredGames = this.fs.search(this.gamesList, this.datePipe.transform(this.modelDate.value, 'mediumDate'), '_id', 'mediumDate')
-    this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
+    //this.query = this.datePipe.transform(this.modelDate.value, 'mediumDate');
     this.searchGames();
   }
 
@@ -67,8 +73,23 @@ export class GamesComponent implements OnInit, OnDestroy {
       );
   }
 
+  getGameAttester(allAttestations, loc) {
+    return allAttestations.find((a)=> {return a.attesterType == loc });
+  }
+  
+  getGameScore(gm, loc) {
+    if (gm.results && gm.results.scores) {
+        return gm.results.scores.find((g)=> {return g.location == loc})    
+    }
+  }
+  
+  
   searchGames() {
-    this.filteredGames = this.fs.search(this.gamesList, this.query, '_id', 'mediumDate');
+    var searchInput = this.gamesList
+    if (this.modelDate.value) { 
+      searchInput = this.gamesList.filter((g)=> {return this.datePipe.transform(g.gameDate, 'mediumDate') == this.datePipe.transform(this.modelDate.value, 'mediumDate')})
+    }
+    this.filteredGames = this.fs.search(searchInput, this.query, '_id', 'mediumDate');
     
   }
 

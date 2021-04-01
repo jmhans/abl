@@ -46,62 +46,62 @@
       [innerHTML]="formErrors.stadium">
     </div>
   </div>
-  
-Owners
+  <div class="form-group">
+    Owners
 
    <section class="list-group" formArrayName="owners">
       <div *ngFor="let owner of teamForm.get('owners')['controls']; let i = index;" class="list-group-item list-group-item-action flex-column align-items-start">
-        <div [formGroupName]="i" class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">
+        <div [formGroupName]="i" class="d-flex w-100 justify-content-start">
+          <span class="p-2">
+   
+                    <a class="btn btn-outline-danger" role="button" (click)="deleteOwner(i)">
+                      <i class="fa fa-user-times me-2" aria-hidden="true"></i>Remove owner from team
+                    </a>
             
-            <div>
-              <span *ngIf="teamForm.controls.owners.controls[i].controls.verified.value">
-                Name: {{teamForm.controls.owners.controls[i].controls.name.value}}
+               </span>  
+          <div class="d-flex border">         
+              <span *ngIf="teamForm.controls.owners.controls[i].controls.verified.value" class="p-2">
+                {{teamForm.controls.owners.controls[i].controls.name.value}} (Verified!)
               </span>
 
-              <span *ngIf="!teamForm.controls.owners.controls[i].controls.verified.value">
+              <span *ngIf="!teamForm.controls.owners.controls[i].controls.verified.value" class="p-2">
                 <strong>Unverified</strong>: User will need to log in and claim team to be able to manage team.
                 <div>
+                  <span class='col-4'>
+                    Is this you? <button class="btn btn-info btn-xs" type="button" (click)="_verifyOwnerRecord(i)">Claim Team</button>
+                  </span>
                   <span  class='col-4'>
-                    <label for="name">Name: </label> 
+                    <label for="name">Placeholder Name: </label> 
                     <input id="name" 
                            type="text"
                            formControlName="name" 
                            placeholder="name">
-  <!--                   <label for="email">Email</label> 
-                    <input id="email" 
-                           type="text"
-                           formControlName="email" 
-                           placeholder="email"> -->
                      
                   </span>
-                  <span class="col-4"></span>
-                  <span class='col-4'>
-                    Is this you? <button class="btn btn-info btn-xs" type="button" (click)="_verifyOwnerRecord(i)">Claim Team</button>
-                  </span>
-
+                  
                 </div>
               </span>                     
 
-             <button class="btn btn-danger btn-xs" 
-                      type="button"
-                      (click)="deleteOwner(i)"> Delete Owner</button>
-
+             
               </div>
-          </h5>
           
         </div>
 
-      </div>      
-      <button class="btn btn-success" 
-              type="button"
-              (click)="addOwner()">Invite another owner</button>
+      </div> 
+      </section>
+      <span>
+        
+        <a class="btn btn-outline-success" role="button" (click)="addOwner()">
+          <i class="fa fa-user-plus me-2" aria-hidden="true"></i>Add owner to team
+        </a>
+     </span>
      <div
       *ngIf="formErrors.owners"
       class="small text-danger formErrors"
       [innerHTML]="formErrors.owners">
     </div>
-    </section>
+
+  </div>
 
 
   <!-- Submit -->
@@ -110,7 +110,7 @@ Owners
       type="submit"
       class="btn btn-primary"
       [attr.disabled]="teamForm.invalid || submitting ? true : null"
-      [innerText]="submitBtnText"></button>
+      ><i class="far fa-save me-2" aria-hidden="true"></i> {{submitBtnText}}</button>
       <!-- https://github.com/angular/angular/issues/11271#issuecomment-289806196 -->
     <app-submitting *ngIf="submitting"></app-submitting>
     <a

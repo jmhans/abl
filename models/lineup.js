@@ -9,7 +9,11 @@ var lineupSchema = new Schema({
   roster: [{
     player: {type: Schema.Types.ObjectId, ref:'Player'}, 
     lineupPosition: {type: String}, 
-    rosterOrder: {type: Number}
+    rosterOrder: {type: Number}, 
+    dailyStats: {type: {}}, 
+    playedPosition: {type: String}, 
+    ablstatus: {type: String}, 
+    lineupOrder: {type: Number}
   }], 
   effectiveDate: {type: Date}, 
   priorRosters: [{

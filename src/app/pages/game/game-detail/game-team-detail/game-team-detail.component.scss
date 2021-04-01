@@ -1,3 +1,21 @@
 .mat-cell {
   padding: 8px 8px 8px 0;
 }
+.mat-header-cell {
+  padding: 8px 8px 8px 0;
+}
+
+table {
+  width: 100%;
+}
+
+
+.table-responsive {
+    width: 100%;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    border: 1px solid #DDD;
+}

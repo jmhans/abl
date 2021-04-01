@@ -1,9 +1,14 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 
 const request = require('request');
+//const Player = require('../models/player');
+var express = require('express');
+var router = express.Router();
 const AblTeam = require('./../models/owner').AblTeam;
 const Owner = require('./../models/owner').Owner;
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
+
+const BaseController = require('./base.controller');
 
 var AblTeamController = {
   
@@ -121,9 +126,45 @@ var AblTeamController = {
           res.status(200).send({message: 'Team successfully deleted.'});
         });
     });
-  }
+  },
+  
+
 
 }
+
+
+// class AblTeamControllerNew extends BaseController {
+  
+//   constructor() {
+//     super(AblTeam, 'ablteams');
+    
+//   }
+  
+//   async _getGamesForTeam(tmId) {
+//     try {
+
+          
+
+//       if (dateItem) {
+//         gamesList = dateItem.games
+//         this._loadGamesToDB(gamesList);
+//       }
+//       return gamesList
+      
+//     } catch(err) {
+//       console.error(`Error in _getGames: ${err}`)
+//     }
+//   }
+ 
+//   route() {
+//     router.get('/' + this.routeString, (...args) => this._get(...args));
+//     router.post('/' + this.routeString , (...args) => this._create(...args));
+//     router.get('/' + this.routeString + '/:id', (...args) => this._getOne(...args));
+//     router.put('/' + this.routeString + '/:id', (...args) => this._update(...args));
+//     router.delete('/' + this.routeString + '/:id', (...args) => this._delete(...args));
+//     return router;
+//   }
+// }
 
 
 module.exports = AblTeamController

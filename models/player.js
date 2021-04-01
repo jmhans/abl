@@ -11,7 +11,7 @@ var playerSchema = new mongoose.Schema({
   team:{type: String, required: false}, 
   status:{type: String, required: false}, 
   stats: {type: mongoose.Schema.Types.Mixed, required: false},
-  ablTeam: {type: mongoose.Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
+  ablTeam: {type: mongoose.Schema.Types.ObjectId, ref:'AblTeam', required: false},
 //   games: [ {
 //     gameDate: {type: String, required: true}, 
 //     gamePk: {type: String, required: true}, 

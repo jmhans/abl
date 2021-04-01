@@ -23,7 +23,16 @@ const gameSchema = new Schema({
   awayScore: { type: Number, required: false},
   homeScore: { type: Number, required: false},
   winner: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}, 
-  loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false}
+  loser: {type : Schema.Types.ObjectId, ref:'AblTeam', required: false},
+  active: [{type: gamePlayerSchema}], 
+  status: String, 
+  results: {
+        status: String,
+        scores: [{team: String, location: String, regulation: {}, final: {}  }] ,
+        winner: {}, 
+        loser: {},
+        attestations: [{attester: String, attesterType: String, time: Date}]
+      }
                               
 });
 
