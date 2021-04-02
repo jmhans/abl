@@ -1,6 +1,10 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { AuthModule } from '@auth0/auth0-angular';
+
+import { AUTH_CONFIG } from './auth/auth.config';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
@@ -144,7 +148,11 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     MatButtonModule,
     MatTabsModule,
     ButtonsModule, WavesModule, CollapseModule,
-    IconsModule 
+    IconsModule,
+    AuthModule.forRoot({
+      domain: AUTH_CONFIG.CLIENT_DOMAIN,
+      clientId: AUTH_CONFIG.CLIENT_ID,
+    })
   ],
   providers: [ 
     Title, 

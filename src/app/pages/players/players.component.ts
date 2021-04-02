@@ -3,6 +3,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
+import { UserContextService } from './../../core/services/user.context.service';
 import { UtilsService } from './../../core/utils.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
@@ -55,7 +56,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
               private api: ApiService, 
               public fs: FilterSortService, 
               private rosterService: RosterService, 
-              private auth: AuthService) { }
+              private auth: AuthService, 
+              public userContext: UserContextService) { }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
