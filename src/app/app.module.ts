@@ -85,6 +85,7 @@ import { PlayerGameLineComponent } from './player-game-line/player-game-line.com
 import { TeamRosterComponent } from './team-roster/team-roster.component';
 import { GameTeamDetailComponent } from './pages/game/game-detail/game-team-detail/game-team-detail.component';
 import { MyFilterPipe } from './core/pipes/filter.pipe';
+import { StandingsComponent } from './pages/standings/standings.component';
 //import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 
@@ -119,7 +120,7 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent, StandingsComponent
     //, LineupFormComponent
   ],
   imports: [

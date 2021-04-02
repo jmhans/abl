@@ -31,7 +31,6 @@ var ablTeamSchema = new Schema({
 })
 
 
-
 const Team = mongoose.model('Team', teamSchema);
 const Owner = mongoose.model('Owner', ownerSchema);
 const AblTeam = mongoose.model('AblTeam', ablTeamSchema);
