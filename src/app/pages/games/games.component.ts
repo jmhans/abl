@@ -3,6 +3,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ApiService } from './../../core/api.service';
+import { AblGameService } from './../../core/services/abl-game.service';
 import { UtilsService } from './../../core/utils.service';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
@@ -10,6 +11,7 @@ import { GameModel } from './../../core/models/game.model';
 import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { AuthService } from './../../auth/auth.service';
 
 
 @Component({
@@ -26,7 +28,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   error: boolean;
   query: string = '';
   modelDate: FormControl;
-  
+  attestSub: Subscription;
 
   headings = ['Description', 'Date', 'Away Score', 'Home Score', 'Away Attestation', 'Home Attestation'];
   
@@ -36,8 +38,10 @@ export class GamesComponent implements OnInit, OnDestroy {
     private title: Title,
     public utils: UtilsService,
     private api: ApiService,
+    private ablGame: AblGameService,
     public fs: FilterSortService, 
-    private datePipe: DatePipe
+    private datePipe: DatePipe, 
+     private auth: AuthService
   ) { }
 
   ngOnInit() {
@@ -83,6 +87,27 @@ export class GamesComponent implements OnInit, OnDestroy {
     }
   }
   
+  _userInGame(tm) {
+    if (!tm) return null;
+    
+    return tm.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
+  }
+  
+  
+  
+  _saveResult(gm) {
+    var attestSub = this.ablGame.addAttestation$(gm, this.auth.userProfile.sub).subscribe(
+      res => {
+        console.log(res)
+      },
+      err => {
+        console.error(err);
+      }
+    )
+  }
+  
+  
+  
   
   searchGames() {
     var searchInput = this.gamesList
@@ -101,6 +126,9 @@ export class GamesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.gamesListSub.unsubscribe();
+    if (this.attestSub) {
+      this.attestSub.unsubscribe();
+    }
   }
   
   hasProp(o, name) {

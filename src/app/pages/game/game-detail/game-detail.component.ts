@@ -5,6 +5,7 @@ import { UtilsService } from './../../../core/utils.service';
 import { GameModel, PopulatedGameModel } from './../../../core/models/game.model';
 import { StatlineModel } from './../../../core/models/statline.model';
 import { LineupModel } from './../../../core/models/lineup.model';
+import { gameRosters,  rosterScoreRecord, rosterGameScoreRecord } from './../../../core/models/roster.record.model';
 import { AblGameService } from './../../../core/services/abl-game.service';
 import { RosterService } from './../../../core/services/roster.service';
 import { Subscription, interval, Observable, from, of } from 'rxjs';
@@ -16,35 +17,6 @@ import { map, mergeMap } from 'rxjs/operators';
   }
 
 
-interface rosterScoreRecord {
-  abl_runs : Number
-  abl_points : Number
-  e : Number
-  ab : Number
-  g : Number
-  h : Number
-  hr : Number
-  bb : Number
-  hbp : Number
-  sac : Number
-  sf : Number
-  sb : Number
-  cs : Number
-}
-
-interface rosterGameScoreRecord {
-  regulation: rosterScoreRecord
-  final: rosterScoreRecord
-}
-
-interface gameRosters {
-  away_score: rosterGameScoreRecord
-  home_score: rosterGameScoreRecord
-  awayTeam: {}
-  homeTeam: {}
-  result: {winner: {}, loser: {}}
-}
-
 @Component({
   selector: 'app-game-detail',
   templateUrl: './game-detail.component.html',
@@ -54,7 +26,7 @@ interface gameRosters {
 
 export class GameDetailComponent {
   
-  @Input() game: PopulatedGameModel;
+  @Input() game: GameModel;
   rosters: gameRosters;
   potentialStatlines: object;
   statsSub: Subscription;
@@ -90,26 +62,10 @@ export class GameDetailComponent {
   }
   
   _saveResult() {
-    var gameResultsObj = this.game.results
-    if (!this.game.results) {
-      gameResultsObj = {
-       status: 'final', 
-        scores: [
-          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final  }, 
-          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final  }
-        ], 
-        winner: this.rosters.result.winner, 
-        loser: this.rosters.result.loser, 
-        attestations: []
-      };
-    } 
-    
-    gameResultsObj.attestations.push({attester: this.auth.userProfile.sub, attesterType: this._userInGame(), time: new Date()})
-
-    
-    this.submitSub = this.ablGame.editGame$(this.game._id, gameResultsObj)
+    this.submitSub = this.ablGame.attestGame$(this.game, this.rosters, this.auth.userProfile.sub)
       .subscribe(res => {
         console.log(`Document updated: ${res}` );
+        this.game.results = res.results
       })
   }
   

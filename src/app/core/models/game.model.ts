@@ -31,7 +31,6 @@ interface PopulatedGameModel {
     _id?: string
     awayTeamRoster?: PopulatedRoster[] 
     homeTeamRoster?: PopulatedRoster[]
-    status: any
     results?: GameResultsModel
 }
 interface GameResultsModel  {

@@ -571,9 +571,7 @@ var AblGameController = {
               { $set: { results: req.body } },
               { new: true }
           );
-          res.json({
-              updatedGame
-          });
+          res.json(updatedGame);
       } catch (e) {
           return res.status(422).send({
               error: { message: 'e', resend: true }

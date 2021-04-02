@@ -4,8 +4,8 @@ import { AuthService } from './../../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { GameModel , GameResultsModel} from './../models/game.model';
-
+import { GameModel , GameResultsModel,  PopulatedGameModel} from './../models/game.model';
+import { gameRosters,  rosterScoreRecord, rosterGameScoreRecord } from './../models/roster.record.model';
 
 import { StatlineModel } from './../models/statline.model';
 
@@ -74,6 +74,62 @@ export class AblGameService {
       .pipe(
         catchError((error) => this._handleError(error))
       );
+  }
+  
+  addAttestation$(game: GameModel, attester: string): Observable<GameModel> {
+    
+    var gameResultsObj = game.results
+    
+    var _userInGame = function (gm, user) {
+      var home = gm.homeTeam.owners.find((o)=> { return user == o.userId})
+      var away = gm.awayTeam.owners.find((o)=> { return user == o.userId})
+
+        if (home) {
+          return "home"
+        } else if (away) {
+          return "away"
+        }
+        // return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+      }
+    
+    gameResultsObj.attestations.push({attester:attester, attesterType: _userInGame(game, attester), time: new Date()})
+    
+    return this.editGame$(game._id, gameResultsObj)
+  }
+  
+  
+  
+  attestGame$(game: GameModel, rosters: gameRosters, attester: string): Observable<GameModel> {
+    
+    var gameResultsObj = game.results
+    if (gameResultsObj) {
+      gameResultsObj = {
+       status: 'final', 
+        scores: [
+          {team: game.homeTeam._id, location: 'H', regulation: rosters.home_score.regulation, final: rosters.home_score.final  }, 
+          {team: game.awayTeam._id, location: 'A', regulation: rosters.away_score.regulation, final: rosters.away_score.final  }
+        ], 
+        winner: rosters.result.winner, 
+        loser: rosters.result.loser, 
+        attestations: []
+      };
+    } 
+    
+    var _userInGame = function (gm, user) {
+      var home = gm.homeTeam.owners.find((o)=> { return user == o.userId})
+      var away = gm.awayTeam.owners.find((o)=> { return user == o.userId})
+
+        if (home) {
+          return "home"
+        } else if (away) {
+          return "away"
+        }
+        // return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+      }
+    
+    gameResultsObj.attestations.push({attester:attester, attesterType: _userInGame(game, attester), time: new Date()})
+    
+    return this.editGame$(game._id, gameResultsObj)
   }
   
 //   attestGame$(id: string, game: GameResultsModel): Observable<GameModel> {

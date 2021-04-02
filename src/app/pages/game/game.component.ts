@@ -78,6 +78,9 @@ export class GameComponent implements OnInit, OnDestroy {
         }
       );
   }
+ 
+
+  
 
   private _setPageTitle(title: string) {
     this.pageTitle = title;
