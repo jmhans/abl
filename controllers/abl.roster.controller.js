@@ -165,6 +165,8 @@ var AblRosterController = {
   
   _addPlayerToTeam: function(req, res) {
 
+    console.log("Running this function...")
+    
     MlbPlayer.findById(req.body._id, (err, mlbPlayer) => {
 
       if (err) {
@@ -173,6 +175,7 @@ var AblRosterController = {
         });
       }
       mlbPlayer.ablTeam = new ObjectId(req.params.id)
+      console.log(mlbPlayer);
       mlbPlayer.save((err) => {
         if (err) {
           return res.status(500).send({
@@ -199,7 +202,8 @@ var AblRosterController = {
             existingLineupRec.roster.push({
               player: mlbPlayer._id,
               lineupPosition: req.body.position,
-              rosterOrder: existingLineupRec.roster.length + 1
+              rosterOrder: existingLineupRec.roster.length + 1,
+              rosterAddType: 'pickup'
             });
 
             existingLineupRec.save((err) => {
@@ -218,7 +222,8 @@ var AblRosterController = {
               roster: [{
                 player: mlbPlayer._id,
                 lineupPosition: req.body.position,
-                rosterOrder: 1
+                rosterOrder: 1, 
+                rosterAddType: 'pickup'
               }],
               effectiveDate: new Date(),
               priorRosters: []
@@ -397,7 +402,7 @@ class altABLRosterController extends BaseController{
   async _addPlayerToTeam(req, res, next) {
     try {
       var mlbPlayer = await MlbPlayer.findById(req.body._id);
-      mlbPlayer.ablTeam = new ObjectId(req.params.id);
+      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup'};
       var savedMlbPlayer = await mlbPlayer.save();
       var existingLineupRec = await Lineup.findOne({ablTeam: mlbPlayer.ablTeam});
       if (existingLineupRec) {

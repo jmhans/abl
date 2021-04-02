@@ -6,14 +6,16 @@ import { ApiService } from './../../core/api.service';
 import { UserContextService } from './../../core/services/user.context.service';
 import { UtilsService } from './../../core/utils.service';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, Subject } from 'rxjs';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
+import { AblTeamModel } from './../../core/models/abl.team.model';
 import { RosterRecordModel } from './../../core/models/roster.record.model';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { RosterService } from './../../core/services/roster.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject} from 'rxjs';
+import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-players',
@@ -34,6 +36,11 @@ export class PlayersComponent implements OnInit, OnDestroy {
   rosterUpdateSub: Subscription;
   submitting: boolean;
   takenFilter: boolean;
+  ownerTeams: AblTeamModel[];
+  ownerPrimaryTeam: AblTeamModel;
+  ownerSub: Subscription;
+  unsubscribe$: Subject<void> = new Subject<void>();
+
   
   displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
@@ -68,6 +75,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       responsive: true
     }
     this._getPlayerList();
+    this._getOwner();
 
   }
   
@@ -109,7 +117,26 @@ export class PlayersComponent implements OnInit, OnDestroy {
       );
   }
   
-
+  
+  _getOwner() {
+    this.ownerSub = this.userContext.teams$.pipe(takeUntil(this.unsubscribe$)).subscribe(
+      data => {
+        this.ownerTeams = data
+        this.ownerPrimaryTeam = data.length ? data[0] : '';
+      }, 
+      err => console.log(err)
+    )
+  }
+  
+  
+  _addPlayerToTeam(plyr) {
+      this.rosterUpdateSub = this.rosterService
+        .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
+        .subscribe(
+          data => this._handleSubmitSuccess(data),
+          err => this._handleSubmitError(err)
+        );
+  }
 
 
   
@@ -156,6 +183,10 @@ export class PlayersComponent implements OnInit, OnDestroy {
     if(this.rosterUpdateSub) { 
       this.rosterUpdateSub.unsubscribe();
     }
+    
+        
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
 }

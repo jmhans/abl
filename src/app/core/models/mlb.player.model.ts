@@ -10,6 +10,7 @@ class MlbPlayerModel {
     public stats: Object,
     public games: Object[], 
     public positionLog: Object,
+    public ablstatus: Object,
      public _id?: string 
     
   ) { }
