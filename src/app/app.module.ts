@@ -19,8 +19,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
-import { ButtonsModule, WavesModule, CollapseModule } from 'angular-bootstrap-md'
-import { IconsModule } from 'angular-bootstrap-md'
+import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
+import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
+
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -150,6 +151,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
     MatTabsModule,
     ButtonsModule, WavesModule, CollapseModule,
     IconsModule,
+    TableModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,

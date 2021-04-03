@@ -18,6 +18,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
   
   loading: boolean;
   error: boolean;
+  headings = ['Team', 'G', 'W', 'L', 'WPct']
   
   
   constructor(

@@ -38,8 +38,8 @@
         No games found for <em class="text-danger">{{ query }}</em>, sorry!
       </p>
 
-      
-      <table mdbTable class="table table-responsive table-sm">
+      <ng-container class="table-responsive">
+      <table mdbTable class="table table-sm">
         <thead>
           <tr>
             <th *ngFor="let head of headings" scope="col">{{head}} </th>
@@ -85,6 +85,8 @@
           </tr>
         </tbody>
       </table>
+      </ng-container>
+      
      
     </ng-template>
 
