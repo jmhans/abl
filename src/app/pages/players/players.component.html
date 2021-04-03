@@ -5,6 +5,30 @@
 <h3>
    Players
 </h3>
+
+<mat-card class="example-result-card" *ngIf='playerList'>
+  <mat-card-content>
+        <section>
+          <mat-slide-toggle
+              class="example-margin"
+              [color]="primary"
+              [checked]="false"
+              [disabled]="!_isAdmin()"
+              [(ngModel)]="draftMode">
+            Draft Mode (Admin only) {{draftMode}}
+          </mat-slide-toggle>
+        </section>
+  </mat-card-content>
+</mat-card>
+
+
+ <mat-select [(ngModel)]="draftTeam">
+   <mat-option *ngFor="let tm of (formData | async) " [value]="tm._id">{{tm.nickname}}</mat-option>   
+   
+ </mat-select>
+
+{{draftTeam}}
+
 <table datatable 
        [dtOptions]="dtOptions" 
        [dtTrigger]="dtTrigger"
@@ -54,10 +78,15 @@
       <td>{{player.stats.batting.caughtStealing}}</td>
       <td>
         
-        <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addPlayerToTeam(player)" *ngIf="!player.ablstatus?.ablTeam">
+        <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addPlayerToTeam(player)" *ngIf="!player.ablstatus?.ablTeam && !draftMode">
           <mdb-icon fas icon="user-plus"></mdb-icon>
         </button>
-        
+        <mat-checkbox
+            class="example-margin"
+            [(ngModel)]="player.draftMe"
+            *ngIf="draftMode">
+          Include in draft
+        </mat-checkbox>
         
       </td>
     </tr>

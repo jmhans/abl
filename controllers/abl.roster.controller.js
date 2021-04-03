@@ -249,6 +249,9 @@ var AblRosterController = {
 
 
   }
+  
+  
+  
 
 
 }
@@ -402,7 +405,7 @@ class altABLRosterController extends BaseController{
   async _addPlayerToTeam(req, res, next) {
     try {
       var mlbPlayer = await MlbPlayer.findById(req.body._id);
-      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup'};
+      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup', onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save();
       var existingLineupRec = await Lineup.findOne({ablTeam: mlbPlayer.ablTeam});
       if (existingLineupRec) {
@@ -445,11 +448,62 @@ class altABLRosterController extends BaseController{
    
   }
   
+  async _draftPlayersToTeam(req, res, next) {
+    try {
+      // expecting an array in req.body...
+      
+      
+      var roster = []
+      
+      for (var p=0; p<req.body.length; p++) {
+        var mlbPlayer = await MlbPlayer.findById(req.body[p]._id);
+        mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'draft', onRoster: true};
+        var savedMlbPlayer = await mlbPlayer.save();
+        roster.push({
+          player: mlbPlayer._id,
+          lineupPosition: req.body[p].position,
+          rosterOrder: roster.length + 1
+        })
+
+      }
+      var existingLineupRec = await Lineup.findOne({ablTeam: req.params.id});
+      
+      if (existingLineupRec) {
+        var priorLineupRec = {
+          effectiveDate: existingLineupRec.effectiveDate,
+          roster: existingLineupRec.roster
+        }
+        existingLineupRec.priorRosters.push(priorLineupRec);
+        existingLineupRec.roster = roster
+        existingLineupRec.effectiveDate = new Date("2021-03-01"); //Should update. But not going to right now. 
+        var savedExistingLineupRec = await existingLineupRec.save();
+        return res.send(savedExistingLineupRec);
+        
+      } else {
+
+        const RR = new Lineup({
+          ablTeam: new ObjectId(req.params.id),
+          roster: roster,
+          effectiveDate: new Date("2021-03-01"),
+          priorRosters: []
+        });
+        
+        var savedRR = await RR.save();
+        return res.send(savedRR);
+        
+      }
+    } catch(err) {
+      return res.status(500).send({message : err.message})
+    }
+   
+  }
+  
   
 
    
   route() {
     router.post('/team/:id/addPlayer', (...args) => this._addPlayerToTeam(...args));
+    router.post('/team/:id/draftPlayers', (...args) => this._draftPlayersToTeam(...args));
     router.get('/team/:id/lineup' , (...args) => this._getLineup(...args));
     router.put('/lineup_roster/:id', (...args) => this._newUpdateLineup(...args));
     router.get('/team/:id/lineup/:dt', (...args) => this._getLineupForTeamAndDate(...args));

@@ -12,6 +12,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatSliderModule} from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox'; 
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -152,6 +153,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
     ButtonsModule, WavesModule, CollapseModule,
     IconsModule,
     TableModule,
+    MatCheckboxModule ,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,

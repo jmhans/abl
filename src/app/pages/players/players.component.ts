@@ -40,6 +40,10 @@ export class PlayersComponent implements OnInit, OnDestroy {
   ownerPrimaryTeam: AblTeamModel;
   ownerSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
+  draftTeam: string;
+  draftMode: boolean = false;
+  teamList: AblTeamModel[];
+  teamsListSub: Subscription;
 
   
   displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
@@ -55,12 +59,14 @@ export class PlayersComponent implements OnInit, OnDestroy {
       this.dataSource.paginator.firstPage();
     }
   }
-  
-  
+  formData : Observable<Array<any>>;
+
+
+
   
   constructor(private title: Title, 
               public utils: UtilsService, 
-              private api: ApiService, 
+              public api: ApiService, 
               public fs: FilterSortService, 
               private rosterService: RosterService, 
               private auth: AuthService, 
@@ -68,7 +74,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    
+    this.formData = this.api.getAblTeams$();
     this.dtOptions = {
       pagingType: 'full_numbers', 
       pageLength: 50, 
@@ -103,7 +109,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
                   }
               }
             };
-
+          //this._getTeamList();
           this.dataSource.sort = this.sort;
           this.filteredPlayers = res;
           this.loading = false;
@@ -117,6 +123,21 @@ export class PlayersComponent implements OnInit, OnDestroy {
       );
   }
   
+//   private _getTeamList() {
+    
+//     this.teamListSub = this.api
+//       .getAblTeams$()
+//       .subscribe(
+//         res => {
+//           this.teamList = res;
+//         },
+//         err => {
+//           console.error(err);
+//         }
+//       );
+//   }
+  
+  
   
   _getOwner() {
     this.ownerSub = this.userContext.teams$.pipe(takeUntil(this.unsubscribe$)).subscribe(
@@ -126,6 +147,12 @@ export class PlayersComponent implements OnInit, OnDestroy {
       }, 
       err => console.log(err)
     )
+  }
+  
+  _isAdmin() {
+    const userProf = this.auth.userProfile; 
+    const roles = userProf["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
+    return (roles.indexOf("admin") > -1)
   }
   
   
@@ -138,6 +165,16 @@ export class PlayersComponent implements OnInit, OnDestroy {
         );
   }
 
+   _addSelectedToTeam(tm) {
+     var selectedPlyrs = []; // Need to hook this up to the players with the checkbox selected. 
+     
+     this.rosterUpdateSub = this.rosterService
+        .draftPlayersToTeam$(selectedPlyrs, this.draftTeam)
+        .subscribe(
+          data => this._handleSubmitSuccess(data),
+          err => this._handleSubmitError(err)
+        );
+   }
 
   
   searchPlayers() {
@@ -179,6 +216,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.playerListSub.unsubscribe();
+    //this.teamsListSub.unsubscribe();
     this.dtTrigger.unsubscribe();
     if(this.rosterUpdateSub) { 
       this.rosterUpdateSub.unsubscribe();
