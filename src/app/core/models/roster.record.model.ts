@@ -43,6 +43,7 @@ interface gameRosters {
   home_score: rosterGameScoreRecord
   awayTeam: {}
   homeTeam: {}
+  status: string
   result: {winner: {}, loser: {}}
 }
 

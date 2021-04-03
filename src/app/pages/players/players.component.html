@@ -6,7 +6,7 @@
    Players
 </h3>
 
-<mat-card class="example-result-card" *ngIf='playerList'>
+<!-- <mat-card class="example-result-card" *ngIf='playerList'>
   <mat-card-content>
         <section>
           <mat-slide-toggle
@@ -19,10 +19,10 @@
           </mat-slide-toggle>
         </section>
   </mat-card-content>
-</mat-card>
+</mat-card> -->
 
 
- <mat-select [(ngModel)]="draftTeam">
+<!--  <mat-select [(ngModel)]="draftTeam">
    <mat-option *ngFor="let tm of (formData | async) " [value]="tm">{{tm.nickname}}</mat-option>   
    
  </mat-select>
@@ -38,7 +38,7 @@
 
   <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="takenPlayers(!showTaken)" *ngIf="draftMode">
           Show Taken
-        </button>
+        </button> -->
 
 <span *ngIf="playerList">Selected Players: {{_selectedItems()}}</span>
 

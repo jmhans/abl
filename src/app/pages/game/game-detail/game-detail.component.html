@@ -30,7 +30,7 @@
       
     </div>
   </mat-card-content>
-  <mat-card-actions>
+  <mat-card-actions *ngIf="rosters && rosters.status == 'Final'">
     <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
       <i class="far fa-check-square"></i> Attest to Boxscore
     </button>

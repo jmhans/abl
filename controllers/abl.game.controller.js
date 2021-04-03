@@ -354,7 +354,6 @@ var AblGameController = {
       var homeScore = {regulation: {}, final: {}}; 
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
-      
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
                                                                         return lineup;}));
 
@@ -362,6 +361,7 @@ var AblGameController = {
             // This game should be done by now. 
             
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
+            
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
             
             homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
@@ -448,6 +448,7 @@ var AblGameController = {
       
       return lineup.map((plyr) => {
 
+                
         var player_stats = dailyStats.filter((statline) => {
             return (statline.mlbId == plyr.player.mlbID);
           })

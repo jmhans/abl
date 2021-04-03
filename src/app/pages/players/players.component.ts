@@ -87,7 +87,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     }
     this._getPlayerList();
     this._getOwner();
-    this._getOverride();
+    //this._getOverride();
   }
   
   private _getPlayerList() {
@@ -263,7 +263,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.playerListSub.unsubscribe();
-    this.dataSub.unsubscribe();
+    //this.dataSub.unsubscribe();
     this.dtTrigger.unsubscribe();
     if(this.rosterUpdateSub) { 
       this.rosterUpdateSub.unsubscribe();
