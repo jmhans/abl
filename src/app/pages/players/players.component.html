@@ -23,11 +23,24 @@
 
 
  <mat-select [(ngModel)]="draftTeam">
-   <mat-option *ngFor="let tm of (formData | async) " [value]="tm._id">{{tm.nickname}}</mat-option>   
+   <mat-option *ngFor="let tm of (formData | async) " [value]="tm">{{tm.nickname}}</mat-option>   
    
  </mat-select>
 
-{{draftTeam}}
+{{draftTeam | json}}
+
+  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addSelectedToTeam()" *ngIf="draftMode">
+          <mdb-icon fas icon="user-plus"></mdb-icon>
+        </button>
+  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_updateSelectionsWithOverride(draftTeam.nickname)" *ngIf="draftMode">
+          Update selections for team
+        </button>
+
+  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="takenPlayers(!showTaken)" *ngIf="draftMode">
+          Show Taken
+        </button>
+
+<span *ngIf="playerList">Selected Players: {{_selectedItems()}}</span>
 
 <table datatable 
        [dtOptions]="dtOptions" 

@@ -11,7 +11,8 @@ class MlbPlayerModel {
     public games: Object[], 
     public positionLog: Object,
     public ablstatus: Object,
-     public _id?: string 
+     public _id?: string , 
+     public draftMe?: boolean
     
   ) { }
 }

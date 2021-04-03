@@ -17,6 +17,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
 
+
 @Component({
   selector: 'app-players',
   templateUrl: './players.component.html',
@@ -40,10 +41,14 @@ export class PlayersComponent implements OnInit, OnDestroy {
   ownerPrimaryTeam: AblTeamModel;
   ownerSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
-  draftTeam: string;
+  draftTeam: AblTeamModel;
   draftMode: boolean = false;
   teamList: AblTeamModel[];
   teamsListSub: Subscription;
+  showTaken: boolean = false;
+  
+  overrideData: any[];
+  dataSub: Subscription;
 
   
   displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
@@ -82,12 +87,13 @@ export class PlayersComponent implements OnInit, OnDestroy {
     }
     this._getPlayerList();
     this._getOwner();
-
+    this._getOverride();
   }
   
   private _getPlayerList() {
     this.loading = true;
     // Get future, public events
+    
     this.playerListSub = this.api
       .getMlbPlayers$()
       .subscribe(
@@ -111,7 +117,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
             };
           //this._getTeamList();
           this.dataSource.sort = this.sort;
-          this.filteredPlayers = res;
+          this.filteredPlayers = this.playerList;
           this.loading = false;
           this.dtTrigger.next();
         },
@@ -149,6 +155,42 @@ export class PlayersComponent implements OnInit, OnDestroy {
     )
   }
   
+  _selectedItems() {
+    return this.playerList.filter((p)=> {return p.draftMe}).length
+    
+  }
+  
+  _getOverride() {
+    this.dataSub = this.api.getData$("draft").subscribe(
+      data => {
+        this.overrideData = data
+        
+      }
+    )
+  }
+  
+  _updateSelectionsWithOverride(tmNickname) {
+    var matchList = this.overrideData.filter((draft) => {
+      return draft.Team == tmNickname
+    })
+    
+    this.playerList.forEach((p) => {
+      if (p.name == "Cody Bellinger") {
+        console.log(p)
+      }
+      var match = matchList.find((m)=> {return m.mlbId == p.mlbID})
+      // There is a match, so this guy was selected by the tm in the draft. 
+      if (match) {
+        p.draftMe = true
+      } else {
+        p.draftMe = false
+      }
+      
+    })
+  }
+  
+  
+  
   _isAdmin() {
     const userProf = this.auth.userProfile; 
     const roles = userProf["https://test-heroku-jmhans33439.codeanyapp.com/roles"];
@@ -166,10 +208,10 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
    _addSelectedToTeam(tm) {
-     var selectedPlyrs = []; // Need to hook this up to the players with the checkbox selected. 
-     
+     var selectedPlyrs = this.playerList.filter((p)=> {return p.draftMe});
+     console.log(selectedPlyrs);
      this.rosterUpdateSub = this.rosterService
-        .draftPlayersToTeam$(selectedPlyrs, this.draftTeam)
+        .draftPlayersToTeam$(selectedPlyrs, this.draftTeam._id)
         .subscribe(
           data => this._handleSubmitSuccess(data),
           err => this._handleSubmitError(err)
@@ -179,6 +221,11 @@ export class PlayersComponent implements OnInit, OnDestroy {
   
   searchPlayers() {
     this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
+  }
+  
+  takenPlayers(taken: boolean) {
+    this.showTaken = taken
+    this.filteredPlayers = this.playerList.filter((p)=> {return p.draftMe == this.showTaken})
   }
 
   resetQuery() {
@@ -216,7 +263,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.playerListSub.unsubscribe();
-    //this.teamsListSub.unsubscribe();
+    this.dataSub.unsubscribe();
     this.dtTrigger.unsubscribe();
     if(this.rosterUpdateSub) { 
       this.rosterUpdateSub.unsubscribe();
