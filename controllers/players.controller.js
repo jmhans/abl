@@ -29,12 +29,12 @@ class PlayersController extends BaseController {
             // Create a new player record. 
               _playerRecord = new this.model({
                 mlbID: player.person.id,
-                lastUpdate: '', 
+                lastUpdate: new Date ("2000-01-01"), 
                 //games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
                 //positionLog : []
               })
           }
-          if (gm.gameDate >= _playerRecord.lastUpdate) {
+          if (new Date(gm.gameDate) >= new Date(_playerRecord.lastUpdate) || _playerRecord.lastUpdate == null) {
                 _playerRecord.name = player.person.fullName;
                 _playerRecord.team = team.abbreviation; 
                 _playerRecord.status = player.status.description; 

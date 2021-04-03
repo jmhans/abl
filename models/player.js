@@ -12,7 +12,8 @@ var playerSchema = new mongoose.Schema({
   status:{type: String, required: false}, 
   stats: {type: mongoose.Schema.Types.Mixed, required: false},
   ablstatus: {ablTeam: {type: mongoose.Schema.Types.ObjectId, ref:'AblTeam', required: false},
-              acqType: {type: String, required: true, default: 'draft'}
+              acqType: {type: String, required: false}, 
+              onRoster: {type: Boolean, required: true, default: false}
              },
 //   games: [ {
 //     gameDate: {type: String, required: true}, 
