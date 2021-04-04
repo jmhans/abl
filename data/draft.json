@@ -1,0 +1,1681 @@
+[{
+  "Position": "OF",
+  "mlbId": "641355",
+  "Player": "Cody Bellinger",
+  "Team": "Campers",
+  "PlyrCt": "Campers1",
+  "rosterOrder": 1
+}, {
+  "Position": "3B",
+  "mlbId": "543685",
+  "Player": "Anthony Rendon",
+  "Team": "Campers",
+  "PlyrCt": "Campers2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "467793",
+  "Player": "Carlos Santana",
+  "Team": "Campers",
+  "PlyrCt": "Campers3",
+  "rosterOrder": 3
+}, {
+  "Position": "OF",
+  "mlbId": "606466",
+  "Player": "Ketel Marte",
+  "Team": "Campers",
+  "PlyrCt": "Campers4",
+  "rosterOrder": 4
+}, {
+  "Position": "OF",
+  "mlbId": "453568",
+  "Player": "Charlie Blackmon",
+  "Team": "Campers",
+  "PlyrCt": "Campers5",
+  "rosterOrder": 5
+}, {
+  "Position": "3B",
+  "mlbId": "457759",
+  "Player": "Justin Turner",
+  "Team": "Campers",
+  "PlyrCt": "Campers6",
+  "rosterOrder": 6
+}, {
+  "Position": "2B",
+  "mlbId": "643446",
+  "Player": "Jeff McNeil",
+  "Team": "Campers",
+  "PlyrCt": "Campers7",
+  "rosterOrder": 7
+}, {
+  "Position": "DH",
+  "mlbId": "519317",
+  "Player": "Giancarlo Stanton",
+  "Team": "Campers",
+  "PlyrCt": "Campers8",
+  "rosterOrder": 8
+}, {
+  "Position": "DH",
+  "mlbId": "592192",
+  "Player": "Mark Canha",
+  "Team": "Campers",
+  "PlyrCt": "Campers9",
+  "rosterOrder": 9
+}, {
+  "Position": "SS",
+  "mlbId": "621043",
+  "Player": "Carlos Correa",
+  "Team": "Campers",
+  "PlyrCt": "Campers10",
+  "rosterOrder": 10
+}, {
+  "Position": "OF",
+  "mlbId": "457705",
+  "Player": "Andrew McCutchen",
+  "Team": "Campers",
+  "PlyrCt": "Campers11",
+  "rosterOrder": 11
+}, {
+  "Position": "2B",
+  "mlbId": "593871",
+  "Player": "Jorge Polanco",
+  "Team": "Campers",
+  "PlyrCt": "Campers12",
+  "rosterOrder": 12
+}, {
+  "Position": "1B",
+  "mlbId": "493329",
+  "Player": "Yuli Gurriel",
+  "Team": "Campers",
+  "PlyrCt": "Campers13",
+  "rosterOrder": 13
+}, {
+  "Position": "OF",
+  "mlbId": "444482",
+  "Player": "David Peralta",
+  "Team": "Campers",
+  "PlyrCt": "Campers14",
+  "rosterOrder": 14
+}, {
+  "Position": "C",
+  "mlbId": "641598",
+  "Player": "Mitch Garver",
+  "Team": "Campers",
+  "PlyrCt": "Campers15",
+  "rosterOrder": 15
+}, {
+  "Position": "3B",
+  "mlbId": "500871",
+  "Player": "Eduardo Escobar",
+  "Team": "Campers",
+  "PlyrCt": "Campers16",
+  "rosterOrder": 16
+}, {
+  "Position": "SS",
+  "mlbId": "592743",
+  "Player": "Andrelton Simmons",
+  "Team": "Campers",
+  "PlyrCt": "Campers17",
+  "rosterOrder": 17
+}, {
+  "Position": "SS",
+  "mlbId": "500743",
+  "Player": "Miguel Rojas",
+  "Team": "Campers",
+  "PlyrCt": "Campers18",
+  "rosterOrder": 18
+}, {
+  "Position": "C",
+  "mlbId": "457763",
+  "Player": "Buster Posey",
+  "Team": "Campers",
+  "PlyrCt": "Campers19",
+  "rosterOrder": 19
+}, {
+  "Position": "C",
+  "mlbId": "592200",
+  "Player": "Curt Casali",
+  "Team": "Campers",
+  "PlyrCt": "Campers20",
+  "rosterOrder": 20
+}, {
+  "Position": "C",
+  "mlbId": "571466",
+  "Player": "Tucker Barnhart",
+  "Team": "Campers",
+  "PlyrCt": "Campers21",
+  "rosterOrder": 21
+}, {
+  "Position": "2B",
+  "mlbId": "476704",
+  "Player": "Jed Lowrie",
+  "Team": "Campers",
+  "PlyrCt": "Campers22",
+  "rosterOrder": 22
+}, {
+  "Position": "C",
+  "mlbId": "663886",
+  "Player": "Tyler Stephenson",
+  "Team": "Campers",
+  "PlyrCt": "Campers23",
+  "rosterOrder": 23
+}, {
+  "Position": "1B",
+  "mlbId": "458679",
+  "Player": "Josh Bell",
+  "Team": "Campers",
+  "PlyrCt": "Campers24",
+  "rosterOrder": 24
+}, {
+  "Position": "OF",
+  "mlbId": "660670",
+  "Player": "Ronald Acuna Jr.",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks1",
+  "rosterOrder": 1
+}, {
+  "Position": "DH",
+  "mlbId": "670541",
+  "Player": "Yordan Alvarez",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "656555",
+  "Player": "Rhys Hoskins",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks3",
+  "rosterOrder": 3
+}, {
+  "Position": "SS",
+  "mlbId": "596115",
+  "Player": "Trevor Story",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks4",
+  "rosterOrder": 4
+}, {
+  "Position": "OF",
+  "mlbId": "543807",
+  "Player": "George Springer",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks5",
+  "rosterOrder": 5
+}, {
+  "Position": "OF",
+  "mlbId": "608385",
+  "Player": "Jesse Winker",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks6",
+  "rosterOrder": 6
+}, {
+  "Position": "3B",
+  "mlbId": "592178",
+  "Player": "Kris Bryant",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "607043",
+  "Player": "Brandon Nimmo",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "643217",
+  "Player": "Andrew Benintendi",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks9",
+  "rosterOrder": 9
+}, {
+  "Position": "OF",
+  "mlbId": "571745",
+  "Player": "Mitch Haniger",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks10",
+  "rosterOrder": 10
+}, {
+  "Position": "2B",
+  "mlbId": "543760",
+  "Player": "Marcus Semien",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks11",
+  "rosterOrder": 11
+}, {
+  "Position": "1B",
+  "mlbId": "641820",
+  "Player": "Trey Mancini",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks12",
+  "rosterOrder": 12
+}, {
+  "Position": "3B",
+  "mlbId": "596748",
+  "Player": "Maikel Franco",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks13",
+  "rosterOrder": 13
+}, {
+  "Position": "SS",
+  "mlbId": "621020",
+  "Player": "Dansby Swanson",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks14",
+  "rosterOrder": 14
+}, {
+  "Position": "3B",
+  "mlbId": "600303",
+  "Player": "Tommy La Stella",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks15",
+  "rosterOrder": 15
+}, {
+  "Position": "SS",
+  "mlbId": "544369",
+  "Player": "Didi Gregorius",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks16",
+  "rosterOrder": 16
+}, {
+  "Position": "2B",
+  "mlbId": "516416",
+  "Player": "Jean Segura",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks17",
+  "rosterOrder": 17
+}, {
+  "Position": "OF",
+  "mlbId": "669222",
+  "Player": "Nick Senzel",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks18",
+  "rosterOrder": 18
+}, {
+  "Position": "",
+  "mlbId": "641343",
+  "Player": "Jake Bauers",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks19",
+  "rosterOrder": 19
+}, {
+  "Position": "C",
+  "mlbId": "543877",
+  "Player": "Christian Vazquez",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks20",
+  "rosterOrder": 20
+}, {
+  "Position": "",
+  "mlbId": "542932",
+  "Player": "Jon Berti",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks21",
+  "rosterOrder": 21
+}, {
+  "Position": "2B",
+  "mlbId": "668942",
+  "Player": "Josh Rojas",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks22",
+  "rosterOrder": 22
+}, {
+  "Position": "C",
+  "mlbId": "608596",
+  "Player": "Tom Murphy",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks23",
+  "rosterOrder": 23
+}, {
+  "Position": "C",
+  "mlbId": "547379",
+  "Player": "Roberto Perez",
+  "Team": "Cracks",
+  "PlyrCt": "Cracks24",
+  "rosterOrder": 24
+}, {
+  "Position": "OF",
+  "mlbId": "545361",
+  "Player": "Mike Trout",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas1",
+  "rosterOrder": 1
+}, {
+  "Position": "SS",
+  "mlbId": "608369",
+  "Player": "Corey Seager",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas2",
+  "rosterOrder": 2
+}, {
+  "Position": "SS",
+  "mlbId": "553993",
+  "Player": "Eugenio Suarez",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas3",
+  "rosterOrder": 3
+}, {
+  "Position": "1B",
+  "mlbId": "572228",
+  "Player": "Luke Voit",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas4",
+  "rosterOrder": 4
+}, {
+  "Position": "3B",
+  "mlbId": "646240",
+  "Player": "Rafael Devers",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas5",
+  "rosterOrder": 5
+}, {
+  "Position": "OF",
+  "mlbId": "596146",
+  "Player": "Max Kepler",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas6",
+  "rosterOrder": 6
+}, {
+  "Position": "DH",
+  "mlbId": "660271",
+  "Player": "Shohei Ohtani",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas7",
+  "rosterOrder": 7
+}, {
+  "Position": "2B",
+  "mlbId": "645277",
+  "Player": "Ozzie Albies",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "592206",
+  "Player": "Nicholas Castellanos",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas9",
+  "rosterOrder": 9
+}, {
+  "Position": "OF",
+  "mlbId": "543305",
+  "Player": "Aaron Hicks",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas10",
+  "rosterOrder": 10
+}, {
+  "Position": "C",
+  "mlbId": "592663",
+  "Player": "J.T. Realmuto",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas11",
+  "rosterOrder": 11
+}, {
+  "Position": "OF",
+  "mlbId": "502054",
+  "Player": "Tommy Pham",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas12",
+  "rosterOrder": 12
+}, {
+  "Position": "1B",
+  "mlbId": "543068",
+  "Player": "C.J. Cron",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas13",
+  "rosterOrder": 13
+}, {
+  "Position": "3B",
+  "mlbId": "641857",
+  "Player": "Ryan McMahon",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas14",
+  "rosterOrder": 14
+}, {
+  "Position": "OF",
+  "mlbId": "456715",
+  "Player": "Lorenzo Cain",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas15",
+  "rosterOrder": 15
+}, {
+  "Position": "SS",
+  "mlbId": "642708",
+  "Player": "Amed Rosario",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas16",
+  "rosterOrder": 16
+}, {
+  "Position": "",
+  "mlbId": "670712",
+  "Player": "Mike Brosseau",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas17",
+  "rosterOrder": 17
+}, {
+  "Position": "C",
+  "mlbId": "543228",
+  "Player": "Yan Gomes",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas18",
+  "rosterOrder": 18
+}, {
+  "Position": "C",
+  "mlbId": "642082",
+  "Player": "Chance Sisco",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas19",
+  "rosterOrder": 19
+}, {
+  "Position": "1B",
+  "mlbId": "658069",
+  "Player": "Josh Fuentes",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas20",
+  "rosterOrder": 20
+}, {
+  "Position": "2B",
+  "mlbId": "663697",
+  "Player": "Jonathan India",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas21",
+  "rosterOrder": 21
+}, {
+  "Position": "OF",
+  "mlbId": "672284",
+  "Player": "Jarred Kelenic",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas22",
+  "rosterOrder": 22
+}, {
+  "Position": "OF",
+  "mlbId": "666135",
+  "Player": "Alex Kirilloff",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas23",
+  "rosterOrder": 23
+}, {
+  "Position": "2B",
+  "mlbId": "630105",
+  "Player": "Jake Cronenworth",
+  "Team": "Iguanas",
+  "PlyrCt": "Iguanas24",
+  "rosterOrder": 24
+}, {
+  "Position": "SS",
+  "mlbId": "665487",
+  "Player": "Fernando Tatis Jr.",
+  "Team": "Machines",
+  "PlyrCt": "Machines1",
+  "rosterOrder": 1
+}, {
+  "Position": "1B",
+  "mlbId": "624413",
+  "Player": "Pete Alonso",
+  "Team": "Machines",
+  "PlyrCt": "Machines2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "571970",
+  "Player": "Max Muncy",
+  "Team": "Machines",
+  "PlyrCt": "Machines3",
+  "rosterOrder": 3
+}, {
+  "Position": "3B",
+  "mlbId": "518626",
+  "Player": "Josh Donaldson",
+  "Team": "Machines",
+  "PlyrCt": "Machines4",
+  "rosterOrder": 4
+}, {
+  "Position": "OF",
+  "mlbId": "656941",
+  "Player": "Kyle Schwarber",
+  "Team": "Machines",
+  "PlyrCt": "Machines5",
+  "rosterOrder": 5
+}, {
+  "Position": "C",
+  "mlbId": "518735",
+  "Player": "Yasmani Grandal",
+  "Team": "Machines",
+  "PlyrCt": "Machines6",
+  "rosterOrder": 6
+}, {
+  "Position": "OF",
+  "mlbId": "488726",
+  "Player": "Michael Brantley",
+  "Team": "Machines",
+  "PlyrCt": "Machines7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "592626",
+  "Player": "Joc Pederson",
+  "Team": "Machines",
+  "PlyrCt": "Machines8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "664023",
+  "Player": "Ian Happ",
+  "Team": "Machines",
+  "PlyrCt": "Machines9",
+  "rosterOrder": 9
+}, {
+  "Position": "1B",
+  "mlbId": "596847",
+  "Player": "Ji-Man Choi",
+  "Team": "Machines",
+  "PlyrCt": "Machines10",
+  "rosterOrder": 10
+}, {
+  "Position": "1B",
+  "mlbId": "600524",
+  "Player": "Renato Nunez",
+  "Team": "Machines",
+  "PlyrCt": "Machines11",
+  "rosterOrder": 11
+}, {
+  "Position": "OF",
+  "mlbId": "543105",
+  "Player": "Alex Dickerson",
+  "Team": "Machines",
+  "PlyrCt": "Machines12",
+  "rosterOrder": 12
+}, {
+  "Position": "3B",
+  "mlbId": "572122",
+  "Player": "Kyle Seager",
+  "Team": "Machines",
+  "PlyrCt": "Machines13",
+  "rosterOrder": 13
+}, {
+  "Position": "SS",
+  "mlbId": "657557",
+  "Player": "Paul DeJong",
+  "Team": "Machines",
+  "PlyrCt": "Machines14",
+  "rosterOrder": 14
+}, {
+  "Position": "DH",
+  "mlbId": "527038",
+  "Player": "Wilmer Flores",
+  "Team": "Machines",
+  "PlyrCt": "Machines15",
+  "rosterOrder": 15
+}, {
+  "Position": "2B",
+  "mlbId": "669256",
+  "Player": "Nick Solak",
+  "Team": "Machines",
+  "PlyrCt": "Machines16",
+  "rosterOrder": 16
+}, {
+  "Position": "C",
+  "mlbId": "669221",
+  "Player": "Sean Murphy",
+  "Team": "Machines",
+  "PlyrCt": "Machines17",
+  "rosterOrder": 17
+}, {
+  "Position": "2B",
+  "mlbId": "669242",
+  "Player": "Tommy Edman",
+  "Team": "Machines",
+  "PlyrCt": "Machines18",
+  "rosterOrder": 18
+}, {
+  "Position": "2B",
+  "mlbId": "452678",
+  "Player": "Asdrubal Cabrera",
+  "Team": "Machines",
+  "PlyrCt": "Machines19",
+  "rosterOrder": 19
+}, {
+  "Position": "3B",
+  "mlbId": "503556",
+  "Player": "Marwin Gonzalez",
+  "Team": "Machines",
+  "PlyrCt": "Machines20",
+  "rosterOrder": 20
+}, {
+  "Position": "SS",
+  "mlbId": "621028",
+  "Player": "Kevin Newman",
+  "Team": "Machines",
+  "PlyrCt": "Machines21",
+  "rosterOrder": 21
+}, {
+  "Position": "3B",
+  "mlbId": "649966",
+  "Player": "Luis Urias",
+  "Team": "Machines",
+  "PlyrCt": "Machines22",
+  "rosterOrder": 22
+}, {
+  "Position": "OF",
+  "mlbId": "643289",
+  "Player": "Mauricio Dubon",
+  "Team": "Machines",
+  "PlyrCt": "Machines23",
+  "rosterOrder": 23
+}, {
+  "Position": "C",
+  "mlbId": "605244",
+  "Player": "Aramis Garcia",
+  "Team": "Machines",
+  "PlyrCt": "Machines24",
+  "rosterOrder": 24
+}, {
+  "Position": "OF",
+  "mlbId": "605141",
+  "Player": "Mookie Betts",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos1",
+  "rosterOrder": 1
+}, {
+  "Position": "SS",
+  "mlbId": "596019",
+  "Player": "Francisco Lindor",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "621566",
+  "Player": "Matt Olson",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos3",
+  "rosterOrder": 3
+}, {
+  "Position": "OF",
+  "mlbId": "663656",
+  "Player": "Kyle Tucker",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos4",
+  "rosterOrder": 4
+}, {
+  "Position": "3B",
+  "mlbId": "656305",
+  "Player": "Matt Chapman",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos5",
+  "rosterOrder": 5
+}, {
+  "Position": "3B",
+  "mlbId": "519058",
+  "Player": "Mike Moustakas",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos6",
+  "rosterOrder": 6
+}, {
+  "Position": "2B",
+  "mlbId": "518934",
+  "Player": "DJ LeMahieu",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos7",
+  "rosterOrder": 7
+}, {
+  "Position": "C",
+  "mlbId": "575929",
+  "Player": "Willson Contreras",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "621439",
+  "Player": "Byron Buxton",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos9",
+  "rosterOrder": 9
+}, {
+  "Position": "SS",
+  "mlbId": "595879",
+  "Player": "Javier Baez",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos10",
+  "rosterOrder": 10
+}, {
+  "Position": "3B",
+  "mlbId": "600869",
+  "Player": "Jeimer Candelario",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos11",
+  "rosterOrder": 11
+}, {
+  "Position": "OF",
+  "mlbId": "572041",
+  "Player": "A.J. Pollock",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos12",
+  "rosterOrder": 12
+}, {
+  "Position": "OF",
+  "mlbId": "623993",
+  "Player": "Anthony Santander",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos13",
+  "rosterOrder": 13
+}, {
+  "Position": "OF",
+  "mlbId": "645302",
+  "Player": "Victor Robles",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos14",
+  "rosterOrder": 14
+}, {
+  "Position": "OF",
+  "mlbId": "545341",
+  "Player": "Randal Grichuk",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos15",
+  "rosterOrder": 15
+}, {
+  "Position": "1B",
+  "mlbId": "543333",
+  "Player": "Eric Hosmer",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos16",
+  "rosterOrder": 16
+}, {
+  "Position": "2B",
+  "mlbId": "624428",
+  "Player": "Adam Frazier",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos17",
+  "rosterOrder": 17
+}, {
+  "Position": "C",
+  "mlbId": "608348",
+  "Player": "Carson Kelly",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos18",
+  "rosterOrder": 18
+}, {
+  "Position": "2B",
+  "mlbId": "664238",
+  "Player": "Dylan Moore",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos19",
+  "rosterOrder": 19
+}, {
+  "Position": "SS",
+  "mlbId": "462101",
+  "Player": "Elvis Andrus",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos20",
+  "rosterOrder": 20
+}, {
+  "Position": "C",
+  "mlbId": "595751",
+  "Player": "Jorge Alfaro",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos21",
+  "rosterOrder": 21
+}, {
+  "Position": "OF",
+  "mlbId": "673357",
+  "Player": "Luis Robert",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos22",
+  "rosterOrder": 22
+}, {
+  "Position": "1B",
+  "mlbId": "666915",
+  "Player": "Bobby Dalbec",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos23",
+  "rosterOrder": 23
+}, {
+  "Position": "OF",
+  "mlbId": "665750",
+  "Player": "Leody Taveras",
+  "Team": "Psychos",
+  "PlyrCt": "Psychos24",
+  "rosterOrder": 24
+}, {
+  "Position": "3B",
+  "mlbId": "608070",
+  "Player": "Jose Ramirez",
+  "Team": "Rats",
+  "PlyrCt": "Rats1",
+  "rosterOrder": 1
+}, {
+  "Position": "1B",
+  "mlbId": "502671",
+  "Player": "Paul Goldschmidt",
+  "Team": "Rats",
+  "PlyrCt": "Rats2",
+  "rosterOrder": 2
+}, {
+  "Position": "SS",
+  "mlbId": "607208",
+  "Player": "Trea Turner",
+  "Team": "Rats",
+  "PlyrCt": "Rats3",
+  "rosterOrder": 3
+}, {
+  "Position": "OF",
+  "mlbId": "624424",
+  "Player": "Michael Conforto",
+  "Team": "Rats",
+  "PlyrCt": "Rats4",
+  "rosterOrder": 4
+}, {
+  "Position": "3B",
+  "mlbId": "624415",
+  "Player": "Cavan Biggio",
+  "Team": "Rats",
+  "PlyrCt": "Rats5",
+  "rosterOrder": 5
+}, {
+  "Position": "2B",
+  "mlbId": "664040",
+  "Player": "Brandon Lowe",
+  "Team": "Rats",
+  "PlyrCt": "Rats6",
+  "rosterOrder": 6
+}, {
+  "Position": "OF",
+  "mlbId": "657656",
+  "Player": "Ramon Laureano",
+  "Team": "Rats",
+  "PlyrCt": "Rats7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "668227",
+  "Player": "Randy Arozarena",
+  "Team": "Rats",
+  "PlyrCt": "Rats8",
+  "rosterOrder": 8
+}, {
+  "Position": "3B",
+  "mlbId": "570482",
+  "Player": "Giovanny Urshela",
+  "Team": "Rats",
+  "PlyrCt": "Rats9",
+  "rosterOrder": 9
+}, {
+  "Position": "OF",
+  "mlbId": "666971",
+  "Player": "Lourdes Gurriel Jr.",
+  "Team": "Rats",
+  "PlyrCt": "Rats10",
+  "rosterOrder": 10
+}, {
+  "Position": "1B",
+  "mlbId": "572233",
+  "Player": "Christian Walker",
+  "Team": "Rats",
+  "PlyrCt": "Rats11",
+  "rosterOrder": 11
+}, {
+  "Position": "OF",
+  "mlbId": "457708",
+  "Player": "Justin Upton",
+  "Team": "Rats",
+  "PlyrCt": "Rats12",
+  "rosterOrder": 12
+}, {
+  "Position": "SS",
+  "mlbId": "641313",
+  "Player": "Tim Anderson",
+  "Team": "Rats",
+  "PlyrCt": "Rats13",
+  "rosterOrder": 13
+}, {
+  "Position": "2B",
+  "mlbId": "666158",
+  "Player": "Gavin Lux",
+  "Team": "Rats",
+  "PlyrCt": "Rats14",
+  "rosterOrder": 14
+}, {
+  "Position": "1B",
+  "mlbId": "663993",
+  "Player": "Nate Lowe",
+  "Team": "Rats",
+  "PlyrCt": "Rats15",
+  "rosterOrder": 15
+}, {
+  "Position": "C",
+  "mlbId": "543592",
+  "Player": "Austin Nola",
+  "Team": "Rats",
+  "PlyrCt": "Rats16",
+  "rosterOrder": 16
+}, {
+  "Position": "C",
+  "mlbId": "553882",
+  "Player": "Omar Narvaez",
+  "Team": "Rats",
+  "PlyrCt": "Rats17",
+  "rosterOrder": 17
+}, {
+  "Position": "SS",
+  "mlbId": "650489",
+  "Player": "Willi Castro",
+  "Team": "Rats",
+  "PlyrCt": "Rats18",
+  "rosterOrder": 18
+}, {
+  "Position": "OF",
+  "mlbId": "622682",
+  "Player": "Victor Reyes",
+  "Team": "Rats",
+  "PlyrCt": "Rats19",
+  "rosterOrder": 19
+}, {
+  "Position": "C",
+  "mlbId": "545358",
+  "Player": "Max Stassi",
+  "Team": "Rats",
+  "PlyrCt": "Rats20",
+  "rosterOrder": 20
+}, {
+  "Position": "2B",
+  "mlbId": "665862",
+  "Player": "Jazz Chisholm",
+  "Team": "Rats",
+  "PlyrCt": "Rats21",
+  "rosterOrder": 21
+}, {
+  "Position": "1B",
+  "mlbId": "657108",
+  "Player": "Evan White",
+  "Team": "Rats",
+  "PlyrCt": "Rats22",
+  "rosterOrder": 22
+}, {
+  "Position": "OF",
+  "mlbId": "662139",
+  "Player": "Daulton Varsho",
+  "Team": "Rats",
+  "PlyrCt": "Rats23",
+  "rosterOrder": 23
+}, {
+  "Position": "C",
+  "mlbId": "672386",
+  "Player": "Alejandro Kirk",
+  "Team": "Rats",
+  "PlyrCt": "Rats24",
+  "rosterOrder": 24
+}, {
+  "Position": "OF",
+  "mlbId": "592885",
+  "Player": "Christian Yelich",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics1",
+  "rosterOrder": 1
+}, {
+  "Position": "3B",
+  "mlbId": "592518",
+  "Player": "Manny Machado",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "547989",
+  "Player": "Jose Abreu",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics3",
+  "rosterOrder": 3
+}, {
+  "Position": "1B",
+  "mlbId": "593934",
+  "Player": "Miguel Sano",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics4",
+  "rosterOrder": 4
+}, {
+  "Position": "OF",
+  "mlbId": "516782",
+  "Player": "Starling Marte",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics5",
+  "rosterOrder": 5
+}, {
+  "Position": "3B",
+  "mlbId": "605204",
+  "Player": "J.D. Davis",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics6",
+  "rosterOrder": 6
+}, {
+  "Position": "1B",
+  "mlbId": "542583",
+  "Player": "Jesus Aguilar",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "571976",
+  "Player": "Wil Myers",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics8",
+  "rosterOrder": 8
+}, {
+  "Position": "SS",
+  "mlbId": "666182",
+  "Player": "Bo Bichette",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics9",
+  "rosterOrder": 9
+}, {
+  "Position": "OF",
+  "mlbId": "606192",
+  "Player": "Teoscar Hernandez",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics10",
+  "rosterOrder": 10
+}, {
+  "Position": "OF",
+  "mlbId": "593160",
+  "Player": "Whit Merrifield",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics11",
+  "rosterOrder": 11
+}, {
+  "Position": "3B",
+  "mlbId": "663586",
+  "Player": "Austin Riley",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics12",
+  "rosterOrder": 12
+}, {
+  "Position": "2B",
+  "mlbId": "571771",
+  "Player": "Enrique Hernandez",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics13",
+  "rosterOrder": 13
+}, {
+  "Position": "SS",
+  "mlbId": "609275",
+  "Player": "Adalberto Mondesi",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics14",
+  "rosterOrder": 14
+}, {
+  "Position": "2B",
+  "mlbId": "570731",
+  "Player": "Jonathan Schoop",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics15",
+  "rosterOrder": 15
+}, {
+  "Position": "3B",
+  "mlbId": "543768",
+  "Player": "Travis Shaw",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics16",
+  "rosterOrder": 16
+}, {
+  "Position": "C",
+  "mlbId": "518595",
+  "Player": "Travis d'Arnaud",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics17",
+  "rosterOrder": 17
+}, {
+  "Position": "C",
+  "mlbId": "600474",
+  "Player": "Pedro Severino",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics18",
+  "rosterOrder": 18
+}, {
+  "Position": "C",
+  "mlbId": "607732",
+  "Player": "Jacob Stallings",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics19",
+  "rosterOrder": 19
+}, {
+  "Position": "C",
+  "mlbId": "455117",
+  "Player": "Martin Maldonado",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics20",
+  "rosterOrder": 20
+}, {
+  "Position": "OF",
+  "mlbId": "663624",
+  "Player": "Ryan Mountcastle",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics21",
+  "rosterOrder": 21
+}, {
+  "Position": "OF",
+  "mlbId": "666185",
+  "Player": "Dylan Carlson",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics22",
+  "rosterOrder": 22
+}, {
+  "Position": "SS",
+  "mlbId": "665926",
+  "Player": "Andres Gimenez",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics23",
+  "rosterOrder": 23
+}, {
+  "Position": "1B",
+  "mlbId": "683734",
+  "Player": "Andrew Vaughn",
+  "Team": "Sabeermetrics",
+  "PlyrCt": "Sabeermetrics24",
+  "rosterOrder": 24
+}, {
+  "Position": "3B",
+  "mlbId": "608324",
+  "Player": "Alex Bregman",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics1",
+  "rosterOrder": 1
+}, {
+  "Position": "OF",
+  "mlbId": "547180",
+  "Player": "Bryce Harper",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics2",
+  "rosterOrder": 2
+}, {
+  "Position": "1B",
+  "mlbId": "519203",
+  "Player": "Anthony Rizzo",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics3",
+  "rosterOrder": 3
+}, {
+  "Position": "OF",
+  "mlbId": "663757",
+  "Player": "Trent Grisham",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics4",
+  "rosterOrder": 4
+}, {
+  "Position": "1B",
+  "mlbId": "458015",
+  "Player": "Joey Votto",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics5",
+  "rosterOrder": 5
+}, {
+  "Position": "SS",
+  "mlbId": "650402",
+  "Player": "Gleyber Torres",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics6",
+  "rosterOrder": 6
+}, {
+  "Position": "DH",
+  "mlbId": "624585",
+  "Player": "Jorge Soler",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "657077",
+  "Player": "Alex Verdugo",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "592696",
+  "Player": "Eddie Rosario",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics9",
+  "rosterOrder": 9
+}, {
+  "Position": "DH",
+  "mlbId": "408234",
+  "Player": "Miguel Cabrera",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics10",
+  "rosterOrder": 10
+}, {
+  "Position": "OF",
+  "mlbId": "668804",
+  "Player": "Bryan Reynolds",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics11",
+  "rosterOrder": 11
+}, {
+  "Position": "3B",
+  "mlbId": "650490",
+  "Player": "Yandy Diaz",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics12",
+  "rosterOrder": 12
+}, {
+  "Position": "OF",
+  "mlbId": "606132",
+  "Player": "Raimel Tapia",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics13",
+  "rosterOrder": 13
+}, {
+  "Position": "2B",
+  "mlbId": "514917",
+  "Player": "Cesar Hernandez",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics14",
+  "rosterOrder": 14
+}, {
+  "Position": "C",
+  "mlbId": "521692",
+  "Player": "Salvador Perez",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics15",
+  "rosterOrder": 15
+}, {
+  "Position": "SS",
+  "mlbId": "641487",
+  "Player": "J.P. Crawford",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics16",
+  "rosterOrder": 16
+}, {
+  "Position": "OF",
+  "mlbId": "647304",
+  "Player": "Josh Naylor",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics17",
+  "rosterOrder": 17
+}, {
+  "Position": "C",
+  "mlbId": "643376",
+  "Player": "Danny Jansen",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics18",
+  "rosterOrder": 18
+}, {
+  "Position": "2B",
+  "mlbId": "663898",
+  "Player": "Brendan Rodgers",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics19",
+  "rosterOrder": 19
+}, {
+  "Position": "SS",
+  "mlbId": "578428",
+  "Player": "Jose Iglesias",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics20",
+  "rosterOrder": 20
+}, {
+  "Position": "C",
+  "mlbId": "553869",
+  "Player": "Elias Diaz",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics21",
+  "rosterOrder": 21
+}, {
+  "Position": "2B",
+  "mlbId": "663611",
+  "Player": "Nick Madrigal",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics22",
+  "rosterOrder": 22
+}, {
+  "Position": "3B",
+  "mlbId": "664761",
+  "Player": "Alec Bohm",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics23",
+  "rosterOrder": 23
+}, {
+  "Position": "C",
+  "mlbId": "680777",
+  "Player": "Ryan Jeffers",
+  "Team": "Sferics",
+  "PlyrCt": "Sferics24",
+  "rosterOrder": 24
+}, {
+  "Position": "OF",
+  "mlbId": "665742",
+  "Player": "Juan Soto",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers1",
+  "rosterOrder": 1
+}, {
+  "Position": "DH",
+  "mlbId": "502110",
+  "Player": "J.D. Martinez",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers2",
+  "rosterOrder": 2
+}, {
+  "Position": "3B",
+  "mlbId": "571448",
+  "Player": "Nolan Arenado",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers3",
+  "rosterOrder": 3
+}, {
+  "Position": "1B",
+  "mlbId": "665489",
+  "Player": "Vladimir Guerrero Jr.",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers4",
+  "rosterOrder": 4
+}, {
+  "Position": "OF",
+  "mlbId": "592450",
+  "Player": "Aaron Judge",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers5",
+  "rosterOrder": 5
+}, {
+  "Position": "DH",
+  "mlbId": "614177",
+  "Player": "Franmil Reyes",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers6",
+  "rosterOrder": 6
+}, {
+  "Position": "OF",
+  "mlbId": "608336",
+  "Player": "Joey Gallo",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers7",
+  "rosterOrder": 7
+}, {
+  "Position": "1B",
+  "mlbId": "669374",
+  "Player": "Keston Hiura",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers8",
+  "rosterOrder": 8
+}, {
+  "Position": "2B",
+  "mlbId": "514888",
+  "Player": "Jose Altuve",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers9",
+  "rosterOrder": 9
+}, {
+  "Position": "3B",
+  "mlbId": "660162",
+  "Player": "Yoan Moncada",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers10",
+  "rosterOrder": 10
+}, {
+  "Position": "C",
+  "mlbId": "596142",
+  "Player": "Gary Sanchez",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers11",
+  "rosterOrder": 11
+}, {
+  "Position": "OF",
+  "mlbId": "650333",
+  "Player": "Luis Arraez",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers12",
+  "rosterOrder": 12
+}, {
+  "Position": "2B",
+  "mlbId": "543939",
+  "Player": "Kolten Wong",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers13",
+  "rosterOrder": 13
+}, {
+  "Position": "SS",
+  "mlbId": "642715",
+  "Player": "Willy Adames",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers14",
+  "rosterOrder": 14
+}, {
+  "Position": "1B",
+  "mlbId": "665120",
+  "Player": "Jared Walsh",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers15",
+  "rosterOrder": 15
+}, {
+  "Position": "OF",
+  "mlbId": "572816",
+  "Player": "Corey Dickerson",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers16",
+  "rosterOrder": 16
+}, {
+  "Position": "DH",
+  "mlbId": "664034",
+  "Player": "Ty France",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers17",
+  "rosterOrder": 17
+}, {
+  "Position": "C",
+  "mlbId": "467092",
+  "Player": "Wilson Ramos",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers18",
+  "rosterOrder": 18
+}, {
+  "Position": "2B",
+  "mlbId": "542340",
+  "Player": "Jonathan Villar",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers19",
+  "rosterOrder": 19
+}, {
+  "Position": "3B",
+  "mlbId": "446334",
+  "Player": "Evan Longoria",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers20",
+  "rosterOrder": 20
+}, {
+  "Position": "OF",
+  "mlbId": "621311",
+  "Player": "David Dahl",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers21",
+  "rosterOrder": 21
+}, {
+  "Position": "SS",
+  "mlbId": "606115",
+  "Player": "Orlando Arcia",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers22",
+  "rosterOrder": 22
+}, {
+  "Position": "C",
+  "mlbId": "642336",
+  "Player": "Francisco Mejia",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers23",
+  "rosterOrder": 23
+}, {
+  "Position": "SS",
+  "mlbId": "677551",
+  "Player": "Wander Franco",
+  "Team": "Vipers",
+  "PlyrCt": "Vipers24",
+  "rosterOrder": 24
+}, {
+  "Position": "1B",
+  "mlbId": "518692",
+  "Player": "Freddie Freeman",
+  "Team": "Winers",
+  "PlyrCt": "Winers1",
+  "rosterOrder": 1
+}, {
+  "Position": "DH",
+  "mlbId": "443558",
+  "Player": "Nelson Cruz",
+  "Team": "Winers",
+  "PlyrCt": "Winers2",
+  "rosterOrder": 2
+}, {
+  "Position": "SS",
+  "mlbId": "593428",
+  "Player": "Xander Bogaerts",
+  "Team": "Winers",
+  "PlyrCt": "Winers3",
+  "rosterOrder": 3
+}, {
+  "Position": "OF",
+  "mlbId": "542303",
+  "Player": "Marcell Ozuna",
+  "Team": "Winers",
+  "PlyrCt": "Winers4",
+  "rosterOrder": 4
+}, {
+  "Position": "1B",
+  "mlbId": "474832",
+  "Player": "Brandon Belt",
+  "Team": "Winers",
+  "PlyrCt": "Winers5",
+  "rosterOrder": 5
+}, {
+  "Position": "C",
+  "mlbId": "669257",
+  "Player": "Will Smith",
+  "Team": "Winers",
+  "PlyrCt": "Winers6",
+  "rosterOrder": 6
+}, {
+  "Position": "OF",
+  "mlbId": "642086",
+  "Player": "Dominic Smith",
+  "Team": "Winers",
+  "PlyrCt": "Winers7",
+  "rosterOrder": 7
+}, {
+  "Position": "OF",
+  "mlbId": "573262",
+  "Player": "Mike Yastrzemski",
+  "Team": "Winers",
+  "PlyrCt": "Winers8",
+  "rosterOrder": 8
+}, {
+  "Position": "OF",
+  "mlbId": "640449",
+  "Player": "Clint Frazier",
+  "Team": "Winers",
+  "PlyrCt": "Winers9",
+  "rosterOrder": 9
+}, {
+  "Position": "OF",
+  "mlbId": "594777",
+  "Player": "Kole Calhoun",
+  "Team": "Winers",
+  "PlyrCt": "Winers10",
+  "rosterOrder": 10
+}, {
+  "Position": "3B",
+  "mlbId": "641531",
+  "Player": "Hunter Dozier",
+  "Team": "Winers",
+  "PlyrCt": "Winers11",
+  "rosterOrder": 11
+}, {
+  "Position": "3B",
+  "mlbId": "605119",
+  "Player": "Brian Anderson",
+  "Team": "Winers",
+  "PlyrCt": "Winers12",
+  "rosterOrder": 12
+}, {
+  "Position": "1B",
+  "mlbId": "592567",
+  "Player": "Colin Moran",
+  "Team": "Winers",
+  "PlyrCt": "Winers13",
+  "rosterOrder": 13
+}, {
+  "Position": "2B",
+  "mlbId": "664058",
+  "Player": "David Fletcher",
+  "Team": "Winers",
+  "PlyrCt": "Winers14",
+  "rosterOrder": 14
+}, {
+  "Position": "2B",
+  "mlbId": "621035",
+  "Player": "Chris Taylor",
+  "Team": "Winers",
+  "PlyrCt": "Winers15",
+  "rosterOrder": 15
+}, {
+  "Position": "OF",
+  "mlbId": "641786",
+  "Player": "Kyle Lewis",
+  "Team": "Winers",
+  "PlyrCt": "Winers16",
+  "rosterOrder": 16
+}, {
+  "Position": "OF",
+  "mlbId": "594807",
+  "Player": "Adam Duvall",
+  "Team": "Winers",
+  "PlyrCt": "Winers17",
+  "rosterOrder": 17
+}, {
+  "Position": "SS",
+  "mlbId": "605113",
+  "Player": "Nick Ahmed",
+  "Team": "Winers",
+  "PlyrCt": "Winers18",
+  "rosterOrder": 18
+}, {
+  "Position": "2B",
+  "mlbId": "456781",
+  "Player": "Donovan Solano",
+  "Team": "Winers",
+  "PlyrCt": "Winers19",
+  "rosterOrder": 19
+}, {
+  "Position": "C",
+  "mlbId": "425877",
+  "Player": "Yadier Molina",
+  "Team": "Winers",
+  "PlyrCt": "Winers20",
+  "rosterOrder": 20
+}, {
+  "Position": "C",
+  "mlbId": "543510",
+  "Player": "James McCann",
+  "Team": "Winers",
+  "PlyrCt": "Winers21",
+  "rosterOrder": 21
+}, {
+  "Position": "C",
+  "mlbId": "624431",
+  "Player": "Jose Trevino",
+  "Team": "Winers",
+  "PlyrCt": "Winers22",
+  "rosterOrder": 22
+}, {
+  "Position": "3B",
+  "mlbId": "663647",
+  "Player": "Ke'Bryan Hayes",
+  "Team": "Winers",
+  "PlyrCt": "Winers23",
+  "rosterOrder": 23
+}, {
+  "Position": "SS",
+  "mlbId": "673490",
+  "Player": "Ha-Seong Kim",
+  "Team": "Winers",
+  "PlyrCt": "Winers24",
+  "rosterOrder": 24
+}]

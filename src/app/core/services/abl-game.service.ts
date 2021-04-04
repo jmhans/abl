@@ -4,8 +4,8 @@ import { AuthService } from './../../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { GameModel , GameResultsModel} from './../models/game.model';
-
+import { GameModel , GameResultsModel,  PopulatedGameModel} from './../models/game.model';
+import { gameRosters,  rosterScoreRecord, rosterGameScoreRecord } from './../models/roster.record.model';
 
 import { StatlineModel } from './../models/statline.model';
 
@@ -75,6 +75,34 @@ export class AblGameService {
         catchError((error) => this._handleError(error))
       );
   }
+  
+  
+  saveGameResult$(game: string, gameResult: GameResultsModel): Observable<GameModel> {
+    
+    return this.editGame$(game,  gameResult)
+  }
+  
+  attestGame$(gmId: string, gameResult: GameResultsModel, attester: any): Observable<GameModel> {
+    
+    attester.time = new Date();
+    gameResult.attestations.push(attester)
+    
+    return this.editGame$(gmId, gameResult)
+  }
+  
+  gameParticipant(game, user) {
+    var home = game.homeTeam.owners.find((o)=> { return user == o.userId})
+    var away = game.awayTeam.owners.find((o)=> { return user == o.userId})
+    
+    if (home) {
+      return "home"
+    } else if (away) {
+      return "away"
+    } 
+    // return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
+  }
+  
+  
   
 //   attestGame$(id: string, game: GameResultsModel): Observable<GameModel> {
     

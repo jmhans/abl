@@ -17,6 +17,34 @@ class CreateRosterRecordModel {
   ) { }
 }
 
- 
+ interface rosterScoreRecord {
+  abl_runs : Number
+  abl_points : Number
+  e : Number
+  ab : Number
+  g : Number
+  h : Number
+  hr : Number
+  bb : Number
+  hbp : Number
+  sac : Number
+  sf : Number
+  sb : Number
+  cs : Number
+}
 
-export { RosterRecordModel, CreateRosterRecordModel };
+interface rosterGameScoreRecord {
+  regulation: rosterScoreRecord
+  final: rosterScoreRecord
+}
+
+interface gameRosters {
+  away_score: rosterGameScoreRecord
+  home_score: rosterGameScoreRecord
+  awayTeam: {}
+  homeTeam: {}
+  status: string
+  result: {winner: {}, loser: {}}
+}
+
+export { RosterRecordModel, CreateRosterRecordModel, rosterScoreRecord, rosterGameScoreRecord, gameRosters };

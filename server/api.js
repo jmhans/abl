@@ -100,14 +100,21 @@ module.exports = function(app, config) {
   
   app.get("/api3/mlbPlayers", (req, res, next) => {
     
-    Player.aggregate([
-        {$lookup: {from: "activeRosterRecords", localField:"_id", foreignField:"roster.player", as: "ablRoster"}}, 
-        {$unwind: {path: "$ablRoster", preserveNullAndEmptyArrays:true}}, 
-        {$addFields: {"ablTeam": "$ablRoster.ablTeam"}}, 
-        {$project: {"ablRoster":0}},
-        {$lookup: {from: "ablteams", localField:"ablTeam", foreignField:"_id", as: "ablTeam"}},
-        {$unwind: {path: "$ablTeam", preserveNullAndEmptyArrays:true}}
-    ], function(err, players) {
+    Player.aggregate(
+      [{
+          '$lookup': {
+            'from': 'ablteams', 
+            'localField': 'ablstatus.ablTeam', 
+            'foreignField': '_id', 
+            'as': 'ablstatus.ablTeam'
+          }
+        }, {
+          '$unwind': {
+            'path': '$ablstatus.ablTeam', 
+            'preserveNullAndEmptyArrays': true
+          }
+        }
+      ], function(err, players) {
       if (err) return next(err);
 
       res.send(players);

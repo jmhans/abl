@@ -51,36 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this._getTeamList();
   }
 
-//   getOwners(): void {
-// //     this.heroService.getHeroes()
-// //       .subscribe(heroes => this.heroes = heroes.slice(1, 5));
-//     this.ownerService.getOwners2()
-//       .subscribe(owners => this.owners = owners)
-//   }
-  
-//   getGames(): void {
-//     this.MlbDataService.getGamesForDate()
-//     .subscribe(sched => this.schedData = sched)
-//   }
-  
-//   private _getEventList() {
-//     this.loading = true;
-//     // Get future, public events
-//     this.eventListSub = this.api
-//       .getEvents$()
-//       .subscribe(
-//         res => {
-//           this.eventList = res;
-//           this.filteredEvents = res;
-//           this.loading = false;
-//         },
-//         err => {
-//           console.error(err);
-//           this.loading = false;
-//           this.error = true;
-//         }
-//       );
-//   }
+
   
   private _getTeamList() {
     this.loading = true;

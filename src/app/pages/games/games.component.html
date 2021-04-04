@@ -38,28 +38,8 @@
         No games found for <em class="text-danger">{{ query }}</em>, sorry!
       </p>
 
-      <!-- Events listing -->
-<!--       <section class="list-group">
-        <a
-          *ngFor="let game of fs.orderByDate(filteredGames, 'startDatetime')"
-          [routerLink]="['/game', game._id]"
-          class="list-group-item list-group-item-action flex-column align-items-start">
-          <div class="row">
-            <div class="col"><strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong></div>
-            <div class="col">{{game.gameDate | date:'longDate'}}</div>
-            <div class="col" ><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></div>
-            <div class="col" ><span *ngIf="getGameScore(game, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span></div>
-            <div class="col">Away<span *ngIf="getGameAttester(game.results?.attestations, 'away') as attestation; then thenBlock else elseBlock"> </span></div>
-            <div class="col">Home<span *ngIf="getGameAttester(game.results?.attestations, 'home') as attestation; then thenBlock else elseBlock"> </span></div>
-            <ng-template #thenBlock> Attested!</ng-template>
-            <ng-template #elseBlock> Nope!</ng-template>
-            
-          </div>
-
-        </a>
-      </section> -->
-      
-      <table mdbTable class="table table-responsive table-sm">
+      <ng-container class="table-responsive">
+      <table mdbTable class="table table-sm">
         <thead>
           <tr>
             <th *ngFor="let head of headings" scope="col">{{head}} </th>
@@ -67,17 +47,46 @@
         </thead>
         <tbody>
           <tr mdbTableCol *ngFor="let game of fs.orderByDate(filteredGames, 'gameDate')">
-            <th scope="row"><strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong></th>
+            <th scope="row">
+              <a [routerLink]="['/game', game._id]">
+                <strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong>
+              </a>
+            </th>
             <td>{{game.gameDate | date:'longDate'}}</td>
             <td><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></td>
             <td><span *ngIf="getGameScore(game, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span></td>
-            <td><span *ngIf="getGameAttester(game.results?.attestations, 'away') as attestation; then thenBlock else elseBlock"> </span></td>
-            <td><span *ngIf="getGameAttester(game.results?.attestations, 'home') as attestation; then thenBlock else elseBlock"> </span></td>
-            <ng-template #thenBlock>Attested!</ng-template>
-            <ng-template #elseBlock>Nope!</ng-template>
+            <ng-template #attestTemplate let-game let-attest="attest" let-team="team">
+              <mdb-icon *ngIf="attest" far icon="check-square"></mdb-icon>
+              <div *ngIf="game.results?.status == 'final' && !attest">
+                  <button *ngIf="team && _userInGame(team)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(game)">
+                    <i class="far check-square"></i> Attest to Boxscore
+                  </button>
+                <mdb-icon *ngIf="!_userInGame(team)" far icon="square"></mdb-icon>
+              </div>
+
+              
+              
+            </ng-template>
+            
+            <td>
+              <ngContainer 
+                           [ngTemplateOutlet]="attestTemplate"
+                           [ngTemplateOutletContext]="{ $implicit: game, attest: getGameAttester(game.results?.attestations, 'away'), team: game.awayTeam  }"> 
+              </ngContainer>
+            </td>
+            
+            <td>
+              <ngContainer 
+                           [ngTemplateOutlet]="attestTemplate"
+                           [ngTemplateOutletContext]="{$implicit: game, attest: getGameAttester(game.results?.attestations, 'home') , team: game.homeTeam }"> 
+              </ngContainer>
+            </td>
+            
           </tr>
         </tbody>
       </table>
+      </ng-container>
+      
      
     </ng-template>
 

@@ -299,25 +299,40 @@ var AblGameController = {
 
   },
 
-  _getAllGames: function(req, res) {
-    AblGame.find({}).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, games) {
-      var gamesArr = []
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (!games) {
-        return res.status(400).send({
-          message: 'No games found.'
-        });
-      } else {
-        games.forEach(gm => {
-          gamesArr.push(gm);
-        });
-      }
-      return res.send(gamesArr)
-    })
+  _getAllGames: async function(req, res) {
+    try {
+        var result = await AblGame.aggregate([{
+            '$addFields': {
+              'attesters': '$results.attestations.attesterType'
+            }
+          }
+        ]);
+        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
+
+          if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!games) {
+            return res.status(400).send({
+              message: 'No games found.'
+            });
+          } 
+//           else {
+//             games.forEach(gm => {
+//               gamesArr.push(gm);
+//             });
+//           }
+          return res.send(games)
+        })  
+      
+    } catch (err) {
+      return res.status(500).send({
+              message: err.message
+            });
+    }
+    
   },
   _delete: function(req, res) {
     AblGame.findById(req.params.id, (err, gm) => {
@@ -354,7 +369,6 @@ var AblGameController = {
       var homeScore = {regulation: {}, final: {}}; 
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
-      
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
                                                                         return lineup;}));
 
@@ -362,6 +376,7 @@ var AblGameController = {
             // This game should be done by now. 
             
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
+            
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
             
             homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
@@ -448,6 +463,7 @@ var AblGameController = {
       
       return lineup.map((plyr) => {
 
+                
         var player_stats = dailyStats.filter((statline) => {
             return (statline.mlbId == plyr.player.mlbID);
           })
@@ -568,12 +584,10 @@ var AblGameController = {
        try {
           const updatedGame = await AblGame.findByIdAndUpdate(
               req.params.id,
-              { $set: { results: req.body } },
+              { $set: {results: req.body} },
               { new: true }
           );
-          res.json({
-              updatedGame
-          });
+          res.json(updatedGame);
       } catch (e) {
           return res.status(422).send({
               error: { message: 'e', resend: true }

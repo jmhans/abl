@@ -1,6 +1,10 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { AuthModule } from '@auth0/auth0-angular';
+
+import { AUTH_CONFIG } from './auth/auth.config';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
@@ -8,6 +12,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatSliderModule} from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox'; 
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -15,8 +20,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
-import { ButtonsModule, WavesModule, CollapseModule } from 'angular-bootstrap-md'
-import { IconsModule } from 'angular-bootstrap-md'
+import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
+import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
+
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -81,6 +87,7 @@ import { PlayerGameLineComponent } from './player-game-line/player-game-line.com
 import { TeamRosterComponent } from './team-roster/team-roster.component';
 import { GameTeamDetailComponent } from './pages/game/game-detail/game-team-detail/game-team-detail.component';
 import { MyFilterPipe } from './core/pipes/filter.pipe';
+import { StandingsComponent } from './pages/standings/standings.component';
 //import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 
@@ -115,7 +122,7 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent
+    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent, StandingsComponent
     //, LineupFormComponent
   ],
   imports: [
@@ -144,7 +151,13 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
     MatButtonModule,
     MatTabsModule,
     ButtonsModule, WavesModule, CollapseModule,
-    IconsModule 
+    IconsModule,
+    TableModule,
+    MatCheckboxModule ,
+    AuthModule.forRoot({
+      domain: AUTH_CONFIG.CLIENT_DOMAIN,
+      clientId: AUTH_CONFIG.CLIENT_ID,
+    })
   ],
   providers: [ 
     Title, 

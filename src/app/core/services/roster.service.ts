@@ -55,6 +55,16 @@ export class RosterService {
       );
   }
   
+  draftPlayersToTeam$(addPlayers: Object[], ablTeamId: string ): Observable<LineupModel> {
+    return this.http
+      .post<LineupModel>(`${this.base_api}team/${ablTeamId}/draftPlayers`, addPlayers, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
   updateRosterRecord$(lineupId: string, lineup: SubmitLineup ): Observable<LineupCollectionModel> {
     return this.http
       .put<LineupCollectionModel>(`${this.base_api}lineup_roster/${lineupId}`, lineup, {

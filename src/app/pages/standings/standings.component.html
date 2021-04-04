@@ -1,0 +1,39 @@
+<!-- src/app/pages/games/games.component.html -->
+<h1 class="text-center">{{ pageTitle }}</h1>
+
+<ng-template [ngIf]="utils.isLoaded(loading)">
+  <ng-template [ngIf]="standings">
+    <ng-template [ngIf]="standings.length">
+      <ng-container class ="table-responsive">
+        <table mdbTable>
+          <thead class="primary-color-dark white-text">
+            <tr>
+              <th *ngFor="let head of headings" scope="col">{{head}} </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr mdbTableCol *ngFor="let team of standings">
+              <th scope="row">
+                <a [routerLink]="['/team', team._id]">
+                  <strong *ngIf="team">{{team.nickname }}</strong> 
+                </a>
+              </th>
+
+              <td>{{team.record.g}}</td>
+              <td>{{team.record.w}}</td>
+              <td>{{team.record.l}}</td>
+              <td>{{team.record.w / team.record.g | number: '1.3-3'}}</td>
+
+            </tr>
+          </tbody>
+        </table>
+     </ng-container>
+    </ng-template>
+  </ng-template>
+
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving game data.
+  </p>
+
+</ng-template>

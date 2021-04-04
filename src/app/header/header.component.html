@@ -42,18 +42,12 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Admin</a>
       </li> -->
-      <li>
-        <a
-          *ngIf="auth.loggedIn && auth.isAdmin"
-          routerLink="/abladmin"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }">ABL Admin</a>
-      </li>
+
 <!--       <li><a routerLink="/owners" routerLinkActive="active">Owners</a></li>
       <li><a routerLink="/players" routerLinkActive="active">Players</a></li>
       <li><a routerLink="/owners/roster" routerLinkActive="active">Rosters</a></li>
       <li><a routerLink="/owners/detail" routerLinkActive="active">Roster Detail</a></li> -->
-      <li><a routerLink="/dashboard">Dashboard</a></li>
+      <li><a routerLink="/dashboard">Teams</a></li>
 <!--       <li><a routerLink="/owners2">OwnersList</a></li>
       <li>
         <a
@@ -72,6 +66,19 @@
           *ngIf="auth.loggedIn"
           routerLink="/games"
           routerLinkActive="active">Games</a>
+      </li>
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/standings"
+          routerLinkActive="active">Standings</a>
+      </li>
+      <li>
+        <a
+          *ngIf="auth.loggedIn && auth.isAdmin"
+          routerLink="/abladmin"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">ABL Admin</a>
       </li>
       
       
