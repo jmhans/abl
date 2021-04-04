@@ -144,6 +144,8 @@ module.exports = function(app, config) {
   
   app.get("/api3/statlines", makeGet(Statline));
   app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));
+  app.get("/api3/statlines/date/:dt", (...args) =>  new StatlineController()._getStatsForDate(...args));
+  
   app.get("/data/:flname", jwtCheck, BulkAdd._getFile);
   var bl = new BulkLoad();
   app.post("/data/:model", jwtCheck,  (...args) => bl._postData(...args));
