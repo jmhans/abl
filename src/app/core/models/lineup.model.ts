@@ -1,6 +1,7 @@
+import { MlbPlayerModel } from './mlb.player.model'
 
 interface Roster {
-  player: string
+  player: MlbPlayerModel
   lineupPosition: string
   rosterOrder: number
   originalPosition? : string

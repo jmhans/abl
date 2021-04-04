@@ -22,6 +22,8 @@
   </button>
 </div>
 
+
+
 <mat-card class="example-result-card" *ngIf='lineup'>
   
   <mat-form-field color="accent" appearance="fill">
@@ -88,12 +90,13 @@
 
 
 <span *ngIf='current_roster'> 
-  Prior Rosters: {{lineup.priorRosters.length}}
   {{current_roster.effectiveDate | date: "mediumDate"}}
+  <angular2csv [data]="_getDLFile()" filename="test" [options]="options"></angular2csv>
+
 </span>
 
 <span *ngIf="current_roster">
-  Editable: {{roster_editable}}
+
 <app-team-roster [lineupId]="lineup._id"
                  [lineup]="current_roster"
                  [originalLineup] = "active_roster"

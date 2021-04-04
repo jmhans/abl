@@ -36,7 +36,8 @@ import { DataTablesModule } from 'angular-datatables';
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { Angular2CsvModule } from 'angular2-csv';
+ 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -154,6 +155,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
     IconsModule,
     TableModule,
     MatCheckboxModule ,
+    Angular2CsvModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,
