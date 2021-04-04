@@ -14,10 +14,7 @@
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
-      {{originalLineup.roster[i].lineupPosition}}
       {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
-
-
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
         <span  *ngIf="rosterRec.player.stats" class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
