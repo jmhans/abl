@@ -299,25 +299,40 @@ var AblGameController = {
 
   },
 
-  _getAllGames: function(req, res) {
-    AblGame.find({}).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, games) {
-      var gamesArr = []
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (!games) {
-        return res.status(400).send({
-          message: 'No games found.'
-        });
-      } else {
-        games.forEach(gm => {
-          gamesArr.push(gm);
-        });
-      }
-      return res.send(gamesArr)
-    })
+  _getAllGames: async function(req, res) {
+    try {
+        var result = await AblGame.aggregate([{
+            '$addFields': {
+              'attesters': '$results.attestations.attesterType'
+            }
+          }
+        ]);
+        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
+
+          if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!games) {
+            return res.status(400).send({
+              message: 'No games found.'
+            });
+          } 
+//           else {
+//             games.forEach(gm => {
+//               gamesArr.push(gm);
+//             });
+//           }
+          return res.send(games)
+        })  
+      
+    } catch (err) {
+      return res.status(500).send({
+              message: err.message
+            });
+    }
+    
   },
   _delete: function(req, res) {
     AblGame.findById(req.params.id, (err, gm) => {
@@ -569,7 +584,7 @@ var AblGameController = {
        try {
           const updatedGame = await AblGame.findByIdAndUpdate(
               req.params.id,
-              { $set: { results: req.body } },
+              { $set: {results: req.body} },
               { new: true }
           );
           res.json(updatedGame);

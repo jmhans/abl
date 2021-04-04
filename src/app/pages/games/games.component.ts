@@ -78,7 +78,10 @@ export class GamesComponent implements OnInit, OnDestroy {
   }
 
   getGameAttester(allAttestations, loc) {
-    return allAttestations.find((a)=> {return a.attesterType == loc });
+    if (allAttestations) {
+      return allAttestations.find((a)=> {return a.attesterType == loc });  
+    }
+    
   }
   
   getGameScore(gm, loc) {
@@ -96,7 +99,10 @@ export class GamesComponent implements OnInit, OnDestroy {
   
   
   _saveResult(gm) {
-    var attestSub = this.ablGame.addAttestation$(gm, this.auth.userProfile.sub).subscribe(
+    var attestSub = this.ablGame.attestGame$(gm._id, 
+                                                 gm.results, 
+                                                 {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
+                                                ).subscribe(
       res => {
         console.log(res)
       },

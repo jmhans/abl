@@ -45,12 +45,11 @@
 <table datatable 
        [dtOptions]="dtOptions" 
        [dtTrigger]="dtTrigger"
-       class="row-border hover">
+       class="row-border hover table-responsive">
   <thead>
     <tr>
     <th>Player Name</th>
     <th>MLB Id</th>
-    <th>ABL Id</th>
     <th>ABL Team</th>
     <th>Position</th>
     <th>Team</th>
@@ -73,7 +72,6 @@
     <tr *ngFor="let player of playerList">
       <td>{{player.name}}</td>
       <td>{{player.mlbID}}</td>
-      <td>{{player._id}}</td>
       <td>{{player.ablstatus?.ablTeam ? player.ablstatus.ablTeam.nickname : ''}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>

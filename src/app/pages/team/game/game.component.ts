@@ -4,11 +4,13 @@ import { ApiService } from './../../../core/api.service';
 import { UtilsService } from './../../../core/utils.service';
 import { FilterSortService } from './../../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
+import { AblGameService } from './../../../core/services/abl-game.service';
 import { GameModel } from './../../../core/models/game.model';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { AuthService } from './../../../auth/auth.service';
 
 
 @Component({
@@ -26,6 +28,7 @@ export class TeamGameComponent implements OnInit {
   loading: boolean;
   error: boolean;
   query: string = '';
+  submitSub: Subscription;
 
 
   constructor(
@@ -33,7 +36,9 @@ export class TeamGameComponent implements OnInit {
     public utils: UtilsService,
     private api: ApiService,
     public fs: FilterSortService, 
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private ablGame: AblGameService,
+         public auth: AuthService
   ) { }
 
   ngOnInit() {
@@ -62,9 +67,22 @@ export class TeamGameComponent implements OnInit {
       );
   }
   
-  attest(gm) {
+  attest(gm: GameModel) {
     //this.api.postData$({})
     console.log(gm);
+    
+    this.submitSub = this.ablGame.attestGame$(gm._id, 
+                                              gm.results, 
+                                              {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
+                                              )
+        .subscribe(res => {
+          console.log(`Document updated: ${res}` );
+          gm.results = res.results
+        })     
+  }
+  
+  _needsAttest(gm) {
+    return gm.attesters.map((a)=> {return gm[a+'Team']._id}).indexOf(this.team._id) == -1
   }
   
   protest(gm) {
@@ -76,6 +94,7 @@ export class TeamGameComponent implements OnInit {
 
   ngOnDestroy() {
     this.gamesListSub.unsubscribe();
+    if (this.submitSub) {this.submitSub.unsubscribe()};
   }
   
   hasProp(o, name) {

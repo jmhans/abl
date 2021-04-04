@@ -2,7 +2,7 @@
 import { Component, Input } from '@angular/core';
 import { AuthService } from './../../../auth/auth.service';
 import { UtilsService } from './../../../core/utils.service';
-import { GameModel, PopulatedGameModel } from './../../../core/models/game.model';
+import { GameModel, PopulatedGameModel , GameResultsModel} from './../../../core/models/game.model';
 import { StatlineModel } from './../../../core/models/statline.model';
 import { LineupModel } from './../../../core/models/lineup.model';
 import { gameRosters,  rosterScoreRecord, rosterGameScoreRecord } from './../../../core/models/roster.record.model';
@@ -34,6 +34,7 @@ export class GameDetailComponent {
   submitSub: Subscription;
   loading: boolean;
   error: boolean;
+  gameResultsObj:GameResultsModel ;
   
   constructor(
     public utils: UtilsService,
@@ -61,13 +62,53 @@ export class GameDetailComponent {
     
   }
   
-  _saveResult() {
-    this.submitSub = this.ablGame.attestGame$(this.game, this.rosters, this.auth.userProfile.sub)
+  _saveResult(attest: boolean) {
+    
+    if (attest) {
+      this.submitSub = this.ablGame.attestGame$(this.game._id, 
+                                                this._getGameResult(), 
+                                                {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(this.game, this.auth.userProfile.sub)}
+                                               ).subscribe(res => {
+          console.log(`Document updated: ${res}` );
+          this.game.results = res.results
+        })      
+    } else {
+      this.submitSub = this.ablGame.saveGameResult$(this.game._id, this._getGameResult())
       .subscribe(res => {
         console.log(`Document updated: ${res}` );
         this.game.results = res.results
       })
+    }
+
   }
+  
+  
+  _getGameResult() {
+    
+    var gameResultsObj = {
+       status: 'final', 
+        scores: [
+          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final  }, 
+          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final  }
+        ], 
+        winner: this.rosters.result.winner, 
+        loser: this.rosters.result.loser, 
+        attestations: this.game.results.attestations
+      };
+    
+    
+    return gameResultsObj
+  }
+  
+  _rawScores(detailScores) {
+    return detailScores.map((detailScore)=> {return  {
+      location: detailScore.location,
+      regulation: detailScore.regulation, 
+      final: detailScore.regulation
+    }})
+  }
+  
+  
   
   _userInGame() {
     var home = this.game.homeTeam.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
