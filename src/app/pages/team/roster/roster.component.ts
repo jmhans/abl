@@ -52,15 +52,38 @@ export class RosterComponent implements OnInit, OnDestroy {
   alerts: Alert[] = [];
   events: string[] = [];
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
+  
+  options: any;
+  
+  
+  
+  
+  
   constructor(  private router: Router, 
                 private route: ActivatedRoute,
                 public auth: AuthService,
                 public rosterService: RosterService,
-                private utils: UtilsService,
+                private utils: UtilsService
                 ) { }
 
   ngOnInit() {
     this._routeSubs();
+    
+    
+  // option veriable
+  this.options = {
+    fieldSeparator: ',',
+    quoteStrings: '"',
+    decimalseparator: '.',
+    showLabels: false,
+    headers: [],
+    showTitle: true,
+    title: this.team.nickname,
+    useBom: false,
+    removeNewLines: true,
+    keys: ['playerName','playerTeam', 'mlbID', 'lineupPosition','rosterOrder' ]
+  };
+  
 
   }
   
@@ -189,6 +212,39 @@ export class RosterComponent implements OnInit, OnDestroy {
     moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
   }
   
+  
+  _getDLFile() {
+    return this.current_roster.roster.map((p)=> {
+      return {
+        playerName: p.player.name, 
+        playerTeam: p.player.team, 
+        mlbID: p.player.mlbID, 
+        lineupPosition: p.lineupPosition, 
+        rosterOrder: p.rosterOrder
+    }})
+  }
+ 
+  downloadFile(data: any) {
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = Object.keys(data[0]);
+    const csv = data.map((row) =>
+      header
+        .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+        .join(',')
+    );
+    csv.unshift(header.join(','));
+    const csvArray = csv.join('\r\n');
+
+    const a = document.createElement('a');
+    const blob = new Blob([csvArray], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+
+    a.href = url;
+    a.download = 'myFile.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
   
   private _updateRoster(result) {
     if (result.success) {

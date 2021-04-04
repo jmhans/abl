@@ -77,6 +77,50 @@ class StatlineController extends BaseController {
     }  
   }
   
+  async _getStatsForDate(req, res, next) {
+
+    try {
+      
+       const day = new Date(req.params.dt + "T12:00:00Z")
+       var nextDay = new Date(day.toISOString());
+       nextDay.setDate(day.getDate() +1)
+      
+      var stats = await this.model.aggregate([
+          {
+            '$match': {
+              'gameDate': {
+                '$gte': day, 
+                '$lt': nextDay
+              }
+            }
+          }, {
+            '$lookup': {
+              'from': 'players', 
+              'localField': 'mlbId', 
+              'foreignField': 'mlbID', 
+              'as': 'player'
+            }
+          }, {
+            '$addFields': {
+              'player': {
+                '$first': '$player'
+              }
+            }
+          }
+        ])
+
+      if (!stats) {
+        return res.status(400).send({message: 'No stats found.'});
+      }
+      return res.send(stats)
+
+    } catch (err) {
+      return res.status(500).send({message: err.message });
+    }
+  }
+
+    
+  
     
 //   route() {
 //     router.get("/statlines/:mlbId", (...args)=> this._getStatsForPlayer(...args))
