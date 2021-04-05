@@ -89,7 +89,11 @@ export class TeamGameComponent implements OnInit {
     console.log(gm);
     //this.api.postData$({})
   }
-
+  getGameScore(gm, loc) {
+    if (gm.results && gm.results.scores) {
+        return gm.results.scores.find((g)=> {return g.location == loc})    
+    }
+  }
 
 
   ngOnDestroy() {

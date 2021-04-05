@@ -46,6 +46,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   teamList: AblTeamModel[];
   teamsListSub: Subscription;
   showTaken: boolean = false;
+  filterGroup: any = {value: 'showAll'};
+  showPlayers: string;
   
   overrideData: any[];
   dataSub: Subscription;
@@ -99,7 +101,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.playerList = res;
-          this.dataSource = new MatTableDataSource(this.playerList);
+          this.filteredPlayers = this.playerList;
+          this.dataSource = new MatTableDataSource(this.filteredPlayers);
           this.dataSource.paginator = this.paginator;
           
            this.dataSource.sortingDataAccessor = (item, property) => {
@@ -117,7 +120,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
             };
           //this._getTeamList();
           this.dataSource.sort = this.sort;
-          this.filteredPlayers = this.playerList;
+          this.updateTakenPlayers('all');
           this.loading = false;
           this.dtTrigger.next();
         },
@@ -202,7 +205,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       this.rosterUpdateSub = this.rosterService
         .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
         .subscribe(
-          data => this._handleSubmitSuccess(data),
+          data => this._handleSubmitSuccess(data, plyr),
           err => this._handleSubmitError(err)
         );
   }
@@ -213,19 +216,27 @@ export class PlayersComponent implements OnInit, OnDestroy {
      this.rosterUpdateSub = this.rosterService
         .draftPlayersToTeam$(selectedPlyrs, this.draftTeam._id)
         .subscribe(
-          data => this._handleSubmitSuccess(data),
+          data => this._handleSubmitSuccess(data, selectedPlyrs),
           err => this._handleSubmitError(err)
         );
    }
 
   
-  searchPlayers() {
-    this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
-  }
+//   searchPlayers() {
+//     this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
+//   }
   
-  takenPlayers(taken: boolean) {
-    this.showTaken = taken
-    this.filteredPlayers = this.playerList.filter((p)=> {return p.draftMe == this.showTaken})
+  updateTakenPlayers(filterType: string) {
+//     if (this.showTaken) {
+//       this.filteredPlayers = this.playerList
+//     } else {
+//       this.filteredPlayers = this.playerList.filter((p)=> {return p.ablstatus.onRoster == this.showTaken})  
+//     }
+    
+    this.filteredPlayers = this.playerList.filter((p) => {
+      return (p.ablstatus.onRoster == (filterType == 'taken')) || filterType == "all"
+    })
+    
   }
 
   resetQuery() {
@@ -233,7 +244,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.filteredPlayers = this.playerList;
   }
   
-   private _handleSubmitSuccess(res) {
+   private _handleSubmitSuccess(res, plyr) { 
+    plyr.ablstatus = res.player.ablstatus;
     this.error = false;
     this.submitting = false;
   }

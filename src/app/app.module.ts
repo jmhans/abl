@@ -22,7 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
-
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -156,6 +156,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
     TableModule,
     MatCheckboxModule ,
     Angular2CsvModule,
+    MatButtonToggleModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,

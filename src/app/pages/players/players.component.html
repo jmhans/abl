@@ -40,7 +40,16 @@
           Show Taken
         </button> -->
 
-<span *ngIf="playerList">Selected Players: {{_selectedItems()}}</span>
+
+
+<div class="btn-group shadow-0" role="group">
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'Available'; updateTakenPlayers('available')">Available</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'Taken'; updateTakenPlayers('taken')">Taken</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'All'; updateTakenPlayers('all')">All</button>
+</div>
+
+
+
 
 <table datatable 
        [dtOptions]="dtOptions" 
@@ -69,7 +78,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let player of playerList">
+    <tr *ngFor="let player of filteredPlayers">
       <td>{{player.name}}</td>
       <td>{{player.mlbID}}</td>
       <td>{{player.ablstatus?.ablTeam ? player.ablstatus.ablTeam.nickname : ''}}</td>
