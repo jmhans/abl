@@ -28,51 +28,13 @@
   
   <mat-form-field color="accent" appearance="fill">
     <mat-label>Roster Date</mat-label>
-    <input matInput [matDatepicker]="roster_date" (dateChange)="_date_changed($event)">
+    <input matInput [matDatepicker]="roster_date" [max]="currentRosterDate()" (dateChange)="_date_changed($event)">
     <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
     <mat-datepicker #roster_date></mat-datepicker>
   </mat-form-field>
   
   
   <mat-card-content>
-<!--         <section *ngIf="!edit_lineup">
-          Oldest<mat-slider
-            class="example-margin"
-            [disabled]="edit_lineup"
-            [invert]="true"
-            [max]="lineup.priorRosters.length"
-            [min]="0"
-            [step]="1"
-            [thumbLabel]="true"
-            [tickInterval]="1"
-            [vertical]="false"
-            [displayWith]="formatLabel(lineup)"
-            (change)="toggleLineup($event)"
-            [(ngModel)] = "active_roster_index"
-                       >
-          </mat-slider> Most Recent
-        </section> -->
-
-    
-<!--     <section class="example-section">
-      <mat-tab-group mat-align-tabs="start" *ngIf="lineup">
-        <mat-tab >
-           <ng-template mat-tab-label>
-              {{lineup.priorRosters[active_roster_index -1].effectiveDate}}
-            </ng-template>
-          Content 1</mat-tab>
-        <mat-tab>
-           <ng-template mat-tab-label>
-              {{current_roster.effectiveDate}}
-            </ng-template>
-          Content 2</mat-tab>
-        <mat-tab label="New">Content 3</mat-tab>
-      </mat-tab-group>
-    </section> -->
-    
-<!--     <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="!create_lineup">Create New</button>
-    <button mat-stroked-button color="primary" (click)="_createNew()" *ngIf="create_lineup">Cancel Create</button> -->
-    
     
     <section *ngIf="create_lineup">
       <mat-form-field>
@@ -90,8 +52,8 @@
 
 
 <span *ngIf='current_roster'> 
-  {{current_roster.effectiveDate | date: "mediumDate"}}
-  <angular2csv [data]="_getDLFile()" filename="test" [options]="options"></angular2csv>
+  Roster First Effective Date: {{actualRosterEffectiveDate(current_roster.effectiveDate) | date: "mediumDate"}}
+  <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv>
 
 </span>
 
