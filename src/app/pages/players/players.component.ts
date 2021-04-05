@@ -99,7 +99,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.playerList = res;
-          this.dataSource = new MatTableDataSource(this.playerList);
+          this.filteredPlayers = this.playerList;
+          this.dataSource = new MatTableDataSource(this.filteredPlayers);
           this.dataSource.paginator = this.paginator;
           
            this.dataSource.sortingDataAccessor = (item, property) => {
@@ -117,7 +118,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
             };
           //this._getTeamList();
           this.dataSource.sort = this.sort;
-          this.filteredPlayers = this.playerList;
+          
           this.loading = false;
           this.dtTrigger.next();
         },
@@ -202,7 +203,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       this.rosterUpdateSub = this.rosterService
         .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
         .subscribe(
-          data => this._handleSubmitSuccess(data),
+          data => this._handleSubmitSuccess(data, plyr),
           err => this._handleSubmitError(err)
         );
   }
@@ -213,7 +214,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
      this.rosterUpdateSub = this.rosterService
         .draftPlayersToTeam$(selectedPlyrs, this.draftTeam._id)
         .subscribe(
-          data => this._handleSubmitSuccess(data),
+          data => this._handleSubmitSuccess(data, selectedPlyrs),
           err => this._handleSubmitError(err)
         );
    }
@@ -233,7 +234,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.filteredPlayers = this.playerList;
   }
   
-   private _handleSubmitSuccess(res) {
+   private _handleSubmitSuccess(res, plyr) { 
+    plyr.ablstatus = res.player.ablstatus;
     this.error = false;
     this.submitting = false;
   }

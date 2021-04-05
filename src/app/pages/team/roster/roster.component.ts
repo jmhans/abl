@@ -172,8 +172,8 @@ export class RosterComponent implements OnInit, OnDestroy {
   
   _set_Active_Roster(idx) {
     var i = 0;
-    if (this.roster_date < new Date(this.lineup.effectiveDate)) {
-      while (this.roster_date < new Date(this.lineup.priorRosters[i].effectiveDate) && i<this.lineup.priorRosters.length) {
+    if (this.roster_deadline < new Date(this.lineup.effectiveDate)) {
+      while (this.roster_deadline < new Date(this.lineup.priorRosters[i].effectiveDate) && i<this.lineup.priorRosters.length) {
         i++
       }
       this.active_roster = this.lineup.priorRosters[i]

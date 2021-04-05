@@ -406,8 +406,9 @@ class altABLRosterController extends BaseController{
     try {
       var mlbPlayer = await MlbPlayer.findById(req.body._id);
       mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup', onRoster: true};
-      var savedMlbPlayer = await mlbPlayer.save();
-      var existingLineupRec = await Lineup.findOne({ablTeam: mlbPlayer.ablTeam});
+      var savedMlbPlayer = await mlbPlayer.save()
+      var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
+      var existingLineupRec = await Lineup.findOne({ablTeam: req.params.id});
       if (existingLineupRec) {
         var priorLineupRec = {
           effectiveDate: existingLineupRec.effectiveDate,
@@ -423,7 +424,9 @@ class altABLRosterController extends BaseController{
         });
 
         var savedExistingLineupRec = await existingLineupRec.save();
-        return res.send(savedExistingLineupRec);
+        console.log(savedExistingLineupRec);
+        console.log(savedMlbPlayer);
+        return res.send({player: savedMlbPlayer, roster: savedExistingLineupRec});
         
       } else {
 
@@ -439,7 +442,8 @@ class altABLRosterController extends BaseController{
         });
         
         var savedRR = await RR.save();
-        return res.send(savedRR);
+        console.log(savedRR);
+        return res.send({player: savedMlbPlayer, roster: savedRR});
         
       }
     } catch(err) {
