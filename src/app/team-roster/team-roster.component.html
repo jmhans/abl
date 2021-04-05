@@ -18,7 +18,7 @@
     <span >
       <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">Pickup</span>
     </span>
-      {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
+      {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.position}})
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
         <span  *ngIf="rosterRec.player.stats" class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
