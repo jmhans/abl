@@ -53,9 +53,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   events: string[] = [];
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
   
-  options: any;
-  
-  
+  dlOptions: any;
   
   
   
@@ -71,20 +69,28 @@ export class RosterComponent implements OnInit, OnDestroy {
     
     
   // option veriable
-  this.options = {
+  this.dlOptions = {
     fieldSeparator: ',',
     quoteStrings: '"',
     decimalseparator: '.',
     showLabels: false,
     headers: [],
-    showTitle: true,
+    showTitle: false,
     title: this.team.nickname,
     useBom: false,
     removeNewLines: true,
-    keys: ['playerName','playerTeam', 'mlbID', 'lineupPosition','rosterOrder' ]
+    keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
   };
   
 
+  }
+  
+  dlFileName() {
+    return this.team.nickname + '_Lineup_' + this.actualRosterEffectiveDate(this.current_roster.effectiveDate).toISOString().substring(0, 10)
+  }
+  
+  currentRosterDate() {
+    return this.actualRosterEffectiveDate(new Date())
   }
   
   private _routeSubs() {
@@ -94,15 +100,20 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.paramSub = this.route.queryParams
       .subscribe(queryParams => {
         this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
-          console.log(this.roster_date);
-          var mnth = this.roster_date.getMonth()+1;
-        
-          var globalrosterDeadline = new Date(this.roster_date.getFullYear() + "-" + mnth.toString() + "-" + this.roster_date.getDate() + " " + this.editTimeLimit)
-          this.roster_deadline = this.utils.changeTimezone(globalrosterDeadline, this.editTimeLimitInantz)
-          console.log(this.roster_deadline); 
-
+        this.roster_deadline = this.actualRosterEffectiveDate(this.roster_date)
         this._getRosterRecords();
       });
+  }
+  
+  actualRosterEffectiveDate(curDt) {
+    // var curDt = this.current_roster.effectiveDate
+    if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call. 
+    
+    var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + this.editTimeLimit)
+    if (globalrosterDeadline < curDt) {
+      globalrosterDeadline.setDate(globalrosterDeadline.getDate() +1)
+    }
+    return this.utils.changeTimezone(globalrosterDeadline, this.editTimeLimitInantz)
   }
   
     
@@ -189,7 +200,7 @@ export class RosterComponent implements OnInit, OnDestroy {
         this.lineup._id, 
         null, 
         this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
-        this.roster_deadline
+        new Date()//this.roster_deadline
       );
     }
     
