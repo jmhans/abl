@@ -13,7 +13,11 @@
     <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">
       <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
     </select>
+    
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
+    <span >
+      <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">Pickup</span>
+    </span>
       {{ rosterRec.player.name }} | {{ rosterRec.player.team }}
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 

@@ -46,6 +46,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   teamList: AblTeamModel[];
   teamsListSub: Subscription;
   showTaken: boolean = false;
+  filterGroup: any = {value: 'showAll'};
+  showPlayers: string;
   
   overrideData: any[];
   dataSub: Subscription;
@@ -118,7 +120,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
             };
           //this._getTeamList();
           this.dataSource.sort = this.sort;
-          
+          this.updateTakenPlayers('all');
           this.loading = false;
           this.dtTrigger.next();
         },
@@ -220,13 +222,21 @@ export class PlayersComponent implements OnInit, OnDestroy {
    }
 
   
-  searchPlayers() {
-    this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
-  }
+//   searchPlayers() {
+//     this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
+//   }
   
-  takenPlayers(taken: boolean) {
-    this.showTaken = taken
-    this.filteredPlayers = this.playerList.filter((p)=> {return p.draftMe == this.showTaken})
+  updateTakenPlayers(filterType: string) {
+//     if (this.showTaken) {
+//       this.filteredPlayers = this.playerList
+//     } else {
+//       this.filteredPlayers = this.playerList.filter((p)=> {return p.ablstatus.onRoster == this.showTaken})  
+//     }
+    
+    this.filteredPlayers = this.playerList.filter((p) => {
+      return (p.ablstatus.onRoster == (filterType == 'taken')) || filterType == "all"
+    })
+    
   }
 
   resetQuery() {
