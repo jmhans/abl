@@ -45,6 +45,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   active_roster_index: number = 0;
   active_roster_is_current: boolean;
   lineupSub: Subscription;
+  saveRosterRecordSub: Subscription;
   loading: boolean;
   error: boolean;
   saveLineupSub: Subscription;
@@ -264,6 +265,18 @@ export class RosterComponent implements OnInit, OnDestroy {
       this._handleUpdateError(result.err);
     }
   }
+  
+  private _createNewRoster(evt) {
+    if (evt.lineup) {
+      this.saveRosterRecordSub = this.rosterService
+        .createRosterRecord$(this.team._id, evt.lineup)
+        .subscribe(
+          data => this._handleLineupSuccess(data, true),
+          err => this._handleUpdateError(err)
+      )   
+    }
+  }
+  
   
 
   

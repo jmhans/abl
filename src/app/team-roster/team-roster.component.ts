@@ -31,6 +31,7 @@ export class TeamRosterComponent implements OnInit {
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
   @Output() updated = new EventEmitter<{success: boolean, data?: LineupModel, err?: string}>();
+  @Output() create = new EventEmitter<{lineup: SubmitLineup}>();
   
   formLineup: LineupFormModel;
   
@@ -64,15 +65,17 @@ export class TeamRosterComponent implements OnInit {
   
   
   _updateRosterRecord() {
-    const submitRoster = this._getSubmitRoster()
-    if (submitRoster) {
-      this.saveRosterRecordSub = this.rosterService
-        .updateRosterRecord$(this.lineupId, submitRoster)
-        .subscribe(
-          data => this._handleLineupSuccess(data),
-          err => this._handleUpdateError(err)
-      )      
-    }
+    
+     const submitRoster = this._getSubmitRoster()
+     if (submitRoster) {
+       this.create.emit({lineup: submitRoster})
+//       this.saveRosterRecordSub = this.rosterService
+//         .createRosterRecord$(this.lineupId, submitRoster)
+//         .subscribe(
+//           data => this._handleLineupSuccess(data),
+//           err => this._handleUpdateError(err)
+//       )      
+     }
 
   }
   

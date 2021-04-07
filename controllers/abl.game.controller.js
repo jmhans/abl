@@ -2,7 +2,9 @@
 
 const request = require('request');
 const AblGame = require('./../models/Game');
-var AblRosterController = require('./abl.roster.controller').AblRosterController;
+//var AblRosterController = require('./abl.roster.controller').AblRosterController;
+var AblRosterController = require('./abl.roster.controller').altABLRosterController;
+var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
 const Statline = require('./../models/statline');
 
@@ -112,28 +114,34 @@ class lineupArray extends Array {
   
   
   startNextPlayer(pos) {
-        
+
         var posPAs = 0;
         var posGs = 0;
         
         var possibles = this.bench().filter((plyr)=> {
           return canPlayPosition(plyr.lineupPosition, pos)
         }); 
-        var curPlyrRec;
+       var curPlyrRec;
     
     
         while (posPAs < 2) {
           
           if (possibles.length > 0) {
             var nextPlyr = possibles[0]
-
+            
             if ( nextPlyr.dailyStats && nextPlyr.dailyStats.g > 0) {
+                                
               curPlyrRec = this[this.indexOf(nextPlyr)];
-                           
+                              
+         
+              curPlyrRec.gameStatus = {playedPosition: pos, played: 'active', lineupOrder: this.active().length}
               curPlyrRec.playedPosition = pos
               curPlyrRec.ablstatus = 'active'
               curPlyrRec.lineupOrder = this.active().length
-              
+              if (pos == "1B") {
+                console.log(`Trying to log curPlyr that played`)
+                console.log(curPlyrRec)
+              }
               //nextPlyr.playedPosition = pos
               //nextPlyr.ablstatus = 'active'
               //nextPlyr.lineupOrder = this.active().length
@@ -147,10 +155,10 @@ class lineupArray extends Array {
             // Still not enough Plate Appearances. Add in Supplemental. 
 
             if (posGs > 0) {
-              this.push({"player": {name: "supp"}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
+              this.push({"player": {name: "supp"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
               posPAs = 2
             } else {
-              this.push({"player": {name: "four"}, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
+              this.push({"player": {name: "four"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'},lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
               posPAs = 4
             }
 
@@ -369,13 +377,18 @@ var AblGameController = {
       var homeScore = {regulation: {}, final: {}}; 
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
-      var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {const lineup = await AblRosterController._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
-                                                                        return lineup;}));
+      var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
+        const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
+        //console.log(lineup);
+        return lineup;
+      }));
 
           if (new Date(day) <= new Date()) {
             // This game should be done by now. 
             
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
+             // console.log(lineups_with_stats)
+             // console.log(lineups_with_stats[1].find((p)=> {return p.player.name == "Max Muncy"}));
             
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
             
@@ -457,18 +470,18 @@ var AblGameController = {
     })
 
     console.log(dailyStats.length + " stat records found.");
-        
-    return lineups.map((lineup) => {
-      
+    
+    return lineups.map( (lineup) => {
       
       return lineup.map((plyr) => {
 
                 
-        var player_stats = dailyStats.filter((statline) => {
-            return (statline.mlbId == plyr.player.mlbID);
+        var player_stats =  dailyStats.filter((statline) => {
+              return (statline.mlbId == plyr.player.mlbID); 
+            
           })
           .map(this._getDailyStats)
-          .reduce(function getSum(total, thisRec) {
+          .reduce( function getSum(total, thisRec) {
             for (var propertyName in thisRec) {
               // propertyName is what you want
               // you can get the value like this: myObject[propertyName]
@@ -479,7 +492,7 @@ var AblGameController = {
                 case 'gamePk':
                 case 'gameDate':
                 case 'position(s)':
-                  total[propertyName].push(thisRec[propertyName])
+                  total[propertyName].concat(thisRec[propertyName])
                   break;
                 case 'abl_score': 
                   total.abl_score.abl_points += ( thisRec.abl_points || 0);
@@ -500,9 +513,19 @@ var AblGameController = {
             'position(s)': [], 
             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
           });
+        //console.log(`Stats for ${plyr.player.name} updating.`);
         
-        plyr.stats = {};
+        plyr.player.stats = {};
+       // console.log("before update");
+      //  console.log(plyr);
         plyr.dailyStats = player_stats;
+       // if (plyr.player.name == "Max Muncy") {
+         // console.log( plyr.dailyStats)
+          
+       //   console.log(plyr)
+       //   console.log("after update");
+       //   plyr.prop = "New Prop"
+       // }
         
         return plyr;
 //         return {

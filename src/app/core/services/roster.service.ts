@@ -74,5 +74,19 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
+  createRosterRecord$(ablTeam: string, lineup: SubmitLineup): Observable<LineupCollectionModel> {
+    var submitlineup = {
+      ablTeam: ablTeam, 
+      roster: lineup.roster, 
+      effectiveDate: new Date()
+    }  
+    return this.http
+        .post<LineupModel>(`${this.base_api}lineups`, submitlineup, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+  }
 
 }
