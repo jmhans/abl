@@ -69,20 +69,20 @@ export class RosterComponent implements OnInit, OnDestroy {
     this._routeSubs();
     
     
-  // option veriable
-  this.dlOptions = {
-    fieldSeparator: ',',
-    quoteStrings: '"',
-    decimalseparator: '.',
-    showLabels: false,
-    headers: [],
-    showTitle: false,
-    title: this.team.nickname,
-    useBom: false,
-    removeNewLines: true,
-    keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
-  };
-  
+    // option veriable
+    this.dlOptions = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalseparator: '.',
+      showLabels: false,
+      headers: [],
+      showTitle: false,
+      title: this.team.nickname,
+      useBom: false,
+      removeNewLines: true,
+      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
+    };
+
 
   }
   
@@ -107,7 +107,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   }
   
   actualRosterEffectiveDate(curDt) {
-    // var curDt = this.current_roster.effectiveDate
+    //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call. 
     
     var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + this.editTimeLimit)
@@ -169,7 +169,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.loading = true;
     
     this.lineupSub = this.rosterService
-      .getLineupByTeamId$(this.team._id)
+      .getLineupForTeamAndDate$(this.team._id, this.roster_deadline)
       .subscribe(
         res => {
           this._handleLineupSuccess(res, false);
@@ -199,9 +199,9 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.active_roster = this.lineup
       this.current_roster = new LineupFormModel(
         this.lineup._id, 
-        null, 
+        this.active_roster._id, 
         this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
-        new Date()//this.roster_deadline
+        new Date(this.roster_deadline)
       );
     }
     
@@ -266,14 +266,26 @@ export class RosterComponent implements OnInit, OnDestroy {
     }
   }
   
+  
+  
+  
   private _createNewRoster(evt) {
     if (evt.lineup) {
+    const thingy = {
+      ablTeam: this.team._id, 
+      roster: evt.lineup.roster, 
+      effectiveDate: evt.lineup.effectiveDate
+    }
+      
+      
+        // editing lineup for the roster_deadline date   
       this.saveRosterRecordSub = this.rosterService
-        .createRosterRecord$(this.team._id, evt.lineup)
+        .updateRosterRecord2$(this.team._id, thingy)
         .subscribe(
           data => this._handleLineupSuccess(data, true),
           err => this._handleUpdateError(err)
-      )   
+        )
+         
     }
   }
   

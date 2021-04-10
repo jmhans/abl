@@ -52,7 +52,8 @@
 
 
 <span *ngIf='current_roster'> 
-  Roster First Effective Date: {{actualRosterEffectiveDate(current_roster.effectiveDate) | date: "mediumDate"}}
+  Roster effective date: {{active_roster.effectiveDate}}
+  Roster date on update: {{actualRosterEffectiveDate(current_roster.effectiveDate) | date: "mediumDate"}}
   <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv>
 
 </span>

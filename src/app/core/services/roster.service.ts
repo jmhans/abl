@@ -45,6 +45,17 @@ export class RosterService {
       );
   }
   
+  getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
+    return this.http
+      .get<LineupModel>(`${this.base_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+ 
+  
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.http
       .post<LineupModel>(`${this.base_api}team/${ablTeamId}/addPlayer`, addPlayer, {
@@ -82,6 +93,16 @@ export class RosterService {
     }  
     return this.http
         .post<LineupModel>(`${this.base_api}lineups`, submitlineup, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+  }
+  updateRosterRecord2$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
+    
+    return this.http
+        .put<LineupModel>(`${this.base_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)
         })
         .pipe(

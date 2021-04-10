@@ -379,7 +379,7 @@ var AblGameController = {
       var result = {};
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
         const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
-        //console.log(lineup);
+       // console.log(lineup);
         return lineup;
       }));
 
