@@ -113,18 +113,18 @@ class lineupArray extends Array {
 
   
   
-  startNextPlayer(pos) {
+  startNextPlayer(pos, rosterPos = 99, starterOnly = false) {
 
-        var posPAs = 0;
-        var posGs = 0;
+        var posPAs = this.active().filter((p)=> {return p.ablRosterPosition == rosterPos}).reduce((total, cur)=> {return total + (new statline(cur.dailyStats).plateAppearances)}, 0);
+        var posGs = this.active().filter((p)=> {return p.ablRosterPosition == rosterPos}).reduce((total, cur)=> {return total + (cur.dailyStats.g || 0)},0 );
         
         var possibles = this.bench().filter((plyr)=> {
           return canPlayPosition(plyr.lineupPosition, pos)
         }); 
        var curPlyrRec;
     
-        var playedType = (pos == 'XTRA') ? 'XTRA' : 'STARTER'
-        while (posPAs < 2) {
+        var playedType = (pos == 'XTRA') ? 'XTRA' : (posGs == 0 ? 'STARTER' : 'SUB')
+        while ( starterOnly ? (posGs < 1) :  (posPAs < 2) ) {
           
           if (possibles.length > 0) {
             var nextPlyr = possibles[0]
@@ -138,6 +138,7 @@ class lineupArray extends Array {
               curPlyrRec.playedPosition = pos
               curPlyrRec.ablstatus = 'active'
               curPlyrRec.ablPlayedType = playedType
+              curPlyrRec.ablRosterPosition = rosterPos
               curPlyrRec.lineupOrder = this.active().length
               playedType = 'STARTER' ? 'SUB' : playedType
   
@@ -166,7 +167,6 @@ class lineupArray extends Array {
     
     return this
   }
-  
   
 }
 
@@ -383,8 +383,6 @@ var AblGameController = {
             // This game should be done by now. 
             
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
-             // console.log(lineups_with_stats)
-             // console.log(lineups_with_stats[1].find((p)=> {return p.player.name == "Max Muncy"}));
             
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
             
@@ -438,13 +436,43 @@ var AblGameController = {
   
   
   _getActiveStarters: function (lineups) {
-    return lineups.map((lineup) => {
+     return lineups.map((lineup) => {
       var newLineup = new lineupArray(...lineup)
 
       for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-        newLineup.startNextPlayer(ABL_STARTERS[starter]); // lineup = this._getNextRosterSpot(ABL_STARTERS[starter], lineup);
+        // Loop through position players first, placing only the first player into the spot.  
+        if(ABL_STARTERS[starter] != "DH" ) {
+          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
+        }
       }
+       
+      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH). 
+        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false); 
+      }
+       
+       
+      return newLineup
+    })  
+  },
+  
+  _getStartersOnly: function(lineups) {
+     return lineups.map((lineup) => {
+      var newLineup = new lineupArray(...lineup)
 
+      for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through position players first, placing only the first player into the spot.  
+        if(ABL_STARTERS[starter] != "DH" ) {
+          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
+        }
+      }
+       
+      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH). 
+        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false); 
+      }
+       
+       
       return newLineup
     })  
   },
