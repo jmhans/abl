@@ -24,70 +24,44 @@
 
 
 
-<mat-card class="example-result-card" *ngIf='lineup'>
+<mat-card class="example-result-card " *ngIf='lineup'>
+  <mat-card-subtitle  class="d-flex justify-content-between">
   
-  <mat-form-field color="accent" appearance="fill">
-    <mat-label>Roster Date</mat-label>
-    <input matInput [matDatepicker]="roster_date" [max]="currentRosterDate()" (dateChange)="_date_changed($event)">
-    <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
-    <mat-datepicker #roster_date></mat-datepicker>
-  </mat-form-field>
-  
-  
-  <mat-card-content>
+    <mat-form-field color="accent" appearance="fill">
+      <mat-label>Roster Date</mat-label>
+      <input matInput [matDatepicker]="roster_date" [max]="currentRosterDate()" (dateChange)="_date_changed($event)" [formControl]="formDate">
+      <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
+      <mat-datepicker #roster_date></mat-datepicker>
+    </mat-form-field>
+    <mat-slide-toggle
+          class="example-margin"
+          [color]="primary"
+          [checked]="false"
+          [disabled]="!_isAdmin()"
+          [(ngModel)]="edit_lineup">
+        Edit (Admin only)
+      </mat-slide-toggle>
+  </mat-card-subtitle>
+  <mat-card-content>   
+    <span *ngIf='current_roster'> 
+      
+
+    </span>
+
+    <span *ngIf="current_roster">
+<!--       <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv> -->
+      
+ <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="download()"><mdb-icon fas icon="file-download"></mdb-icon> Download Lineup</button>
+
+    <app-team-roster [lineup]="current_roster"
+                     [originalLineup] = "active_roster"
+                     [editable]="editable()"
+                     (update)="_createNewRoster($event)"
+                     ></app-team-roster>
+    </span>
     
-    <section *ngIf="create_lineup">
-      <mat-form-field>
-        <mat-label>Set Effective Date</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="current_roster.effectiveDate">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-    </section>
     
   </mat-card-content>
 
 </mat-card>
     
-
-
-<span *ngIf='current_roster'> 
-  Roster effective date: {{active_roster.effectiveDate}}
-  Roster date on update: {{actualRosterEffectiveDate(current_roster.effectiveDate) | date: "mediumDate"}}
-  <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv>
-
-</span>
-
-<span *ngIf="current_roster">
-
-<app-team-roster [lineupId]="lineup._id"
-                 [lineup]="current_roster"
-                 [originalLineup] = "active_roster"
-                 [editable]="editable()"
-                 (updated)="_updateRoster($event)"
-                 (create)="_createNewRoster($event)"
-                 ></app-team-roster>
-</span>
-
-
-<mat-card class="example-result-card" *ngIf='lineup'>
-  <mat-card-content>
-        <section>
-          <mat-slide-toggle
-              class="example-margin"
-              [color]="primary"
-              [checked]="false"
-              [disabled]="!_isAdmin()"
-              [(ngModel)]="edit_lineup">
-            Edit (Admin only)
-          </mat-slide-toggle>
-        </section>
-  </mat-card-content>
-</mat-card>
-
-
-
-<!-- <button (click)="_updateRoster()" *ngIf="editable()">
-  Update
-</button> -->
-

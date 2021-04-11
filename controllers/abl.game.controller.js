@@ -2,8 +2,7 @@
 
 const request = require('request');
 const AblGame = require('./../models/Game');
-//var AblRosterController = require('./abl.roster.controller').AblRosterController;
-var AblRosterController = require('./abl.roster.controller').altABLRosterController;
+var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
 const Statline = require('./../models/statline');

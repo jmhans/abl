@@ -1,3 +1,6 @@
+<button mdbBtn type="button" color="primary" outline="true" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
+
+
 <div cdkDropList class="example-list" 
      [cdkDropListDisabled] = !editable 
      (cdkDropListDropped)="dropLineupRecord($event)" 
@@ -37,6 +40,3 @@
   </div>
 </div>
 
-<button mat-button (click)="_updateRosterRecord()" *ngIf="editable">
-  Update Lineup
-</button>

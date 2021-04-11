@@ -14,249 +14,7 @@ const Lineup = require('./../models/lineup').Lineup;
 
 const ObjectId = require('mongoose').Types.ObjectId;
 
-// var AblRosterController = {
-
-//   _getLineupForTeam: function(req, res) {
-
-//     Lineup.findOne({
-//       ablTeam: new ObjectId(req.params.id)
-//     }).populate('roster.player priorRosters.roster.player').exec(function(err, lineup) {
-//       if (err) {
-//         return res.status(500).send({
-//           message: err.message
-//         });
-//       }
-//       console.log(lineup.priorRosters.map((pr)=> {return pr.effectiveDate}));
-//       if(lineup.priorRosters) {
-//         lineup.priorRosters.sort((a,b)=> {
-//           var aDt = new Date(a.effectiveDate);
-//           var bDt = new Date(b.effectiveDate);
-//           return bDt - aDt;
-//         })
-//       }
-//       console.log(lineup.priorRosters.map((pr)=> {return pr.effectiveDate}));
-//       res.send(lineup);
-//     })
-//   },
-
-//   _getLineupForTeamAndDate: function(req, res) {
-
-//     const gmDt = new Date(req.params.dt)
-
-//     Lineup.findOne({
-//       ablTeam: new ObjectId(req.params.id)
-//     }).populate('roster.player priorRosters.roster.player').exec(function(err, lineup) {
-//       if (err) {
-//         return res.status(500).send({
-//           message: err.message
-//         });
-//       }
-//       if (!lineup) {
-//         return res.status(400).send({
-//           message: 'No lineup found for that date.'
-//         });
-//       }
-//       console.log("Effective date of lineup:" + lineup.effectiveDate);
-//       if (lineup.effectiveDate < gmDt) {
-//         return res.status(200).send(lineup);
-//       } else {
-//         if (lineup.priorRosters.length > 0) {
-//           var sortedPR = lineup.priorRosters.sort(function(a, b) {
-//             return (new Date(b.effectiveDate) - new Date(a.effectiveDate));
-//           })
-//           for (s = sortedPR.length - 1; s >= 0; s--) {
-//             if (sortedPR[s].effectiveDate < gmDate) {
-//               return res.status(200).send(sortedPR[s]);
-//             }
-//           }
-//         } else {
-//           return res.status(400).send({
-//             message: 'No lineup found for that date.'
-//           });
-//         }
-
-
-//       }
-//     })
-
-//   },
-//   _getRosterForTeamAndDate: async function(teamId, gmDate) {
-//     try {
-//       var lineup = await Lineup.findOne({
-//         ablTeam: new ObjectId(teamId)
-//       }).populate('roster.player priorRosters.roster.player').exec();
-//       if (lineup) {
-
-//         if (new Date(lineup.effectiveDate) < gmDate) {
-//           return lineup.roster;
-
-//         } else {
-//           var sortedPR = lineup.priorRosters.sort(function(a, b) {
-//             return (new Date(b.effectiveDate) - new Date(a.effectiveDate));
-//           })
-//           for (s = sortedPR.length - 1; s >= 0; s--) {
-//             if (sortedPR[s].effectiveDate < gmDate) {
-//               return (sortedPR[s].roster);
-//             }
-//           }
-//         }
-//       } else {
-//         console.log("didn't find a lineup");
-//       }
-//     } catch (err) {
-//       console.error(`Error in _getRosterForTeamAndDate2:${err}`);
-//     }
-
-//   },
-
-//   _newUpdateLineup: function(req, res) {
-//     Lineup.findById(new ObjectId(req.params.id), (err, LineupRec) => {
-//       if (err) {
-//         return res.status(500).send({
-//           message: err.message
-//         });
-//       }
-//       if (LineupRec) {
-//         var updateRecord;
-//         if (req.body._id == LineupRec._id) {
-//           // Updating the active roster record. 
-//           LineupRec.effective_date = req.body.effective_date;
-//           LineupRec.roster = req.body.roster;
-
-//         } else {
-//           // Updating a prior roster record.
-//           updateRecord = LineupRec.priorRosters.find((pr) => {
-//             return pr._id == req.body._id
-//           });
-//           updateRecord.effective_date = req.body.effective_date;
-//           updateRecord.roster = req.body.roster;
-//         }
-
-//       } else {
-//         AblTeam.findById(req.body.ablTeamId, (err, ablTeam) => {
-//           if (err) {
-//             return res.status(500).send({
-//               message: err.message
-//             });
-//           }
-//           const LineupRec = new Lineup({
-//             ablTeam: ablTeam._id,
-//             roster: req.body.roster,
-//             effective_date: new Date(),
-//             priorRosters: []
-//           });
-//         })
-//       }
-
-//       LineupRec.save((err) => {
-//         if (err) {
-//           return res.status(500).send({
-//             message: err.message
-//           });
-//         }
-//         LineupRec.populate('roster.player priorRosters.roster.player', function(err) {
-//           res.send(LineupRec);
-//         });
-
-
-//       });
-//     });
-//   },
-  
-//   _addPlayerToTeam: function(req, res) {
-
-//     console.log("Running this function...")
-    
-//     MlbPlayer.findById(req.body._id, (err, mlbPlayer) => {
-
-//       if (err) {
-//         return res.status(500).send({
-//           message: err.message
-//         });
-//       }
-//       mlbPlayer.ablTeam = new ObjectId(req.params.id)
-//       console.log(mlbPlayer);
-//       mlbPlayer.save((err) => {
-//         if (err) {
-//           return res.status(500).send({
-//             message: err.message
-//           });
-//         }
-
-//         Lineup.findOne({
-//           ablTeam: new ObjectId(req.params.id)
-//         }).exec((err, existingLineupRec) => {
-//           if (err) {
-//             return res.status(500).send({
-//               message: err.message
-//             });
-//           }
-//           if (existingLineupRec) {
-//             var priorLineupRec = {
-//               effectiveDate: existingLineupRec.effectiveDate,
-//               roster: existingLineupRec.roster
-//             }
-//             existingLineupRec.priorRosters.push(priorLineupRec);
-//             existingLineupRec.effectiveDate = new Date();
-
-//             existingLineupRec.roster.push({
-//               player: mlbPlayer._id,
-//               lineupPosition: req.body.position,
-//               rosterOrder: existingLineupRec.roster.length + 1,
-//               rosterAddType: 'pickup'
-//             });
-
-//             existingLineupRec.save((err) => {
-//               if (err) {
-//                 return res.status(500).send({
-//                   message: err.message
-//                 });
-//               }
-//               res.send(existingLineupRec);
-//             });
-
-//           } else {
-
-//             const RR = new Lineup({
-//               ablTeam: new ObjectId(req.params.id),
-//               roster: [{
-//                 player: mlbPlayer._id,
-//                 lineupPosition: req.body.position,
-//                 rosterOrder: 1, 
-//                 rosterAddType: 'pickup'
-//               }],
-//               effectiveDate: new Date(),
-//               priorRosters: []
-//             });
-//             RR.save((err) => {
-//               if (err) {
-//                 return res.status(500).send({
-//                   message: err.message
-//                 });
-//               }
-//               res.send(RR);
-//             });
-
-//           }
-
-
-
-
-//         });
-//       })
-
-//     })
-
-
-//   }
-  
-  
-  
-
-
-// }
-
-class altABLRosterController extends BaseController{
+class ABLRosterController extends BaseController{
 
   constructor() {
     super(Lineup, 'lineups');
@@ -349,10 +107,8 @@ class altABLRosterController extends BaseController{
           }
         }
       }])
-      //var populated = await MlbPlayer.populate(atomicLineup[0], {path: 'roster.player'}).exec();
       
       if (atomicLineup) {
-//        var populated = Lineup.populate(atomicLineup, {path: 'roster.player'}).exec()
         
         console.log(atomicLineup)
        
@@ -361,28 +117,6 @@ class altABLRosterController extends BaseController{
         console.log("didn't find a lineup");
       }
       
-      
-      
-//       var lineup = await Lineup.findOne({ablTeam: new ObjectId(teamId)}).populate('roster.player priorRosters.roster.player').exec();
-//       if (lineup) {
-//         if (new Date(lineup.effectiveDate) <= gmDate) {
-//           console.log("Found current roster")
-//           return lineup.roster;
-
-//         } else {
-//           var sortedPR = lineup.priorRosters.sort(function(a, b) {
-//             return (new Date(b.effectiveDate) - new Date(a.effectiveDate));
-//           })
-//           for (var s = sortedPR.length - 1; s >= 0; s--) {
-//             if (sortedPR[s].effectiveDate < gmDate) {
-//               console.log("Found old roster")
-//               return (sortedPR[s].roster);
-//             }
-//           }
-//         }
-//       } else {
-//         console.log("didn't find a lineup");
-//       }
     } catch (err) {
       console.error(`Error in _getRosterForTeamAndDate2:${err}`);
     }
@@ -624,60 +358,10 @@ class altABLRosterController extends BaseController{
    
   }
   
-  async _addPlayerToTeam(req, res, next) {
-    try {
-      var mlbPlayer = await MlbPlayer.findById(req.body._id);
-      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup', onRoster: true};
-      var savedMlbPlayer = await mlbPlayer.save()
-      var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
-      var existingLineupRec = await Lineup.findOne({ablTeam: req.params.id});
-      if (existingLineupRec) {
-        var priorLineupRec = {
-          effectiveDate: existingLineupRec.effectiveDate,
-          roster: existingLineupRec.roster
-        }
-        existingLineupRec.priorRosters.push(priorLineupRec);
-        existingLineupRec.effectiveDate = new Date();
-
-        existingLineupRec.roster.push({
-          player: mlbPlayer._id,
-          lineupPosition: req.body.position,
-          rosterOrder: existingLineupRec.roster.length + 1
-        });
-
-        var savedExistingLineupRec = await existingLineupRec.save();
-        console.log(savedExistingLineupRec);
-        console.log(savedMlbPlayer);
-        return res.send({player: savedMlbPlayer, roster: savedExistingLineupRec});
-        
-      } else {
-
-        const RR = new Lineup({
-          ablTeam: new ObjectId(req.params.id),
-          roster: [{
-            player: mlbPlayer._id,
-            lineupPosition: req.body.position,
-            rosterOrder: 1
-          }],
-          effectiveDate: new Date(),
-          priorRosters: []
-        });
-        
-        var savedRR = await RR.save();
-        console.log(savedRR);
-        return res.send({player: savedMlbPlayer, roster: savedRR});
-        
-      }
-    } catch(err) {
-      return res.status(500).send({message : err.message})
-    }
-   
-  }
   
   async _draftPlayersToTeam(req, res, next) {
     try {
       // expecting an array in req.body...
-      
       
       var roster = []
       
@@ -741,12 +425,6 @@ class altABLRosterController extends BaseController{
   }
 }
 
-//  app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
-//  app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
-//  app.put('/api3/lineup_roster/:id', jwtCheck, AblRosterController._newUpdateLineup);
-//  app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
-  
 
 
-
-module.exports = {/*AblRosterController: AblRosterController,*/ altABLRosterController: altABLRosterController}
+module.exports = ABLRosterController

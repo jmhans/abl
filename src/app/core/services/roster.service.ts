@@ -75,16 +75,7 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
-  
-  updateRosterRecord$(lineupId: string, lineup: SubmitLineup ): Observable<LineupCollectionModel> {
-    return this.http
-      .put<LineupCollectionModel>(`${this.base_api}lineup_roster/${lineupId}`, lineup, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
+
   createRosterRecord$(ablTeam: string, lineup: SubmitLineup): Observable<LineupCollectionModel> {
     var submitlineup = {
       ablTeam: ablTeam, 
@@ -99,7 +90,7 @@ export class RosterService {
           catchError((error) => this._handleError(error))
         );
   }
-  updateRosterRecord2$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
+  updateRosterRecord$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
     
     return this.http
         .put<LineupModel>(`${this.base_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
