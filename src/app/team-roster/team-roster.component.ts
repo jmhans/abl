@@ -26,11 +26,11 @@ const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   styleUrls: ['./team-roster.component.scss']
 })
 export class TeamRosterComponent implements OnInit {
-  @Input() lineupId: string;
   @Input() lineup: LineupFormModel;
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
-  @Output() updated = new EventEmitter<{success: boolean, data?: LineupModel, err?: string}>();
+  @Output() dropPlyr = new EventEmitter<{playerId: string}>(); 
+  @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
   
   formLineup: LineupFormModel;
   
@@ -45,6 +45,20 @@ export class TeamRosterComponent implements OnInit {
   
   dropLineupRecord(event: CdkDragDrop<any>) {
     moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
+  }
+  
+  lineupDirty(): boolean {
+    for (var j =0; j<this.lineup.roster.length; j++) {
+      var rr = this.lineup.roster[j]
+      if (rr.rosterOrder != (j+1) || rr.lineupPosition != this.originalLineup.roster[j].lineupPosition) {
+        return true
+      }
+
+    }
+  }
+  
+  _dropPlyr(playerId) {
+    this.dropPlyr.emit({playerId: playerId});
   }
   
   _getSubmitRoster() {
@@ -64,32 +78,13 @@ export class TeamRosterComponent implements OnInit {
   
   
   _updateRosterRecord() {
-    const submitRoster = this._getSubmitRoster()
-    if (submitRoster) {
-      this.saveRosterRecordSub = this.rosterService
-        .updateRosterRecord$(this.lineupId, submitRoster)
-        .subscribe(
-          data => this._handleLineupSuccess(data),
-          err => this._handleUpdateError(err)
-      )      
-    }
+    
+     const submitRoster = this._getSubmitRoster()
+     if (submitRoster) {
+       this.update.emit({lineup: submitRoster})
+     }
 
   }
-  
-  private _handleLineupSuccess(res) {
-    this.updated.emit({success: true, data: res});
-  }
-  
-  private _handleUpdateError(err) {
-    console.error(err);
-    this.updated.emit({success: false, err: err});
-//    this.alerts.push({type:'danger', message:'Lineup not saved'});
-//    this.error = true;
-  }
-  
-  
-  
-  
   
 
   

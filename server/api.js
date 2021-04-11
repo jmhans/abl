@@ -75,10 +75,6 @@ module.exports = function(app, config) {
   app.delete('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._delete);
   app.get('/api3/teams', AblTeamController._getTeams);
   app.get('/api3/owners', AblTeamController._getOwners);
-  app.post('/api3/team/:id/addPlayer', jwtCheck, AblRosterController._addPlayerToTeam);
-  app.get('/api3/team/:id/lineup', jwtCheck, AblRosterController._getLineupForTeam);
-  app.put('/api3/lineup_roster/:id', jwtCheck, AblRosterController._newUpdateLineup);
-  app.get('/api3/team/:id/lineup/:dt', jwtCheck, AblRosterController._getLineupForTeamAndDate);
   app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
   app.delete('/api3/game/:id', jwtCheck, adminCheck, AblGameController._delete);
   

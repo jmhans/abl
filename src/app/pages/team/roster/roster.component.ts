@@ -37,14 +37,13 @@ export class RosterComponent implements OnInit, OnDestroy {
   paramSub: Subscription;
   roster_date: Date;
   roster_deadline: Date;
+  formDate: FormControl;
   roster_editable: boolean;
   edit_lineup: boolean;
   
-  create_lineup: boolean;
   active_roster : LineupModel;
-  active_roster_index: number = 0;
-  active_roster_is_current: boolean;
   lineupSub: Subscription;
+  saveRosterRecordSub: Subscription;
   loading: boolean;
   error: boolean;
   saveLineupSub: Subscription;
@@ -66,22 +65,22 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._routeSubs();
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     
-    
-  // option veriable
-  this.dlOptions = {
-    fieldSeparator: ',',
-    quoteStrings: '"',
-    decimalseparator: '.',
-    showLabels: false,
-    headers: [],
-    showTitle: false,
-    title: this.team.nickname,
-    useBom: false,
-    removeNewLines: true,
-    keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
-  };
-  
+    // option veriable
+    this.dlOptions = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalseparator: '.',
+      showLabels: false,
+      headers: [],
+      showTitle: false,
+      title: this.team.nickname,
+      useBom: false,
+      removeNewLines: true,
+      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
+    };
+
 
   }
   
@@ -101,12 +100,14 @@ export class RosterComponent implements OnInit, OnDestroy {
       .subscribe(queryParams => {
         this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
         this.roster_deadline = this.actualRosterEffectiveDate(this.roster_date)
+        this.formDate = new FormControl(this.roster_deadline)
+      
         this._getRosterRecords();
       });
   }
   
   actualRosterEffectiveDate(curDt) {
-    // var curDt = this.current_roster.effectiveDate
+    //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call. 
     
     var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + this.editTimeLimit)
@@ -141,7 +142,6 @@ export class RosterComponent implements OnInit, OnDestroy {
   
   
   _date_changed(ev) {
-    console.log(ev);
     
     this.router.navigate(
       [], 
@@ -151,10 +151,7 @@ export class RosterComponent implements OnInit, OnDestroy {
         queryParamsHandling: 'merge'
       });
   }
-  _createNew() {
-    this.create_lineup = !this.create_lineup;
-    this._set_Active_Roster(-1);
-  }
+
   
   
   _isAdmin() {
@@ -168,7 +165,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.loading = true;
     
     this.lineupSub = this.rosterService
-      .getLineupByTeamId$(this.team._id)
+      .getLineupForTeamAndDate$(this.team._id, this.roster_deadline)
       .subscribe(
         res => {
           this._handleLineupSuccess(res, false);
@@ -181,36 +178,16 @@ export class RosterComponent implements OnInit, OnDestroy {
      );
   }
   
-  _set_Active_Roster(idx) {
-    var i = 0;
-    if (this.roster_deadline < new Date(this.lineup.effectiveDate)) {
-      while (this.roster_deadline < new Date(this.lineup.priorRosters[i].effectiveDate) && i<this.lineup.priorRosters.length) {
-        i++
-      }
-      this.active_roster = this.lineup.priorRosters[i]
-      this.current_roster = new LineupFormModel(
-          this.lineup._id, 
-          this.active_roster._id, 
-          this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
-          this.active_roster.effectiveDate
-      );
-    } else {
+  _set_Active_Roster() { 
       this.active_roster = this.lineup
       this.current_roster = new LineupFormModel(
         this.lineup._id, 
-        null, 
+        this.active_roster._id, 
         this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
-        new Date()//this.roster_deadline
+        new Date(this.roster_deadline)
       );
-    }
-    
-    
-    
   }
 
-  toggleLineup(event : any) {
-    this._set_Active_Roster(event.value);
-  }
   
   ngOnDestroy() {
     this.lineupSub.unsubscribe();
@@ -218,10 +195,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.saveLineupSub.unsubscribe();
     }
   }
-  
-  dropLineupRecord(event: CdkDragDrop<any>) {
-    moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
-  }
+
   
   
   _getDLFile() {
@@ -257,14 +231,40 @@ export class RosterComponent implements OnInit, OnDestroy {
     a.remove();
   }
   
-  private _updateRoster(result) {
-    if (result.success) {
-      this._handleLineupSuccess(result.data, true);
-    } else {
-      this._handleUpdateError(result.err);
+  
+  private _createNewRoster(evt) {
+    if (evt.lineup) {
+    const newRec = {
+      ablTeam: this.team._id, 
+      roster: evt.lineup.roster, 
+      effectiveDate: evt.lineup.effectiveDate
+    }
+      
+      
+        // editing lineup for the roster_deadline date   
+      this.saveRosterRecordSub = this.rosterService
+        .updateRosterRecord$(this.team._id, newRec)
+        .subscribe(
+          data => this._handleLineupSuccess(data, true),
+          err => this._handleUpdateError(err)
+        )
+         
     }
   }
   
+  private _dropPlayer(evt) {
+    if (evt.playerId) {
+      this.saveRosterRecordSub = this.rosterService
+        .dropPlayerFromTeam$(this.team._id, evt.playerId)
+        .subscribe(
+          data => {if (data.success) {
+                this.router.navigate([])
+          }}, 
+          err => this._handleUpdateError(err)
+        
+      )
+    }
+  }
 
   
   private _handleLineupSuccess(res, update) {
@@ -274,7 +274,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
     }
     this.lineup = res;
-    this._set_Active_Roster(this.active_roster_index);
+    this._set_Active_Roster() //this.active_roster_index);
         
   }
   
@@ -288,38 +288,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   close(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
-  
-  formatLabel(lineup) {
-    
-    return (value: number)=> {
-      if (lineup) {
-        
-        const dt = new Date(value > 0 ? lineup.priorRosters[value-1]["effectiveDate"] : lineup.effectiveDate);
-        return  dt.toLocaleDateString()
-      } 
-      
-    }
 
-    
-  }
-  
-  
-  
-  rosterChanged () {
-  var diffs = false;
-    if (this.lineup) {
-      for (var j =0; j<this.lineup.roster.length; j++) {
-        if (
-          this.lineup.roster[j].rosterOrder != (j+1) ||
-          this.lineup.roster[j].originalPosition != this.lineup.roster[j].lineupPosition
-           ) {
-          return true;
-        }
-      }  
-    }
-    
-    return false;
-  }
   
   abl(plyrStats) { 
     return (plyrStats.hits * 25 + 
@@ -332,6 +301,53 @@ export class RosterComponent implements OnInit, OnDestroy {
             plyrStats.caughtStealing * (-7)  + 
             (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
   }
+  
+  
+  
+    download(){
+    this.downloadFile2(this._getDLFile(), this.dlFileName());
+  }
+
+  
+     downloadFile2(data, filename='data') {
+        let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']);
+        
+        let blob = new Blob(['\ufeff' + csvData], { type: 'text/csv;charset=utf-8;' });
+        let dwldLink = document.createElement("a");
+        let url = URL.createObjectURL(blob);
+        let isSafariBrowser = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
+        if (isSafariBrowser) {  //if Safari open in new window to save file with random filename.
+            dwldLink.setAttribute("target", "_blank");
+        }
+        dwldLink.setAttribute("href", url);
+        dwldLink.setAttribute("download", filename + ".csv");
+        dwldLink.style.visibility = "hidden";
+        document.body.appendChild(dwldLink);
+        dwldLink.click();
+        document.body.removeChild(dwldLink);
+    }
+
+    ConvertToCSV(objArray, headerList) {
+         let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+         let str = '';
+         let row = 'S.No,';
+
+         for (let index in headerList) {
+             row += headerList[index] + ',';
+         }
+         row = row.slice(0, -1);
+         str += row + '\r\n';
+         for (let i = 0; i < array.length; i++) {
+             let line = (i+1)+'';
+             for (let index in headerList) {
+                let head = headerList[index];
+
+                 line += ',' + array[i][head];
+             }
+             str += line + '\r\n';
+         }
+         return str;
+     }
   
   
 

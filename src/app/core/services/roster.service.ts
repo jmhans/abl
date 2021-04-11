@@ -45,6 +45,17 @@ export class RosterService {
       );
   }
   
+  getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
+    return this.http
+      .get<LineupModel>(`${this.base_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+ 
+  
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.http
       .post<LineupModel>(`${this.base_api}team/${ablTeamId}/addPlayer`, addPlayer, {
@@ -64,15 +75,42 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
-  
-  updateRosterRecord$(lineupId: string, lineup: SubmitLineup ): Observable<LineupCollectionModel> {
+
+  createRosterRecord$(ablTeam: string, lineup: SubmitLineup): Observable<LineupCollectionModel> {
+    var submitlineup = {
+      ablTeam: ablTeam, 
+      roster: lineup.roster, 
+      effectiveDate: new Date()
+    }  
     return this.http
-      .put<LineupCollectionModel>(`${this.base_api}lineup_roster/${lineupId}`, lineup, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
+        .post<LineupModel>(`${this.base_api}lineups`, submitlineup, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
   }
+  updateRosterRecord$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
+    
+    return this.http
+        .put<LineupModel>(`${this.base_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+  }
+  
+  dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
+    
+    return this.http
+        .get<any>(`${this.base_api}lineups/${ablTeamId}/drop/${plyr}`, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+  }
+  
 
 }

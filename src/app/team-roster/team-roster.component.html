@@ -1,3 +1,6 @@
+<button mdbBtn type="button" color="primary" outline="true" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
+
+
 <div cdkDropList class="example-list" 
      [cdkDropListDisabled] = !editable 
      (cdkDropListDropped)="dropLineupRecord($event)" 
@@ -15,9 +18,12 @@
     </select>
     
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
-    <span >
-      <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">Pickup</span>
+    <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
+      Pickup
+      <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
+
     </span>
+    
       {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.position}})
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
@@ -37,6 +43,3 @@
   </div>
 </div>
 
-<button mat-button (click)="_updateRosterRecord()" *ngIf="editable">
-  Update
-</button>
