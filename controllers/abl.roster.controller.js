@@ -307,15 +307,9 @@ class ABLRosterController extends BaseController{
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       
-      // If I explicitly have a lineup for today, update it and all futures...updateMany() with upsert = true will accommodate that. 
-      // If I do not have a lineup record for today, but do for future, I need to create one for today, and also update all future. updateMany() will work for all future, but won't create new for today. 
-      // If I do not have a lineup record for today or any future, I need to create one for today. updateMany() with upsert = true, as long as setOnInsert sets effDate correctly, but also need to set with most recent lineup, which is more difficult... 
 
       
-      // First, create one for today (without the new dude)
-      // Then, updateMany(). That will update all future, and also today. Upsert should not matter. 
-      
-      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date()) // need to modify to look for upcoming game date deadline.  
+      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date())  
       var rosterDeadline =  this.getRosterDeadline(new Date());
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
       
@@ -357,6 +351,54 @@ class ABLRosterController extends BaseController{
     }
    
   }
+  
+  async _dropPlayerFromTeamAllFutureRosters(req, res, next) {
+    
+    try {
+      console.log(req.params.plyr);
+      var mlbPlayer = await MlbPlayer.findById(req.params.plyr);
+      mlbPlayer.ablstatus = {ablTeam : null, acqType : null, onRoster: false};
+      var savedMlbPlayer = await mlbPlayer.save()
+      var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
+      
+      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date())  
+      var rosterDeadline =  this.getRosterDeadline(new Date());
+      var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
+      
+      if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
+        // Cool. Move on to update many
+        
+      } else {
+        // Create a new one first. Then, update many
+        
+        console.log("Creating new lineup where player is dropped")
+        console.log(new Date(mostRecent.effectiveDate))
+        console.log(yesterdayDeadline)
+        
+        var newLineup = await Lineup.create({
+          ablTeam: mostRecent.ablTeam,
+          roster: mostRecent.roster, 
+          effectiveDate: rosterDeadline
+        })
+        
+      }
+      
+      
+      var remList = await Lineup.updateMany({ablTeam: req.params.id, effectiveDate: {$gt: yesterdayDeadline}}, {$pull : {roster: {player: mlbPlayer._id}}})
+      console.log(`Removed ${mlbPlayer.name} from rosters`)
+      
+      return res.send({success: true});
+
+      
+    } catch(err) {
+      return res.status(500).send({message : err.message})
+    }
+   
+  }
+  
+  
+  
+  
   
   
   async _draftPlayersToTeam(req, res, next) {
@@ -421,6 +463,7 @@ class ABLRosterController extends BaseController{
     router.get('/' + this.routeString +  '/:id/date/:dt', (...args) => this._getLineupForTeamAndDate2(...args));
     router.put('/' + this.routeString + '/:id/date/:dt', (...args) => this._update(...args))
     router.put('/' + this.routeString + '/:id', (...args) => this._update(...args))
+    router.get('/' + this.routeString + '/:id/drop/:plyr', (...args) => this._dropPlayerFromTeamAllFutureRosters(...args))
     return router;
   }
 }

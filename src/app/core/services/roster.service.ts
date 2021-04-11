@@ -100,5 +100,17 @@ export class RosterService {
           catchError((error) => this._handleError(error))
         );
   }
+  
+  dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
+    
+    return this.http
+        .get<any>(`${this.base_api}lineups/${ablTeamId}/drop/${plyr}`, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+  }
+  
 
 }

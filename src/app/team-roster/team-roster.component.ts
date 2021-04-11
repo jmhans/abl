@@ -29,6 +29,7 @@ export class TeamRosterComponent implements OnInit {
   @Input() lineup: LineupFormModel;
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
+  @Output() dropPlyr = new EventEmitter<{playerId: string}>(); 
   @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
   
   formLineup: LineupFormModel;
@@ -56,6 +57,9 @@ export class TeamRosterComponent implements OnInit {
     }
   }
   
+  _dropPlyr(playerId) {
+    this.dropPlyr.emit({playerId: playerId});
+  }
   
   _getSubmitRoster() {
        

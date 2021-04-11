@@ -65,7 +65,7 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._routeSubs();
-    
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     
     // option veriable
     this.dlOptions = {
@@ -252,7 +252,19 @@ export class RosterComponent implements OnInit, OnDestroy {
     }
   }
   
-  
+  private _dropPlayer(evt) {
+    if (evt.playerId) {
+      this.saveRosterRecordSub = this.rosterService
+        .dropPlayerFromTeam$(this.team._id, evt.playerId)
+        .subscribe(
+          data => {if (data.success) {
+                this.router.navigate([])
+          }}, 
+          err => this._handleUpdateError(err)
+        
+      )
+    }
+  }
 
   
   private _handleLineupSuccess(res, update) {

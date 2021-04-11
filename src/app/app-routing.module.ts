@@ -56,7 +56,7 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'})],
   exports: [RouterModule], 
   providers: [
     AuthGuard,
