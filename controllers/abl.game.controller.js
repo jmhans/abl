@@ -24,7 +24,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 class statline {
   constructor(statline) {
-    this.plateAppearances = statline.baseOnBalls + statline.intentionalWalks + statline.atBats + statline.sacBunts + statline.sacFlies
+    
+    this.plateAppearances = (statline.bb  + statline.ab + statline.sac + statline.sf) || 0
   }
  
 }
@@ -122,7 +123,7 @@ class lineupArray extends Array {
         }); 
        var curPlyrRec;
     
-    
+        var playedType = (pos == 'XTRA') ? 'XTRA' : 'STARTER'
         while (posPAs < 2) {
           
           if (possibles.length > 0) {
@@ -136,17 +137,13 @@ class lineupArray extends Array {
               curPlyrRec.gameStatus = {playedPosition: pos, played: 'active', lineupOrder: this.active().length}
               curPlyrRec.playedPosition = pos
               curPlyrRec.ablstatus = 'active'
+              curPlyrRec.ablPlayedType = playedType
               curPlyrRec.lineupOrder = this.active().length
-              if (pos == "1B") {
-                console.log(`Trying to log curPlyr that played`)
-                console.log(curPlyrRec)
-              }
-              //nextPlyr.playedPosition = pos
-              //nextPlyr.ablstatus = 'active'
-              //nextPlyr.lineupOrder = this.active().length
-              
+              playedType = 'STARTER' ? 'SUB' : playedType
+  
               posPAs += new statline(curPlyrRec.dailyStats).plateAppearances; //this.plateAppearances(nextPlyr.dailyStats)
               posGs += curPlyrRec.dailyStats.g
+
             } 
             possibles.splice(0, 1); // First player has been evaluated. Remove him from list for next loop. 
             
@@ -377,9 +374,9 @@ var AblGameController = {
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
-        const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
+        const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(gm.gameDate));
        // console.log(lineup);
-        return lineup;
+        return lineup.roster;
       }));
 
           if (new Date(day) <= new Date()) {
@@ -469,7 +466,7 @@ var AblGameController = {
     })
 
     console.log(dailyStats.length + " stat records found.");
-    
+
     return lineups.map( (lineup) => {
       
       return lineup.map((plyr) => {

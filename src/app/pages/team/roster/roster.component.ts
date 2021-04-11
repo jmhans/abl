@@ -137,7 +137,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   }
   
   editable() {
-   return this._isTeamOwner() && ((new Date() < this.roster_deadline) || this.edit_lineup)
+   return (this._isTeamOwner() && (new Date() < this.roster_deadline)) || this.edit_lineup
   }
   
   

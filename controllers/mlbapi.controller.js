@@ -63,8 +63,8 @@ class altMlbApiController extends BaseController{
   
   async _loadGamesToDB(gamesList) {
     try {
-            gamesList.forEach((gm) => {
-
+      gamesList.forEach((gm) => {
+        
           var query = {
             'gamePk': gm.gamePk
           };
@@ -77,9 +77,11 @@ class altMlbApiController extends BaseController{
 
             //return res.send("succesfully saved");
           });
-        this.loadPlayersInGame(gm);
-
-        });
+        
+          if (gm.status.codedGameState != 'D') {
+            this.loadPlayersInGame(gm);    
+          }   
+      });
     } catch(err) {
       console.error(`Error in _loadGamesToDB: ${err}`)
     }
