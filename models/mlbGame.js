@@ -6,6 +6,8 @@ const mlbGameSchema = new Schema({
   gameType: { type: String, required: true}, 
   season: {type: String}, 
   gameDate: { type: String, required: true}, 
+  officialDate: { type: String, required: false}, 
+  rescheduleDate: { type: String, required: false}, 
   teams: {type: Schema.Types.Mixed, required: true},
   //gameNumber: {type:Number},
   //doubleHeader: {type:String},

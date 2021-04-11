@@ -54,20 +54,19 @@ class StatlineController extends BaseController {
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
       var query = {
         'mlbId': plyr.person.id, 
-        'gameDate': gm.gameDate, 
-        'gamePk': gm.gamePk, 
+        'gamePk': gm.gamePk
         
       }
       
        var _statline = {
                 mlbId: plyr.person.id,
-                gameDate: gm.gameDate, 
+                gameDate: gm.rescheduleDate || gm.gameDate, 
                 gamePk: gm.gamePk, 
                 stats: plyr.stats,
                 positions: shortPositions
               };
       try {
-        const doc = await this.model.findOneAndUpdate(query, _statline, { upsert: true });
+        const doc = await this.model.updateMany(query, _statline, { upsert: true });
         return doc;
       } catch (err) {
         console.error(`Error in _updateStatline:${err}`);

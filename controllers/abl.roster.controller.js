@@ -110,7 +110,7 @@ class ABLRosterController extends BaseController{
       
       if (atomicLineup) {
         
-        console.log(atomicLineup)
+        //console.log(atomicLineup)
        
         return atomicLineup[0]
       } else {
@@ -118,7 +118,7 @@ class ABLRosterController extends BaseController{
       }
       
     } catch (err) {
-      console.error(`Error in _getRosterForTeamAndDate2:${err}`);
+      console.error(`Error in _getRosterForTeamAndDate:${err}`);
     }
 
   }
@@ -196,10 +196,10 @@ class ABLRosterController extends BaseController{
       var LineupRec = await this._getLineupById(req.params.id);
       if (LineupRec) {
         var updateRecord;
-        console.log(req.body._id);
+        
         if (!req.body._id) {
           // Create a new lineup rec within the existing one & shift the current to the prior list
-          console.log(req.body.effectiveDate);
+        
           var priorLineupRec = {
               effectiveDate: LineupRec.effectiveDate,
               roster: LineupRec.roster, 
@@ -313,7 +313,7 @@ class ABLRosterController extends BaseController{
       var rosterDeadline =  this.getRosterDeadline(new Date());
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
       
-      console.log(mostRecent.effectiveDate);
+
       
       if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
         // Cool. Move on to update many
@@ -355,7 +355,7 @@ class ABLRosterController extends BaseController{
   async _dropPlayerFromTeamAllFutureRosters(req, res, next) {
     
     try {
-      console.log(req.params.plyr);
+      
       var mlbPlayer = await MlbPlayer.findById(req.params.plyr);
       mlbPlayer.ablstatus = {ablTeam : null, acqType : null, onRoster: false};
       var savedMlbPlayer = await mlbPlayer.save()
@@ -372,8 +372,6 @@ class ABLRosterController extends BaseController{
         // Create a new one first. Then, update many
         
         console.log("Creating new lineup where player is dropped")
-        console.log(new Date(mostRecent.effectiveDate))
-        console.log(yesterdayDeadline)
         
         var newLineup = await Lineup.create({
           ablTeam: mostRecent.ablTeam,

@@ -24,7 +24,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 class statline {
   constructor(statline) {
-    this.plateAppearances = statline.baseOnBalls + statline.intentionalWalks + statline.atBats + statline.sacBunts + statline.sacFlies
+    
+    this.plateAppearances = (statline.bb  + statline.ab + statline.sac + statline.sf) || 0
   }
  
 }
@@ -68,10 +69,10 @@ class lineupArray extends Array {
     this.sort((a,b)=> {return (a.lineupOrder || Infinity) - (b.lineupOrder || Infinity)})
   }
   
-  regulationScore(homeTeam = false) {
+  regulationScore(homeTeam = false, oppErrors = 0) {
     return this.regulation().reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
+        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
           // Player played in DH or XTRA spot, so errors are not counted toward team total. 
           total.e += (curPlyr.dailyStats.e || 0);
         }
@@ -82,17 +83,17 @@ class lineupArray extends Array {
       
         // total.ab += (curPlyr.dailyStats.ab || 0);
         
-        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
+        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
       
       return total;
       
     }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0})
   }
   
-  finalScore(homeTeam = false) {
+  finalScore(homeTeam = false, oppErrors = 0) {
     return this.active().reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
+        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
           // Player played in DH or XTRA spot, so errors are not counted toward team total. 
           total.e += (curPlyr.dailyStats.e || 0);
         }
@@ -103,7 +104,7 @@ class lineupArray extends Array {
       
         // total.ab += (curPlyr.dailyStats.ab || 0);
         
-        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
+        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
       
       return total;
       
@@ -112,18 +113,18 @@ class lineupArray extends Array {
 
   
   
-  startNextPlayer(pos) {
+  startNextPlayer(pos, rosterPos = 99, starterOnly = false) {
 
-        var posPAs = 0;
-        var posGs = 0;
+        var posPAs = this.active().filter((p)=> {return p.ablRosterPosition == rosterPos}).reduce((total, cur)=> {return total + (new statline(cur.dailyStats).plateAppearances)}, 0);
+        var posGs = this.active().filter((p)=> {return p.ablRosterPosition == rosterPos}).reduce((total, cur)=> {return total + (cur.dailyStats.g || 0)},0 );
         
         var possibles = this.bench().filter((plyr)=> {
           return canPlayPosition(plyr.lineupPosition, pos)
         }); 
        var curPlyrRec;
     
-    
-        while (posPAs < 2) {
+        var playedType = (pos == 'XTRA') ? 'XTRA' : (posGs == 0 ? 'STARTER' : 'SUB')
+        while ( starterOnly ? (posGs < 1) :  (posPAs < 2) ) {
           
           if (possibles.length > 0) {
             var nextPlyr = possibles[0]
@@ -136,17 +137,14 @@ class lineupArray extends Array {
               curPlyrRec.gameStatus = {playedPosition: pos, played: 'active', lineupOrder: this.active().length}
               curPlyrRec.playedPosition = pos
               curPlyrRec.ablstatus = 'active'
+              curPlyrRec.ablPlayedType = playedType
+              curPlyrRec.ablRosterPosition = rosterPos
               curPlyrRec.lineupOrder = this.active().length
-              if (pos == "1B") {
-                console.log(`Trying to log curPlyr that played`)
-                console.log(curPlyrRec)
-              }
-              //nextPlyr.playedPosition = pos
-              //nextPlyr.ablstatus = 'active'
-              //nextPlyr.lineupOrder = this.active().length
-              
+              playedType = 'STARTER' ? 'SUB' : playedType
+  
               posPAs += new statline(curPlyrRec.dailyStats).plateAppearances; //this.plateAppearances(nextPlyr.dailyStats)
               posGs += curPlyrRec.dailyStats.g
+
             } 
             possibles.splice(0, 1); // First player has been evaluated. Remove him from list for next loop. 
             
@@ -169,7 +167,6 @@ class lineupArray extends Array {
     
     return this
   }
-  
   
 }
 
@@ -376,28 +373,33 @@ var AblGameController = {
       var homeScore = {regulation: {}, final: {}}; 
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
+      var homeErrors = {reg: 0, final: 0}
+      var awayErrors = {reg: 0, final: 0}
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
-        const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(day.toISOString()));
+        const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(gm.gameDate));
        // console.log(lineup);
-        return lineup;
+        return lineup.roster;
       }));
 
           if (new Date(day) <= new Date()) {
             // This game should be done by now. 
             
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
-             // console.log(lineups_with_stats)
-             // console.log(lineups_with_stats[1].find((p)=> {return p.player.name == "Max Muncy"}));
             
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
-            
-            homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-            awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
-            while (Math.abs(homeScore - awayScore) < 0.5) {
+              homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
+              awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+
+            homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
+            awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.reg) }; 
+            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) < 0.5) {
               lineups_with_starters[0].startNextPlayer("XTRA");  
               lineups_with_starters[1].startNextPlayer("XTRA"); 
-              homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-              awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+              homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
+              awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+
+              homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
+              awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.final) }; 
             }
             
             result = {
@@ -441,13 +443,43 @@ var AblGameController = {
   
   
   _getActiveStarters: function (lineups) {
-    return lineups.map((lineup) => {
+     return lineups.map((lineup) => {
       var newLineup = new lineupArray(...lineup)
 
       for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-        newLineup.startNextPlayer(ABL_STARTERS[starter]); // lineup = this._getNextRosterSpot(ABL_STARTERS[starter], lineup);
+        // Loop through position players first, placing only the first player into the spot.  
+        if(ABL_STARTERS[starter] != "DH" ) {
+          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
+        }
       }
+       
+      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH). 
+        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false); 
+      }
+       
+       
+      return newLineup
+    })  
+  },
+  
+  _getStartersOnly: function(lineups) {
+     return lineups.map((lineup) => {
+      var newLineup = new lineupArray(...lineup)
 
+      for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through position players first, placing only the first player into the spot.  
+        if(ABL_STARTERS[starter] != "DH" ) {
+          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
+        }
+      }
+       
+      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH). 
+        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false); 
+      }
+       
+       
       return newLineup
     })  
   },
@@ -469,7 +501,7 @@ var AblGameController = {
     })
 
     console.log(dailyStats.length + " stat records found.");
-    
+
     return lineups.map( (lineup) => {
       
       return lineup.map((plyr) => {

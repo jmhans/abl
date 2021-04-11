@@ -28,7 +28,7 @@
           <tbody *ngIf="status=='Final'">
             <tr  *ngFor="let player of roster | myfilter : true ; index as i" [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')">
               
-              <th scope="row">{{player.playedPosition}}</th>
+              <th scope="row">{{player.playedPosition}} | {{player.ablPlayedType}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
               <td>{{player.dailyStats ?  player.dailyStats.g : 0 }} </td>
               <td> {{player.dailyStats ?  player.dailyStats.ab : 0 }} </td>
