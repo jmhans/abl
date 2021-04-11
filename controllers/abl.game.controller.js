@@ -69,10 +69,10 @@ class lineupArray extends Array {
     this.sort((a,b)=> {return (a.lineupOrder || Infinity) - (b.lineupOrder || Infinity)})
   }
   
-  regulationScore(homeTeam = false) {
+  regulationScore(homeTeam = false, oppErrors = 0) {
     return this.regulation().reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
+        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
           // Player played in DH or XTRA spot, so errors are not counted toward team total. 
           total.e += (curPlyr.dailyStats.e || 0);
         }
@@ -83,17 +83,17 @@ class lineupArray extends Array {
       
         // total.ab += (curPlyr.dailyStats.ab || 0);
         
-        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
+        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
       
       return total;
       
     }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0})
   }
   
-  finalScore(homeTeam = false) {
+  finalScore(homeTeam = false, oppErrors = 0) {
     return this.active().reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
+        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
           // Player played in DH or XTRA spot, so errors are not counted toward team total. 
           total.e += (curPlyr.dailyStats.e || 0);
         }
@@ -104,7 +104,7 @@ class lineupArray extends Array {
       
         // total.ab += (curPlyr.dailyStats.ab || 0);
         
-        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
+        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
       
       return total;
       
@@ -373,6 +373,8 @@ var AblGameController = {
       var homeScore = {regulation: {}, final: {}}; 
       var awayScore = {regulation: {}, final: {} }; 
       var result = {};
+      var homeErrors = {reg: 0, final: 0}
+      var awayErrors = {reg: 0, final: 0}
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
         const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(gm.gameDate));
        // console.log(lineup);
@@ -385,14 +387,19 @@ var AblGameController = {
             var lineups_with_stats = await this._getStatsForLineups(lineups, day);
             
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
-            
-            homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-            awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
-            while (Math.abs(homeScore - awayScore) < 0.5) {
+              homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
+              awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+
+            homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
+            awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.reg) }; 
+            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) < 0.5) {
               lineups_with_starters[0].startNextPlayer("XTRA");  
               lineups_with_starters[1].startNextPlayer("XTRA"); 
-              homeScore = {regulation: lineups_with_starters[0].regulationScore(true), final: lineups_with_starters[0].finalScore(true) }; 
-              awayScore = {regulation: lineups_with_starters[1].regulationScore(false), final: lineups_with_starters[1].finalScore(false) }; 
+              homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
+              awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+
+              homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
+              awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.final) }; 
             }
             
             result = {
