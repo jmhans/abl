@@ -240,7 +240,7 @@ var AblGameController = {
         20 * (retObj["3b"] || 0) + 
         30 * (retObj.hr || 0) + 
         10 * (retObj.bb || 0) + 
-        10 * (retObj.ibb || 0)+ 
+        //10 * (retObj.ibb || 0)+ 
         10 * (retObj.hbp || 0) + 
         7 * (retObj.sb - retObj.cs || 0) + 
         5 * (retObj.sac + retObj.sf || 0);
