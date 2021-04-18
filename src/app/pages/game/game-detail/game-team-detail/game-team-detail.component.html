@@ -25,8 +25,14 @@
 
             </tr>
           </thead>
-          <tbody *ngIf="status=='Final'">
-            <tr  *ngFor="let player of roster | myfilter : true ; index as i" [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')">
+          <tbody *ngIf="status=='Final'"  
+                 cdkDropList
+                 #activeList="cdkDropList"
+                 [cdkDropListData]="active"
+                 [cdkDropListConnectedTo]="[benchList]"
+                 (cdkDropListDropped)="drop($event)">
+    
+            <tr  *ngFor="let player of active ; index as i"  cdkDrag [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')">
               
               <th scope="row">{{player.playedPosition}} | {{player.ablPlayedType}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
@@ -90,9 +96,15 @@
 
 
           </tbody>
-            <tbody *ngIf="showBench || status != 'Final'" >
+            <tbody *ngIf="showBench || status != 'Final'" 
+                   cdkDropList
+                  #benchList="cdkDropList"
+                  [cdkDropListData]="bench"
+                  [cdkDropListConnectedTo]="[activeList]"
+                  (cdkDropListDropped)="drop($event)"
+                   >
               
-            <tr *ngFor="let player of roster | myfilter : false ; index as i" [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')">
+            <tr *ngFor="let player of bench; index as i" [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')">
               
               <th scope="row">{{player.playedPosition || (status == 'Final' ? "B" : player.lineupPosition)}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input  } from '@angular/core';
 import { WavesModule } from 'angular-bootstrap-md';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 
 
 interface ablgameScore {
@@ -45,11 +46,12 @@ interface gameTeam {
 
 export class GameTeamDetailComponent implements OnInit {
 
-  @Input() roster: gameTeam ;
+  @Input() roster: any[]; // gameTeam ;
   @Input() teamScore: ablgameScore;
   @Input() status: string;
   showBench: boolean = false;
-  
+  active: any[];
+  bench: any[];
   
 
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
@@ -57,6 +59,14 @@ export class GameTeamDetailComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.active = this.roster.filter((p)=> {return p.ablstatus == 'active'});
+    this.bench = this.roster.filter((p)=> {return p.ablstatus != 'active'})
+    
+    
+  }
+  
+  drop(evt) {
+    console.log(evt)
   }
 
 }
