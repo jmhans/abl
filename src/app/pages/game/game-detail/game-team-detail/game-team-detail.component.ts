@@ -1,6 +1,6 @@
 import { Component, OnInit, Input  } from '@angular/core';
 import { WavesModule } from 'angular-bootstrap-md';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, CdkDragEnter, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 
 
 interface ablgameScore {
@@ -52,6 +52,8 @@ export class GameTeamDetailComponent implements OnInit {
   showBench: boolean = false;
   active: any[];
   bench: any[];
+  dragTarget: any;
+  dragging: boolean;
   
 
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
@@ -65,8 +67,28 @@ export class GameTeamDetailComponent implements OnInit {
     
   }
   
-  drop(evt) {
-    console.log(evt)
+  drop(event: CdkDragDrop<string[]>) {
+        if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data,
+                        event.container.data,
+                        event.previousIndex,
+                        event.currentIndex);
+    }
+    console.log(this.active)
+    
+    console.log(this.roster)
   }
+  enter(event: CdkDragEnter<string[]>) {
+    
+    
+  }
+  toggleDrag( ) {
+    
+    this.dragging = !this.dragging
+    console.log(`Dragging: ${this.dragging}`)
+  }
+  
 
 }
