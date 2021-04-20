@@ -1,7 +1,7 @@
       <div >
 
         
-        <table class="table table-responsive table-sm">
+        <table mdbTable class="table table-responsive table-sm">
           <thead>
             <tr>
               
@@ -29,15 +29,15 @@
                      cdkDropList
                   [cdkDropListData]="active"
                   (cdkDropListDropped)="drop($event)"
-                 [ngClass]="{'higlight-border': dragging }"
+
                  >
     
             <tr  *ngFor="let player of active ; index as i"  cdkDrag [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')"
-                (cdkDragStarted)="toggleDrag()"
-                (cdkDragEnded)="toggleDrag()"
+                (cdkDragStarted)="toggleDrag('active')"
+                (cdkDragEnded)="toggleDrag('')"
                 
                 >
-              <div class="example-custom-placeholder" *cdkDragPlaceholder>Move Player Here</div>
+              <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
               <th scope="row">{{player.playedPosition}} | {{player.ablPlayedType}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
               <td>{{player.dailyStats ?  player.dailyStats.g : 0 }} </td>
@@ -100,18 +100,37 @@
 
 
           </tbody>
-            <tbody 
-          cdkDropList 
-          [cdkDropListData]="bench"
-        (cdkDropListEntered)="enter($event)"
-          (cdkDropListDropped)="drop($event)"
-                         >
-            <tr *ngFor="let player of bench; index as i" cdkDrag [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')" ></tr>
-          </tbody>
+
+            <div
+                 cdkDropList 
+                 [cdkDropListData]="bench"
+                 (cdkDropListEntered)="enter($event)"
+                 (cdkDropListDropped)="drop($event)" 
+                 [ngClass]="{'highlight-border': dragging  && dragSource == 'active'}">
+              Move to bench
+            </div>
             </ng-container>
           <ng-container>
-          <tbody *ngIf="showBench || status != 'Final'" >
-            <tr *ngFor="let player of roster | myfilter : false  ; index as i" cdkDrag [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')" >
+            <div
+                 cdkDropList 
+                 [cdkDropListData]="active"
+                 (cdkDropListEntered)="enter($event)"
+                 (cdkDropListDropped)="drop($event)" 
+                 [ngClass]="{'highlight-border': dragging && dragSource == 'bench' }">
+              Move to Active Lineup
+            </div>
+            
+          <tbody 
+                 *ngIf="status=='Final'"
+                     cdkDropList
+                  [cdkDropListData]="bench"
+                 (cdkDropListEntered)="enter($event)"
+                 (cdkDropListDropped)="drop($event)" 
+                 class="table table-responsive table-sm">
+            <tr *ngFor="let player of bench ; index as i" cdkDrag 
+                (cdkDragStarted)="toggleDrag('bench')"
+                (cdkDragEnded)="toggleDrag('')"
+                [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')" >
               
               <th scope="row">{{player.playedPosition || (status == 'Final' ? "B" : player.lineupPosition)}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>

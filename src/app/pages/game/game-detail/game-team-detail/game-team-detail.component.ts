@@ -54,6 +54,7 @@ export class GameTeamDetailComponent implements OnInit {
   bench: any[];
   dragTarget: any;
   dragging: boolean;
+  dragSource: string;
   
 
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
@@ -78,15 +79,16 @@ export class GameTeamDetailComponent implements OnInit {
     }
     console.log(this.active)
     
-    console.log(this.roster)
+    
   }
   enter(event: CdkDragEnter<string[]>) {
     
     
   }
-  toggleDrag( ) {
+  toggleDrag(dragSource: string ) {
     
     this.dragging = !this.dragging
+    this.dragSource = dragSource
     console.log(`Dragging: ${this.dragging}`)
   }
   
