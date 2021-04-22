@@ -60,7 +60,7 @@ class StatlineController extends BaseController {
       
        var _statline = {
                 mlbId: plyr.person.id,
-                gameDate: gm.rescheduleDate || gm.gameDate, 
+                gameDate: gm.officialDate ? (new Date(gm.officialDate + "T12:00:00")).toISOString() : gm.gameDate, 
                 gamePk: gm.gamePk, 
                 stats: plyr.stats,
                 positions: shortPositions
