@@ -87,7 +87,7 @@ class lineupArray extends Array {
       
       return total;
       
-    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0})
+    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0, opp_e: oppErrors})
   }
   
   finalScore(homeTeam = false, oppErrors = 0) {
@@ -108,7 +108,7 @@ class lineupArray extends Array {
       
       return total;
       
-    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0})
+    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0, opp_e: oppErrors})
   }
   nextRosterPos() {
     return this.active().reduce((tot, cur)=> {return Math.max(cur.rosterPos, tot)}, 0)+1

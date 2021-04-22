@@ -1,7 +1,7 @@
       <div >
 
-        
-        <table mdbTable class="table table-responsive table-sm">
+        <ng-container  cdkDropListGroup>
+        <table class="table table-responsive table-sm table-editable">
           <thead>
             <tr>
               
@@ -20,16 +20,16 @@
               <th scope="col" > SB </th>
               <th scope="col" > CS </th>
               <th scope="col" > ERR </th>
+              <th scope="col" > ABLPts </th>
               <th scope="col" >  Runs </th>
 
             </tr>
           </thead>
-          <ng-container  cdkDropListGroup>
+          
           <tbody *ngIf="status=='Final'"
                      cdkDropList
                   [cdkDropListData]="active"
                   (cdkDropListDropped)="drop($event)"
-
                  >
     
             <tr  *ngFor="let player of active ; index as i"  cdkDrag [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')"
@@ -39,23 +39,78 @@
                 >
               <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
               <th scope="row">{{player.playedPosition}} | {{player.ablPlayedType}}</th>
-              <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
-              <td>{{player.dailyStats ?  player.dailyStats.g : 0 }} </td>
-              <td> {{player.dailyStats ?  player.dailyStats.ab : 0 }} </td>
-              <td> {{player.dailyStats ?  player.dailyStats.h : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats['2b'] : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats['3b'] : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.hr : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.bb: 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.hbp : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sac : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sf : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.sb : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.cs : 0 }} </td>
-              <td >{{player.dailyStats ?  player.dailyStats.e : 0 }} </td>
+              <td>
+                <span contenteditable="true" (blur)="updateList(i, player.player, 'name', $event)" (mousedown)="$event.stopPropagation()">{{player.player.name}}</span> <small> ({{player.player.position}} - {{player.player.team}})</small></td>
+              <td>
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'g', $event)" (mousedown)="$event.stopPropagation()">{{player.dailyStats ?  player.dailyStats.g : 0 }} </span>
+              </td>
+              <td> 
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'ab', $event, true)" (mousedown)="$event.stopPropagation()">
+                {{player.dailyStats ?  player.dailyStats.ab : 0 }} 
+                </span>
+              </td>
+              <td> 
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'h', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.h : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, '2b', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats['2b'] : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, '3b', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats['3b'] : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'hr', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.hr : 0 }}
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'bb', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.bb: 0 }}
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'hbp', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.hbp : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sac', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.sac : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sf', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.sf : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sb', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.sb : 0 }}
+                </span> 
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'cs', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.cs : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'e', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.e : 0 }} 
+                </span>
+              </td>
+              <td >{{player.dailyStats ?  player.dailyStats.abl_score?.abl_points : 0 }} </td>
               <td >{{(player.dailyStats ?  player.dailyStats.abl_score?.abl_runs : 0) | number:'1.2-2' }} </td>
 
             </tr>
+
+          </tbody>
+            <tbody>
             <tr>
               <td scope="row" colspan =2>Regulation Totals</td>
               <td><em> {{teamScore.regulation?.g }} </em> </td>
@@ -71,6 +126,7 @@
               <td ><em>{{teamScore ?  teamScore.regulation?.sb : 0 }} </em></td>
               <td ><em>{{teamScore ?  teamScore.regulation?.cs : 0 }}</em> </td>
               <td ><em>{{teamScore ?  teamScore.regulation?.e : 0 }}</em> </td>
+              <td >{{teamScore ?  teamScore.regulation?.abl_points : 0 }} </td>
               <td ><em>{{(teamScore ? teamScore.regulation?.abl_runs : 0) | number:'1.2-2' }}</em> </td>
             </tr>
             <tr>
@@ -88,6 +144,7 @@
               <th >{{teamScore ?  teamScore.final?.sb : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.cs : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.e : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.abl_points : 0 }} </th>
               <th >{{(teamScore ? teamScore.final?.abl_runs : 0) | number:'1.2-2' }} </th>
             </tr>
             <tr>
@@ -97,41 +154,20 @@
                 </button>
               </th>
             </tr>
-
-
-          </tbody>
-
-            <div
-                 cdkDropList 
-                 [cdkDropListData]="bench"
-                 (cdkDropListEntered)="enter($event)"
-                 (cdkDropListDropped)="drop($event)" 
-                 [ngClass]="{'highlight-border': dragging  && dragSource == 'active'}">
-              Move to bench
-            </div>
-            </ng-container>
-          <ng-container>
-            <div
-                 cdkDropList 
-                 [cdkDropListData]="active"
-                 (cdkDropListEntered)="enter($event)"
-                 (cdkDropListDropped)="drop($event)" 
-                 [ngClass]="{'highlight-border': dragging && dragSource == 'bench' }">
-              Move to Active Lineup
-            </div>
-            
+            </tbody>
           <tbody 
                  *ngIf="status=='Final'"
                      cdkDropList
                   [cdkDropListData]="bench"
                  (cdkDropListEntered)="enter($event)"
-                 (cdkDropListDropped)="drop($event)" 
-                 class="table table-responsive table-sm">
+                 (cdkDropListDropped)="drop($event)" >
             <tr *ngFor="let player of bench ; index as i" cdkDrag 
                 (cdkDragStarted)="toggleDrag('bench')"
                 (cdkDragEnded)="toggleDrag('')"
                 [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')" >
               
+              <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
+
               <th scope="row">{{player.playedPosition || (status == 'Final' ? "B" : player.lineupPosition)}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
               <td>{{ player.dailyStats?.g }} </td>
@@ -147,16 +183,17 @@
               <td >{{ player.dailyStats?.sb  }} </td>
               <td >{{ player.dailyStats?.cs  }} </td>
               <td >{{ player.dailyStats?.e  }} </td>
+              <td >{{ player.dailyStats?.abl_score?.abl_points }} </td>
               <td >{{ player.dailyStats?.abl_score?.abl_runs  | number:'1.2-2' }} </td>
 
             </tr>
 
           </tbody>  
-          </ng-container>
             <tfoot>
 
           </tfoot>
         </table>
+          </ng-container>
 
         
         
