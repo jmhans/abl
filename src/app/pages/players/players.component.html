@@ -1,44 +1,10 @@
-<!--  <div *ngFor="let tm of (userContext.teams$ | async)">
-              {{tm | json}}
-            </div> -->
+
 
 <h3>
    Players
 </h3>
 
-<!-- <mat-card class="example-result-card" *ngIf='playerList'>
-  <mat-card-content>
-        <section>
-          <mat-slide-toggle
-              class="example-margin"
-              [color]="primary"
-              [checked]="false"
-              [disabled]="!_isAdmin()"
-              [(ngModel)]="draftMode">
-            Draft Mode (Admin only) {{draftMode}}
-          </mat-slide-toggle>
-        </section>
-  </mat-card-content>
-</mat-card> -->
 
-
-<!--  <mat-select [(ngModel)]="draftTeam">
-   <mat-option *ngFor="let tm of (formData | async) " [value]="tm">{{tm.nickname}}</mat-option>   
-   
- </mat-select>
-
-{{draftTeam | json}}
-
-  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addSelectedToTeam()" *ngIf="draftMode">
-          <mdb-icon fas icon="user-plus"></mdb-icon>
-        </button>
-  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_updateSelectionsWithOverride(draftTeam.nickname)" *ngIf="draftMode">
-          Update selections for team
-        </button>
-
-  <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="takenPlayers(!showTaken)" *ngIf="draftMode">
-          Show Taken
-        </button> -->
 
 
 
@@ -48,6 +14,17 @@
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'All'; updateTakenPlayers('all')">All</button>
 </div>
 
+<mat-slide-toggle
+          
+          color="primary"
+          checked="false"
+          [(ngModel)] = "adminMode"
+          >
+        Admin Mode
+      </mat-slide-toggle>
+
+{{adminMode}}
+  <button type="button" *ngIf="adminMode" class="btn btn-link" data-mdb-color="dark" (click)="openDialog()">Open</button>
 
 
 

@@ -23,6 +23,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatDialogModule} from '@angular/material/dialog';
+
 
 import { HttpClientModule }    from '@angular/common/http';
 
@@ -91,6 +93,8 @@ import { MyFilterPipe } from './core/pipes/filter.pipe';
 import { StandingsComponent } from './pages/standings/standings.component';
 //import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
+import { LocalMaterialModule } from './core/local-material-module/local-material.module';
+
 
 @NgModule({
   declarations: [
@@ -130,35 +134,37 @@ import { StandingsComponent } from './pages/standings/standings.component';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSelectModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatCardModule,
-    MatSortModule,
-    MatSliderModule,
-    MatSlideToggleModule,
+//    MatSelectModule,
+//    MatTableModule,
+//    MatPaginatorModule,
+//    MatCardModule,
+//    MatSortModule,
+//    MatSliderModule,
+//    MatSlideToggleModule,
     MatFormFieldModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatInputModule,
+//    MatDatepickerModule,
+//    MatNativeDateModule,
+//    MatDialogModule,
+//    MatInputModule,
     FlexLayoutModule,
     HttpClientModule,
     OwnersModule,
     AppRoutingModule, 
     BrowserAnimationsModule, 
     DataTablesModule, 
-    DragDropModule,
+//    DragDropModule,
     NgbModule,
-    MatButtonModule,
-    MatTabsModule,
+//    MatButtonModule,
+//    MatTabsModule,
     ButtonsModule, 
     WavesModule, 
     CollapseModule,
     IconsModule,
     TableModule,
-    MatCheckboxModule ,
+//    MatCheckboxModule ,
     Angular2CsvModule,
     MatButtonToggleModule,
+    LocalMaterialModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,

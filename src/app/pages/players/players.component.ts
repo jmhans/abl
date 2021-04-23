@@ -1,5 +1,5 @@
 // src/app/pages/player/players.component.ts
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild , Inject} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -16,7 +16,13 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
+import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
+
+export interface DialogData {
+  animal: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-players',
@@ -48,10 +54,15 @@ export class PlayersComponent implements OnInit, OnDestroy {
   showTaken: boolean = false;
   filterGroup: any = {value: 'showAll'};
   showPlayers: string;
+  adminMode: boolean = false; 
   
   overrideData: any[];
   dataSub: Subscription;
 
+  animal: string;
+  name: string;
+  
+  
   
   displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
@@ -77,7 +88,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
               public fs: FilterSortService, 
               private rosterService: RosterService, 
               private auth: AuthService, 
-              public userContext: UserContextService) { }
+              public userContext: UserContextService,
+              public dialog: MatDialog
+              ) { }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
@@ -202,7 +215,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
   
   
   _addPlayerToTeam(plyr) {
-      this.rosterUpdateSub = this.rosterService
+     this.rosterUpdateSub = this.rosterService
         .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
         .subscribe(
           data => this._handleSubmitSuccess(data, plyr),
@@ -272,6 +285,19 @@ export class PlayersComponent implements OnInit, OnDestroy {
     
   }
   
+   
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+      width: '250px',
+      data: {name: this.name, animal: this.animal}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
+  }
+  
 
   ngOnDestroy() {
     this.playerListSub.unsubscribe();
@@ -287,3 +313,21 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
 }
+
+@Component({
+  selector: 'dialog-overview-example-dialog',
+  templateUrl: 'playerAddDialog.html',
+})
+export class DialogOverviewExampleDialog {
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+}
+
+
