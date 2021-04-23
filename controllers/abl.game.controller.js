@@ -172,7 +172,7 @@ class lineupArray extends Array {
   
 }
 
-const ABL_STARTERS = ['1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF', 'C', 'DH']
+const ABL_STARTERS = ['1B', '2B',  'SS','3B', 'OF', 'OF', 'OF', 'C', 'DH']
 
 var AblGameController = {
 
