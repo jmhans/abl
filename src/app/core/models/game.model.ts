@@ -33,6 +33,10 @@ interface PopulatedGameModel {
     homeTeamRoster?: PopulatedRoster[]
     results?: GameResultsModel
 }
+
+
+
+
 interface GameResultsModel  {
         status: string
         scores: {team: string, location: string, regulation: {}, final: {}  }[] 
@@ -42,4 +46,4 @@ interface GameResultsModel  {
       }
 
 
-export { GameModel, FormGameModel, PopulatedGameModel, GameResultsModel  };
+export { GameModel, FormGameModel, PopulatedGameModel, GameResultsModel };

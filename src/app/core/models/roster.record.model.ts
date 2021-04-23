@@ -41,10 +41,24 @@ interface rosterGameScoreRecord {
 interface gameRosters {
   away_score: rosterGameScoreRecord
   home_score: rosterGameScoreRecord
-  awayTeam: {}
-  homeTeam: {}
+  awayTeam: [playerModel]
+  homeTeam: [playerModel]
   status: string
   result: {winner: {}, loser: {}}
 }
 
-export { RosterRecordModel, CreateRosterRecordModel, rosterScoreRecord, rosterGameScoreRecord, gameRosters };
+
+interface playerModel {
+  player?: {}
+  lineupPosition?: string
+  rosterOrder?: Number
+  dailyStats?: {}
+  gameStatus?: {}
+  playedPosition?: string
+  ablstatus?: string
+  ablPlayedType?: string
+  ablRosterPosition?: Number
+  lineupOrder?: Number
+}
+
+export { RosterRecordModel, CreateRosterRecordModel, rosterScoreRecord, rosterGameScoreRecord, gameRosters, playerModel };
