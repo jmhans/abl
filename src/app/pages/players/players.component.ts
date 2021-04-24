@@ -54,7 +54,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
   showTaken: boolean = false;
   filterGroup: any = {value: 'showAll'};
   showPlayers: string;
-  adminMode: boolean = false; 
+  advancedMode: boolean = false; 
   
   overrideData: any[];
   dataSub: Subscription;
@@ -215,12 +215,37 @@ export class PlayersComponent implements OnInit, OnDestroy {
   
   
   _addPlayerToTeam(plyr) {
+    
+    if (this.advancedMode) {
+      const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+        width: '250px',
+        data: {name: this.name, animal: this.animal}
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        this.animal = result;
+        console.log(this.animal)
+        this.rosterUpdateSub = this.rosterService
+        .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
+        .subscribe(
+          data => this._handleSubmitSuccess(data, plyr),
+          err => this._handleSubmitError(err)
+        );  
+        
+        
+      });
+    } else {
+       
      this.rosterUpdateSub = this.rosterService
         .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
         .subscribe(
           data => this._handleSubmitSuccess(data, plyr),
           err => this._handleSubmitError(err)
-        );
+        );  
+    }
+    
+ 
   }
 
    _addSelectedToTeam(tm) {
@@ -287,15 +312,12 @@ export class PlayersComponent implements OnInit, OnDestroy {
   
    
   openDialog(): void {
-    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      width: '250px',
-      data: {name: this.name, animal: this.animal}
-    });
+    
+    if (this.advancedMode) {
+      
+    }
+    
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.animal = result;
-    });
   }
   
 

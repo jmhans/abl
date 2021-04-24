@@ -1,0 +1,55 @@
+<!-- src/app/pages/game/game-detail/game-detail.component.html -->
+
+<ng-container>
+<!-- <div class="card-body">
+  <h2 class="card-title text-center mb-0">    <strong>When:</strong>{{ game.gameDate | date : "mediumDate"}}</h2>
+  
+</div>
+<hr /> -->
+  <mat-card>
+  <mat-card-header>
+    <mat-card-title><strong>When: </strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-title>
+    <mat-card-subtitle>
+      <div *ngIf="rosters">
+        Winner: {{rosters.result?.winner?.nickname}}
+      </div>
+    </mat-card-subtitle>
+    
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="d-flex table-responsive" *ngIf="rosters">
+      <span class="p-1 boxscore flex-fill">        
+        Away Team:<strong> {{game.awayTeam.nickname}}</strong>
+        <app-game-team-detail  [roster]="rosters.awayTeam" [teamScore]="rosters.away_score" [status]="rosters.status"></app-game-team-detail>   
+      </span>
+      <span class="p-1 boxscore flex-fill">
+        Home Team:<strong> {{game.homeTeam.nickname}}</strong>
+        <app-game-team-detail  [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"  [status]="rosters.status"></app-game-team-detail>   
+      </span>
+      
+    </div>
+  </mat-card-content>
+  <mat-card-actions *ngIf="rosters && rosters.status == 'Final'">
+    <button *ngIf="_rawScores(game.results.scores) != _rawScores(_getGameResult().scores)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
+      <mdb-icon far icon="save"></mdb-icon> Save Results
+    </button>
+    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
+      <i class="far fa-check-square"></i> Attest to Boxscore
+    </button>
+    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+      <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+  
+
+
+
+<div *ngIf="auth.isAdmin" class="card-footer text-right small">
+  <!-- To do: create an /admin/game/update route and service
+  <a [routerLink]="['/admin/game/update', game._id]">Edit</a> -->
+  Edit
+</div>
+ </ng-container>

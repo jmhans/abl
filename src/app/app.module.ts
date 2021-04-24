@@ -2,28 +2,12 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AuthModule } from '@auth0/auth0-angular';
-
 import { AUTH_CONFIG } from './auth/auth.config';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {MatCardModule} from '@angular/material/card';
-import {MatSelectModule} from '@angular/material/select';
-import {MatTableModule} from '@angular/material/table';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSortModule} from '@angular/material/sort';
-import {MatSliderModule} from '@angular/material/slider';
-import { MatCheckboxModule } from '@angular/material/checkbox'; 
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import {MatTabsModule} from '@angular/material/tabs';
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatDialogModule} from '@angular/material/dialog';
 
 
 import { HttpClientModule }    from '@angular/common/http';
@@ -79,6 +63,7 @@ import { TeamFormComponent } from './pages/admin/team-form/team-form.component';
 import { CreateTeamComponent } from './pages/admin/create-team/create-team.component';
 import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.component';
 import { PlayersComponent } from './pages/players/players.component';
+import { DialogOverviewExampleDialog } from './pages/players/players.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { RosterFormComponent } from './pages/admin/roster-form/roster-form.component';
 import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-form.component';
@@ -127,48 +112,49 @@ import { LocalMaterialModule } from './core/local-material-module/local-material
     UpdateTeamComponent,
     TeamFormComponent,
     CreateTeamComponent, 
-    DeleteTeamComponent, PlayersComponent, ManageRostersComponent, RosterFormComponent, OwnerFormComponent, GameFormComponent, CreateGameComponent, UpdateGameComponent, DeleteGameComponent, PlayerGameLineComponent, TeamRosterComponent, GameTeamDetailComponent, MyFilterPipe, TeamGameComponent, StandingsComponent
-    //, LineupFormComponent
+    DeleteTeamComponent, 
+    PlayersComponent, 
+    ManageRostersComponent, 
+    RosterFormComponent, 
+    OwnerFormComponent, 
+    GameFormComponent, 
+    CreateGameComponent, 
+    UpdateGameComponent, 
+    DeleteGameComponent, 
+    PlayerGameLineComponent, 
+    TeamRosterComponent, 
+    GameTeamDetailComponent, 
+    MyFilterPipe, 
+    TeamGameComponent, 
+    StandingsComponent,
+    DialogOverviewExampleDialog
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-//    MatSelectModule,
-//    MatTableModule,
-//    MatPaginatorModule,
-//    MatCardModule,
-//    MatSortModule,
-//    MatSliderModule,
-//    MatSlideToggleModule,
     MatFormFieldModule,
-//    MatDatepickerModule,
-//    MatNativeDateModule,
-//    MatDialogModule,
-//    MatInputModule,
     FlexLayoutModule,
     HttpClientModule,
     OwnersModule,
     AppRoutingModule, 
     BrowserAnimationsModule, 
     DataTablesModule, 
-//    DragDropModule,
     NgbModule,
-//    MatButtonModule,
-//    MatTabsModule,
     ButtonsModule, 
     WavesModule, 
     CollapseModule,
     IconsModule,
     TableModule,
-//    MatCheckboxModule ,
     Angular2CsvModule,
-    MatButtonToggleModule,
     LocalMaterialModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,
       clientId: AUTH_CONFIG.CLIENT_ID,
     })
+  ], 
+  entryComponents: [
+    DialogOverviewExampleDialog
   ],
   providers: [ 
     Title, 
