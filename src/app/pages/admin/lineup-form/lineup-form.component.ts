@@ -97,7 +97,7 @@ export class LineupFormComponent implements OnInit, OnDestroy {
     this.submitRosterRec = this._getSubmitObj();
 
       this.submitRosterSub = this.rosterService
-        .addPlayertoTeam$(this.submitRosterRec.player, this.submitRosterRec.ablTeamId)
+        .addPlayertoTeam$({player: this.submitRosterRec.player}, this.submitRosterRec.ablTeamId)
         .subscribe(
           data => this._handleSubmitSuccess(data),
           err => this._handleSubmitError(err)

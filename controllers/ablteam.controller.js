@@ -133,38 +133,5 @@ var AblTeamController = {
 }
 
 
-// class AblTeamControllerNew extends BaseController {
-  
-//   constructor() {
-//     super(AblTeam, 'ablteams');
-    
-//   }
-  
-//   async _getGamesForTeam(tmId) {
-//     try {
-
-          
-
-//       if (dateItem) {
-//         gamesList = dateItem.games
-//         this._loadGamesToDB(gamesList);
-//       }
-//       return gamesList
-      
-//     } catch(err) {
-//       console.error(`Error in _getGames: ${err}`)
-//     }
-//   }
- 
-//   route() {
-//     router.get('/' + this.routeString, (...args) => this._get(...args));
-//     router.post('/' + this.routeString , (...args) => this._create(...args));
-//     router.get('/' + this.routeString + '/:id', (...args) => this._getOne(...args));
-//     router.put('/' + this.routeString + '/:id', (...args) => this._update(...args));
-//     router.delete('/' + this.routeString + '/:id', (...args) => this._delete(...args));
-//     return router;
-//   }
-// }
-
 
 module.exports = AblTeamController

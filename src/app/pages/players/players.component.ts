@@ -17,11 +17,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-
+import {FormControl} from '@angular/forms';
 
 export interface DialogData {
-  animal: string;
-  name: string;
+  team: AblTeamModel;
+  player: string;
+  effective_date: Date;
 }
 
 @Component({
@@ -145,19 +146,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       );
   }
   
-//   private _getTeamList() {
-    
-//     this.teamListSub = this.api
-//       .getAblTeams$()
-//       .subscribe(
-//         res => {
-//           this.teamList = res;
-//         },
-//         err => {
-//           console.error(err);
-//         }
-//       );
-//   }
+
   
   
   
@@ -219,26 +208,27 @@ export class PlayersComponent implements OnInit, OnDestroy {
     if (this.advancedMode) {
       const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
         width: '250px',
-        data: {name: this.name, animal: this.animal}
+        data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date()}
       });
 
       dialogRef.afterClosed().subscribe(result => {
         console.log('The dialog was closed');
-        this.animal = result;
-        console.log(this.animal)
-        this.rosterUpdateSub = this.rosterService
-        .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
-        .subscribe(
-          data => this._handleSubmitSuccess(data, plyr),
-          err => this._handleSubmitError(err)
-        );  
+        console.log(result)
         
-        
+        if (result) {
+          this.rosterUpdateSub = this.rosterService
+          .addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString()}, result.team._id)
+          .subscribe(
+            data => this._handleSubmitSuccess(data, plyr),
+            err => this._handleSubmitError(err)
+          );           
+        }
+ 
       });
     } else {
        
      this.rosterUpdateSub = this.rosterService
-        .addPlayertoTeam$(plyr, this.ownerPrimaryTeam._id)
+        .addPlayertoTeam$({player: plyr}, this.ownerPrimaryTeam._id)
         .subscribe(
           data => this._handleSubmitSuccess(data, plyr),
           err => this._handleSubmitError(err)
@@ -341,14 +331,33 @@ export class PlayersComponent implements OnInit, OnDestroy {
   templateUrl: 'playerAddDialog.html',
 })
 export class DialogOverviewExampleDialog {
-
-  constructor(
+date = new FormControl(new Date());
+teamList$ = this.api.getAblTeams$()
+  
+  
+  constructor(public api: ApiService, 
     public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 
   onNoClick(): void {
     this.dialogRef.close();
   }
+  
+//   private _getTeamList() {
+    
+//     this.teamListSub = this.api
+//       .getAblTeams$()
+//       .subscribe(
+//         res => {
+//           this.teamList = res;
+//         },
+//         err => {
+//           console.error(err);
+//         }
+//       );
+//   }
+  
+  
 
 }
 

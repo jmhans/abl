@@ -1,12 +1,28 @@
-<h1 mat-dialog-title>Hi {{data.name}}</h1>
+<h1 mat-dialog-title>Pick up {{data.player}}</h1>
 <div mat-dialog-content>
-  <p>What's your favorite animal?</p>
+  <p>Fill in pickup details</p>
   <mat-form-field>
-    <mat-label>Favorite Animal</mat-label>
-    <input matInput [(ngModel)]="data.animal">
+  <mat-label>Team</mat-label>
+    <mat-select placeholder="Team" [(ngModel)]="data.team" name="food">
+      <mat-option *ngFor="let tm of (teamList$ | async)" [value]="tm">
+        {{tm.nickname}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  
+  
+  
+  <mat-form-field>
+    <mat-label>Effective Date</mat-label>
+    
+    <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="data.effective_date">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+    
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
 </div>
