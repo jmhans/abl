@@ -51,6 +51,8 @@ export class GameTeamDetailComponent implements OnInit {
   @Input() oppScore: ablgameScore;
   @Input() homeTeam: boolean;
   @Input() status: string;
+  @Input() editable: boolean;
+  
   showBench: boolean = false;
   active: any[];
   bench: any[];

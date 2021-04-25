@@ -35,6 +35,7 @@ export class GameDetailComponent {
   loading: boolean;
   error: boolean;
   gameResultsObj:GameResultsModel ;
+  editable: boolean = false
   
   constructor(
     public utils: UtilsService,
