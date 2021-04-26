@@ -302,15 +302,15 @@ class ABLRosterController extends BaseController{
   async _addPlayerToTeamAllFutureRosters(req, res, next) {
     
     try {
-      var mlbPlayer = await MlbPlayer.findById(req.body._id);
+      var mlbPlayer = await MlbPlayer.findById(req.body.player._id);
       mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup', onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       
-
+      var firstDate = req.body.effective_date ? new Date(req.body.effective_date) : new Date()
       
-      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date())  
-      var rosterDeadline =  this.getRosterDeadline(new Date());
+      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, firstDate)  
+      var rosterDeadline =  this.getRosterDeadline(firstDate);
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
       
 
@@ -333,7 +333,7 @@ class ABLRosterController extends BaseController{
       for (var i = 0; i<allToUpdate.length; i++) {
         allToUpdate[i].roster.push({
           player: mlbPlayer._id, 
-          lineupPosition: req.body.position, 
+          lineupPosition: req.body.player.position, 
           rosterOrder: allToUpdate[i].roster.length + 1
         })
         

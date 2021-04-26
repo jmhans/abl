@@ -172,7 +172,7 @@ class lineupArray extends Array {
   
 }
 
-const ABL_STARTERS = ['1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF', 'C', 'DH']
+const ABL_STARTERS = ['1B', '2B',  'SS','3B', 'OF', 'OF', 'OF', 'C', 'DH']
 
 var AblGameController = {
 
@@ -242,7 +242,7 @@ var AblGameController = {
         20 * (retObj["3b"] || 0) + 
         30 * (retObj.hr || 0) + 
         10 * (retObj.bb || 0) + 
-        10 * (retObj.ibb || 0)+ 
+        //10 * (retObj.ibb || 0)+ 
         10 * (retObj.hbp || 0) + 
         7 * (retObj.sb - retObj.cs || 0) + 
         5 * (retObj.sac + retObj.sf || 0);

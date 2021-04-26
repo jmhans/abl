@@ -1,5 +1,4 @@
-// src/app/pages/game/game-detail/game-detail.component.ts
-import { Component, Input ,ViewChild} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AuthService } from './../../../auth/auth.service';
 import { UtilsService } from './../../../core/utils.service';
 import { GameModel, PopulatedGameModel , GameResultsModel} from './../../../core/models/game.model';
@@ -10,25 +9,22 @@ import { AblGameService } from './../../../core/services/abl-game.service';
 import { RosterService } from './../../../core/services/roster.service';
 import { Subscription, interval, Observable, from, of } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import {GameTeamDetailComponent} from './game-team-detail/game-team-detail.component';
+
+
+
   interface potentialSL {
     tm: string
     plyrs: StatlineModel[]
   }
 
-
 @Component({
-  selector: 'app-game-detail',
-  templateUrl: './game-detail.component.html',
-  styleUrls: ['./game-detail.component.scss']
+  selector: 'app-game-override',
+  templateUrl: './game-override.component.html',
+  styleUrls: ['./game-override.component.scss']
 })
+export class GameOverrideComponent {
 
-
-export class GameDetailComponent {
-  @ViewChild('awayChild') awayChild: GameTeamDetailComponent;
-  @ViewChild('homeChild') homeChild: GameTeamDetailComponent;
-
-  @Input() game: GameModel;
+@Input() game: GameModel;
   rosters: gameRosters;
   potentialStatlines: object;
   statsSub: Subscription;
@@ -36,8 +32,7 @@ export class GameDetailComponent {
   submitSub: Subscription;
   loading: boolean;
   error: boolean;
-  gameResultsObj:GameResultsModel ;
-  editable: boolean = false
+  gameResultsObj: GameResultsModel;
   
   constructor(
     public utils: UtilsService,
@@ -129,15 +124,7 @@ export class GameDetailComponent {
     return this.game.results.attestations.find((a)=> { return this.auth.userProfile.sub == a.attester})
   }
   
-  _updateScore($evt, team) {
-    if (team == "home") {
-      this.rosters.home_score = $evt
-    //  this.awayChild.updateTeamScore(true)
-    } else {
-      this.rosters.away_score = $evt
-     // this.homeChild.updateTeamScore(true)
-    }
-  }
+  
   
   ngOnDestroy() {
    // this.RosterSub.unsubscribe();
@@ -148,3 +135,5 @@ export class GameDetailComponent {
 
 
 }
+
+

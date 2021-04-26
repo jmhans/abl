@@ -14,35 +14,18 @@
         Winner: {{rosters.result?.winner?.nickname}}
       </div>
     </mat-card-subtitle>
-    <mat-slide-toggle
-          class="example-margin"
-          color="primary"
-          [(ngModel)]="editable">
-        Edit Mode
-      </mat-slide-toggle>
+    
   </mat-card-header>
 
   <mat-card-content>
     <div class="d-flex table-responsive" *ngIf="rosters">
       <span class="p-1 boxscore flex-fill">        
         Away Team:<strong> {{game.awayTeam.nickname}}</strong>
-        <app-game-team-detail  
-                              [roster]="rosters.awayTeam" 
-                              [teamScore]="rosters.away_score" 
-                              [oppScore]="rosters.home_score" 
-                              homeTeam="false" 
-                              [status]="rosters.status" 
-                              [editable]="editable"
-                              (updateScore)="_updateScore($event, 'away')"
-                              #awayChild>
-        </app-game-team-detail>   
+        <app-game-team-detail  [roster]="rosters.awayTeam" [teamScore]="rosters.away_score" [status]="rosters.status"></app-game-team-detail>   
       </span>
       <span class="p-1 boxscore flex-fill">
         Home Team:<strong> {{game.homeTeam.nickname}}</strong>
-        <app-game-team-detail  [roster]="rosters.homeTeam" 
-                              [teamScore]="rosters.home_score"  
-                              [oppScore]="rosters.away_score" homeTeam="true" [status]="rosters.status" [editable]="editable" 
-                              (updateScore)="_updateScore($event, 'home')" #homeChild></app-game-team-detail>   
+        <app-game-team-detail  [roster]="rosters.homeTeam" [teamScore]="rosters.home_score"  [status]="rosters.status"></app-game-team-detail>   
       </span>
       
     </div>
