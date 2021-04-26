@@ -1,4 +1,4 @@
-import { Component, OnInit, Input , Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input , Output, EventEmitter, SimpleChanges, SimpleChange, OnChanges} from '@angular/core';
 import { WavesModule } from 'angular-bootstrap-md';
 import {CdkDragDrop, CdkDragEnter, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { playerModel } from './../../../../core/models/roster.record.model';
@@ -63,8 +63,27 @@ export class GameTeamDetailComponent implements OnInit {
   dragging: boolean;
   dragSource: string;
   editField: string;
-  regulation_score = ()=>this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e )
+  regulation_score = ()=> { if (this.active) {
+    return this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e 
+                      )}}
   final_score = ()=>this.score(this.active,  this.oppScore.final.e )
+      
+    ngOnChanges(changes: SimpleChanges) {
+      
+      if (changes.roster) {
+        this.active = this.roster.filter((p)=> {return p.ablstatus == 'active'});
+        this.bench = this.roster.filter((p)=> {return p.ablstatus != 'active'})
+      }
+      
+      if (changes.oppScore) {
+        this.updateTeamScore(true);
+      }
+//        this.doSomething(changes.categoryId.currentValue);
+        // You can also use categoryId.previousValue and 
+        // categoryId.firstChange for comparing old and new values
+        
+    }
+  
   
 
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
@@ -72,8 +91,7 @@ export class GameTeamDetailComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.active = this.roster.filter((p)=> {return p.ablstatus == 'active'});
-    this.bench = this.roster.filter((p)=> {return p.ablstatus != 'active'})
+
     
     
   }
@@ -183,6 +201,7 @@ export class GameTeamDetailComponent implements OnInit {
   
   
   score(playerList, oppErrors = 0) {
+    if (playerList) {
     return playerList.reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
         if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
@@ -202,5 +221,6 @@ export class GameTeamDetailComponent implements OnInit {
       
       }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0 , opp_e: oppErrors})
   }
+    }
     
 }

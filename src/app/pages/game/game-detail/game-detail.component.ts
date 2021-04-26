@@ -132,10 +132,10 @@ export class GameDetailComponent {
   _updateScore($evt, team) {
     if (team == "home") {
       this.rosters.home_score = $evt
-      this.awayChild.updateTeamScore(true)
+    //  this.awayChild.updateTeamScore(true)
     } else {
       this.rosters.away_score = $evt
-      this.homeChild.updateTeamScore(true)
+     // this.homeChild.updateTeamScore(true)
     }
   }
   

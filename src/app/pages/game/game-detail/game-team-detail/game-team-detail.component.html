@@ -27,6 +27,7 @@
           
           <tbody *ngIf="status=='Final'"
                      cdkDropList
+                 [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="active"
                   (cdkDropListDropped)="drop($event)"
                  >
@@ -53,67 +54,67 @@
                 <span *ngIf="!editable"> {{player.ablPlayedType}} </span>
               </th>
               <td>
-                <span contenteditable="true" (blur)="updateList(i, player.player, 'name', $event)" (mousedown)="$event.stopPropagation()">{{player.player.name}}</span> <small> ({{player.player.position}} - {{player.player.team}})</small></td>
+                <span [contentEditable]="editable" (blur)="updateList(i, player.player, 'name', $event)" (mousedown)="$event.stopPropagation()">{{player.player.name}}</span> <small> ({{player.player.position}} - {{player.player.team}})</small></td>
               <td>
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'g', $event)" (mousedown)="$event.stopPropagation()">{{player.dailyStats ?  player.dailyStats.g : 0 }} </span>
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'g', $event)" (mousedown)="$event.stopPropagation()">{{player.dailyStats ?  player.dailyStats.g : 0 }} </span>
               </td>
               <td> 
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'ab', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'ab', $event, true)" (mousedown)="$event.stopPropagation()">
                 {{player.dailyStats ?  player.dailyStats.ab : 0 }} 
                 </span>
               </td>
               <td> 
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'h', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'h', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.h : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, '2b', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, '2b', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats['2b'] : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, '3b', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, '3b', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats['3b'] : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'hr', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'hr', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.hr : 0 }}
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'bb', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'bb', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.bb: 0 }}
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'hbp', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'hbp', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.hbp : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sac', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sac', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.sac : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sf', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sf', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.sf : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'sb', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sb', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.sb : 0 }}
                 </span> 
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'cs', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'cs', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.cs : 0 }} 
                 </span>
               </td>
               <td >
-                <span contenteditable="true" (blur)="updateList(i, player.dailyStats, 'e', $event, true)" (mousedown)="$event.stopPropagation()">
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'e', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.e : 0 }} 
                 </span>
               </td>
@@ -171,6 +172,7 @@
           <tbody 
                  *ngIf="status=='Final'"
                      cdkDropList
+                 [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="bench"
                  (cdkDropListEntered)="enter($event)"
                  (cdkDropListDropped)="drop($event)" >
