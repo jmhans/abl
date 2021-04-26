@@ -1,4 +1,4 @@
-import { Component, OnInit, Input  } from '@angular/core';
+import { Component, OnInit, Input , Output, EventEmitter} from '@angular/core';
 import { WavesModule } from 'angular-bootstrap-md';
 import {CdkDragDrop, CdkDragEnter, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { playerModel } from './../../../../core/models/roster.record.model';
@@ -52,6 +52,9 @@ export class GameTeamDetailComponent implements OnInit {
   @Input() homeTeam: boolean;
   @Input() status: string;
   @Input() editable: boolean;
+  @Output() updateScore = new EventEmitter<ablgameScore>(); 
+
+  
   
   showBench: boolean = false;
   active: any[];
@@ -152,8 +155,12 @@ export class GameTeamDetailComponent implements OnInit {
     changeStatValue(id: number, property: string, event: any) {
       this.editField = event.target.textContent;
     }
-  updateTeamScore() {
+  updateTeamScore(external:boolean = false) {
     this.teamScore = {regulation : this.regulation_score(), final: this.final_score()}
+    if (!external) {
+      this.updateScore.emit(this.teamScore);
+    }
+    
   }
   
   updateScoreForPlyr (stats) {

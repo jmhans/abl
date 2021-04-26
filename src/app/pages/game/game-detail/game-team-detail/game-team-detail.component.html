@@ -1,5 +1,4 @@
       <div >
-        <span>Editable: {{editable}}</span>
         <ng-container  cdkDropListGroup>
         <table class="table table-responsive table-sm table-editable table-full">
           <thead>
@@ -40,15 +39,16 @@
               <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
               <th scope="row">
                 <span *ngIf="editable">
-                  <mat-select [(value)]="player.playedPosition">
-                    <mat-option *ngFor="let pos of ['1B', '2B', 'SS', '3B', 'OF', 'C', 'DH', 'XTRA']" [value]="pos">{{pos}}</mat-option>
-                  </mat-select>
+                  <select [(ngModel)]="player.playedPosition"> 
+                      <option *ngFor="let pos of ['1B', '2B', 'SS', '3B', 'OF', 'C', 'DH', 'XTRA']" [value]="pos" >{{pos}}</option> 
+                  </select> 
                    </span>
                 <span *ngIf="!editable">{{player.playedPosition}} </span>|
                 <span *ngIf="editable">
-                  <mat-select [(value)]="player.ablPlayedType">
-                    <mat-option *ngFor="let playType of ['STARTER', 'SUB', 'XTRA']" [value]="playType">{{playType}}</mat-option>
-                  </mat-select>
+                  <select [(ngModel)]="player.ablPlayedType"> 
+                      <option *ngFor="let playType of ['STARTER', 'SUB', 'XTRA']" [value]="playType" >{{playType}}</option> 
+                  </select> 
+
                    </span>
                 <span *ngIf="!editable"> {{player.ablPlayedType}} </span>
               </th>

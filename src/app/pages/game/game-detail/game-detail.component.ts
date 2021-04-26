@@ -1,5 +1,5 @@
 // src/app/pages/game/game-detail/game-detail.component.ts
-import { Component, Input } from '@angular/core';
+import { Component, Input ,ViewChild} from '@angular/core';
 import { AuthService } from './../../../auth/auth.service';
 import { UtilsService } from './../../../core/utils.service';
 import { GameModel, PopulatedGameModel , GameResultsModel} from './../../../core/models/game.model';
@@ -10,7 +10,7 @@ import { AblGameService } from './../../../core/services/abl-game.service';
 import { RosterService } from './../../../core/services/roster.service';
 import { Subscription, interval, Observable, from, of } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-
+import {GameTeamDetailComponent} from './game-team-detail/game-team-detail.component';
   interface potentialSL {
     tm: string
     plyrs: StatlineModel[]
@@ -25,7 +25,9 @@ import { map, mergeMap } from 'rxjs/operators';
 
 
 export class GameDetailComponent {
-  
+  @ViewChild('awayChild') awayChild: GameTeamDetailComponent;
+  @ViewChild('homeChild') homeChild: GameTeamDetailComponent;
+
   @Input() game: GameModel;
   rosters: gameRosters;
   potentialStatlines: object;
@@ -127,7 +129,15 @@ export class GameDetailComponent {
     return this.game.results.attestations.find((a)=> { return this.auth.userProfile.sub == a.attester})
   }
   
-  
+  _updateScore($evt, team) {
+    if (team == "home") {
+      this.rosters.home_score = $evt
+      this.awayChild.updateTeamScore(true)
+    } else {
+      this.rosters.away_score = $evt
+      this.homeChild.updateTeamScore(true)
+    }
+  }
   
   ngOnDestroy() {
    // this.RosterSub.unsubscribe();
