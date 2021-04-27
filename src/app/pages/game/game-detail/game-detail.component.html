@@ -30,7 +30,7 @@
                               [roster]="rosters.awayTeam" 
                               [teamScore]="rosters.away_score" 
                               [oppScore]="rosters.home_score" 
-                              homeTeam="false" 
+                              [homeTeam]="false" 
                               [status]="rosters.status" 
                               [editable]="editable"
                               (updateScore)="_updateScore($event, 'away')"
@@ -41,7 +41,7 @@
         Home Team:<strong> {{game.homeTeam.nickname}}</strong>
         <app-game-team-detail  [roster]="rosters.homeTeam" 
                               [teamScore]="rosters.home_score"  
-                              [oppScore]="rosters.away_score" homeTeam="true" [status]="rosters.status" [editable]="editable" 
+                              [oppScore]="rosters.away_score" [homeTeam]="true" [status]="rosters.status" [editable]="editable" 
                               (updateScore)="_updateScore($event, 'home')" #homeChild></app-game-team-detail>   
       </span>
       

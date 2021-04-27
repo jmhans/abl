@@ -170,7 +170,7 @@
             </tr>
             </tbody>
           <tbody 
-                 *ngIf="status=='Final'"
+                 *ngIf="status=='Final' && showBench"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="bench"
