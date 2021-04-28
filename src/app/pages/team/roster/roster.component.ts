@@ -78,7 +78,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       title: this.team.nickname,
       useBom: false,
       removeNewLines: true,
-      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
+      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID', 'dougstatsName']
     };
 
 
@@ -205,7 +205,8 @@ export class RosterComponent implements OnInit, OnDestroy {
         playerTeam: p.player.team, 
         mlbID: p.player.mlbID, 
         lineupPosition: p.lineupPosition, 
-        rosterOrder: p.rosterOrder
+        rosterOrder: p.rosterOrder,
+        dougstatsName: p.player.dougstatsName || p.player.name
     }})
   }
  
@@ -310,7 +311,7 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   
      downloadFile2(data, filename='data') {
-        let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']);
+        let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID', 'dougstatsName']);
         
         let blob = new Blob(['\ufeff' + csvData], { type: 'text/csv;charset=utf-8;' });
         let dwldLink = document.createElement("a");
