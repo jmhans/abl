@@ -80,7 +80,10 @@ class altMlbApiController extends BaseController{
         
           if (gm.status.codedGameState != 'D') {
             this.loadPlayersInGame(gm);    
-          }   
+          }
+        
+        
+        
       });
     } catch(err) {
       console.error(`Error in _loadGamesToDB: ${err}`)
