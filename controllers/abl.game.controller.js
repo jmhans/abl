@@ -394,7 +394,7 @@ var AblGameController = {
 
             homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
             awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.reg) }; 
-            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) < 0.5) {
+            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) <= 0.5) {
               
               lineups_with_starters[0].startNextPlayer("XTRA", lineups_with_starters[0].nextRosterPos() , false );  
               lineups_with_starters[1].startNextPlayer("XTRA",lineups_with_starters[1].nextRosterPos() , false); 

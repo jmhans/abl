@@ -63,11 +63,28 @@ class StatlineController extends BaseController {
                 gameDate: gm.officialDate ? (new Date(gm.officialDate + "T12:00:00")).toISOString() : gm.gameDate, 
                 gamePk: gm.gamePk, 
                 stats: plyr.stats,
-                positions: shortPositions
+                positions: shortPositions,
+                statlineType: gm.status.detailedState
               };
       try {
-        const doc = await this.model.updateMany(query, _statline, { upsert: true });
-        return doc;
+        const doc = await this.model.find(query);
+        if (doc) {
+          // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc. 
+          if (doc.statlineType == "Suspended") {
+            // Leave the existing one. Create a new one with supplemental stats only. 
+            _statline.stats = await this._getStatlineDiff(plyr.stats, doc.stats)
+            _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
+            query = {
+              'mlbId': plyr.person.id,
+              'gamePk' : gm.gamePk,
+              'gameDate': gm.gameDate // Modify the query so it won't replace the existing doc. 
+            }
+          }
+        } 
+        const doc2 = await this.model.updateMany(query, _statline, { upsert: true });
+          return doc2;
+        
+        
       } catch (err) {
         console.error(`Error in _updateStatline:${err}`);
       }
@@ -75,6 +92,29 @@ class StatlineController extends BaseController {
 
     }  
   }
+  
+  async _getStatlineDiff(fullStat, partialStat) {
+    var ret = {batting: {}, fielding: {}, pitching: {}}
+    
+    Object.keys(fullStat.batting).forEach((prop)=> {
+      if (typeof(fullStat.batting[prop]) == "number") {
+              ret.batting[prop] = fullStat.batting[prop] - partialStat.batting[prop]
+        }
+    })
+    Object.keys(fullStat.fielding).forEach((prop)=> {
+      if (typeof(fullStat.fielding[prop]) == "number") {
+        ret.fielding[prop] = fullStat.fielding[prop] - partialStat.fielding[prop]
+      }
+    })
+    Object.keys(fullStat.pitching).forEach((prop)=> {
+      if (typeof(fullStat.pitching[prop]) == "number") {
+        ret.pitching[prop] = fullStat.pitching[prop] - partialStat.pitching[prop]
+      }
+    })
+    return ret
+    
+  }
+  
   
   async _getStatsForDate(req, res, next) {
 
