@@ -1,0 +1,57 @@
+<h1 mat-dialog-title>Import CSV</h1>
+<span fxLayout="row">
+  <span *ngIf="includesHeaders">Content must contain fields (in any order) with the names "name" and "position" (other fields also acceptable). </span>
+  <span *ngIf="!includesHeaders">Content must not contain headers, and fields must be in the following order: position, name </span>
+  
+</span>
+<span fxLayout="row">
+<span mat-dialog-content  fxLayout="column" fxFlex="20" fxLayoutAlign="space-around start">
+  
+  <mat-checkbox [(ngModel)]="includesHeaders"
+                      color="primary"
+                      >
+          Data Includes Headers?
+        </mat-checkbox>
+  <mat-radio-group aria-label="Delimiter Type" [(ngModel)]="delimiterType">
+    <mat-radio-button value="comma">Comma</mat-radio-button>
+    <mat-radio-button value="tab">Tab</mat-radio-button>
+  </mat-radio-group>  
+  
+  
+</span>
+<span fxLayout="column" fxFlex="30">
+    <p>Paste in Content</p>
+
+  <mat-form-field class="example-full-width">
+    <textarea matInput placeholder="Enter CSV content" [(ngModel)]="csvLineupInput"></textarea>
+  </mat-form-field>
+  
+ </span>
+  <span fxLayout="column" fxFlex *ngIf="outputLineup">
+    Matched Players:
+    <span *ngFor="let plyr of outputLineup.roster" fxLayout="row" fxLayoutAlign="space-around start">
+      <span fxLayout="column">{{plyr.lineupPosition}}</span>
+      <span fxLayout="column">{{plyr.player.name}}</span>
+      <span fxLayout="column">{{plyr.player.mlbID}}</span>
+    </span>
+    
+    Errored Players:
+    <span *ngFor="let err of unmatchedPlayers" fxLayout="row" fxLayoutAlign="space-around start">
+      <span fxLayout="column">{{err | json}}</span>
+    </span>
+    
+  </span>
+  
+  
+</span>
+
+ <span fxLayout="row">
+ <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="submitCSV()"> Translate</button>
+
+  </span>
+
+  
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="outputLineup" cdkFocusInitial>Ok</button>
+</div>

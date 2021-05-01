@@ -79,7 +79,8 @@ import { StandingsComponent } from './pages/standings/standings.component';
 //import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 import { LocalMaterialModule } from './core/local-material-module/local-material.module';
-
+import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
+                                       
 
 @NgModule({
   declarations: [
@@ -127,7 +128,8 @@ import { LocalMaterialModule } from './core/local-material-module/local-material
     MyFilterPipe, 
     TeamGameComponent, 
     StandingsComponent,
-    DialogOverviewExampleDialog
+    DialogOverviewExampleDialog,
+    RosterImportComponent
   ],
   imports: [
     BrowserModule,
@@ -154,7 +156,8 @@ import { LocalMaterialModule } from './core/local-material-module/local-material
     })
   ], 
   entryComponents: [
-    DialogOverviewExampleDialog
+    DialogOverviewExampleDialog,
+    RosterImportComponent
   ],
   providers: [ 
     Title, 

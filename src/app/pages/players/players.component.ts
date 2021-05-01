@@ -342,20 +342,7 @@ teamList$ = this.api.getAblTeams$()
   onNoClick(): void {
     this.dialogRef.close();
   }
-  
-//   private _getTeamList() {
-    
-//     this.teamListSub = this.api
-//       .getAblTeams$()
-//       .subscribe(
-//         res => {
-//           this.teamList = res;
-//         },
-//         err => {
-//           console.error(err);
-//         }
-//       );
-//   }
+ 
   
   
 
