@@ -37,6 +37,49 @@ export class RosterImportComponent {
       try {
             // code that may throw an error...
               if (this.delimiterType == "comma" && (this.csvLineupInput.match(/,/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw "not enough commas"}
+              if (this.delimiterType == "comma" && (this.csvLineupInput.match(/\t/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw "not enough tabs"}
+        
+              var importContent = this.utils.CSVToArray(this.csvLineupInput, (this.delimiterType == "tab" ? "\t" : ","))
+              var outputArr = []
+              if(this.includesHeaders) {
+                for (var row = 1; row<importContent.length; row++) {
+                  var outputObj = null
+                  for (var idx =0; idx<importContent[0].length; idx++) {
+                    if (importContent[row][idx] && importContent[row][idx] != "") {
+                      outputObj = outputObj || {}
+                      outputObj[importContent[0][idx]] = importContent[row][idx]  
+                    }
+
+                  }
+                  if (outputObj) {
+                    outputArr.push(outputObj)  
+                  }
+
+                }
+              }
+              var outputRoster= [];
+              outputArr.forEach((item, index)=> {
+                var match = this.data.actualLineup.roster.find((plyr)=> {return plyr.player.name == item.name})
+
+
+                if (match) { 
+                 // match.lineupPosition = item.position
+                  //match.rosterOrder = index + 1
+                  outputRoster.push({player: match.player,  lineupPosition: item.position, rosterOrder: index + 1})
+                  
+                  
+                  
+                } else {
+                  // Did not find a player record that matches. 
+                  this.unmatchedPlayers.push(item)
+                }
+              })
+
+
+              this.outputLineup = new LineupFormModel(this.data.actualLineup.lineupId , this.data.actualLineup.rosterId, outputRoster, this.data.actualLineup.effectiveDate)
+
+        
+        
         }
         catch(e) {
             if(e instanceof Error) {
@@ -46,7 +89,7 @@ export class RosterImportComponent {
             else if(typeof e === 'string' || e instanceof String) {
                 // IDE type hinting now available
                 // properly handle e or...stop using libraries that throw naked strings
-              console.log("Did an error thing");
+              console.log(`There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`);
             }
             else if(typeof e === 'number' || e instanceof Number) {
                 // IDE type hinting now available
@@ -65,41 +108,6 @@ export class RosterImportComponent {
         }
       
       
-      var importContent = this.utils.CSVToArray(this.csvLineupInput, (this.delimiterType == "tab" ? "\t" : ","))
-      var outputArr = []
-      if(this.includesHeaders) {
-        for (var row = 1; row<importContent.length; row++) {
-          var outputObj = null
-          for (var idx =0; idx<importContent[0].length; idx++) {
-            if (importContent[row][idx] && importContent[row][idx] != "") {
-              outputObj = outputObj || {}
-              outputObj[importContent[0][idx]] = importContent[row][idx]  
-            }
-            
-          }
-          if (outputObj) {
-            outputArr.push(outputObj)  
-          }
-          
-        }
-      }
-      var outputRoster= [];
-      outputArr.forEach((item, index)=> {
-        var match = this.data.actualLineup.roster.find((plyr)=> {return plyr.player.name == item.name})
-        
-        
-        if (match) { 
-          match.lineupPosition = item.position
-          match.rosterOrder = index + 1
-          outputRoster.push(match)
-        } else {
-          // Did not find a player record that matches. 
-          this.unmatchedPlayers.push(item)
-        }
-      })
-      
-      
-      this.outputLineup = new LineupFormModel(this.data.actualLineup.lineupId , this.data.actualLineup.rosterId, outputRoster, this.data.actualLineup.effectiveDate)
       
       
       
