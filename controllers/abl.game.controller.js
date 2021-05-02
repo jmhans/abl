@@ -48,6 +48,12 @@ class lineupArray extends Array {
     return this.filter((plyr) => { return (plyr.ablstatus != 'active')    })
   }
   
+  benchWithStats() {
+    return this.bench().filter((plyr) => {
+      return (plyr.dailyStats && plyr.dailyStats.g >0)
+    })
+  }
+  
   ablscore(homeTeam = false) {
     return this.active().reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
@@ -394,7 +400,7 @@ var AblGameController = {
 
             homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) }; 
             awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.reg) }; 
-            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) <= 0.5) {
+            while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) <= 0.5 && (lineups_with_starters[0].benchWithStats().length + lineups_with_starters[1].benchWithStats().length >0 )) {
               
               lineups_with_starters[0].startNextPlayer("XTRA", lineups_with_starters[0].nextRosterPos() , false );  
               lineups_with_starters[1].startNextPlayer("XTRA",lineups_with_starters[1].nextRosterPos() , false); 
