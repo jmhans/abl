@@ -12,7 +12,8 @@ class MlbPlayerModel {
     public positionLog: Object,
     public ablstatus: {onRoster: boolean, ablTeam: Object, acqType: string},
      public _id?: string , 
-     public draftMe?: boolean
+     public draftMe?: boolean, 
+     public dougstatsName?: string
     
   ) { }
 }

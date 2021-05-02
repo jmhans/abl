@@ -1,4 +1,4 @@
-<button mdbBtn type="button" color="primary" outline="true" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
+<button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
 
 
 <div cdkDropList class="example-list" 
@@ -10,7 +10,8 @@
        *ngFor="let rosterRec of lineup.roster; index as i;" 
        cdkDrag
        [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition  }"
+          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition || 
+          rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}"
        >
        
     <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">

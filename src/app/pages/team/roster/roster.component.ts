@@ -8,8 +8,11 @@ import { AuthService } from './../../../auth/auth.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UtilsService } from './../../../core/utils.service';
+import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import { RosterImportComponent } from './roster-import/roster-import.component'
+
 
 import { FormControl } from '@angular/forms';
 
@@ -40,7 +43,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   formDate: FormControl;
   roster_editable: boolean;
   edit_lineup: boolean;
-  
+  csvLineupInput: string;
   active_roster : LineupModel;
   lineupSub: Subscription;
   saveRosterRecordSub: Subscription;
@@ -60,7 +63,9 @@ export class RosterComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 public auth: AuthService,
                 public rosterService: RosterService,
-                private utils: UtilsService
+                private utils: UtilsService,
+                 public dialog: MatDialog
+
                 ) { }
 
   ngOnInit() {
@@ -78,7 +83,7 @@ export class RosterComponent implements OnInit, OnDestroy {
       title: this.team.nickname,
       useBom: false,
       removeNewLines: true,
-      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']
+      keys: ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID', 'dougstatsName']
     };
 
 
@@ -87,6 +92,29 @@ export class RosterComponent implements OnInit, OnDestroy {
   dlFileName() {
     return this.team.nickname + '_Lineup_' + this.actualRosterEffectiveDate(this.current_roster.effectiveDate).toISOString().substring(0, 10)
   }
+  
+  submitCSV() {
+    
+    const dialogRef = this.dialog.open(RosterImportComponent, {
+        width: '60%',
+        data: {actualLineup: this.current_roster}
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        if (result) {
+          console.log(result)
+          this.current_roster = result
+        }
+        
+ 
+      });
+    
+    
+    
+    
+  }
+  
   
   currentRosterDate() {
     return this.actualRosterEffectiveDate(new Date())
@@ -205,7 +233,8 @@ export class RosterComponent implements OnInit, OnDestroy {
         playerTeam: p.player.team, 
         mlbID: p.player.mlbID, 
         lineupPosition: p.lineupPosition, 
-        rosterOrder: p.rosterOrder
+        rosterOrder: p.rosterOrder,
+        dougstatsName: p.player.dougstatsName || p.player.name
     }})
   }
  
@@ -308,9 +337,29 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.downloadFile2(this._getDLFile(), this.dlFileName());
   }
 
-  
+  ConvertToCSV(objArray, headerList) {
+     let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+     let str = '';
+     let row = 'S.No,';
+
+     for (let index in headerList) {
+         row += headerList[index] + ',';
+     }
+     row = row.slice(0, -1);
+     str += row + '\r\n';
+     for (let i = 0; i < array.length; i++) {
+         let line = (i+1)+'';
+         for (let index in headerList) {
+            let head = headerList[index];
+
+             line += ',' + array[i][head];
+         }
+         str += line + '\r\n';
+     }
+     return str;
+ }
      downloadFile2(data, filename='data') {
-        let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID']);
+        let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID', 'dougstatsName']);
         
         let blob = new Blob(['\ufeff' + csvData], { type: 'text/csv;charset=utf-8;' });
         let dwldLink = document.createElement("a");
@@ -326,28 +375,6 @@ export class RosterComponent implements OnInit, OnDestroy {
         dwldLink.click();
         document.body.removeChild(dwldLink);
     }
-
-    ConvertToCSV(objArray, headerList) {
-         let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-         let str = '';
-         let row = 'S.No,';
-
-         for (let index in headerList) {
-             row += headerList[index] + ',';
-         }
-         row = row.slice(0, -1);
-         str += row + '\r\n';
-         for (let i = 0; i < array.length; i++) {
-             let line = (i+1)+'';
-             for (let index in headerList) {
-                let head = headerList[index];
-
-                 line += ',' + array[i][head];
-             }
-             str += line + '\r\n';
-         }
-         return str;
-     }
   
   
 

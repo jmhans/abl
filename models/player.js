@@ -23,6 +23,7 @@ var playerSchema = new mongoose.Schema({
 //   }], 
   lastUpdate: {type: String, required: false}, 
   //positionLog: {type: [String], required: false}
+  dougstatsName: {type: String, required: false}
 })
 
 module.exports = {Player: mongoose.model('Player', playerSchema), 
