@@ -50,7 +50,10 @@ export class TeamRosterComponent implements OnInit {
   lineupDirty(): boolean {
     for (var j =0; j<this.lineup.roster.length; j++) {
       var rr = this.lineup.roster[j]
-      if (rr.rosterOrder != (j+1) || rr.lineupPosition != this.originalLineup.roster[j].lineupPosition) {
+      if (rr.rosterOrder != (j+1) 
+          || rr.lineupPosition != this.originalLineup.roster[j].lineupPosition 
+          || rr.player.mlbID != this.originalLineup.roster[j].player.mlbID
+         ) {
         return true
       }
 
