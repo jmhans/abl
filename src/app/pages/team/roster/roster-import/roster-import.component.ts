@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject , ViewChild, ElementRef} from '@angular/core';
 import { ApiService } from './../../../../core/api.service';
 import { UtilsService } from './../../../../core/utils.service';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
@@ -20,6 +20,11 @@ export class RosterImportComponent {
   includesHeaders: boolean = true;
   outputLineup: LineupFormModel;
   unmatchedPlayers: any[] = [];
+  errorMessage = ''
+  errorsList = [];
+  
+  @ViewChild('alert', { static: true }) alert: ElementRef;
+
   
   constructor(public api: ApiService, 
     public dialogRef: MatDialogRef<RosterImportComponent>,
@@ -30,16 +35,25 @@ export class RosterImportComponent {
     this.dialogRef.close();
   }
 
+  closeAlert(i) {
+   this.errorsList.splice(i, 1)
+  }
   
     submitCSV() {
       this.unmatchedPlayers = [];
-      
+      this.outputLineup = null
       try {
             // code that may throw an error...
-              if (this.delimiterType == "comma" && (this.csvLineupInput.match(/,/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw "not enough commas"}
-              if (this.delimiterType == "comma" && (this.csvLineupInput.match(/\t/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw "not enough tabs"}
+              if (this.delimiterType == "comma" && (this.csvLineupInput.match(/,/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw `There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`}
+              if (this.delimiterType == "tab" && (this.csvLineupInput.match(/\t/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw `There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`}
+              
+
         
               var importContent = this.utils.CSVToArray(this.csvLineupInput, (this.delimiterType == "tab" ? "\t" : ","))
+              
+              if (this.includesHeaders && !importContent[0].find((col)=>{return col == 'name'})) {throw "Unexpected field names"}
+              if (this.includesHeaders && !importContent[0].find((col)=>{return col == 'position'})) {throw "Unexpected field names"}
+      
               var outputArr = []
               if(this.includesHeaders) {
                 for (var row = 1; row<importContent.length; row++) {
@@ -89,6 +103,8 @@ export class RosterImportComponent {
             else if(typeof e === 'string' || e instanceof String) {
                 // IDE type hinting now available
                 // properly handle e or...stop using libraries that throw naked strings
+              this.errorsList.push(e)
+              //this.errorMessage = ;
               console.log(`There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`);
             }
             else if(typeof e === 'number' || e instanceof Number) {

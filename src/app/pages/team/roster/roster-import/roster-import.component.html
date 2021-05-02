@@ -27,31 +27,43 @@
   </mat-form-field>
   
  </span>
-  <span fxLayout="column" fxFlex *ngIf="outputLineup">
-    Matched Players:
-    <span *ngFor="let plyr of outputLineup.roster" fxLayout="row" fxLayoutAlign="space-around start">
-      <span fxLayout="column">{{plyr.lineupPosition}}</span>
-      <span fxLayout="column">{{plyr.player.name}}</span>
-      <span fxLayout="column">{{plyr.player.mlbID}}</span>
+  <span fxLayout="column" fxFlex>
+    <span *ngIf="outputLineup">
+          Matched Players: {{outputLineup.roster.length}} valid matches!
+
+      <span *ngFor="let plyr of outputLineup.roster" fxLayout="row" fxLayoutAlign="space-around start">
+        <span fxLayout="column">{{plyr.lineupPosition}}</span>
+        <span fxLayout="column">{{plyr.player.name}}</span>
+        <span fxLayout="column">{{plyr.player.mlbID}}</span>
+      </span>
     </span>
-    
+
+    <span>
+      <div class="alert alert-danger alert-dismissible" role="alert" *ngFor="let err of errorsList; let i = index">
+        <button type="button" class="close" aria-label="Close" (click)="closeAlert(i)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Error!</strong> {{err}}
+      </div>
+      
+      
     Errored Players:
     <span *ngFor="let err of unmatchedPlayers" fxLayout="row" fxLayoutAlign="space-around start">
       <span fxLayout="column">{{err | json}}</span>
     </span>
-    
+    </span>
   </span>
   
   
 </span>
 
  <span fxLayout="row">
- <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="submitCSV()"> Translate</button>
+ <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="submitCSV()"> Translate &amp; Validate</button>
 
   </span>
 
   
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button [mat-dialog-close]="outputLineup" cdkFocusInitial>Ok</button>
+  <button mat-button [mat-dialog-close]="outputLineup" cdkFocusInitial  *ngIf="unmatchedPlayers.length == 0 && outputLineup && outputLineup.roster.length == data.actualLineup.roster.length && errorsList.length == 0">Import</button>
 </div>
