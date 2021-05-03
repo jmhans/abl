@@ -95,9 +95,9 @@ export class TeamRosterComponent implements OnInit {
     return (plyrStats.hits * 25 + 
        plyrStats.doubles * 10 + 
             plyrStats.triples * 20 +
-            plyrStats.homeRuns * 40 + 
+            plyrStats.homeRuns * 30 + 
             plyrStats.baseOnBalls * 10 + 
-            plyrStats.intentionalWalks * 10 + 
+            plyrStats.hitByPitch * 10 + 
             plyrStats.stolenBases * 7 + 
             plyrStats.caughtStealing * (-7)  + 
             (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
