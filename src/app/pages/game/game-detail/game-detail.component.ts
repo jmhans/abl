@@ -38,6 +38,7 @@ export class GameDetailComponent {
   error: boolean;
   gameResultsObj:GameResultsModel ;
   editable: boolean = false
+  score_changed: boolean = false;
   
   constructor(
     public utils: UtilsService,
@@ -49,7 +50,6 @@ export class GameDetailComponent {
   ngOnInit() {
     this._getRosters();
     //this.getStats();
-    
   }
 
   _getRosters() {
@@ -61,6 +61,8 @@ export class GameDetailComponent {
     this.statsSub = this.ablGame.getGameRosters$(this.game._id)
       .subscribe(res => {
         this.rosters = res;
+        this._updateScoreChanged();
+
       })
     
   }
@@ -86,13 +88,13 @@ export class GameDetailComponent {
   }
   
   
-  _getGameResult() {
+  _getGameResult(): GameResultsModel {
     
-    var gameResultsObj = {
+    var gameResultsObj: GameResultsModel = {
        status: 'final', 
         scores: [
-          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final  }, 
-          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final  }
+          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final , players: this._getModifiedPlayers(this.rosters.homeTeam) }, 
+          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final , players: this._getModifiedPlayers(this.rosters.awayTeam) }
         ], 
         winner: this.rosters.result.winner, 
         loser: this.rosters.result.loser, 
@@ -103,6 +105,12 @@ export class GameDetailComponent {
     return gameResultsObj
   }
   
+  _getModifiedPlayers(roster) {
+    return roster.filter((plyr)=> {return plyr.dailyStats.modified})
+  }
+  
+  
+  
   _rawScores(detailScores) {
     return detailScores.map((detailScore)=> {return  {
       location: detailScore.location,
@@ -110,6 +118,23 @@ export class GameDetailComponent {
       final: detailScore.regulation
     }})
   }
+  
+  _getLiveScoreForTeam(teamloc: string): number {
+    return this._getGameResult().scores.find((s)=>{return s.location == teamloc}).final.abl_runs
+  }
+  
+  _updateScoreChanged() {
+    this.score_changed = false
+    if (this.game.results) {
+      this.game.results.scores.forEach((score)=> {
+        if (score.final.abl_runs != this._getLiveScoreForTeam(score.location)) {
+          this.score_changed = true
+        }
+      })  
+    }
+   
+  }
+  
   
   
   
@@ -126,7 +151,9 @@ export class GameDetailComponent {
   }
   
   _userHasAttested() {
-    return this.game.results.attestations.find((a)=> { return this.auth.userProfile.sub == a.attester})
+    return this.game.results.attestations.find((a)=> { 
+      return this.auth.userProfile.sub == a.attester
+    })
   }
   
   _updateScore($evt, team) {
@@ -137,6 +164,7 @@ export class GameDetailComponent {
       this.rosters.away_score = $evt
      // this.homeChild.updateTeamScore(true)
     }
+    this._updateScoreChanged()
   }
   
   ngOnDestroy() {

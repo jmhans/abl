@@ -532,7 +532,7 @@ var AblGameController = {
                 case 'gamePk':
                 case 'gameDate':
                 case 'position(s)':
-                  total[propertyName].concat(thisRec[propertyName])
+                  total[propertyName].push(thisRec[propertyName])
                   break;
                 case 'abl_score': 
                   total.abl_score.abl_points += ( thisRec.abl_points || 0);
@@ -645,10 +645,24 @@ var AblGameController = {
   _updateResults: async (req, res) => {
     
        try {
+          var modifiedPlyrs = req.body.scores.reduce((all, cur) => {return all.concat(cur.players)}, []);
+          if (modifiedPlyrs.length >0 ) {
+            
+            for (var m = 0; m<modifiedPlyrs.length; m++) {
+              var plyr = modifiedPlyrs[m]
+              console.log(`Updating ${plyr.player.name}`);
+              var s = await Statline.findOneAndUpdate( {mlbId: plyr.player.mlbID, gamePk: plyr.dailyStats.gamePk}, {$set: {updatedStats: plyr.dailyStats}}, {new: true, useFindAndModify: false})  
+              var s2 = await Statline.find({mlbId: plyr.player.mlbID, gamePk: plyr.dailyStats.gamePk})
+              console.log(`${plyr.player.mlbID}; ${plyr.dailyStats.gamePk}`);
+            }
+          }
+            
+         
+         
           const updatedGame = await AblGame.findByIdAndUpdate(
               req.params.id,
               { $set: {results: req.body} },
-              { new: true }
+              { new: true, useFindAndModify: false }
           );
           res.json(updatedGame);
       } catch (e) {

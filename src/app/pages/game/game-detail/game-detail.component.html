@@ -47,9 +47,20 @@
       
     </div>
   </mat-card-content>
+  
+    
+    
   <mat-card-actions *ngIf="rosters && rosters.status == 'Final'">
+    <span *ngIf="game.results.scores"> 
+      <span *ngFor="let score of game.results.scores">
+        <span *ngIf="score.final.abl_runs != _getLiveScoreForTeam(score.location)">
+          Calculated result differs from saved result. 
+        </span>
+
+      </span>
+    </span>
     <button *ngIf="_rawScores(game.results.scores) != _rawScores(_getGameResult().scores)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
-      <mdb-icon far icon="save"></mdb-icon> Save Results
+      <mdb-icon far icon="save"></mdb-icon> {{score_changed ? "Overwrite" : "Save"}} Results
     </button>
     <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="far fa-check-square"></i> Attest to Boxscore

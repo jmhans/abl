@@ -1,5 +1,6 @@
 import { AblTeamModel } from './abl.team.model'
 import { Roster, PopulatedRoster } from './lineup.model'
+import { rosterGameScoreRecord, rosterScoreRecord , playerModel} from './roster.record.model'
 
 class GameModel {
     constructor(
@@ -34,12 +35,29 @@ interface PopulatedGameModel {
     results?: GameResultsModel
 }
 
+interface gameLineModel {
+  abl_runs: number
+  g: number
+  ab: number
+  h: number
+//  "2b": number
+//  "3b": number
+  hr: number
+  bb: number
+  hbp: number
+  sac: number
+  sf: number
+  sb: number
+  cs: number
+  e: number
+  abl_points: number
+}
 
-
+ 
 
 interface GameResultsModel  {
         status: string
-        scores: {team: string, location: string, regulation: {}, final: {}  }[] 
+        scores: {team: string, location: string, regulation: rosterScoreRecord, final: rosterScoreRecord  , players:  playerModel[]}[] 
         winner: {} 
         loser: {}
         attestations: {attester: string, attesterType: string, time: Date}[]

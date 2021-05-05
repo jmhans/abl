@@ -149,6 +149,7 @@ export class GameTeamDetailComponent implements OnInit {
       
       if (stat) {
         obj[property] = parseInt(editField);
+        obj.modified = true;
           this.updateScoreForPlyr(obj)
           this.updateTeamScore();
           } else {
