@@ -98,7 +98,7 @@ export class GameDetailComponent {
         ], 
         winner: this.rosters.result.winner, 
         loser: this.rosters.result.loser, 
-        attestations: this.game.results.attestations
+        attestations: this.score_changed ? [] : this.game.results.attestations
       };
     
     
@@ -112,10 +112,22 @@ export class GameDetailComponent {
   
   
   _rawScores(detailScores) {
+    
+    if (detailScores) {
+      return {
+        h: detailScores.find((sc)=>{ return sc.location == 'H'}).final.abl_runs, 
+        a: detailScores.find((sc)=>{ return sc.location == 'A'}).final.abl_runs, 
+      }      
+    } else {
+      return {}
+    }
+
+    
+    
     return detailScores.map((detailScore)=> {return  {
       location: detailScore.location,
       regulation: detailScore.regulation, 
-      final: detailScore.regulation
+      final: detailScore.final
     }})
   }
   
@@ -125,7 +137,7 @@ export class GameDetailComponent {
   
   _updateScoreChanged() {
     this.score_changed = false
-    if (this.game.results) {
+    if (this.game.results.scores.length > 0) {
       this.game.results.scores.forEach((score)=> {
         if (score.final.abl_runs != this._getLiveScoreForTeam(score.location)) {
           this.score_changed = true
@@ -155,6 +167,13 @@ export class GameDetailComponent {
       return this.auth.userProfile.sub == a.attester
     })
   }
+  
+  _opponentHasAttested() {
+    return this.game.results.attestations.find((a)=> { 
+      return this.auth.userProfile.sub != a.attester
+    })
+  }
+  
   
   _updateScore($evt, team) {
     if (team == "home") {

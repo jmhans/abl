@@ -143,7 +143,8 @@ class StatlineController extends BaseController {
             '$addFields': {
               'player': {
                 '$first': '$player'
-              }
+              }, 
+              'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
             }
           }
         ])

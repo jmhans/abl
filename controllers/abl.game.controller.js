@@ -196,28 +196,59 @@ var AblGameController = {
   
   _getDailyStats: function(statlineObj) {
     var retObj = {};
+    
+    
     if (typeof(statlineObj.stats) != 'undefined') {
+      if (statlineObj.stats.modified) {
+         retObj = {
+          'mlbId': statlineObj.mlbId,
+          'gamePk': statlineObj.gamePk,
+          'gameDate': statlineObj.gameDate,
+          'g': statlineObj.stats.g,
+          'ab': statlineObj.stats.ab,
+          'h': statlineObj.stats.h,
+          '2b': statlineObj.stats['2b'] ,
+          '3b': statlineObj.stats['3b'] ,
+          'hr': statlineObj.stats.hr ,
+          'bb': statlineObj.stats.bb ,
+          'ibb': statlineObj.stats.ibb,
+          'hbp': statlineObj.stats.hbp ,
+          'sb': statlineObj.stats.sb ,
+          'cs': statlineObj.stats.cs ,
+          'sac': statlineObj.stats.sac,
+          'sf': statlineObj.stats.sf ,
+          'e': statlineObj.stats.e ,
+          'position(s)': statlineObj.positions
+         
+        } 
+      }
+      else {
+              
       retObj = {
         'mlbId': statlineObj.mlbId,
         'gamePk': statlineObj.gamePk,
         'gameDate': statlineObj.gameDate,
-        'g': statlineObj.stats.batting.gamesPlayed,
-        'ab': statlineObj.stats.batting.atBats,
-        'h': statlineObj.stats.batting.hits,
-        '2b': statlineObj.stats.batting.doubles,
-        '3b': statlineObj.stats.batting.triples,
-        'hr': statlineObj.stats.batting.homeRuns,
-        'bb': statlineObj.stats.batting.baseOnBalls,
-        'ibb': statlineObj.stats.batting.intentionalWalks,
-        'hbp': statlineObj.stats.batting.hitByPitch,
-        'sb': statlineObj.stats.batting.stolenBases,
-        'cs': statlineObj.stats.batting.caughtStealing,
-        'sac': statlineObj.stats.batting.sacBunts,
-        'sf': statlineObj.stats.batting.sacFlies,
-        'e': statlineObj.stats.fielding.errors,
+        'g':  statlineObj.stats.batting.gamesPlayed,
+        'ab':  statlineObj.stats.batting.atBats,
+        'h':  statlineObj.stats.batting.hits,
+        '2b':  statlineObj.stats.batting.doubles,
+        '3b':  statlineObj.stats.batting.triples,
+        'hr':  statlineObj.stats.batting.homeRuns,
+        'bb':  statlineObj.stats.batting.baseOnBalls,
+        'ibb':  statlineObj.stats.batting.intentionalWalks,
+        'hbp':  statlineObj.stats.batting.hitByPitch,
+        'sb':  statlineObj.stats.batting.stolenBases,
+        'cs':  statlineObj.stats.batting.caughtStealing,
+        'sac':  statlineObj.stats.batting.sacBunts,
+        'sf':  statlineObj.stats.batting.sacFlies,
+        'e':  statlineObj.stats.fielding.errors,
         'position(s)': statlineObj.positions
         
       }
+      }
+      
+      
+
 
     } else {
       retObj = {
@@ -502,12 +533,30 @@ var AblGameController = {
     var nextDay = new Date(current_date.toISOString());
     nextDay.setDate(current_date.getDate() + 1)
     console.log("Searching stats between " + current_date + " and " + nextDay);
-    var dailyStats = await Statline.find({
-      gameDate: {
-        $gte: current_date.toISOString().substring(0, 10) + "T08:00:00Z",
-        $lt: nextDay.toISOString().substring(0, 10) + "T08:00:00Z"
-      }
-    })
+    var dailyStats = await Statline.aggregate([
+          {
+            '$match': {
+              'gameDate': {
+                '$gte': new Date(current_date.toISOString().substring(0, 10) + "T08:00:00Z"), 
+                '$lt': new Date(nextDay.toISOString().substring(0, 10) + "T08:00:00Z")
+              }
+            }
+          }, {
+            '$lookup': {
+              'from': 'players', 
+              'localField': 'mlbId', 
+              'foreignField': 'mlbID', 
+              'as': 'player'
+            }
+          }, {
+            '$addFields': {
+              'player': {
+                '$first': '$player'
+              }, 
+              'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
+            }
+          }
+        ]);
 
     console.log(dailyStats.length + " stat records found.");
 

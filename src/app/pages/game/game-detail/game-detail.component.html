@@ -46,7 +46,17 @@
       </span>
       
     </div>
-  </mat-card-content>
+
+    Attestations: 
+    <span *ngFor="let att of game.results.attestations">
+     Attester: {{att.attesterType}}
+    <button *ngIf="att.attester == auth.userProfile.sub" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" >
+      Remove Attestation
+    </button>
+    </span>
+    
+    
+    </mat-card-content>
   
     
     
@@ -59,13 +69,13 @@
 
       </span>
     </span>
-    <button *ngIf="_rawScores(game.results.scores) != _rawScores(_getGameResult().scores)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
+    <button *ngIf="game.results.scores.length == 0 || score_changed" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
       <mdb-icon far icon="save"></mdb-icon> {{score_changed ? "Overwrite" : "Save"}} Results
     </button>
-    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
+    <button *ngIf="!score_changed && _userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="far fa-check-square"></i> Attest to Boxscore
     </button>
-    <button *ngIf="_userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+    <button *ngIf="score_changed && _userInGame() && _opponentHasAttested()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
       <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
     </button>
   </mat-card-actions>
