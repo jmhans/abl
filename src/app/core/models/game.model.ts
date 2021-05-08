@@ -61,6 +61,7 @@ interface GameResultsModel  {
         winner: {} 
         loser: {}
         attestations: {attester: string, attesterType: string, time: Date}[]
+        attestation_status?: string
       }
 
 

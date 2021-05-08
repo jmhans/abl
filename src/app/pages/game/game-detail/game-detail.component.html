@@ -50,7 +50,7 @@
     Attestations: 
     <span *ngFor="let att of game.results.attestations">
      Attester: {{att.attesterType}}
-    <button *ngIf="att.attester == auth.userProfile.sub" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" >
+    <button *ngIf="att.attester == auth.userProfile.sub" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
       Remove Attestation
     </button>
     </span>
@@ -60,22 +60,22 @@
   
     
     
-  <mat-card-actions *ngIf="rosters && rosters.status == 'Final'">
+  <mat-card-actions *ngIf="rosters && rosters.status == 'final'">
     <span *ngIf="game.results.scores"> 
       <span *ngFor="let score of game.results.scores">
         <span *ngIf="score.final.abl_runs != _getLiveScoreForTeam(score.location)">
-          Calculated result differs from saved result. 
+          Calculated result differs from saved result. <span *ngIf="_userHasAttested()"> You must remove your prior attestation in order to save updates. </span>
         </span>
 
       </span>
     </span>
-    <button *ngIf="game.results.scores.length == 0 || score_changed" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
+    <button *ngIf="!score_exists() || (score_changed && attestation_count() == 0)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
       <mdb-icon far icon="save"></mdb-icon> {{score_changed ? "Overwrite" : "Save"}} Results
     </button>
-    <button *ngIf="!score_changed && _userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
+    <button *ngIf="score_exists() && !score_changed && _userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="far fa-check-square"></i> Attest to Boxscore
     </button>
-    <button *ngIf="score_changed && _userInGame() && _opponentHasAttested()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
+    <button *ngIf="score_exists() && score_changed && _userInGame() && !_userHasAttested() && attestation_count() > 0" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
     </button>
   </mat-card-actions>

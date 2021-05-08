@@ -90,6 +90,17 @@ export class AblGameService {
     return this.editGame$(gmId, gameResult)
   }
   
+  removeAttestation$(gmId: string, attestId: string): Observable<GameModel> {
+    return this.http
+      .put<GameModel>(`${this.base_api}game/${gmId}/attestations`, {attestation_id: attestId}, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  
+  
   gameParticipant(game, user) {
     var home = game.homeTeam.owners.find((o)=> { return user == o.userId})
     var away = game.awayTeam.owners.find((o)=> { return user == o.userId})

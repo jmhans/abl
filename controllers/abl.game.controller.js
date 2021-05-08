@@ -25,7 +25,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 class statline {
   constructor(statline) {
     
-    this.plateAppearances = (statline.bb || 0) + (statline.ab || 0 )+ (statline.sac || 0)+ (statline.sf || 0)
+    this.plateAppearances = (statline.bb || 0) + (statline.hbp || 0) +(statline.ab || 0 )+ (statline.sac || 0)+ (statline.sf || 0)
   }
  
 }
@@ -455,7 +455,7 @@ var AblGameController = {
              home_score: homeScore,
              away_score: awayScore, 
              result: result, 
-             status: "Final"
+             status: "final"
             } 
 
           } else {
@@ -465,7 +465,7 @@ var AblGameController = {
              home_score: homeScore,
              away_score: awayScore, 
              result: result,
-             status: "Scheduled"
+             status: "scheduled"
             }
           }
        
@@ -694,23 +694,29 @@ var AblGameController = {
   _updateResults: async (req, res) => {
     
        try {
-          var modifiedPlyrs = req.body.scores.reduce((all, cur) => {return all.concat(cur.players)}, []);
-          if (modifiedPlyrs.length >0 ) {
-            
-            for (var m = 0; m<modifiedPlyrs.length; m++) {
-              var plyr = modifiedPlyrs[m]
-              console.log(`Updating ${plyr.player.name}`);
-              var s = await Statline.findOneAndUpdate( {mlbId: plyr.player.mlbID, gamePk: plyr.dailyStats.gamePk}, {$set: {updatedStats: plyr.dailyStats}}, {new: true, useFindAndModify: false})  
-              var s2 = await Statline.find({mlbId: plyr.player.mlbID, gamePk: plyr.dailyStats.gamePk})
-              console.log(`${plyr.player.mlbID}; ${plyr.dailyStats.gamePk}`);
-            }
-          }
-            
-         
          
           const updatedGame = await AblGame.findByIdAndUpdate(
               req.params.id,
               { $set: {results: req.body} },
+              { new: true, useFindAndModify: false }
+          );
+          res.json(updatedGame);
+      } catch (e) {
+          return res.status(422).send({
+              error: { message: 'e', resend: true }
+          });
+      } 
+  },
+  
+  _removeAttestation: async (req, res) => {
+    
+       try {
+         console.log(req.body.attestation_id);
+         console.log(ObjectId(req.body.attestation_id));
+         
+          const updatedGame = await AblGame.findByIdAndUpdate(
+              req.params.id,
+              { $pull: {"results.attestations": {_id: ObjectId(req.body.attestation_id)}} },
               { new: true, useFindAndModify: false }
           );
           res.json(updatedGame);

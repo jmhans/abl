@@ -25,7 +25,7 @@
             </tr>
           </thead>
           
-          <tbody *ngIf="status=='Final'"
+          <tbody *ngIf="status=='final'"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="active"
@@ -170,7 +170,7 @@
             </tr>
             </tbody>
           <tbody 
-                 *ngIf="status=='Final' && showBench"
+                 *ngIf="status=='final' && showBench"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="bench"
@@ -179,11 +179,11 @@
             <tr *ngFor="let player of bench ; index as i" cdkDrag 
                 (cdkDragStarted)="toggleDrag('bench')"
                 (cdkDragEnded)="toggleDrag('')"
-                [ngClass]="(player.ablstatus != 'active' && status == 'Final' ? 'table-dark': '')" >
+                [ngClass]="(player.ablstatus != 'active' && status == 'final' ? 'table-dark': '')" >
               
               <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
 
-              <th scope="row">{{player.playedPosition || (status == 'Final' ? "B" : player.lineupPosition)}}</th>
+              <th scope="row">{{player.playedPosition || (status == 'final' ? "B" : player.lineupPosition)}}</th>
               <td>{{player.player.name}} <small>({{player.player.position}} - {{player.player.team}})</small></td>
               <td>{{ player.dailyStats?.g }} </td>
               <td> {{ player.dailyStats?.ab }} </td>

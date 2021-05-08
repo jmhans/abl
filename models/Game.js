@@ -28,7 +28,7 @@ const gameSchema = new Schema({
   status: String, 
   results: {
         status: String,
-        scores: [{team: String, location: String, regulation: {}, final: {}  , players: [{}]}] ,
+        scores: [{team: String, location: String, regulation: {}, final: {}  , players: Array}] ,
         winner: {}, 
         loser: {},
         attestations: [{attester: String, attesterType: String, time: Date}]

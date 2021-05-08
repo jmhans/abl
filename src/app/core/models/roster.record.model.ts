@@ -41,8 +41,8 @@ interface rosterGameScoreRecord {
 interface gameRosters {
   away_score: rosterGameScoreRecord
   home_score: rosterGameScoreRecord
-  awayTeam: [playerModel]
-  homeTeam: [playerModel]
+  awayTeam: playerModel[]
+  homeTeam: playerModel[]
   status: string
   result: {winner: {}, loser: {}}
 }
