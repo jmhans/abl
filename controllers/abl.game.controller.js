@@ -25,7 +25,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 class statline {
   constructor(statline) {
     
-    this.plateAppearances = (statline.bb || 0) + (statline.ab || 0 )+ (statline.sac || 0)+ (statline.sf || 0)
+    this.plateAppearances = (statline.bb || 0) + (statline.hbp || 0) + (statline.ab || 0 )+ (statline.sac || 0)+ (statline.sf || 0)
   }
  
 }
