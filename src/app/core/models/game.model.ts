@@ -11,7 +11,7 @@ class GameModel {
     public _id?: string,
     public awayTeamRoster?: Roster[], 
     public homeTeamRoster?: Roster[],
-    public results?: GameResultsModel
+    public results?: GameResultsModel[]
   ) { }
 }
 
@@ -32,7 +32,7 @@ interface PopulatedGameModel {
     _id?: string
     awayTeamRoster?: PopulatedRoster[] 
     homeTeamRoster?: PopulatedRoster[]
-    results?: GameResultsModel
+    results?: GameResultsModel[]
 }
 
 interface gameLineModel {
@@ -62,6 +62,7 @@ interface GameResultsModel  {
         loser: {}
         attestations: {attester: string, attesterType: string, time: Date}[]
         attestation_status?: string
+        created_by?: string
       }
 
 

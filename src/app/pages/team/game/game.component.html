@@ -30,11 +30,11 @@
             <div class="col">{{game.gameDate | date:'longDate'}}</div>
             <div class="col"> 
               
-              
-              <span *ngIf="game.results?.status == 'final'" fxLayout="row" fxLayoutAlign="space-evenly center" >
+              <span *ngFor="let game_result of game.results">
+                <span *ngIf="game_result?.status == 'final'" fxLayout="row" fxLayoutAlign="space-evenly center" >
                 
-                <span  *ngIf="getGameScore(game, 'A') as awayScore">{{game.awayTeam.nickname }}: {{awayScore.final.abl_runs | number:'1.2-2'}}</span>
-                <span *ngIf="getGameScore(game, 'H') as homeScore">{{game.homeTeam.nickname }}: {{homeScore.final.abl_runs | number:'1.2-2'}}</span>
+                <span  *ngIf="getGameScore(game_result, 'A') as awayScore">{{game.awayTeam.nickname }}: {{awayScore.final.abl_runs | number:'1.2-2'}}</span>
+                <span *ngIf="getGameScore(game_result, 'H') as homeScore">{{game.homeTeam.nickname }}: {{homeScore.final.abl_runs | number:'1.2-2'}}</span>
                 
                 <button *ngIf="_needsAttest(game)" type="button" mdbBtn (click)="attest(game)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
                 
@@ -49,6 +49,7 @@
                 
                 
               </span>
+                </span>
 
             </div>
           </div>

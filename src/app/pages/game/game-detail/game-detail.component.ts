@@ -40,8 +40,19 @@ export class GameDetailComponent {
   gameResultsObj:GameResultsModel ;
   editable: boolean = false
   score_changed: boolean = false;
-  score_exists = () => {return this.game.results.scores.length >= 0}
-  attestation_count = () => {return this.game.results.attestations.length }
+  
+  active_result: GameResultsModel;
+  score_exists = () => {
+    var res = this.game.results.find((result)=> {return result.status == 'final'}) 
+    if (res) {
+      return true
+    } else {
+      return false
+    }                  
+                        
+  }
+  
+  attestation_count = () => {return this.active_result.attestations.length }
   
   
   
@@ -67,15 +78,17 @@ export class GameDetailComponent {
 
     this.statsSub = this.ablGame.getGameRosters$(this.game._id)
       .subscribe(res => {
+
+        this._setActiveResult();
       
-          if ( this.score_exists()) {
+          if ( this.active_result) {
             this.rosters = {
-              away_score: this.game.results.scores.find((sc)=> {return sc.location == 'A'}), 
-              home_score: this.game.results.scores.find((sc)=> {return sc.location == 'H'}), 
-              awayTeam: this.game.results.scores.find((sc)=> {return sc.location == 'A'}).players, 
-              homeTeam:this.game.results.scores.find((sc)=> {return sc.location == 'H'}).players , 
-              status: this.game.results.status,
-              result: {winner: this.game.results.winner, loser: this.game.results.loser}
+              away_score: this.active_result.scores.find((sc)=> {return sc.location == 'A'}), 
+              home_score: this.active_result.scores.find((sc)=> {return sc.location == 'H'}), 
+              awayTeam: this.active_result.scores.find((sc)=> {return sc.location == 'A'}).players, 
+              homeTeam:this.active_result.scores.find((sc)=> {return sc.location == 'H'}).players , 
+              status: this.active_result.status,
+              result: {winner: this.active_result.winner, loser: this.active_result.loser}
             }
           } else {
             this.rosters = res
@@ -87,6 +100,24 @@ export class GameDetailComponent {
     
   }
   
+  
+
+  
+  _setActiveResult(idx = null ) {
+    
+    if (idx) {
+      this.active_result = this.game.results[idx]  
+    } else {
+      this.active_result = this.game.results.find((result)=> {
+        if (result) {
+        return result.status == 'final'
+        }
+      })
+    }
+    
+  }
+  
+  
   _saveResult(attest: boolean) {
     
     if (false) { //dispute!
@@ -96,6 +127,8 @@ export class GameDetailComponent {
                                                ).subscribe(res => {
           console.log(`Document updated: ${res}` );
           this.game.results = res.results
+          
+          this._setActiveResult();
         })
     }
     
@@ -107,6 +140,7 @@ export class GameDetailComponent {
                                                ).subscribe(res => {
           console.log(`Document updated: ${res}` );
           this.game.results = res.results
+          this._setActiveResult();
           this._updateScoreChanged();
         })      
     } else {
@@ -114,6 +148,7 @@ export class GameDetailComponent {
       .subscribe(res => {
         console.log(`Document updated: ${res}` );
         this.game.results = res.results
+        this._setActiveResult();
         this._updateScoreChanged();
       })
     }
@@ -122,9 +157,37 @@ export class GameDetailComponent {
 
   }
   
+  _disputeScore() {
+    // Update saved score record to have status "disputed"
+    // Create new results record with alternate scoring.  
+    
+    var newScore: GameResultsModel  =  {
+       status: 'disputed',
+        scores: [
+          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final , players: this._getActivePlayers(this.rosters.homeTeam) }, 
+          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final , players: this._getActivePlayers(this.rosters.awayTeam) }
+        ], 
+        winner: this.rosters.result.winner, 
+        loser: this.rosters.result.loser, 
+        attestations: [], 
+        created_by: this.auth.userProfile.sub
+      };
+   
+    this.game.results.push( newScore)
+    this._setActiveResult(this.game.results.length-1)
+  }
+  
+  
+  
   _removeAttestation(attId: string) {
-    this.submitSub = this.ablGame.removeAttestation$(this.game._id, attId).subscribe(res => {
+    
+    var result_index = this.game.results.indexOf(this.active_result)
+    
+    this.submitSub = this.ablGame.removeAttestation$(this.game._id, result_index, attId).subscribe(res => {
+
       this.game.results = res.results
+      this._setActiveResult()
+      
       this._updateScoreChanged();
     })
   }
@@ -134,21 +197,21 @@ export class GameDetailComponent {
   _getGameResult(): GameResultsModel {
     
     var gameResultsObj: GameResultsModel
+      
+    if (this.game.results.length > 1) {
+        var status = 'disputed'
+      }
     
       gameResultsObj = {
-       status: 'final', 
+       status: status || 'saved', 
         scores: [
           {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final , players: this._getActivePlayers(this.rosters.homeTeam) }, 
           {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final , players: this._getActivePlayers(this.rosters.awayTeam) }
         ], 
         winner: this.rosters.result.winner, 
         loser: this.rosters.result.loser, 
-        attestations: this.score_changed ? [] : this.game.results.attestations
+        attestations: this.active_result.attestations
       };
-    
-    
-    
-    
     
     return gameResultsObj
   }
@@ -186,8 +249,8 @@ export class GameDetailComponent {
   
   _updateScoreChanged() {
     this.score_changed = false
-    if (this.game.results.scores.length > 0) {
-      this.game.results.scores.forEach((score)=> {
+    if (this.active_result  && this.active_result.scores.length > 0) {
+      this.active_result.scores.forEach((score)=> {
         if (score.final.abl_runs != this._getLiveScoreForTeam(score.location)) {
           this.score_changed = true
         }
@@ -225,13 +288,13 @@ export class GameDetailComponent {
   }
   
   _userHasAttested() {
-    return this.game.results.attestations.find((a)=> { 
+    return this.active_result.attestations.find((a)=> { 
       return this.auth.userProfile.sub == a.attester
     })
   }
   
   _opponentHasAttested() {
-    return this.game.results.attestations.find((a)=> { 
+    return this.active_result.attestations.find((a)=> { 
       return this.auth.userProfile.sub != a.attester
     })
   }

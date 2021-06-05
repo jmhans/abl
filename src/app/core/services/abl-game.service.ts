@@ -90,9 +90,9 @@ export class AblGameService {
     return this.editGame$(gmId, gameResult)
   }
   
-  removeAttestation$(gmId: string, attestId: string): Observable<GameModel> {
+  removeAttestation$(gmId: string, resultIdx: number, attestId: string): Observable<GameModel> {
     return this.http
-      .put<GameModel>(`${this.base_api}game/${gmId}/attestations`, {attestation_id: attestId}, {
+      .put<GameModel>(`${this.base_api}game/${gmId}/attestations`, {result_index: resultIdx , attestation_id: attestId}, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(

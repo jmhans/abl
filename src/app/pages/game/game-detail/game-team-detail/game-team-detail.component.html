@@ -25,7 +25,7 @@
             </tr>
           </thead>
           
-          <tbody *ngIf="status=='final'"
+          <tbody *ngIf="status!='scheduled'"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="active"

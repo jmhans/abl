@@ -11,7 +11,7 @@
     <mat-card-title><strong>When: </strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-title>
     <mat-card-subtitle>
       <div *ngIf="rosters">
-        Winner: {{rosters.result?.winner?.nickname}}
+        Winner: {{active_result?.winner?.nickname}}
       </div>
     </mat-card-subtitle>
     <mat-slide-toggle
@@ -21,7 +21,11 @@
         Edit Mode
       </mat-slide-toggle>
   </mat-card-header>
-
+    <button *ngIf="rosters.status != 'live'" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="">
+      Go to Live Score
+    </button>
+    
+    
   <mat-card-content>
     <div class="d-flex table-responsive" *ngIf="rosters">
       <span class="p-1 boxscore flex-fill">        
@@ -41,14 +45,17 @@
         Home Team:<strong> {{game.homeTeam.nickname}}</strong>
         <app-game-team-detail  [roster]="rosters.homeTeam" 
                               [teamScore]="rosters.home_score"  
-                              [oppScore]="rosters.away_score" [homeTeam]="true" [status]="rosters.status" [editable]="editable" 
+                              [oppScore]="rosters.away_score" 
+                              [homeTeam]="true" 
+                              [status]="rosters.status" 
+                              [editable]="editable" 
                               (updateScore)="_updateScore($event, 'home')" #homeChild></app-game-team-detail>   
       </span>
       
     </div>
 
     Attestations: 
-    <span *ngFor="let att of game.results.attestations">
+    <span *ngFor="let att of active_result?.attestations">
      Attester: {{att.attesterType}}
     <button *ngIf="att.attester == auth.userProfile.sub" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
       Remove Attestation
@@ -60,22 +67,22 @@
   
     
     
-  <mat-card-actions *ngIf="rosters && rosters.status == 'final'">
-    <span *ngIf="game.results.scores"> 
-      <span *ngFor="let score of game.results.scores">
+  <mat-card-actions *ngIf="rosters && rosters.status != 'scheduled'">
+    <span *ngIf="active_result?.scores"> 
+      <span *ngFor="let score of active_result.scores">
         <span *ngIf="score.final.abl_runs != _getLiveScoreForTeam(score.location)">
           Calculated result differs from saved result. <span *ngIf="_userHasAttested()"> You must remove your prior attestation in order to save updates. </span>
         </span>
 
       </span>
     </span>
-    <button *ngIf="!score_exists() || (score_changed && attestation_count() == 0)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
+    <button *ngIf="!active_result || (score_changed && attestation_count() == 0)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
       <mdb-icon far icon="save"></mdb-icon> {{score_changed ? "Overwrite" : "Save"}} Results
     </button>
-    <button *ngIf="score_exists() && !score_changed && _userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
+    <button *ngIf="active_result && !score_changed && _userInGame() && !_userHasAttested()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="far fa-check-square"></i> Attest to Boxscore
     </button>
-    <button *ngIf="score_exists() && score_changed && _userInGame() && !_userHasAttested() && attestation_count() > 0" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
+    <button *ngIf="active_result && score_changed && _userInGame() && !_userHasAttested() && attestation_count() > 0" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_saveResult(true)">
       <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
     </button>
   </mat-card-actions>

@@ -348,7 +348,13 @@ var AblGameController = {
             '$addFields': {
               'attesters': '$results.attestations.attesterType'
             }
-          }
+          }, {
+              '$unwind': {
+                'path': '$attesters', 
+                'preserveNullAndEmptyArrays': true
+              }
+            }
+          
         ]);
         AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
 
@@ -455,7 +461,7 @@ var AblGameController = {
              home_score: homeScore,
              away_score: awayScore, 
              result: result, 
-             status: "final"
+             status: "live"
             } 
 
           } else {
@@ -711,15 +717,22 @@ var AblGameController = {
   _removeAttestation: async (req, res) => {
     
        try {
-         console.log(req.body.attestation_id);
-         console.log(ObjectId(req.body.attestation_id));
          
-          const updatedGame = await AblGame.findByIdAndUpdate(
-              req.params.id,
-              { $pull: {"results.attestations": {_id: ObjectId(req.body.attestation_id)}} },
-              { new: true, useFindAndModify: false }
-          );
-          res.json(updatedGame);
+          const updatedGame = await AblGame.findById(req.params.id)
+          //
+          var r = req.body.result_index
+            for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
+              console.log(`Stored AttId: ${updatedGame.results[r].attestations[a]._id}`)
+              console.log(`Passed AttId: ${ObjectId(req.body.attestation_id)}`)
+              console.log(updatedGame.results[r].attestations[a]._id == req.body.attestation_id)
+              if (updatedGame.results[r].attestations[a]._id == req.body.attestation_id) {
+                console.log("Removing something!!")
+                updatedGame.results[r].attestations.splice(a, 1)
+              }
+            }  
+          //}
+          var output = await updatedGame.save()
+          res.json(output);
       } catch (e) {
           return res.status(422).send({
               error: { message: 'e', resend: true }

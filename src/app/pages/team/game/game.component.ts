@@ -72,7 +72,7 @@ export class TeamGameComponent implements OnInit {
     console.log(gm);
     
     this.submitSub = this.ablGame.attestGame$(gm._id, 
-                                              gm.results, 
+                                              gm.results.find((game_res)=>{return game_res.status == 'final'}), 
                                               {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
                                               )
         .subscribe(res => {
@@ -89,9 +89,9 @@ export class TeamGameComponent implements OnInit {
     console.log(gm);
     //this.api.postData$({})
   }
-  getGameScore(gm, loc) {
-    if (gm.results && gm.results.scores) {
-        return gm.results.scores.find((g)=> {return g.location == loc})    
+  getGameScore(gm_result, loc) {
+    if (gm_result.scores) {
+        return gm_result.scores.find((g)=> {return g.location == loc})    
     }
   }
 
