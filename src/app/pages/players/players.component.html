@@ -9,9 +9,9 @@
 
 
 <div class="btn-group shadow-0" role="group">
-  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'Available'; updateTakenPlayers('available')">Available</button>
-  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'Taken'; updateTakenPlayers('taken')">Taken</button>
-  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'All'; updateTakenPlayers('all')">All</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'available'; updateTakenPlayers('available')">Available</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'taken'; updateTakenPlayers('taken')">Taken</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'all'; updateTakenPlayers('all')">All</button>
 </div>
 
 <mat-slide-toggle
@@ -33,13 +33,44 @@
        [dtTrigger]="dtTrigger"
        class="row-border hover table-responsive">
   <thead>
+    
+     <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>
+          <mat-select placeholder="Pos" [(value)]="filterPos" (selectionChange)='changePositionFilter()'>
+          <mat-option> Any </mat-option>
+          <mat-option *ngFor="let pos of ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']" [value]="pos">
+            {{ pos }}
+          </mat-option>
+        </mat-select>
+      </th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
     <tr>
     <th>Player Name</th>
     <th>MLB Id</th>
     <th>ABL Team</th>
-    <th>Position</th>
+      <th>Acq</th>
+
+      <th>Position</th>
     <th>Team</th>
-    <th>Status</th>
+      <th>Status</th>
     <th>ABL Runs</th>
      <th>G</th>
      <th>AB</th>
@@ -53,12 +84,14 @@
      <th>CS</th>
       <th>Action</th>
     </tr>
+
   </thead>
   <tbody>
     <tr *ngFor="let player of filteredPlayers">
       <td>{{player.name}}</td>
       <td>{{player.mlbID}}</td>
-      <td>{{player.ablstatus?.ablTeam ? player.ablstatus.ablTeam.nickname : ''}}</td>
+      <td>{{player.ablstatus?.ablTeam ? player.ablstatus.ablTeam.nickname : ''}}</td> 
+      <td>{{player.ablstatus?.acqType ? player.ablstatus.acqType : ''}}</td>
       <td>{{player.position}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>

@@ -19,7 +19,7 @@
     </select>
     
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
-    <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
+    <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup' || true">
       Pickup
       <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
 

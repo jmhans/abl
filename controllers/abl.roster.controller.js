@@ -303,7 +303,7 @@ class ABLRosterController extends BaseController{
     
     try {
       var mlbPlayer = await MlbPlayer.findById(req.body.player._id);
-      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'pickup', onRoster: true};
+      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : req.body.acqType, onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       

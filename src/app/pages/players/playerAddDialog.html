@@ -8,10 +8,16 @@
         {{tm.nickname}}
       </mat-option>
     </mat-select>
+
   </mat-form-field>
-  
-  
-  
+    <mat-form-field>
+
+      <mat-select placeholder="PickupType" [(ngModel)]="data.acqType" name="acqType">
+      <mat-option *ngFor="let pickup_type of ['pickup','supp_draft', 'draft']" [value]="pickup_type">
+        {{pickup_type}}
+      </mat-option>
+    </mat-select>
+    </mat-form-field>
   
   <mat-form-field>
     <mat-label>Effective Date</mat-label>
