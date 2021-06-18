@@ -18,6 +18,7 @@ import { UtilsService } from './core/utils.service';
 import { FilterSortService } from './core/filter-sort.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+
 import { DataTablesModule } from 'angular-datatables';
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';

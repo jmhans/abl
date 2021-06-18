@@ -179,7 +179,20 @@ class lineupArray extends Array {
 }
 
 const ABL_STARTERS = ['1B', '2B',  'SS','3B', 'OF', 'OF', 'OF', 'C', 'DH']
-
+ function  _updateAttestStatus(attCount) {
+    var status = '';
+    switch (true) {
+      case (attCount >= 2):
+        status = 'final';
+        break;
+      case (attCount == 1): 
+        status = 'awaiting validation';
+        break;
+      default: 
+        status =  'awaiting attestation';
+    }
+    return status
+    }
 var AblGameController = {
 
   canPlayPosition: function(playerPosition, lineupSlot) {
@@ -699,21 +712,45 @@ var AblGameController = {
   
   _updateResults: async (req, res) => {
     
+    var updatedGame
+    var result
        try {
-         
-          const updatedGame = await AblGame.findByIdAndUpdate(
-              req.params.id,
-              { $set: {results: req.body} },
+         var updateStatement
+            req.body.status = _updateAttestStatus(req.body.attestations.length)
+
+         if (req.body._id) {
+           // Saved result exists, want to Overwrite it. 
+          updatedGame = await AblGame.findOneAndUpdate(
+            {_id: ObjectId(req.params.id), "results._id": ObjectId(req.body._id)},
+              { $set: {"results.$": req.body} },
               { new: true, useFindAndModify: false }
           );
-          res.json(updatedGame);
+           
+           
+           
+         } else {
+           
+           // This is a new result. We want to push it to the list. 
+           
+           req.body._id = ObjectId();
+            updatedGame = await AblGame.findByIdAndUpdate(
+              req.params.id,
+              { $addToSet: {results: req.body} },
+              { new: true, useFindAndModify: false }
+          );
+           
+         }
+         
+         result = updatedGame.results.find((result)=> {return result._id == req.body._id})
+          res.json(result);
       } catch (e) {
-          return res.status(422).send({
+        console.log(e)  
+        return res.status(422).send({
               error: { message: 'e', resend: true }
           });
       } 
   },
-  
+ 
   _removeAttestation: async (req, res) => {
     
        try {
@@ -728,14 +765,81 @@ var AblGameController = {
               if (updatedGame.results[r].attestations[a]._id == req.body.attestation_id) {
                 console.log("Removing something!!")
                 updatedGame.results[r].attestations.splice(a, 1)
+                updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
               }
             }  
           //}
           var output = await updatedGame.save()
           res.json(output);
       } catch (e) {
+        console.log(e)
           return res.status(422).send({
-              error: { message: 'e', resend: true }
+              error: { message: e, resend: true }
+          });
+      } 
+  },
+ 
+  _removeAttestation2: async (req, res) => {
+    
+       try {
+         
+          const updatedGame = await AblGame.findById(req.params.id)
+          //
+          var r = req.params.scoreIdx
+            for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
+              
+              if (updatedGame.results[r].attestations[a]._id == req.params.attId) {
+                updatedGame.results[r].attestations.splice(a, 1)
+                updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
+              }
+            }  
+          //}
+          var output = await updatedGame.save()
+          res.json(output);
+      } catch (e) {
+        console.log(e)
+          return res.status(422).send({
+              error: { message: e, resend: true }
+          });
+      } 
+  },
+    _addAttestation: async (req, res) => {
+    
+       try {
+         
+          const updatedGame = await AblGame.findById(req.params.id)
+          //
+          var r = req.params.scoreIdx
+          console.log(r);
+          console.log(req.params);
+          console.log(updatedGame.results); 
+         var updatedResult = updatedGame.results.find((result)=> {
+           console.log(`${result._id == r}`);
+           return result._id == r
+         });
+          console.log(updatedResult._id);
+         
+         var updateAtt
+         if (req.body._id) {
+           // Prior Att exists. Overwrite it. 
+           updateAtt = updatedResult.attestations.find((att)=> {return att._id == req.body._id})
+           updateAtt.time = new Date();  
+         } else {
+           // Prior att doesn't exist. Create new.  
+          updateAtt = req.body
+          updateAtt._id = ObjectId();
+          updateAtt.time = new Date()
+          updatedResult.attestations.push(updateAtt);  
+         }
+
+         updatedResult.status = _updateAttestStatus(updatedResult.attestations.length)
+
+         var output = await updatedGame.save()
+          res.json(updatedResult);
+      } catch (e) {
+        console.log(e)
+          return res.status(422).send({
+              error: { message: e, resend: true }
           });
       } 
   }
@@ -743,6 +847,9 @@ var AblGameController = {
 
 
 }
+
+
+
 
 
 module.exports = AblGameController

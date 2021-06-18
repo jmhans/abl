@@ -67,17 +67,17 @@ export class TeamGameComponent implements OnInit {
       );
   }
   
-  attest(gm: GameModel) {
+  attest(gm: GameModel, result_id: string, resultIdx: number) {
     //this.api.postData$({})
     console.log(gm);
     
-    this.submitSub = this.ablGame.attestGame$(gm._id, 
-                                              gm.results.find((game_res)=>{return game_res.status == 'final'}), 
+    this.submitSub = this.ablGame.addAttestation$(gm._id, 
+                                              result_id, 
                                               {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
                                               )
         .subscribe(res => {
           console.log(`Document updated: ${res}` );
-          gm.results = res.results
+          gm.results[resultIdx] = res;
         })     
   }
   

@@ -175,9 +175,9 @@ export class GameTeamDetailComponent implements OnInit {
       this.editField = event.target.textContent;
     }
   updateTeamScore(external:boolean = false) {
-    this.teamScore = {regulation : this.regulation_score(), final: this.final_score()}
+    //this.teamScore = 
     if (!external) {
-      this.updateScore.emit(this.teamScore);
+      this.updateScore.emit({regulation : this.regulation_score(), final: this.final_score()}); //this.teamScore);
     }
     
   }

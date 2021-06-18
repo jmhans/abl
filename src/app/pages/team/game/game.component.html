@@ -30,26 +30,13 @@
             <div class="col">{{game.gameDate | date:'longDate'}}</div>
             <div class="col"> 
               
-              <span *ngFor="let game_result of game.results">
+              <span *ngFor="let game_result of game.results; index as resIdx">
                 <span *ngIf="game_result?.status == 'final'" fxLayout="row" fxLayoutAlign="space-evenly center" >
-                
-                <span  *ngIf="getGameScore(game_result, 'A') as awayScore">{{game.awayTeam.nickname }}: {{awayScore.final.abl_runs | number:'1.2-2'}}</span>
-                <span *ngIf="getGameScore(game_result, 'H') as homeScore">{{game.homeTeam.nickname }}: {{homeScore.final.abl_runs | number:'1.2-2'}}</span>
-                
-                <button *ngIf="_needsAttest(game)" type="button" mdbBtn (click)="attest(game)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
-                
-                <!--button type="button" mdbBtn (click)="protest(game)"  mdbWavesEffect><mdb-icon far class="red-text" size="lg" icon="times-circle"></mdb-icon> Reject</button-->
-<!--                     <button *ngIf="_userInGame()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult()">
-                      <i class="far fa-check-square"></i> Attest to Boxscore
-                    </button>
-                    <button *ngIf="_userInGame()" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">
-                      <i class="fas fa-exclamation-circle"></i> Dispute Boxscore
-                    </button> -->
-                
-                
-                
-              </span>
+                  <span  *ngIf="getGameScore(game_result, 'A') as awayScore">{{game.awayTeam.nickname }}: {{awayScore.final.abl_runs | number:'1.2-2'}}</span>
+                  <span *ngIf="getGameScore(game_result, 'H') as homeScore">{{game.homeTeam.nickname }}: {{homeScore.final.abl_runs | number:'1.2-2'}}</span>
+                  <button *ngIf="_needsAttest(game)" type="button" mdbBtn (click)="attest(game, game_result._id, resIdx)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
                 </span>
+              </span>
 
             </div>
           </div>
