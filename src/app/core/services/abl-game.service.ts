@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import { GameModel , GameResultsModel,  PopulatedGameModel} from './../models/game.model';
 import { gameRosters,  rosterScoreRecord, rosterGameScoreRecord } from './../models/roster.record.model';
@@ -106,8 +106,8 @@ export class AblGameService {
   }
   
   addAttestation$(gmId: string, resultId: string, attest: {}): Observable<GameResultsModel> {
+  
     
-
       return this.http
       .post<GameModel>(`${this.base_api}game/${gmId}/score/${resultId}/attestations`, attest, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
@@ -115,10 +115,33 @@ export class AblGameService {
       .pipe(
         catchError((error) => this._handleError(error))
       );
-    
+    }
+  
+  saveGameAndAttest$(gmId: string, result: GameResultsModel, attest: {}): Observable<GameResultsModel> {
+    if (result._id) {
+      // Result exists. Overwrite it. Then add attestation to it. 
+      return this.editGame$(gmId, result).pipe(
+        mergeMap(()=> this.addAttestation$(gmId, result._id, attest))
+      )
+    } else {
+      // Result doesn't exist yet. Need to create one. Then, add the attestation to it. 
+      return this.postResult$(gmId, result).pipe(
+        mergeMap((updatedResult)=> this.addAttestation$(gmId, updatedResult._id, attest))
+      )
+    }
 
-    
   }
+  
+  postResult$(id: string,game: GameResultsModel): Observable<GameResultsModel> {
+        
+    return this.http
+      .post<GameResultsModel>(`${this.base_api}game/${id}/results`, game, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }  
   
   
   removeAttestation$(gmId: string, resultId: string, attestId: string): Observable<GameModel> {

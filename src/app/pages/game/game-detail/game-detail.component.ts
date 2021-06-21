@@ -47,6 +47,9 @@ export class GameDetailComponent {
   active_result_index: number;
   active_result: GameResultsModel;
   originalresults: GameResultsModel[];
+  
+  canAttest: string[];
+  
   score_exists = () => {
     var res = this.game.results.find((result)=> {return result.status == 'final'}) 
     if (res) {
@@ -88,7 +91,6 @@ export class GameDetailComponent {
        this._setResults(res)
         this._setActiveResult();
         this.liveRosters = res;
- //       this.calc_rosters = res;
         this._updateScoreChanged();
 
       })
@@ -144,15 +146,7 @@ export class GameDetailComponent {
     } else {
       this.active_result = this.game.results[0]
     }
-    
-    this.rosters = {
-          away_score: this.active_result.scores.find((sc)=> {return sc.location == 'A'}), 
-          home_score: this.active_result.scores.find((sc)=> {return sc.location == 'H'}), 
-          awayTeam: this.active_result.scores.find((sc)=> {return sc.location == 'A'}).players, 
-          homeTeam:this.active_result.scores.find((sc)=> {return sc.location == 'H'}).players , 
-          status: this.active_result.status,
-          result: {winner: this.active_result.winner, loser: this.active_result.loser}
-        }
+   
     
   }
   
@@ -160,44 +154,18 @@ export class GameDetailComponent {
   _saveResult(attestType: string) {
     var attestObj = {}
     var existingAtt = this._teamAttestationsActiveResult(attestType);
-    if (existingAtt) {
+    if (existingAtt.length > 0) {
       attestObj = {_id: existingAtt[0]._id, attester: this.auth.userProfile.sub, attesterType: attestType}
     } else {
       attestObj = { attester: this.auth.userProfile.sub, attesterType: attestType}
     }
         
     if (attestType) {
-      if (this.active_result._id) {
-            // Add attestation to existing score. 
-            this.submitSub = this.ablGame.addAttestation$(this.game._id, this.active_result._id, attestObj).subscribe(res => {
-            console.log(`Document updated: ${res}` );
-            //this.game.results = res.results
-            this.active_result = res
-    //        this._setActiveResult();
-    //        this._updateScoreChanged();
-
-           })        
-        } else {
-          // Score doesn't exist yet. Save the score with attestation.
-          this.submitSub = this.ablGame.saveGameResult$(this.game._id, this.active_result)
-            .subscribe(res => {
-              console.log(`Document updated: ${res}` );
-              
-              return this.ablGame.addAttestation$(this.game._id, res._id, attestObj).subscribe( attRes => {
-//                this.game.results = attRes.results
-                this.game.results.push(attRes);
-                this.active_result = attRes
-                this.active_result_index = this.game.results.length - 1 
-  //              this._setActiveResult();
-  //              this._updateScoreChanged()
-              })
-
-
-  //            this.game.results = res.results
-  //            this._setActiveResult();
-  //            this._updateScoreChanged();
-            })
-        }
+        // Add attestation to existing score. 
+            this.submitSub = this.ablGame.saveGameAndAttest$(this.game._id, this.active_result, attestObj).subscribe(res => {
+            this._handleGameResultUpdate(res)    
+    
+           })
       } else {
         
       // No attestation - just saving the score.  
@@ -205,34 +173,34 @@ export class GameDetailComponent {
       this.submitSub = this.ablGame.saveGameResult$(this.game._id, this.active_result)
       .subscribe(res => {
         console.log(`Document updated: ${res}` );
-        this.active_result = res
-//        this._setActiveResult();
-//        this._updateScoreChanged();
+        
+          this._handleGameResultUpdate(res)
+
       })
     }
 
   }
   
-  _disputeScore() {
-    // Update saved score record to have status "disputed"
-    // Create new results record with alternate scoring.  
-    
-    var newScore: GameResultsModel  =  {
-       status: 'disputed',
-        scores: [
-          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final , players: this._getActivePlayers(this.rosters.homeTeam) }, 
-          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final , players: this._getActivePlayers(this.rosters.awayTeam) }
-        ], 
-        winner: this.rosters.result.winner, 
-        loser: this.rosters.result.loser, 
-        attestations: [], 
-        created_by: this.auth.userProfile.sub
-      };
-   
-    this.game.results.push( newScore)
-    this._setActiveResult(this.game.results.length-1)
-  }
   
+  _handleGameResultUpdate(response) {
+      if (!this.active_result._id) {
+          this.game.results.push(response)
+          this.active_result_index = this.game.results.length -1
+        } else {
+          var findObj = this.game.results.find((res)=> {return res._id == response._id}) 
+          
+          if (findObj) {
+            this.active_result_index = this.game.results.indexOf(findObj)
+            this.game.results[this.active_result_index] = response
+            
+          } else {
+            console.log("That's weird. The active result had an id, but the response that came back from the DB did not.")
+          }
+        }
+        this._setActiveResult(this.active_result_index);
+        this.originalresults =  this.clonerService.deepClone(this.game.results);
+
+  }
   
   
   _removeAttestation(attId: string) {
@@ -248,34 +216,7 @@ export class GameDetailComponent {
     })
   }
   
-  
-  
-  _getGameResult(): GameResultsModel {
-    
-    var gameResultsObj: GameResultsModel
-      
-    if (this.game.results.length > 1) {
-        var status = 'disputed'
-      }
-    
-      gameResultsObj = {
-       status: status || 'saved', 
-        scores: [
-          {team: this.game.homeTeam._id, location: 'H', regulation: this.rosters.home_score.regulation, final: this.rosters.home_score.final , players: this._getActivePlayers(this.rosters.homeTeam) }, 
-          {team: this.game.awayTeam._id, location: 'A', regulation: this.rosters.away_score.regulation, final: this.rosters.away_score.final , players: this._getActivePlayers(this.rosters.awayTeam) }
-        ], 
-        winner: this.rosters.result.winner, 
-        loser: this.rosters.result.loser, 
-        attestations: this.active_result.attestations
-      };
-    
-    return gameResultsObj
-  }
-  
-  _getActivePlayers(roster) {
-    return roster 
-    // return roster.filter((plyr)=> {return plyr.ablstatus == "active"})
-  }
+
   
   
   _changeEdit(evt) {
@@ -314,9 +255,9 @@ export class GameDetailComponent {
   
   _getLiveScoreForTeam(teamloc: string): number {
     if (teamloc == 'H') { 
-      return this.rosters.home_score.final.abl_runs
+      return this.live_result.scores[0].final.abl_runs // this.rosters.home_score.final.abl_runs
     } else {
-      return this.rosters.away_score.final.abl_runs
+      return this.live_result.scores[1].final.abl_runs //this.rosters.away_score.final.abl_runs
     }
     
   }
@@ -341,11 +282,15 @@ export class GameDetailComponent {
 
     _scoreDiff(scoreIdx) {
       var hasChanges = false;
-      for (let prop in this.game.results[scoreIdx]) {
-        if (this.originalresults[scoreIdx][prop] !== this.game.results[scoreIdx][prop]) {hasChanges = true;}
+      
+      return JSON.stringify(this.originalresults[scoreIdx].scores) !== JSON.stringify(this.game.results[scoreIdx].scores)
+      
+      
+//       for (let prop in this.game.results[scoreIdx]) {
+//         if (this.originalresults[scoreIdx][prop] !== this.game.results[scoreIdx][prop]) {hasChanges = true;}
         
-      }
-      return hasChanges;
+//       }
+//       return hasChanges;
     }
     
 
@@ -422,7 +367,7 @@ export class GameDetailComponent {
     if (atts.length == 0) {
       return true
     } else {
-      return this.active_result == atts[0] && !this._opponentHasAttested() // && add condition for score has changed. 
+      return JSON.stringify(this.active_result.scores) == JSON.stringify(atts[0].scores) && !this._opponentHasAttested() // && add condition for score has changed. 
     }
     
   }
@@ -448,13 +393,6 @@ export class GameDetailComponent {
     scoreRec.regulation = $evt.regulation
     scoreRec.final = $evt.final
     
-//     if (team == "home") {
-//       this.rosters.home_score = $evt
-//     //  this.awayChild.updateTeamScore(true)
-//     } else {
-//       this.rosters.away_score = $evt
-//      // this.homeChild.updateTeamScore(true)
-//     }
     this._updateScoreChanged()
   }
   

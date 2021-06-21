@@ -10,15 +10,21 @@
   <mat-card-header>
     <mat-card-title><strong>When: </strong>{{ game.gameDate | date : "mediumDate"}}</mat-card-title>
     <mat-card-subtitle>
-      <div *ngIf="rosters">
+      <div *ngIf="active_result">
         Winner: {{active_result?.winner?.nickname}}
       </div>
       
       <div>
+        <span [ngPlural]="game.results.length">
+          <ng-template ngPluralCase="=0">There are {{game.results.length}} saved boxscores.</ng-template>
+          <ng-template ngPluralCase="=1">There is {{game.results.length}} saved boxscore.</ng-template>
+          <ng-template ngPluralCase="other">There are {{game.results.length}} saved boxscores.</ng-template>
+        </span>
         <ul *ngIf="active_result">
+
           <li *ngFor="let res of game.results; index as res_idx">
-            <span [ngClass]="{'active-result': (res_idx == active_result_index)}"> {{res.status}} | {{res_idx}} | {{res.attestations.length}} | <a (click)=" _setActiveResult(res_idx)">Go</a> | 
-              <span *ngIf="_scoreDiff(res_idx)">Result has changed</span>
+            <span [ngClass]="{'active-result': (res_idx == active_result_index)}"> {{res_idx}}: {{res.status}} | <a (click)=" _setActiveResult(res_idx)">Go</a> 
+              <span *ngIf="_scoreDiff(res_idx)"> | Result has changed</span>
             </span>
           </li>
           <li *ngIf="live_result">
@@ -40,36 +46,7 @@
     
     
   <mat-card-content>
-    <div class="d-flex table-responsive" *ngIf="rosters">
-      
-<!--       <span>User Has Attested: {{_userHasAttested() }}</span>
-      <span>Opponent Has Attested: {{_opponentHasAttested() }}</span> -->
-      
-      
-      
-<!--       <span class="p-1 boxscore flex-fill">        
-        Away Team:<strong> {{game.awayTeam.nickname}}</strong>
-        <app-game-team-detail  
-                              [roster]="rosters.awayTeam" 
-                              [teamScore]="rosters.away_score" 
-                              [oppScore]="rosters.home_score" 
-                              [homeTeam]="false" 
-                              [status]="rosters.status" 
-                              [editable]="editable"
-                              (updateScore)="_updateScore($event, 'away')"
-                              #awayChild>
-        </app-game-team-detail>   
-      </span>
-      <span class="p-1 boxscore flex-fill">
-        Home Team:<strong> {{game.homeTeam.nickname}}</strong>
-        <app-game-team-detail  [roster]="rosters.homeTeam" 
-                              [teamScore]="rosters.home_score"  
-                              [oppScore]="rosters.away_score" 
-                              [homeTeam]="true" 
-                              [status]="rosters.status" 
-                              [editable]="editable" 
-                              (updateScore)="_updateScore($event, 'home')" #homeChild></app-game-team-detail>   
-      </span> -->
+    <div class="d-flex table-responsive" *ngIf="active_result">
       
       <span class="p-1 boxscore flex-fill" *ngFor="let box of active_result.scores; index as box_idx">
         {{box.location == 'H' ? "Home" : "Away" }} Team:<strong> {{box.location == 'H' ? game.homeTeam.nickname : game.awayTeam.nickname}}</strong>
@@ -99,7 +76,7 @@
   
     
     
-  <mat-card-actions *ngIf="rosters && rosters.status != 'scheduled'">
+  <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
     <span *ngIf="active_result?.scores"> 
       <span *ngFor="let score of active_result.scores">
         <span *ngIf="score.final.abl_runs != _getLiveScoreForTeam(score.location)">
@@ -116,11 +93,11 @@
     
    <!-- home team attest-->
     <button *ngIf="active_result && _canAttest('home')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('home')">
-      <i class="far fa-check-square"></i> Attest to Boxscore (Home)
+      <i class="far fa-check-square"></i> Save & Attest as HOME team
     </button>
     <!-- away team attest-->
     <button *ngIf="active_result && _canAttest('away')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('away')">
-      <i class="far fa-check-square"></i> Attest to Boxscore (Away)
+      <i class="far fa-check-square"></i> Save & Attest as AWAY team
     </button>
     
   </mat-card-actions>

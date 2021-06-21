@@ -750,6 +750,32 @@ var AblGameController = {
           });
       } 
   },
+  
+    _postResults: async (req, res) => {
+    
+    var updatedGame
+    var result
+       try {
+         var updateStatement
+            req.body.status = _updateAttestStatus(req.body.attestations.length)
+
+         // This is a new result. We want to push it to the list. 
+           req.body._id = ObjectId();
+            updatedGame = await AblGame.findByIdAndUpdate(
+              req.params.id,
+              { $addToSet: {results: req.body} },
+              { new: true, useFindAndModify: false }
+          );
+           
+         result = updatedGame.results.find((result)=> {return result._id == req.body._id})
+         res.json(result);
+      } catch (e) {
+        console.log(e)  
+        return res.status(422).send({
+              error: { message: 'e', resend: true }
+          });
+      } 
+  },
  
   _removeAttestation: async (req, res) => {
     
@@ -785,7 +811,9 @@ var AblGameController = {
          
           const updatedGame = await AblGame.findById(req.params.id)
           //
-          var r = req.params.scoreIdx
+          var r = updatedGame.results.indexOf(updatedGame.results.find((result)=>{return result._id == req.params.scoreId}));
+          console.log(`scoreId: ${req.params.scoreId}`);
+         console.log(`found Result at index: ${r}`);
             for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
               
               if (updatedGame.results[r].attestations[a]._id == req.params.attId) {
@@ -810,14 +838,10 @@ var AblGameController = {
           const updatedGame = await AblGame.findById(req.params.id)
           //
           var r = req.params.scoreIdx
-          console.log(r);
-          console.log(req.params);
-          console.log(updatedGame.results); 
+
          var updatedResult = updatedGame.results.find((result)=> {
-           console.log(`${result._id == r}`);
            return result._id == r
          });
-          console.log(updatedResult._id);
          
          var updateAtt
          if (req.body._id) {
