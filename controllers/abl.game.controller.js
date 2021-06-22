@@ -179,20 +179,20 @@ class lineupArray extends Array {
 }
 
 const ABL_STARTERS = ['1B', '2B',  'SS','3B', 'OF', 'OF', 'OF', 'C', 'DH']
- function  _updateAttestStatus(attCount) {
-    var status = '';
-    switch (true) {
-      case (attCount >= 2):
-        status = 'final';
-        break;
-      case (attCount == 1): 
-        status = 'awaiting validation';
-        break;
-      default: 
-        status =  'awaiting attestation';
-    }
-    return status
-    }
+function  _updateAttestStatus(attCount) {
+  var status = '';
+  switch (true) {
+    case (attCount >= 2):
+      status = 'final';
+      break;
+    case (attCount == 1): 
+      status = 'awaiting validation';
+      break;
+    default: 
+      status =  'awaiting attestation';
+  }
+  return status
+  }
 var AblGameController = {
 
   canPlayPosition: function(playerPosition, lineupSlot) {
@@ -731,17 +731,16 @@ var AblGameController = {
          } else {
            
            // This is a new result. We want to push it to the list. 
-           
            req.body._id = ObjectId();
             updatedGame = await AblGame.findByIdAndUpdate(
               req.params.id,
               { $addToSet: {results: req.body} },
               { new: true, useFindAndModify: false }
-          );
-           
+          ); 
          }
-         
-         result = updatedGame.results.find((result)=> {return result._id == req.body._id})
+         result = await updatedGame.results.find((result)=> {
+           return JSON.stringify(result._id) == JSON.stringify(req.body._id)
+         })
           res.json(result);
       } catch (e) {
         console.log(e)  
@@ -759,6 +758,7 @@ var AblGameController = {
          var updateStatement
             req.body.status = _updateAttestStatus(req.body.attestations.length)
 
+         
          // This is a new result. We want to push it to the list. 
            req.body._id = ObjectId();
             updatedGame = await AblGame.findByIdAndUpdate(

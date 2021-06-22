@@ -134,7 +134,11 @@ export class GameDetailComponent {
     if (idx != this.active_result_index && !ignoreUpdate) {
       this.editable = false
     }
-    this.active_result_index = idx || 0
+    
+    idx = idx || (this.game.results.length > 0 ? 0 : -1)
+    
+    this.active_result_index = idx
+    
     if (idx) {
 
       if (idx == -1) {
@@ -144,7 +148,7 @@ export class GameDetailComponent {
       }
       
     } else {
-      this.active_result = this.game.results[0]
+        this.active_result = this.game.results[0]  ? this.game.results[0] : this.live_result
     }
    
     
@@ -252,15 +256,7 @@ export class GameDetailComponent {
       final: detailScore.final
     }})
   }
-  
-  _getLiveScoreForTeam(teamloc: string): number {
-    if (teamloc == 'H') { 
-      return this.live_result.scores[0].final.abl_runs // this.rosters.home_score.final.abl_runs
-    } else {
-      return this.live_result.scores[1].final.abl_runs //this.rosters.away_score.final.abl_runs
-    }
-    
-  }
+
   
   _updateScoreChanged() {
 
@@ -273,24 +269,23 @@ export class GameDetailComponent {
       this.score_changed = hasChanges
       return hasChanges;
     
-    
-    
-    
-   
   }
   
 
     _scoreDiff(scoreIdx) {
-      var hasChanges = false;
       
-      return JSON.stringify(this.originalresults[scoreIdx].scores) !== JSON.stringify(this.game.results[scoreIdx].scores)
-      
-      
-//       for (let prop in this.game.results[scoreIdx]) {
-//         if (this.originalresults[scoreIdx][prop] !== this.game.results[scoreIdx][prop]) {hasChanges = true;}
+      if (this.originalresults && this.game.results && this.originalresults.length > scoreIdx && this.game.results.length > scoreIdx) {
+        return !this._scoreCompare(this.originalresults[scoreIdx], this.game.results[scoreIdx])
         
-//       }
-//       return hasChanges;
+       // return JSON.stringify(this.originalresults[scoreIdx].scores) !== JSON.stringify(this.game.results[scoreIdx].scores)  
+      } 
+        return false
+    }
+  
+    _scoreCompare(s1, s2) {
+      if (s1 && s2) {
+        return JSON.stringify(s1.scores) == JSON.stringify(s2.scores)
+      }
     }
     
 
