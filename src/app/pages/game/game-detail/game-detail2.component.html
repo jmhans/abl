@@ -15,25 +15,62 @@
       </div>
       
       <div>
-        <span [ngPlural]="game.results.length">
-          <ng-template ngPluralCase="=0">There are {{game.results.length}} saved boxscores.</ng-template>
-          <ng-template ngPluralCase="=1">There is {{game.results.length}} saved boxscore.</ng-template>
-          <ng-template ngPluralCase="other">There are {{game.results.length}} saved boxscores.</ng-template>
-        </span>
-        <ul>
+<!--           <span *ngIf="live_result" class="d-block">
+            <span [ngClass]="{'active-result': ( active_result_index == -1)}">System Generated Boxscore | <button mat-button color="primary" (click)=" _setActiveResult(-1)">Go</button></span>
+          </span>
+        
 
-          <li *ngFor="let res of game.results; index as res_idx">
-            <span [ngClass]="{'active-result': (res_idx == active_result_index)}"> {{res_idx}}: {{res.status}} | <a (click)=" _setActiveResult(res_idx)">Go</a> 
+        <ul class="list-group list-group-horizontal">
+          <li *ngIf="live_result" class="list-group-item" [ngClass]="{'active': ( active_result_index == -1)}">
+            <span >System Generated Boxscore | <button mat-button color="primary" (click)=" _setActiveResult(-1)">Go</button></span>
+          </li>
+          <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
+            <span> {{res.status}} |  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>
               <span *ngIf="_scoreDiff(res_idx)"> | Result has changed</span>
             </span>
           </li>
-          <li *ngIf="live_result">
-            <span [ngClass]="{'active-result': ( active_result_index == -1)}">System Generated | <a (click)=" _setActiveResult(-1)">Go</a></span>
+
+
+        </ul> -->
+         <ul class="list-group list-group-horizontal">
+          
+          <li class="list-group-item">
+            <span class="d-block">System Generated Boxscore</span>
+            <ul class="list-group list-group-horizontal">
+              <li *ngIf="live_result" class="list-group-item" [ngClass]="{'active': ( active_result_index == -1)}">
+                <button mat-button color="primary" (click)=" _setActiveResult(-1)">Go</button>
+              </li>
+            </ul>
           </li>
+          <li class="list-group-item">
+              <span [ngPlural]="game.results.length" class="d-block">
+                <ng-template ngPluralCase="=0">There are {{game.results.length}} saved boxscores.</ng-template>
+                <ng-template ngPluralCase="=1">There is {{game.results.length}} saved boxscore.</ng-template>
+                <ng-template ngPluralCase="other">There are {{game.results.length}} saved boxscores.</ng-template>
+              </span>
+            <ul class="list-group list-group-horizontal">
+              <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
+                <span> {{res.status}} |  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>
+                  <span *ngIf="_scoreDiff(res_idx)"> | Result has changed</span>
+                </span>
+              </li>
+            </ul>
+          </li>
+
         </ul>
+        
+        
+        
+        
       </div>
     </mat-card-subtitle>
-    <mat-slide-toggle
+
+  </mat-card-header>
+
+    
+    
+  <mat-card-content>
+        <mat-slide-toggle
           class="example-margin"
           color="primary"
           [(ngModel)]="editable"
@@ -41,11 +78,6 @@
           (change)="_changeEdit($event)">
         Edit Mode
       </mat-slide-toggle>
-  </mat-card-header>
-
-    
-    
-  <mat-card-content>
     <div class="d-flex table-responsive" *ngIf="active_result">
       
       <span class="p-1 boxscore flex-fill" *ngFor="let box of active_result.scores; index as box_idx">
@@ -63,13 +95,7 @@
       
     </div>
 
-    Attestations: 
-    <span *ngFor="let att of active_result?.attestations">
-     Attester: {{att.attesterType}}
-    <button *ngIf="att.attester == auth.userProfile.sub" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
-      Remove Attestation
-    </button>
-    </span>
+
     
     
     </mat-card-content>
@@ -77,32 +103,58 @@
     
     
   <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
+    
+
+    
+    Attestation History: 
+    <span *ngFor="let att of active_result?.attestations" class="d-block">
+     {{att.attesterType | titlecase}} team has attested. 
+      <button *ngIf="_teamOwner(att.attesterType)" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
+        Remove
+      </button>
+    </span>
+        
+    
+    
+    <div class="alert alert-warning" role="alert" *ngIf="activeDifference">
+      Warning! Current result differs from system-generated result. 
+    </div>
     <span *ngIf="active_result?.scores"> 
-      <span *ngIf="!_scoreCompare(active_result, originalresults[active_result_index])">
+      <span class="alert alert-success" role="alert" *ngIf="activeChanged">
           Current result differs from stored result. 
         <span *ngIf="_userHasAttested(); else elseBlock"> Attesting will overwrite stored result. </span>
         <ng-template #elseBlock>Saving will overwrite stored result</ng-template>
       </span>
     </span>
     
-    
-      <span *ngIf="!_scoreCompare(active_result, live_result)">
-          Warning! Current result differs from system-generated result. 
-      </span>
-    
     <button *ngIf="active_result && _canSave()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
-      <mdb-icon far icon="save"></mdb-icon> {{(!_scoreCompare(originalresults[active_result_index], active_result) && active_result._id) ? "Overwrite" : "Save"}} Results
+      <mdb-icon far icon="save"></mdb-icon> {{(activeDifference && active_result._id) ? "Overwrite" : "Save"}} Results
     </button>
 
-    
+    <span>Home Attestations: </span>
+    <span *ngFor="let att of _teamAttestationsActiveResult('home')">
+    {{att | json}}
+    </span>
    <!-- home team attest-->
     <button *ngIf="active_result && _canAttest('home')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('home')">
       <i class="far fa-check-square"></i> Save & Attest as HOME team
     </button>
+    
+    
+    
+    <span>Away Attestations: </span>
+    <span *ngFor="let att of _teamAttestationsActiveResult('away')">
+    {{att | json}}
+    </span>
+    
     <!-- away team attest-->
     <button *ngIf="active_result && _canAttest('away')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('away')">
       <i class="far fa-check-square"></i> Save & Attest as AWAY team
     </button>
+    
+    
+    
+
     
   </mat-card-actions>
 </mat-card>

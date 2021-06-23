@@ -47,6 +47,8 @@ export class GameDetailComponent {
   active_result_index: number;
   active_result: GameResultsModel;
   originalresults: GameResultsModel[];
+  activeChanged: boolean = false; // Bool to identify whether the current active score differs from the DB version of itself. 
+  activeDifference: boolean = false; // Bool to identify whether the current active score differs from the live calculated result (which came from the backend API)
   
   canAttest: string[];
   
@@ -151,7 +153,7 @@ export class GameDetailComponent {
         this.active_result = this.game.results[0]  ? this.game.results[0] : this.live_result
     }
    
-    
+    this._updateScoreChanged()
   }
   
   
@@ -203,6 +205,8 @@ export class GameDetailComponent {
         }
         this._setActiveResult(this.active_result_index);
         this.originalresults =  this.clonerService.deepClone(this.game.results);
+            this._updateScoreChanged();
+
 
   }
   
@@ -259,15 +263,19 @@ export class GameDetailComponent {
 
   
   _updateScoreChanged() {
-
+    this.activeChanged = !this._scoreCompare(this.active_result, this.originalresults[this.active_result_index])
+    this.activeDifference = !this._scoreCompare(this.active_result, this.live_result)
     
-     var hasChanges = false;
-      for (let prop in this.game.results[this.active_result_index]) {
-        if (this.originalresults[this.active_result_index][prop] !== this.game.results[this.active_result_index][prop]) {hasChanges = true;}
+    
+    
+    
+//      var hasChanges = false;
+//       for (let prop in this.game.results[this.active_result_index]) {
+//         if (this.originalresults[this.active_result_index][prop] !== this.game.results[this.active_result_index][prop]) {hasChanges = true;}
         
-      }
-      this.score_changed = hasChanges
-      return hasChanges;
+//       }
+//       this.score_changed = hasChanges
+//       return hasChanges;
     
   }
   
@@ -283,25 +291,45 @@ export class GameDetailComponent {
     }
   
     _scoreCompare(s1, s2) {
+
+      var matches = true 
       if (s1 && s2) {
-        return JSON.stringify(s1.scores) == JSON.stringify(s2.scores)
+        
+        const keys =  [ 'team', 'location']
+        const matchFields = ['regulation', 'final']
+        
+        s1.scores.forEach((sc) => {
+          const matchingScore = s2.scores.find((sc2)=> {
+            var keyMatch = true
+            keys.forEach((k)=> {
+              if (sc[k] != sc2[k]) {
+                keyMatch = false
+              }
+            })
+            return keyMatch
+          })
+          if (!matchingScore) {
+            matches = false
+          } else {
+            matchFields.forEach((mf) => {
+              if (JSON.stringify(sc[mf]) != JSON.stringify(matchingScore[mf])) {
+                matches = false
+              }
+            })
+            
+          }
+        })
+        
+        return matches
+        
+        
+        
+        
+        // return JSON.stringify(s1.scores) == JSON.stringify(s2.scores)
       }
     }
     
 
-  
-  
-  _userInGame() {
-    var home = this.game.homeTeam.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
-    var away = this.game.awayTeam.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
-    
-    if (home) {
-      return "home"
-    } else if (away) {
-      return "away"
-    }
-    // return this.game.homeTeam.owners.concat(this.game.awayTeam.owners).find((o)=> { return this.auth.userProfile.sub == o.userId})
-  }
   
   _teamOwner(loc: string) {
     if (loc == 'home') {
