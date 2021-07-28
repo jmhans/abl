@@ -141,7 +141,18 @@ export class AblGameService {
       .pipe(
         catchError((error) => this._handleError(error))
       );
-  }  
+  }
+  
+  deleteResult$(id: string,resultId: string): Observable<GameResultsModel> {
+        
+    return this.http
+      .delete<GameResultsModel>(`${this.base_api}game/${id}/results/${resultId}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
   
   
   removeAttestation$(gmId: string, resultId: string, attestId: string): Observable<GameModel> {

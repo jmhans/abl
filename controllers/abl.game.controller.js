@@ -361,12 +361,7 @@ var AblGameController = {
             '$addFields': {
               'attesters': '$results.attestations.attesterType'
             }
-          }, {
-              '$unwind': {
-                'path': '$attesters', 
-                'preserveNullAndEmptyArrays': true
-              }
-            }
+          }
           
         ]);
         AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
@@ -766,8 +761,9 @@ var AblGameController = {
               { $addToSet: {results: req.body} },
               { new: true, useFindAndModify: false }
           );
-           
-         result = updatedGame.results.find((result)=> {return result._id == req.body._id})
+         result = updatedGame.results.find((thingy)=> {
+           return JSON.stringify(thingy._id) == JSON.stringify(req.body._id)
+         })
          res.json(result);
       } catch (e) {
         console.log(e)  
@@ -866,7 +862,22 @@ var AblGameController = {
               error: { message: e, resend: true }
           });
       } 
+  },
+    _deleteResult: async (req, res) => {
+    
+       try {
+         
+         const updatedGame = await AblGame.update( { _id: req.params.id }, { $pull: { results: {_id: ObjectId(req.params.resultId) } }} )
+
+         res.json(updatedGame);
+      } catch (e) {
+        console.log(e)
+          return res.status(422).send({
+              error: { message: e, resend: true }
+          });
+      } 
   }
+
 
 
 

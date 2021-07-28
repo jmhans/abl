@@ -50,7 +50,11 @@
               </span>
             <ul class="list-group list-group-horizontal">
               <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
-                <span> {{res.status}} |  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>
+                <span> {{res.status}} |  
+                  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>                  
+                  <button mat-icon-button color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="_deleteResult(res._id)"  [disabled]="_oppAttested(res_idx)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                   <span *ngIf="_scoreDiff(res_idx)"> | Result has changed</span>
                 </span>
               </li>
@@ -105,54 +109,78 @@
   <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
     
 
-    
+<!--     
     Attestation History: 
     <span *ngFor="let att of active_result?.attestations" class="d-block">
      {{att.attesterType | titlecase}} team has attested. 
       <button *ngIf="_teamOwner(att.attesterType)" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
         Remove
       </button>
-    </span>
+    </span> -->
         
     
     
-    <div class="alert alert-warning" role="alert" *ngIf="activeDifference">
+    <div class="alert alert-warning d-block" role="alert" *ngIf="activeDifference">
       Warning! Current result differs from system-generated result. 
     </div>
     <span *ngIf="active_result?.scores"> 
-      <span class="alert alert-success" role="alert" *ngIf="activeChanged">
-          Current result differs from stored result. 
-        <span *ngIf="_userHasAttested(); else elseBlock"> Attesting will overwrite stored result. </span>
-        <ng-template #elseBlock>Saving will overwrite stored result</ng-template>
+      <span class="alert alert-success d-block" role="alert" *ngIf="activeChanged">
+        <span *ngIf="active_result.status == 'draft'; else elseBlockShow"> Current result has not been saved. Saving or attesting will store a new result.</span>
+          <ng-template #elseBlockShow>Current result differs from stored result. Saving or attesting will overwrite stored result</ng-template>
       </span>
     </span>
     
-    <button *ngIf="active_result && _canSave()" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
-      <mdb-icon far icon="save"></mdb-icon> {{(activeDifference && active_result._id) ? "Overwrite" : "Save"}} Results
+      <span class="alert alert-warning d-block" role="alert" *ngIf="active_result_index == -1">
+          You are viewing a live calculated result. <span *ngIf="game.results.length > 0">Stored result(s) also exist.</span> Saving this result will create an additional stored record.  
+      </span>
+    
+    
+    <button *ngIf="active_result && _canSave() && (activeChanged || active_result_index == -1)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
+      <mdb-icon far icon="save"></mdb-icon> {{(activeChanged && active_result._id) ? "Overwrite" : "Save"}} Results
     </button>
-
+    
+    <span class="d-block">
     <span>Home Attestations: </span>
-    <span *ngFor="let att of _teamAttestationsActiveResult('home')">
-    {{att | json}}
+    <span *ngIf="!homeAttestations"> There are no attestations for the home team.</span>
+      
+      <span *ngFor="let att of homeAttestations">
+        {{att.time | date : 'medium'}}
+      <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)" *ngIf="_teamOwner('home')">
+        Remove
+      </button>
     </span>
    <!-- home team attest-->
+    
     <button *ngIf="active_result && _canAttest('home')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('home')">
-      <i class="far fa-check-square"></i> Save & Attest as HOME team
+      <i class="far fa-check-square"></i> 
+      <span *ngIf="homeAttestations.length > 0">Overwrite attestation for HOME Team</span>
+      <span *ngIf="homeAttestations.length == 0"><span *ngIf="!active_result._id || activeChanged">Save boxscore & </span> Attest as HOME team</span>
     </button>
     
+    </span>
     
-    
-    <span>Away Attestations: </span>
-    <span *ngFor="let att of _teamAttestationsActiveResult('away')">
-    {{att | json}}
+    <span class="d-block">
+    <span >Away Attestations: </span>
+      
+    <span *ngIf="!awayAttestations"> There are no attestations for the away team.</span>
+      
+    <span *ngFor="let att of awayAttestations">
+      {{att.time | date : 'medium'}}
+    <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)" *ngIf="_teamOwner('away')">
+        Remove
+      </button>
     </span>
     
     <!-- away team attest-->
     <button *ngIf="active_result && _canAttest('away')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('away')">
-      <i class="far fa-check-square"></i> Save & Attest as AWAY team
+      <i class="far fa-check-square"></i> 
+      <span *ngIf="awayAttestations.length > 0">Overwrite attestation for AWAY Team</span>
+      <span *ngIf="awayAttestations.length == 0"><span *ngIf="!active_result._id || activeChanged">Save boxscore & </span> Attest as AWAY team</span>
     </button>
-    
-    
+      
+      </span>
+
+
     
 
     

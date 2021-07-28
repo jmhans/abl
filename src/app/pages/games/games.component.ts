@@ -84,11 +84,32 @@ export class GamesComponent implements OnInit, OnDestroy {
     
   }
   
+//   getGameScore(gm, loc) {
+//     if (gm.results && gm.results.scores) {
+//         return gm.results.scores.find((g)=> {return g.location == loc})    
+//     }
+//   }
+  
+  
   getGameScore(gm, loc) {
-    if (gm.results && gm.results.scores) {
-        return gm.results.scores.find((g)=> {return g.location == loc})    
+    var displayScore
+    
+    if (gm.results) {
+      
+      if (gm.results.length > 1) {
+        displayScore = gm.results.find((res)=>{return res.status == 'final'})  
+      } else {
+        displayScore = gm.results[0]
+      }
+      if (displayScore) {
+        return displayScore.scores.find((g)=> {return g.location == loc})  
+      } else {
+        return null
+      }
+      
     }
   }
+  
   
   _userInGame(tm) {
     if (!tm) return null;

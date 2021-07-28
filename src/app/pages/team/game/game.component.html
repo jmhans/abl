@@ -31,10 +31,18 @@
             <div class="col"> 
               
               <span *ngFor="let game_result of game.results; index as resIdx">
-                <span *ngIf="game_result?.status == 'final'" fxLayout="row" fxLayoutAlign="space-evenly center" >
+                <span fxLayout="row" fxLayoutAlign="space-evenly center" >
+                  <span  *ngIf="game_result">{{game_result.status}}</span>
                   <span  *ngIf="getGameScore(game_result, 'A') as awayScore">{{game.awayTeam.nickname }}: {{awayScore.final.abl_runs | number:'1.2-2'}}</span>
                   <span *ngIf="getGameScore(game_result, 'H') as homeScore">{{game.homeTeam.nickname }}: {{homeScore.final.abl_runs | number:'1.2-2'}}</span>
-                  <button *ngIf="_needsAttest(game)" type="button" mdbBtn (click)="attest(game, game_result._id, resIdx)"  mdbWavesEffect><mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest</button>
+                  
+                  <span *ngFor="let loc of _ownerLocs(game)">
+                  <button *ngIf="_needsAttest(game, game_result) && _canAttest(game, loc)" type="button" mdbBtn (click)="attest(game, game_result._id, resIdx, loc)"  mdbWavesEffect>
+                    <mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest as {{loc}} team
+                  </button>
+                  </span>
+                  
+                  
                 </span>
               </span>
 

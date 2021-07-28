@@ -49,6 +49,10 @@ export class GameDetailComponent {
   originalresults: GameResultsModel[];
   activeChanged: boolean = false; // Bool to identify whether the current active score differs from the DB version of itself. 
   activeDifference: boolean = false; // Bool to identify whether the current active score differs from the live calculated result (which came from the backend API)
+  homeAttestations: object[];
+  awayAttestations: object[];
+  ownerLocs: string[] = [];
+  
   
   canAttest: string[];
   
@@ -76,8 +80,16 @@ export class GameDetailComponent {
   ngOnInit() {
     this._getRosters();
     //this.getStats();
+    
   }
 
+  
+  _getOwnerLocs() {
+    if (this._teamOwner('away')) this.ownerLocs.push('away')
+    if (this._teamOwner('home')) this.ownerLocs.push('home')
+  }
+  
+  
   _getRosters() {
     
     this.potentialStatlines = {};
@@ -89,8 +101,8 @@ export class GameDetailComponent {
     this.statsSub = this.ablGame.getGameRosters$(this.game._id)
       .subscribe(res => {
          // Add live score to results array. 
-          
-       this._setResults(res)
+        this._getOwnerLocs();
+        this._setResults(res)
         this._setActiveResult();
         this.liveRosters = res;
         this._updateScoreChanged();
@@ -190,6 +202,9 @@ export class GameDetailComponent {
   
   _handleGameResultUpdate(response) {
       if (!this.active_result._id) {
+        if (this.active_result.status == 'draft') {
+          this.game.results.splice(this.active_result_index, 1)
+        }
           this.game.results.push(response)
           this.active_result_index = this.game.results.length -1
         } else {
@@ -205,10 +220,29 @@ export class GameDetailComponent {
         }
         this._setActiveResult(this.active_result_index);
         this.originalresults =  this.clonerService.deepClone(this.game.results);
-            this._updateScoreChanged();
+        this._updateScoreChanged();
 
 
   }
+  
+  _handleGameResultDelete(response) {
+      var delRes = this.game.results.find((result)=> {return result._id == response})
+      
+      if (delRes) {
+        var idx = this.game.results.indexOf(delRes)  
+        this.game.results.splice(idx, 1)
+      }
+      
+      if (this.active_result_index == idx) {
+        this._setActiveResult();
+      }
+    
+        this.originalresults =  this.clonerService.deepClone(this.game.results);
+        this._updateScoreChanged();
+
+
+  }
+  
   
   
   _removeAttestation(attId: string) {
@@ -263,10 +297,10 @@ export class GameDetailComponent {
 
   
   _updateScoreChanged() {
-    this.activeChanged = !this._scoreCompare(this.active_result, this.originalresults[this.active_result_index])
+    this.activeChanged = this.active_result_index > -1 ? !this._scoreCompare(this.active_result, this.originalresults[this.active_result_index]) : false
     this.activeDifference = !this._scoreCompare(this.active_result, this.live_result)
-    
-    
+    this.homeAttestations = this._attestationsActiveResult('home', false)
+    this.awayAttestations = this._attestationsActiveResult('away', false)
     
     
 //      var hasChanges = false;
@@ -346,6 +380,7 @@ export class GameDetailComponent {
       return this.auth.userProfile.sub == a.attester
     })
   }
+
   
   _opponentHasAttested() {
     if (this.active_result) {
@@ -355,6 +390,23 @@ export class GameDetailComponent {
     }
   }
   
+  
+  _oppAttested(resIdx = null) {
+    
+    if (resIdx) {
+      return this.game.results[resIdx].attestations.find((a)=> {
+        return this.ownerLocs.find((loc)=> {return loc != a.attesterType}) 
+      })      
+    } else {
+      return this.game.results.find((result)=>{
+        return result.attestations.find((a)=> {
+          return this.ownerLocs.find((loc)=> {return loc != a.attesterType}) 
+        })
+      })
+    }
+
+    
+  }
   
   _resultsWithTeamAttestations(location) {
     // A score can be saved as long as nobody else besides the current user has attested to it. 
@@ -378,6 +430,10 @@ export class GameDetailComponent {
 
   }
   
+  _attestationsActiveResult(location, activeTeam = true) {
+    return this.active_result.attestations.filter((att)=> {return (activeTeam? this.auth.userProfile.sub == att.attester : true) && (location ? att.attesterType == location : true)})
+  }
+  
   
   _canAttest(location) {
     // Has not attested to any other score record. 
@@ -390,7 +446,7 @@ export class GameDetailComponent {
     if (atts.length == 0) {
       return true
     } else {
-      return JSON.stringify(this.active_result.scores) == JSON.stringify(atts[0].scores) && !this._opponentHasAttested() // && add condition for score has changed. 
+      return this.activeChanged && !this._opponentHasAttested() // && add condition for score has changed. 
     }
     
   }
@@ -417,6 +473,16 @@ export class GameDetailComponent {
     scoreRec.final = $evt.final
     
     this._updateScoreChanged()
+  }
+  
+  _deleteResult(resId) {
+     this.submitSub = this.ablGame.deleteResult$(this.game._id, resId)
+      .subscribe(res => {
+        console.log(`Document updated: ${res}` );
+        
+          this._handleGameResultDelete(resId)
+
+      })
   }
   
   ngOnDestroy() {
