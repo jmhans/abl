@@ -124,6 +124,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   
   _userInGame(tm) {
     if (!tm) return null;
+    if (!this.auth.userProfile) return null;
     
     return tm.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
   }

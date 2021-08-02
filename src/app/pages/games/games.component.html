@@ -53,7 +53,7 @@
               </a>
             </th>
             <td>{{game.gameDate | date:'longDate'}}</td>
-            <ng-container *ngIf="!game.results || game.results?.length <= 1; else gotoDetailBlock">
+            <ng-container *ngIf="!game.results || game.results?.length == 1; else gotoDetailBlock">
             
             
             <td><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></td>
@@ -84,10 +84,13 @@
             </td>
             </ng-container>
             <ng-template #gotoDetailBlock>
-            <td colspan=4>Game has multiple stored results. Go to detail</td>
-            
+            <td colspan=4> 
+              <span *ngIf="game.results?.length >1">Game has multiple stored results.</span>
+              <span *ngIf="game.results?.length ==0">Results have not been calculated for this game yet.</span>
+                Go To <a [routerLink]="['/game', game._id]">Detail
+                </a>
+              </td>
             </ng-template>
-            
             
           </tr>
         </tbody>

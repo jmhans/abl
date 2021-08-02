@@ -107,10 +107,10 @@ class ABLRosterController extends BaseController{
           }
         }
       }])
-      
       if (atomicLineup) {
         return atomicLineup[0]
       } else {
+        
         console.log("didn't find a lineup");
       }
       

@@ -401,7 +401,14 @@ var AblGameController = {
     try {
         var result = await AblGame.aggregate([{
             '$addFields': {
-              'attesters': '$results.attestations.attesterType'
+              'attesters': '$results.attestations.attesterType',
+              'results': {
+                  '$filter': {
+                    'input': '$results', 
+                    'as': 'res', 
+                    'cond': {'$ne': ['$$res', null]}
+                  }
+                }
             }
           }
           
@@ -470,17 +477,26 @@ var AblGameController = {
       var result = {};
       var homeErrors = {reg: 0, final: 0}
       var awayErrors = {reg: 0, final: 0}
+      
+      var tms = [gm.homeTeam._id, gm.awayTeam._id]
+      
+      
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
         const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(gm.gameDate));
        // console.log(lineup);
-        if (lineup.roster) {
-          return lineup.roster;  
-        } else {
-          return []
+        if (lineup) {
+          if (lineup.roster) {
+            return lineup.roster;  
+          } else {
+            throw `No roster for team ${tm}.`
+            return []
+          } 
         }
         
       }));
 
+        console.log(lineups) ;
+      
           if (new Date(day) <= new Date()) {
             // This game should be done by now. 
             
@@ -622,67 +638,71 @@ var AblGameController = {
     console.log(dailyStats.length + " stat records found.");
 
     return lineups.map( (lineup) => {
-      
-      return lineup.map((plyr) => {
+      if (lineup) {
+        return lineup.map((plyr) => {
 
                 
-        var player_stats =  dailyStats.filter((statline) => {
-              return (statline.mlbId == plyr.player.mlbID); 
-            
-          })
-          .map(this._getDailyStats)
-          .reduce( function getSum(total, thisRec) {
-            for (var propertyName in thisRec) {
-              // propertyName is what you want
-              // you can get the value like this: myObject[propertyName]
-              switch (propertyName) {
-                case 'mlbId':
-                  total.mlbId = thisRec.mlbId;
-                  break;
-                case 'gamePk':
-                case 'gameDate':
-                case 'position(s)':
-                  total[propertyName].push(thisRec[propertyName])
-                  break;
-                case 'abl_score': 
-                  total.abl_score.abl_points += ( thisRec.abl_points || 0);
-                  total.abl_score.e += (thisRec.e || 0);
-                  total.abl_score.ab += (thisRec.ab || 0);
-                  total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
-                  break;
-                default:
-                  total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+          var player_stats =  dailyStats.filter((statline) => {
+                return (statline.mlbId == plyr.player.mlbID); 
+
+            })
+            .map(this._getDailyStats)
+            .reduce( function getSum(total, thisRec) {
+              for (var propertyName in thisRec) {
+                // propertyName is what you want
+                // you can get the value like this: myObject[propertyName]
+                switch (propertyName) {
+                  case 'mlbId':
+                    total.mlbId = thisRec.mlbId;
+                    break;
+                  case 'gamePk':
+                  case 'gameDate':
+                  case 'position(s)':
+                    total[propertyName].push(thisRec[propertyName])
+                    break;
+                  case 'abl_score': 
+                    total.abl_score.abl_points += ( thisRec.abl_points || 0);
+                    total.abl_score.e += (thisRec.e || 0);
+                    total.abl_score.ab += (thisRec.ab || 0);
+                    total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
+                    break;
+                  default:
+                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+                }
+
               }
 
-            }
+              return total;
+            }, {
+              'gamePk': [],
+              'gameDate': [],
+              'position(s)': [], 
+              'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
+            });
+          //console.log(`Stats for ${plyr.player.name} updating.`);
 
-            return total;
-          }, {
-            'gamePk': [],
-            'gameDate': [],
-            'position(s)': [], 
-            'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
-          });
-        //console.log(`Stats for ${plyr.player.name} updating.`);
-        
-        plyr.player.stats = {};
-       // console.log("before update");
-      //  console.log(plyr);
-        plyr.dailyStats = player_stats;
-       // if (plyr.player.name == "Max Muncy") {
-         // console.log( plyr.dailyStats)
-          
-       //   console.log(plyr)
-       //   console.log("after update");
-       //   plyr.prop = "New Prop"
-       // }
-        
-        return plyr;
-//         return {
-//           player: plyr,
-//           dailyStats: player_stats
-//         }
-      });
+          plyr.player.stats = {};
+         // console.log("before update");
+        //  console.log(plyr);
+          plyr.dailyStats = player_stats;
+         // if (plyr.player.name == "Max Muncy") {
+           // console.log( plyr.dailyStats)
+
+         //   console.log(plyr)
+         //   console.log("after update");
+         //   plyr.prop = "New Prop"
+         // }
+
+          return plyr;
+  //         return {
+  //           player: plyr,
+  //           dailyStats: player_stats
+  //         }
+        });
+      } else {
+        return []
+      }
+
     });
 
   },
