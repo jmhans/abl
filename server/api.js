@@ -142,6 +142,8 @@ module.exports = function(app, config) {
   app.delete('/api3/game/:id/score/:scoreId/attestations/:attId', jwtCheck, AblGameController._removeAttestation2);
   app.post('/api3/game/:id/results', jwtCheck, AblGameController._postResults);
   app.delete('/api3/game/:id/results/:resultId', jwtCheck, AblGameController._deleteResult);
+  app.get('/api3/games/oldResults', jwtCheck, AblGameController._getOldResultGames);
+  app.post('/api3/games/oldResults/:gameId', jwtCheck, AblGameController._addIdToResult);
   
   app.get("/api3/statlines", makeGet(Statline));
   app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));

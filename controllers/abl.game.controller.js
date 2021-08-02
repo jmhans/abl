@@ -322,23 +322,65 @@ var AblGameController = {
   },
 
 
-  _getById: function(req, res) {
-    AblGame.findById(req.params.id).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, game) {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
+//   _getById: function(req, res) {
+//     AblGame.findById(req.params.id).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, game) {
+//       if (err) {
+//         return res.status(500).send({
+//           message: err.message
+//         });
+//       }
+//       if (!game) {
+//         return res.status(400).send({
+//           message: 'Game not found.'
+//         });
+//       }
+//       // AblGameController._processGame(game);
+//       res.send(game);
+//     });
+
+//   },
+    _getById: async function(req, res) {
+      try {
+        var result = await AblGame.aggregate([
+            {
+              '$match': {
+                '_id': new ObjectId(req.params.id)
+              }
+            }, {
+              '$addFields': {
+                'results': {
+                  '$filter': {
+                    'input': '$results', 
+                    'as': 'res', 
+                    'cond': {'$ne': ['$$res', null]}
+                  }
+                }
+              }
+            }
+          ])
+        
+        AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' }, function (err, game) {
+            if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!game) {
+            return res.status(400).send({
+              message: 'Game not found.'
+            });
+          }
+          res.send(game[0]);  
+        })
       }
-      if (!game) {
-        return res.status(400).send({
-          message: 'Game not found.'
-        });
+      catch (err) {
+        return res.status(500).send({message: err.message})
       }
-      // AblGameController._processGame(game);
-      res.send(game);
-    });
 
   },
+  
+  
+  
 
   _getRosters: async function(req, res, next) {
     try {
@@ -431,7 +473,12 @@ var AblGameController = {
       var lineups = await Promise.all( [gm.homeTeam._id, gm.awayTeam._id].map(async tm=> {
         const lineup = await myAblRoster._getRosterForTeamAndDate(tm, new Date(gm.gameDate));
        // console.log(lineup);
-        return lineup.roster;
+        if (lineup.roster) {
+          return lineup.roster;  
+        } else {
+          return []
+        }
+        
       }));
 
           if (new Date(day) <= new Date()) {
@@ -876,6 +923,119 @@ var AblGameController = {
               error: { message: e, resend: true }
           });
       } 
+  }, 
+  
+   _getOldResultGames: async function(req, res) {
+    try {
+        var result = await AblGame.aggregate([
+                                              {
+                                                '$addFields': {
+                                                  'results': {
+                                                    '$cond': {
+                                                      'if': {
+                                                        '$isArray': '$results'
+                                                      }, 
+                                                      'then': '$results', 
+                                                      'else': [
+                                                        '$results'
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              }, {
+                                                '$addFields': {
+                                                  'results': {
+                                                    '$filter': {
+                                                      'input': '$results', 
+                                                      'as': 'res', 
+                                                      'cond': {
+                                                        '$ne': [
+                                                          '$$res', null
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }, {
+                                                '$match': {
+                                                  'results': {
+                                                    '$elemMatch': {
+                                                      '_id': {
+                                                        '$eq': null
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                            ).exec(function(err, games) {
+
+          if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!games) {
+            return res.status(400).send({
+              message: 'No games found.'
+            });
+          } 
+          return res.send(games)
+        })  
+      
+    } catch (err) {
+      return res.status(500).send({
+              message: err.message
+            });
+    }
+    
+  }, 
+  
+   _addIdToResult: async function(req, res) {
+    try {
+      
+      var pre = await AblGame.findById(ObjectId(req.params.gameId))
+      console.log(req.params.gameId);
+      
+      console.log(pre)
+      
+      if (pre) {
+        if (Array.isArray(pre.results)) {
+            
+              pre.results.forEach((gameRes)=> {
+                if (!gameRes._id) {
+                  gameRes._id = ObjectId()
+                }
+              })
+            } else {
+              if(!pre.results._id) {
+                pre.results._id = ObjectId()
+              }
+            }
+      }
+      
+      pre.save(function(err, gm) {
+              if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!gm) {
+            return res.status(400).send({
+              message: 'No games found.'
+            });
+          } 
+          return res.send(gm)
+      })
+      
+      
+      
+    } catch (err) {
+      return res.status(500).send({
+              message: err.message
+            });
+    }
+    
   }
 
 

@@ -117,6 +117,19 @@ export class AblGameService {
       );
     }
   
+    addAttestationOptions$(gmId: string, resultId: string, attest: {}, options: {}): Observable<GameResultsModel> {
+  
+    
+      return this.http
+      .post<GameModel>(`${this.base_api}game/${gmId}/score/${resultId}/attestations`, attest, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+    }
+  
+  
   saveGameAndAttest$(gmId: string, result: GameResultsModel, attest: {}): Observable<GameResultsModel> {
     if (result._id) {
       // Result exists. Overwrite it. Then add attestation to it. 

@@ -50,7 +50,7 @@
               </span>
             <ul class="list-group list-group-horizontal">
               <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
-                <span> {{res.status}} |  
+                <span *ngIf="res.status"> {{res.status}} |  
                   <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>                  
                   <button mat-icon-button color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="_deleteResult(res._id)"  [disabled]="_oppAttested(res_idx)">
                     <mat-icon>delete</mat-icon>

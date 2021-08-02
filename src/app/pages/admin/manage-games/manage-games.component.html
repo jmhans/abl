@@ -1,0 +1,10 @@
+<ul *ngFor="let game of oldGames$ | async">
+  <li>
+    <ul *ngFor= "let res of game.results">
+      <li>{{res | json}}</li>
+    </ul>
+              <button mat-button (click)="_addIds(game._id)">
+                Add Ids
+              </button>
+  </li>
+</ul>
