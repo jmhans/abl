@@ -137,6 +137,13 @@ module.exports = function(app, config) {
   app.post('/api3/game/new', jwtCheck, AblGameController._post );
   app.put('/api3/game/:id', jwtCheck, AblGameController._put);
   app.put('/api3/game/:id/results', jwtCheck, AblGameController._updateResults);
+  //app.put('/api3/game/:id/attestations', jwtCheck, AblGameController._removeAttestation);
+  app.post('/api3/game/:id/score/:scoreIdx/attestations', jwtCheck, AblGameController._addAttestation);
+  app.delete('/api3/game/:id/score/:scoreId/attestations/:attId', jwtCheck, AblGameController._removeAttestation2);
+  app.post('/api3/game/:id/results', jwtCheck, AblGameController._postResults);
+  app.delete('/api3/game/:id/results/:resultId', jwtCheck, AblGameController._deleteResult);
+  app.get('/api3/games/oldResults', jwtCheck, AblGameController._getOldResultGames);
+  app.post('/api3/games/oldResults/:gameId', jwtCheck, AblGameController._addIdToResult);
   
   app.get("/api3/statlines", makeGet(Statline));
   app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));

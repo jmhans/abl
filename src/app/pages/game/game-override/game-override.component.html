@@ -30,7 +30,7 @@
       
     </div>
   </mat-card-content>
-  <mat-card-actions *ngIf="rosters && rosters.status == 'Final'">
+  <mat-card-actions *ngIf="rosters && rosters.status == 'final'">
     <button *ngIf="_rawScores(game.results.scores) != _rawScores(_getGameResult().scores)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
       <mdb-icon far icon="save"></mdb-icon> Save Results
     </button>

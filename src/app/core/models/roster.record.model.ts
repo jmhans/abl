@@ -18,19 +18,19 @@ class CreateRosterRecordModel {
 }
 
  interface rosterScoreRecord {
-  abl_runs : Number
-  abl_points : Number
-  e : Number
-  ab : Number
-  g : Number
-  h : Number
-  hr : Number
-  bb : Number
-  hbp : Number
-  sac : Number
-  sf : Number
-  sb : Number
-  cs : Number
+  abl_runs : number
+  abl_points : number
+  e : number
+  ab : number
+  g : number
+  h : number
+  hr : number
+  bb : number
+  hbp : number
+  sac : number
+  sf : number
+  sb : number
+  cs : number
 }
 
 interface rosterGameScoreRecord {
@@ -41,8 +41,8 @@ interface rosterGameScoreRecord {
 interface gameRosters {
   away_score: rosterGameScoreRecord
   home_score: rosterGameScoreRecord
-  awayTeam: [playerModel]
-  homeTeam: [playerModel]
+  awayTeam: playerModel[]
+  homeTeam: playerModel[]
   status: string
   result: {winner: {}, loser: {}}
 }

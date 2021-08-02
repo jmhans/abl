@@ -50,7 +50,9 @@ class StatlineController extends BaseController {
    }
   
   async _updateStatline(plyr, gm) {
-    if (ablConfig._isPositionPlayer(plyr)) {
+    if (plyr.allPositions) {
+      
+    
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
       var query = {
         'mlbId': plyr.person.id, 
@@ -88,9 +90,8 @@ class StatlineController extends BaseController {
       } catch (err) {
         console.error(`Error in _updateStatline:${err}`);
       }
-
-
-    }  
+}
+ 
   }
   
   async _getStatlineDiff(fullStat, partialStat) {
@@ -143,7 +144,8 @@ class StatlineController extends BaseController {
             '$addFields': {
               'player': {
                 '$first': '$player'
-              }
+              }, 
+              'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
             }
           }
         ])

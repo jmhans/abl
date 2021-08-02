@@ -67,31 +67,72 @@ export class TeamGameComponent implements OnInit {
       );
   }
   
-  attest(gm: GameModel) {
+  attest(gm: GameModel, result_id: string, resultIdx: number, loc: string) {
     //this.api.postData$({})
     console.log(gm);
     
-    this.submitSub = this.ablGame.attestGame$(gm._id, 
-                                              gm.results, 
-                                              {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
+    this.submitSub = this.ablGame.addAttestation$(gm._id, 
+                                              result_id, 
+                                              {attester: this.auth.userProfile.sub, attesterType: loc}
                                               )
         .subscribe(res => {
           console.log(`Document updated: ${res}` );
-          gm.results = res.results
+          gm.results[resultIdx] = res;
         })     
   }
   
-  _needsAttest(gm) {
-    return gm.attesters.map((a)=> {return gm[a+'Team']._id}).indexOf(this.team._id) == -1
+  _needsAttest(gm, gm_result) {
+    
+    const ownerLoc = this._findOwnerLoc(gm);
+    if (ownerLoc) {
+      if (gm_result) {
+        const att =  gm_result.attestations.find((att)=> {return att.attesterType == ownerLoc})
+        if (!att) {
+          return true
+        } else { 
+          return false 
+        }
+      }
+      return null
+    }   
+  
   }
+  
+  _canAttest(gm, loc) {
+    
+    var hasAttested = false
+    
+    gm.results.forEach((gr)=> {
+      if (gr.attestations.find((att)=> { return att.attesterType == loc })) {
+        hasAttested = true
+      }
+    })
+    
+    return this.team.owners.find((owner)=>{return owner.userId == this.auth.userProfile.sub}) && !hasAttested
+  }
+  
+  
+  _findOwnerLoc(gm) {
+    if (this.team._id == gm.awayTeam._id) return 'away'
+    if (this.team._id == gm.homeTeam._id) return 'home'
+    return null
+  }
+  
+  _ownerLocs(gm) {
+    var locs = []
+    if (this.team._id == gm.awayTeam._id) locs.push('away')
+    if (this.team._id == gm.homeTeam._id) locs.push('home')
+    return locs
+  }
+  
   
   protest(gm) {
     console.log(gm);
     //this.api.postData$({})
   }
-  getGameScore(gm, loc) {
-    if (gm.results && gm.results.scores) {
-        return gm.results.scores.find((g)=> {return g.location == loc})    
+  getGameScore(gm_result, loc) {
+    if (gm_result && gm_result.scores) {
+        return gm_result.scores.find((g)=> {return g.location == loc})    
     }
   }
 

@@ -71,8 +71,8 @@ export class GameTeamDetailComponent implements OnInit {
     ngOnChanges(changes: SimpleChanges) {
       
       if (changes.roster) {
-        this.active = this.roster.filter((p)=> {return p.ablstatus == 'active'});
-        this.bench = this.roster.filter((p)=> {return p.ablstatus != 'active'})
+        this.active = this.roster ? this.roster.filter((p)=> {return p.ablstatus == 'active'}) : [];
+        this.bench = this.roster ? this.roster.filter((p)=> {return p.ablstatus != 'active'}) : [];
       }
       
       if (changes.oppScore) {
@@ -149,6 +149,7 @@ export class GameTeamDetailComponent implements OnInit {
       
       if (stat) {
         obj[property] = parseInt(editField);
+        obj.modified = true;
           this.updateScoreForPlyr(obj)
           this.updateTeamScore();
           } else {
@@ -174,9 +175,9 @@ export class GameTeamDetailComponent implements OnInit {
       this.editField = event.target.textContent;
     }
   updateTeamScore(external:boolean = false) {
-    this.teamScore = {regulation : this.regulation_score(), final: this.final_score()}
+    //this.teamScore = 
     if (!external) {
-      this.updateScore.emit(this.teamScore);
+      this.updateScore.emit({regulation : this.regulation_score(), final: this.final_score()}); //this.teamScore);
     }
     
   }

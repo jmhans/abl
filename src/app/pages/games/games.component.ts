@@ -77,39 +77,73 @@ export class GamesComponent implements OnInit, OnDestroy {
       );
   }
 
-  getGameAttester(allAttestations, loc) {
-    if (allAttestations) {
-      return allAttestations.find((a)=> {return a.attesterType == loc });  
+  getGameAttester(gameResults, loc) {
+    if (gameResults) {
+      var atts
+      if (Array.isArray(gameResults)) {
+        if (gameResults[0]) {
+          atts = gameResults[0].attestations  
+        } else {
+          atts = []
+        }
+        
+      } else {
+        atts = gameResults.attestations
+      }
+      return atts.find((a)=> {return a.attesterType == loc });  
     }
     
   }
   
+//   getGameScore(gm, loc) {
+//     if (gm.results && gm.results.scores) {
+//         return gm.results.scores.find((g)=> {return g.location == loc})    
+//     }
+//   }
+  
+  
   getGameScore(gm, loc) {
-    if (gm.results && gm.results.scores) {
-        return gm.results.scores.find((g)=> {return g.location == loc})    
+    var displayScore
+    
+    if (gm.results) {
+      
+      if (gm.results.length > 1) {
+        displayScore = gm.results.find((res)=>{return res.status == 'final'})  
+      } else {
+        displayScore = gm.results[0]
+      }
+      if (displayScore) {
+        return displayScore.scores.find((g)=> {return g.location == loc})  
+      } else {
+        return null
+      }
+      
     }
   }
   
+  
   _userInGame(tm) {
     if (!tm) return null;
+    if (!this.auth.userProfile) return null;
     
     return tm.owners.find((o)=> { return this.auth.userProfile.sub == o.userId})
   }
   
   
   
-  _saveResult(gm) {
-    var attestSub = this.ablGame.attestGame$(gm._id, 
-                                                 gm.results, 
-                                                 {attester: this.auth.userProfile.sub, attesterType: this.ablGame.gameParticipant(gm, this.auth.userProfile.sub)}
+  _saveResult(gm, loc) {
+    var attestSub = this.ablGame.addAttestation$(gm._id, 
+                                                 gm.results[0]._id, 
+                                                 {attester: this.auth.userProfile.sub, attesterType: loc}
                                                 ).subscribe(
       res => {
-        console.log(res)
-      },
+          console.log(`Document updated: ${res}` );
+        }, 
       err => {
-        console.error(err);
+      console.error(err)
       }
     )
+    
   }
   
   

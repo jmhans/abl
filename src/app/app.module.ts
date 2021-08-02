@@ -18,6 +18,7 @@ import { UtilsService } from './core/utils.service';
 import { FilterSortService } from './core/filter-sort.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+
 import { DataTablesModule } from 'angular-datatables';
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -80,6 +81,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
 
 import { LocalMaterialModule } from './core/local-material-module/local-material.module';
 import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
+import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
                                        
 
 @NgModule({
@@ -129,7 +131,8 @@ import { RosterImportComponent } from './pages/team/roster/roster-import/roster-
     TeamGameComponent, 
     StandingsComponent,
     DialogOverviewExampleDialog,
-    RosterImportComponent
+    RosterImportComponent,
+    ManageGamesComponent
   ],
   imports: [
     BrowserModule,

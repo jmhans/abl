@@ -325,6 +325,27 @@ export class ApiService {
       );
   }
   
+  
+    
+  oldGames$():Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.base_api}games/oldResults`, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error)) 
+    )
+  }
+  
+   fixoldGame$(gmId):Observable<any[]> {
+    return this.http
+      .post<any[]>(`${this.base_api}games/oldResults/${gmId}`,{game: gmId},  {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error)) 
+    )
+  }
 
 
   

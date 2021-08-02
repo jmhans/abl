@@ -39,7 +39,7 @@
       </p>
 
       <ng-container class="table-responsive">
-      <table mdbTable class="table table-sm">
+      <table class="table">
         <thead>
           <tr>
             <th *ngFor="let head of headings" scope="col">{{head}} </th>
@@ -53,38 +53,49 @@
               </a>
             </th>
             <td>{{game.gameDate | date:'longDate'}}</td>
+            <ng-container *ngIf="!game.results || game.results?.length == 1; else gotoDetailBlock">
+            
+            
             <td><span *ngIf="getGameScore(game, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span></td>
             <td><span *ngIf="getGameScore(game, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span></td>
-            <ng-template #attestTemplate let-game let-attest="attest" let-team="team">
+            
+            <ng-template #attestTemplate let-game let-attest="attest" let-team="team" let-loc="loc">
               <mdb-icon *ngIf="attest" far icon="check-square"></mdb-icon>
-              <div *ngIf="game.results?.status == 'final' && !attest">
-                  <button *ngIf="team && _userInGame(team)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(game)">
+              <div *ngIf="!attest">
+                  <button *ngIf="team && _userInGame(team)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(game , loc)">
                     <i class="far check-square"></i> Attest to Boxscore
                   </button>
                 <mdb-icon *ngIf="!_userInGame(team)" far icon="square"></mdb-icon>
               </div>
-
-              
-              
             </ng-template>
             
             <td>
               <ngContainer 
-                           [ngTemplateOutlet]="attestTemplate"
-                           [ngTemplateOutletContext]="{ $implicit: game, attest: getGameAttester(game.results?.attestations, 'away'), team: game.awayTeam  }"> 
+                 [ngTemplateOutlet]="attestTemplate"
+                 [ngTemplateOutletContext]="{ $implicit: game, attest: getGameAttester(game.results, 'away'), team: game.awayTeam , loc: 'away'}"> 
               </ngContainer>
             </td>
             
             <td>
               <ngContainer 
-                           [ngTemplateOutlet]="attestTemplate"
-                           [ngTemplateOutletContext]="{$implicit: game, attest: getGameAttester(game.results?.attestations, 'home') , team: game.homeTeam }"> 
+                 [ngTemplateOutlet]="attestTemplate"
+                 [ngTemplateOutletContext]="{$implicit: game, attest: getGameAttester(game.results, 'home') , team: game.homeTeam , loc: 'home'}"> 
               </ngContainer>
             </td>
+            </ng-container>
+            <ng-template #gotoDetailBlock>
+            <td colspan=4> 
+              <span *ngIf="game.results?.length >1">Game has multiple stored results.</span>
+              <span *ngIf="game.results?.length ==0">Results have not been calculated for this game yet.</span>
+                Go To <a [routerLink]="['/game', game._id]">Detail
+                </a>
+              </td>
+            </ng-template>
             
           </tr>
         </tbody>
       </table>
+        
       </ng-container>
       
      
