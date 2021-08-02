@@ -86,7 +86,7 @@
       
       <span class="p-1 boxscore flex-fill" *ngFor="let box of active_result.scores; index as box_idx">
         {{box.location == 'H' ? "Home" : "Away" }} Team:<strong> {{box.location == 'H' ? game.homeTeam.nickname : game.awayTeam.nickname}}</strong>
-        <app-game-team-detail  [roster]="box.players" 
+        <app-game-team-detail  [roster]="box.players ? box.players : live_result.scores[box_idx].players" 
                               [teamScore]="box"  
                               [oppScore]="box_idx == 1 ? active_result.scores[0] : active_result.scores[1]" 
                               [homeTeam]="box.location == 'H'" 
@@ -129,6 +129,9 @@
           <ng-template #elseBlockShow>Current result differs from stored result. Saving or attesting will overwrite stored result</ng-template>
       </span>
     </span>
+    
+
+    
     
       <span class="alert alert-warning d-block" role="alert" *ngIf="active_result_index == -1">
           You are viewing a live calculated result. <span *ngIf="game.results.length > 0">Stored result(s) also exist.</span> Saving this result will create an additional stored record.  

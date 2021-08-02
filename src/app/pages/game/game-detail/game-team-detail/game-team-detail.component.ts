@@ -71,8 +71,8 @@ export class GameTeamDetailComponent implements OnInit {
     ngOnChanges(changes: SimpleChanges) {
       
       if (changes.roster) {
-        this.active = this.roster.filter((p)=> {return p.ablstatus == 'active'});
-        this.bench = this.roster.filter((p)=> {return p.ablstatus != 'active'})
+        this.active = this.roster ? this.roster.filter((p)=> {return p.ablstatus == 'active'}) : [];
+        this.bench = this.roster ? this.roster.filter((p)=> {return p.ablstatus != 'active'}) : [];
       }
       
       if (changes.oppScore) {

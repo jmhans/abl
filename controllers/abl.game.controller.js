@@ -321,30 +321,26 @@ var AblGameController = {
     })
   },
 
-
-//   _getById: function(req, res) {
-//     AblGame.findById(req.params.id).populate('awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player').exec(function(err, game) {
-//       if (err) {
-//         return res.status(500).send({
-//           message: err.message
-//         });
-//       }
-//       if (!game) {
-//         return res.status(400).send({
-//           message: 'Game not found.'
-//         });
-//       }
-//       // AblGameController._processGame(game);
-//       res.send(game);
-//     });
-
-//   },
     _getById: async function(req, res) {
       try {
         var result = await AblGame.aggregate([
             {
               '$match': {
                 '_id': new ObjectId(req.params.id)
+              }
+            }, {
+              '$addFields': {
+                'results': {
+                  '$cond': {
+                    'if': {
+                      '$isArray': '$results'
+                    }, 
+                    'then': '$results', 
+                    'else': [
+                      '$results'
+                    ]
+                  }
+                }
               }
             }, {
               '$addFields': {
@@ -400,6 +396,20 @@ var AblGameController = {
   _getAllGames: async function(req, res) {
     try {
         var result = await AblGame.aggregate([{
+              '$addFields': {
+                'results': {
+                  '$cond': {
+                    'if': {
+                      '$isArray': '$results'
+                    }, 
+                    'then': '$results', 
+                    'else': [
+                      '$results'
+                    ]
+                  }
+                }
+              }
+            }, {
             '$addFields': {
               'attesters': '$results.attestations.attesterType',
               'results': {
@@ -495,7 +505,6 @@ var AblGameController = {
         
       }));
 
-        console.log(lineups) ;
       
           if (new Date(day) <= new Date()) {
             // This game should be done by now. 
