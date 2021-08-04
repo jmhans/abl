@@ -59,54 +59,149 @@ class ABLRosterController extends BaseController{
     try {
       
       var atomicLineup = await Lineup.aggregate(
-      [{
-        '$match': {
-          'ablTeam': new ObjectId(teamId),
-          'effectiveDate': {
-            '$lte': this.getRosterDeadline(gmDate)
-          }
-        }
-      }, {
-        '$sort': {
-          'effectiveDate': -1
-        }
-      }, {
-        '$limit': 1
-      }, {
-        '$unwind': {
-          'path': '$roster',
-          'preserveNullAndEmptyArrays': false
-        }
-      }, {
-        '$lookup': {
-          'from': 'players',
-          'localField': 'roster.player',
-          'foreignField': '_id',
-          'as': 'player'
-        }
-      }, {
-        '$unwind': {
-          'path': '$player',
-          'preserveNullAndEmptyArrays': false
-        }
-      }, {
-        '$group': {
-          '_id': '$_id',
-          'roster': {
-            '$push': {
-              'player': '$player',
-              'lineupPosition': '$roster.lineupPosition',
-              'rosterOrder': '$roster.rosterOrder'
+      [
+  {
+    '$match': {
+      'ablTeam': new ObjectId(teamId), 
+      'effectiveDate': {
+        '$lte':  this.getRosterDeadline(gmDate)
+      }
+    }
+  }, {
+    '$sort': {
+      'effectiveDate': -1
+    }
+  }, {
+    '$limit': 1
+  }, {
+    '$unwind': {
+      'path': '$roster', 
+      'preserveNullAndEmptyArrays': false
+    }
+  }, {
+    '$lookup': {
+      'from': 'players', 
+      'localField': 'roster.player', 
+      'foreignField': '_id', 
+      'as': 'player'
+    }
+  }, {
+    '$unwind': {
+      'path': '$player', 
+      'preserveNullAndEmptyArrays': false
+    }
+  }, {
+    '$lookup': {
+      'from': 'statlines', 
+      'let': {
+        'plyrId': '$player.mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$gte': [
+                    '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
+                  ]
+                }
+              ]
             }
-          },
-          'effectiveDate': {
-            '$first': '$effectiveDate'
-          },
-          'ablTeam': {
-            '$first': '$ablTeam'
+          }
+        }, {
+          '$unwind': {
+            'path': '$positions', 
+            'includeArrayIndex': 'posIdx', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$addFields': {
+            'positions': {
+              '$cond': [
+                {
+                  '$in': [
+                    '$positions', [
+                      'LF', 'RF', 'CF'
+                    ]
+                  ]
+                }, 'OF', '$positions'
+              ]
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$mlbId', 
+              'gamePk': '$gamePk', 
+              'pos': '$positions'
+            }, 
+            'inGameCount': {
+              '$sum': 1
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId', 
+              'pos': '$_id.pos'
+            }, 
+            'posCount': {
+              '$sum': '$inGameCount'
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId'
+            }, 
+            'positionsLog': {
+              '$push': {
+                'pos': '$_id.pos', 
+                'ct': '$posCount'
+              }
+            }
+          }
+        }, {
+          '$project': {
+            'eligiblePositions': '$positionsLog.pos'
           }
         }
-      }])
+      ], 
+      'as': 'somethingCool'
+    }
+  }, {
+    '$unwind': {
+      'path': '$somethingCool', 
+      'preserveNullAndEmptyArrays': false
+    }
+  }, {
+    '$addFields': {
+      'player.eligible': '$somethingCool.eligiblePositions'
+    }
+  }, {
+    '$group': {
+      '_id': '$_id', 
+      'roster': {
+        '$push': {
+          'player': '$player', 
+          'lineupPosition': '$roster.lineupPosition', 
+          'rosterOrder': '$roster.rosterOrder'
+        }
+      }, 
+      'effectiveDate': {
+        '$first': '$effectiveDate'
+      }, 
+      'ablTeam': {
+        '$first': '$ablTeam'
+      }
+    }
+  }
+])
       if (atomicLineup) {
         return atomicLineup[0]
       } else {
@@ -146,31 +241,6 @@ class ABLRosterController extends BaseController{
   }
   
   
-  async _getLineupForTeamAndDate(req, res, next) {
-    try {
-      const lineup = await this._getLineupForTeam(req.body.id);
-      const gmDt = new Date(req.params.dt)
-      
-      if (lineup.effectiveDate < gmDt) {
-        return res.status(200).send(lineup);
-      } else { 
-        if (lineup.priorRosters.length >0) {
-          var sortedPR = lineup.priorRosters.sort((a,b)=> {return (new Date(b.effectiveDate) - new Date(a.effectiveDate))});
-          for (s = sortedPR.length - 1; s>=0; s--) {
-            if (sortedPR[s].effectiveDate < gmDt) {
-              return res.status(200).send(sortedPR[s]);
-            }  
-          }
-        } else {
-          return res.status(400).send({message: 'No lineup found for that date.'})
-        }
-      }
-    } catch (err) {
-      return res.status(500).send({message: err.message});
-    }
-  }
-  
-    
   async _getLineupForTeamAndDate2(req, res, next) {
     try {
       const tm = req.params.id; //await this._getLineupForTeam(req.body.id);
