@@ -16,18 +16,17 @@
         
         <div
           *ngFor="let game of fs.orderByDate(filteredGames, 'gameDate')"
-          class="list-group-item list-group-item-action flex-column align-items-start">
+          class="list-group-item d-flex flex-column">
           
           <div class="row">
             <div class="col">
-
               <button mat-button [routerLink]="['/game', game._id]">
                 <strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong>
               </button>
             </div>
 
               
-            <div class="col">{{game.gameDate | date:'longDate'}}</div>
+            <span class="col ">{{game.gameDate | date:'longDate'}}</span>
             <div class="col"> 
               
               <span *ngFor="let game_result of game.results; index as resIdx">
