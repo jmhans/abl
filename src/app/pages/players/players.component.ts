@@ -18,11 +18,13 @@ import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Ob
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
+import { DataTableDirective } from 'angular-datatables';
 
 export interface DialogData {
   team: AblTeamModel;
   player: string;
   effective_date: Date;
+  acqType: string;
 }
 
 @Component({
@@ -54,8 +56,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
   teamsListSub: Subscription;
   showTaken: boolean = false;
   filterGroup: any = {value: 'showAll'};
-  showPlayers: string;
+  showPlayers: string = 'all';
   advancedMode: boolean = false; 
+  filterPos: string;
   
   overrideData: any[];
   dataSub: Subscription;
@@ -70,7 +73,10 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-
+  @ViewChild(DataTableDirective, {static: false})
+  dtElement: DataTableDirective;
+  
+  
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
@@ -116,24 +122,24 @@ export class PlayersComponent implements OnInit, OnDestroy {
         res => {
           this.playerList = res;
           this.filteredPlayers = this.playerList;
-          this.dataSource = new MatTableDataSource(this.filteredPlayers);
-          this.dataSource.paginator = this.paginator;
+     //     this.dataSource = new MatTableDataSource(this.filteredPlayers);
+     //     this.dataSource.paginator = this.paginator;
           
-           this.dataSource.sortingDataAccessor = (item, property) => {
+     //      this.dataSource.sortingDataAccessor = (item, property) => {
             
-             switch(property) {
+//              switch(property) {
 
-                case 'abl': return this.abl(item.stats['batting']);
-                default: 
-                  if (typeof item[property] == 'undefined') {
-                    return item.stats['batting'][property];
-                  } else {
-                    return item[property];
-                  }
-              }
-            };
+//                 case 'abl': return this.abl(item.stats['batting']);
+//                 default: 
+//                   if (typeof item[property] == 'undefined') {
+//                     return item.stats['batting'][property];
+//                   } else {
+//                     return item[property];
+//                   }
+//               }
+//             };
           //this._getTeamList();
-          this.dataSource.sort = this.sort;
+//          this.dataSource.sort = this.sort;
           this.updateTakenPlayers('all');
           this.loading = false;
           this.dtTrigger.next();
@@ -208,7 +214,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     if (this.advancedMode) {
       const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
         width: '250px',
-        data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date()}
+        data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: 'pickup'}
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -217,7 +223,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
         
         if (result) {
           this.rosterUpdateSub = this.rosterService
-          .addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString()}, result.team._id)
+          .addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString(), acqType: result.acqType}, result.team._id)
           .subscribe(
             data => this._handleSubmitSuccess(data, plyr),
             err => this._handleSubmitError(err)
@@ -266,6 +272,31 @@ export class PlayersComponent implements OnInit, OnDestroy {
     })
     
   }
+  
+  
+  changePositionFilter() {
+    this.filteredPlayers = this.playerList.filter((p) => {
+      
+      if (this.filterPos) {
+        return  p.position == this.filterPos && ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
+      } else {
+        return  ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
+      }
+      
+    })
+    this.rerender()
+
+  }
+                                                  
+  rerender(): void {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      // Destroy the table first
+      dtInstance.destroy();
+      // Call the dtTrigger to rerender again
+      this.dtTrigger.next();
+    });
+  }
+  
 
   resetQuery() {
     this.query = '';
@@ -333,6 +364,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
 export class DialogOverviewExampleDialog {
 date = new FormControl(new Date());
 teamList$ = this.api.getAblTeams$()
+acqType: string;
   
   
   constructor(public api: ApiService, 
