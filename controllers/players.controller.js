@@ -1,7 +1,10 @@
 const Player = require('../models/player').Player;
 const BaseController = require('./base.controller');
+var express = require('express');
+const Statline = require('../models/statline');
 
 const ablConfig = require('../server/ablConfig');
+var   router = express.Router();
 
 
 
@@ -55,6 +58,191 @@ class PlayersController extends BaseController {
 
     }  
   }
+  
+ async _getEligibility(req, res, next) {
+   if (req.params.plyrId) {
+     console.log(req.params.plyrId);
+     const query = await this.model.aggregate([
+  {
+    '$match': {
+      'mlbID': req.params.plyrId
+    }
+  }, {
+    '$lookup': {
+      'from': 'statlines', 
+      'let': {
+        'mlbId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$mlbId'
+                  ]
+                }, {
+                  '$gte': [
+                    '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
+                  ]
+                }
+              ]
+            }
+          }
+        }, {
+          '$unwind': {
+            'path': '$positions', 
+            'includeArrayIndex': 'posIdx', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$addFields': {
+            'positions': {
+              '$cond': [
+                {
+                  '$in': [
+                    '$positions', [
+                      'LF', 'RF', 'CF'
+                    ]
+                  ]
+                }, 'OF', '$positions'
+              ]
+            }
+          }
+        }, {
+          '$match': {
+            'positions': {
+              '$in': [
+                '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
+              ]
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$mlbId', 
+              'gamePk': '$gamePk', 
+              'pos': '$positions'
+            }, 
+            'inGameCount': {
+              '$sum': 1
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId', 
+              'pos': '$_id.pos'
+            }, 
+            'posCount': {
+              '$sum': '$inGameCount'
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId'
+            }, 
+            'positionsLog': {
+              '$push': {
+                'pos': '$_id.pos', 
+                'ct': '$posCount'
+              }
+            }
+          }
+        }, {
+          '$addFields': {
+            'eligiblePositions': {
+              '$filter': {
+                'input': '$positionsLog', 
+                'as': 'posObj', 
+                'cond': {
+                  '$gte': [
+                    '$$posObj.ct', 10
+                  ]
+                }
+              }
+            }
+          }
+        }, {
+          '$addFields': {
+            'eligiblePositions': '$eligiblePositions.pos'
+          }
+        }
+      ], 
+      'as': 'stats'
+    }
+  }, {
+    '$unwind': {
+      'path': '$stats', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$addFields': {
+      'eligiblePositions': '$stats.eligiblePositions'
+    }
+  }, {
+    '$lookup': {
+      'from': 'draft', 
+      'localField': 'mlbID', 
+      'foreignField': 'mlbId', 
+      'as': 'draftRec'
+    }
+  }, {
+    '$unwind': {
+      'path': '$draftRec', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$addFields': {
+      'eligiblePositions': {
+        '$concatArrays': [
+          {
+            '$filter': {
+              'input': '$eligiblePositions', 
+              'as': 'eligPos', 
+              'cond': {
+                '$ne': [
+                  '$$eligPos', '$draftRec.Position'
+                ]
+              }
+            }
+          }, [
+            '$draftRec.Position'
+          ]
+        ]
+      }
+    }
+  }, {
+    '$project': {
+      'stats': 0, 
+      'draftRec': 0
+    }
+  }
+]).exec(function(err, positions) {
+        console.log("got here")
+          if (err) {
+            return res.status(500).send({
+              message: err.message
+            });
+          }
+          if (!positions) {
+            return res.status(400).send({
+              message: 'No player found.'
+            });
+          } 
+        console.log(positions);
+          return res.send(positions[0].eligiblePositions)
+        })
+   }
+ }
+  
+    route() {
+    router.get('/' + this.routeString + '/:plyrId/eligibility' , (...args) => this._getEligibility(...args));
+    return router;
+  }
+  
   
   
 }

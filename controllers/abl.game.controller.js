@@ -650,6 +650,7 @@ var AblGameController = {
       if (lineup) {
         return lineup.map((plyr) => {
 
+          if (plyr.mlbId == '')
                 
           var player_stats =  dailyStats.filter((statline) => {
                 return (statline.mlbId == plyr.player.mlbID); 

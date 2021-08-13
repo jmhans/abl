@@ -54,28 +54,35 @@ class StatlineController extends BaseController {
       
     
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
+    
+    const originalDate = gm.resumedFrom ? gm.resumedFrom : gm.gameDate
       var query = {
         'mlbId': plyr.person.id, 
-        'gamePk': gm.gamePk
-        
+        'gamePk': gm.gamePk,
+        'gameDate': originalDate
+      }
+      
+      if (gm.officialDate) {
+        // console.log(`${gm.gamePk}: - ` )
       }
       
        var _statline = {
                 mlbId: plyr.person.id,
-                gameDate: gm.officialDate ? (new Date(gm.officialDate + "T12:00:00")).toISOString() : gm.gameDate, 
+                gameDate: gm.gameDate, //gm.officialDate ? (new Date(gm.officialDate + "T12:00:00")).toISOString() : gm.gameDate, 
                 gamePk: gm.gamePk, 
                 stats: plyr.stats,
                 positions: shortPositions,
                 statlineType: gm.status.detailedState
               };
       try {
-        const doc = await this.model.find(query);
+        const doc = await this.model.findOne(query);
         if (doc) {
           // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc. 
-          if (doc.statlineType == "Suspended") {
-            // Leave the existing one. Create a new one with supplemental stats only. 
+          
+          if (doc.gameDate != gm.gameDate) {
+            // They have stats from the original date. Find the diff for the new date.  
             _statline.stats = await this._getStatlineDiff(plyr.stats, doc.stats)
-            _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
+            // _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
             query = {
               'mlbId': plyr.person.id,
               'gamePk' : gm.gamePk,
@@ -96,24 +103,24 @@ class StatlineController extends BaseController {
   
   async _getStatlineDiff(fullStat, partialStat) {
     var ret = {batting: {}, fielding: {}, pitching: {}}
-    
-    Object.keys(fullStat.batting).forEach((prop)=> {
-      if (typeof(fullStat.batting[prop]) == "number") {
-              ret.batting[prop] = fullStat.batting[prop] - partialStat.batting[prop]
+    if (fullStat) {
+      Object.keys(fullStat.batting).forEach((prop)=> {
+        if (typeof(fullStat.batting[prop]) == "number") {
+                ret.batting[prop] = fullStat.batting[prop] - (partialStat.batting[prop] || 0)
+          }
+      })
+      Object.keys(fullStat.fielding).forEach((prop)=> {
+        if (typeof(fullStat.fielding[prop]) == "number") {
+          ret.fielding[prop] = fullStat.fielding[prop] - (partialStat.fielding[prop] || 0)
         }
-    })
-    Object.keys(fullStat.fielding).forEach((prop)=> {
-      if (typeof(fullStat.fielding[prop]) == "number") {
-        ret.fielding[prop] = fullStat.fielding[prop] - partialStat.fielding[prop]
-      }
-    })
-    Object.keys(fullStat.pitching).forEach((prop)=> {
-      if (typeof(fullStat.pitching[prop]) == "number") {
-        ret.pitching[prop] = fullStat.pitching[prop] - partialStat.pitching[prop]
-      }
-    })
-    return ret
-    
+      })
+      Object.keys(fullStat.pitching).forEach((prop)=> {
+        if (typeof(fullStat.pitching[prop]) == "number") {
+          ret.pitching[prop] = fullStat.pitching[prop] - (partialStat.pitching[prop] || 0)
+        }
+      })
+      return ret
+    }
   }
   
   
