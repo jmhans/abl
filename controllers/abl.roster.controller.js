@@ -134,6 +134,9 @@ class ABLRosterController extends BaseController{
             }
           }
         }, {
+            '$match': {'$expr': {'$in': ["$positions", ['1B', '2B', '3B', 'DH', 'OF', 'SS', 'C']]}}
+        }, 
+        {
           '$group': {
             '_id': {
               'mlbId': '$mlbId', 
@@ -167,8 +170,22 @@ class ABLRosterController extends BaseController{
             }
           }
         }, {
+            '$addFields': {
+              'eligiblePositions': {
+                '$filter': {
+                  'input': '$positionsLog', 
+                  'as': 'posObj', 
+                  'cond': {
+                    '$gte': [
+                      '$$posObj.ct', 10 //Should be changed to 10 to match league rules.
+                    ]
+                  }
+                }
+              }
+            }
+          }, {
           '$project': {
-            'eligiblePositions': '$positionsLog.pos'
+            'eligiblePositions': '$eligiblePositions.pos'
           }
         }
       ], 
