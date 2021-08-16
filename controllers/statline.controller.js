@@ -79,8 +79,10 @@ class StatlineController extends BaseController {
         if (doc) {
           // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc. 
           
-          if (doc.gameDate != gm.gameDate) {
+          if (new Date(doc.gameDate).toString != new Date(gm.gameDate).toString) {
             // They have stats from the original date. Find the diff for the new date.  
+            console.log(`Doc: ${doc.gameDate} vs. stats: ${new Date(gm.gameDate)}`)
+            console.log(`Doc: ${typeof(new Date(doc.gameDate))} vs. stats: ${typeof(new Date(gm.gameDate))}`)
             _statline.stats = await this._getStatlineDiff(plyr.stats, doc.stats)
             // _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
             query = {
