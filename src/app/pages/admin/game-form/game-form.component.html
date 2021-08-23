@@ -8,14 +8,14 @@
     <div class="row">
       <!-- Start date -->
       <div class="form-group col-sm-12 col-md-6">
-        <label for="gameDate">Game Date</label>
-        <input
-          id="gameDate"
-          type="text"
-          class="form-control"
-          formControlName="gameDate"
-          [placeholder]="gf.dateFormat"
-          [maxlength]="gf.dateMax">
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Game Date</mat-label>
+          <input matInput [matDatepicker]="picker1" formControlName="gameDate">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+        
         <div
           *ngIf="formErrors.datesGroup.gameDate"
           class="small text-danger formErrors"

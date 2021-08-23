@@ -121,7 +121,6 @@ export class GameFormComponent implements OnInit, OnDestroy {
         gameDate: [this.formGame.gameDate, [
           Validators.required,
           Validators.maxLength(this.gf.dateMax),
-          Validators.pattern(DATE_REGEX),
           dateValidator()
         ]]
       })
@@ -192,8 +191,14 @@ export class GameFormComponent implements OnInit, OnDestroy {
     const gameDate = this.datesGroup.get('gameDate').value;
     // Convert form startDate/startTime and endDate/endTime
     // to JS dates and populate a new GameModel for submission
+    
+    // Ensure game time is noon central. 
+    
+    const insertGameDate = new Date(gameDate).toISOString().substring(0, 10) + "T17:00:00Z"
+    
+    
     return new GameModel(
-      gameDate,
+      insertGameDate,
       this.gameForm.get('awayTeam').value, // Need to think about these - probably need to extract _id from these differently.  
       this.gameForm.get('homeTeam').value,
       this.gameForm.get('description').value,
