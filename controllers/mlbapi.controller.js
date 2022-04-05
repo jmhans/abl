@@ -305,6 +305,17 @@ class mlbAPI {
       }
 
   }
+  async _getScheduleForDate(req, res, next) {
+    
+      try {
+          const scores = await this._getSchedule( req.params.date ); //await this._getGame(529572);
+          return res.send(scores);
+       } catch (err) {
+        console.error(`Error in getGameHttp(): ${err}`);
+        return res.status(500).send({message: err.message});
+
+      }
+  }
   
 
 
@@ -314,6 +325,7 @@ class mlbAPI {
     router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args));
     router.get('/mlb2/:resource', (...args) => this._getResourceHttp(...args));
     router.get('/mlb/boxes', (...args) => this._getBoxesHttp(...args));
+    router.get('/mlb/schedule/:dt', (...args)=> this._getScheduleForDate(...args));
     return router;
   }
 }

@@ -59,12 +59,12 @@ class ABLRosterController extends BaseController{
     try {
       
       var atomicLineup = await Lineup.aggregate(
-      [
+        [
   {
     '$match': {
       'ablTeam': new ObjectId(teamId), 
       'effectiveDate': {
-        '$lte':  this.getRosterDeadline(gmDate)
+        '$lte': this.getRosterDeadline(gmDate)
       }
     }
   }, {
@@ -134,9 +134,16 @@ class ABLRosterController extends BaseController{
             }
           }
         }, {
-            '$match': {'$expr': {'$in': ["$positions", ['1B', '2B', '3B', 'DH', 'OF', 'SS', 'C']]}}
-        }, 
-        {
+          '$match': {
+            '$expr': {
+              '$in': [
+                '$positions', [
+                  '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
+                ]
+              ]
+            }
+          }
+        }, {
           '$group': {
             '_id': {
               'mlbId': '$mlbId', 
@@ -145,13 +152,19 @@ class ABLRosterController extends BaseController{
             }, 
             'inGameCount': {
               '$sum': 1
+            }, 
+            'season': {
+              '$max': {
+                '$year': '$gameDate'
+              }
             }
           }
         }, {
           '$group': {
             '_id': {
               'mlbId': '$_id.mlbId', 
-              'pos': '$_id.pos'
+              'pos': '$_id.pos', 
+              'season': '$season'
             }, 
             'posCount': {
               '$sum': '$inGameCount'
@@ -160,7 +173,8 @@ class ABLRosterController extends BaseController{
         }, {
           '$group': {
             '_id': {
-              'mlbId': '$_id.mlbId'
+              'mlbId': '$_id.mlbId', 
+              'season': '$_id.season'
             }, 
             'positionsLog': {
               '$push': {
@@ -170,35 +184,130 @@ class ABLRosterController extends BaseController{
             }
           }
         }, {
-            '$addFields': {
-              'eligiblePositions': {
+          '$addFields': {
+            'eligiblePositions': {
+              '$filter': {
+                'input': '$positionsLog', 
+                'as': 'posObj', 
+                'cond': {
+                  '$gte': [
+                    '$$posObj.ct', 10
+                  ]
+                }
+              }
+            }, 
+            'maxPosition': {
+              '$first': {
                 '$filter': {
                   'input': '$positionsLog', 
                   'as': 'posObj', 
                   'cond': {
-                    '$gte': [
-                      '$$posObj.ct', 10 //Should be changed to 10 to match league rules.
+                    '$and': [
+                      {
+                        '$gte': [
+                          '$$posObj.ct', {
+                            '$max': '$positionsLog.ct'
+                          }
+                        ]
+                      }
                     ]
                   }
                 }
               }
             }
-          }, {
-          '$project': {
-            'eligiblePositions': '$eligiblePositions.pos'
           }
         }
       ], 
       'as': 'somethingCool'
     }
   }, {
-    '$unwind': {
-      'path': '$somethingCool', 
-      'preserveNullAndEmptyArrays': false
+    '$addFields': {
+      'priorYearElig': {
+        '$first': {
+          '$filter': {
+            'input': '$somethingCool', 
+            'as': 'posEligRec', 
+            'cond': {
+              '$eq': [
+                '$$posEligRec._id.season', 2021
+              ]
+            }
+          }
+        }
+      }, 
+      'currentYearElig': {
+        '$first': {
+          '$filter': {
+            'input': '$somethingCool', 
+            'as': 'posEligRec', 
+            'cond': {
+              '$eq': [
+                '$$posEligRec._id.season', 2022
+              ]
+            }
+          }
+        }
+      }
     }
   }, {
     '$addFields': {
-      'player.eligible': '$somethingCool.eligiblePositions'
+      'priorYearElig': '$priorYearElig.maxPosition.pos', 
+      'currentYearElig': '$currentYearElig.eligiblePositions'
+    }
+  }, {
+    '$addFields': {
+      'player.eligible': '$currentYearElig.eligiblePositions'
+    }
+  }, {
+    '$lookup': {
+      'from': 'positions', 
+      'localField': 'player.mlbID', 
+      'foreignField': 'mlbId', 
+      'as': 'posRec'
+    }
+  }, {
+    '$addFields': {
+      'commishPos': {
+        '$ifNull': [
+          {
+            '$first': '$posRec.position'
+          }, '$priorYearElig'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'allPos': {
+        '$concatArrays': [
+          [
+            '$commishPos'
+          ], '$currentYearElig.pos'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'player.eligible': {
+        '$reduce': {
+          'input': '$allPos', 
+          'initialValue': [], 
+          'in': {
+            '$cond': [
+              {
+                '$in': [
+                  '$$this', '$$value'
+                ]
+              }, '$$value', {
+                '$concatArrays': [
+                  '$$value', [
+                    '$$this'
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      }
     }
   }, {
     '$group': {
