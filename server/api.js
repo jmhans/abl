@@ -97,20 +97,245 @@ module.exports = function(app, config) {
   app.get("/api3/mlbPlayers", (req, res, next) => {
     
     Player.aggregate(
-      [{
-          '$lookup': {
-            'from': 'ablteams', 
-            'localField': 'ablstatus.ablTeam', 
-            'foreignField': '_id', 
-            'as': 'ablstatus.ablTeam'
+      [
+  {
+    '$lookup': {
+      'from': 'ablteams', 
+      'localField': 'ablstatus.ablTeam', 
+      'foreignField': '_id', 
+      'as': 'ablstatus.ablTeam'
+    }
+  }, {
+    '$unwind': {
+      'path': '$ablstatus.ablTeam', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$lookup': {
+      'from': 'statlines', 
+      'let': {
+        'plyrId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$gte': [
+                    '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
+                  ]
+                }
+              ]
+            }
           }
         }, {
           '$unwind': {
-            'path': '$ablstatus.ablTeam', 
-            'preserveNullAndEmptyArrays': true
+            'path': '$positions', 
+            'includeArrayIndex': 'posIdx', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$addFields': {
+            'positions': {
+              '$cond': [
+                {
+                  '$in': [
+                    '$positions', [
+                      'LF', 'RF', 'CF'
+                    ]
+                  ]
+                }, 'OF', '$positions'
+              ]
+            }
+          }
+        }, {
+          '$match': {
+            '$expr': {
+              '$in': [
+                '$positions', [
+                  '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
+                ]
+              ]
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$mlbId', 
+              'gamePk': '$gamePk', 
+              'pos': '$positions'
+            }, 
+            'inGameCount': {
+              '$sum': 1
+            }, 
+            'season': {
+              '$max': {
+                '$year': '$gameDate'
+              }
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId', 
+              'pos': '$_id.pos', 
+              'season': '$season'
+            }, 
+            'posCount': {
+              '$sum': '$inGameCount'
+            }
+          }
+        }, {
+          '$group': {
+            '_id': {
+              'mlbId': '$_id.mlbId', 
+              'season': '$_id.season'
+            }, 
+            'positionsLog': {
+              '$push': {
+                'pos': '$_id.pos', 
+                'ct': '$posCount'
+              }
+            }
+          }
+        }, {
+          '$addFields': {
+            'eligiblePositions': {
+              '$filter': {
+                'input': '$positionsLog', 
+                'as': 'posObj', 
+                'cond': {
+                  '$gte': [
+                    '$$posObj.ct', 10
+                  ]
+                }
+              }
+            }, 
+            'maxPosition': {
+              '$first': {
+                '$filter': {
+                  'input': '$positionsLog', 
+                  'as': 'posObj', 
+                  'cond': {
+                    '$and': [
+                      {
+                        '$gte': [
+                          '$$posObj.ct', {
+                            '$max': '$positionsLog.ct'
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
-      ], function(err, players) {
+      ], 
+      'as': 'somethingCool'
+    }
+  }, {
+    '$addFields': {
+      'priorYearElig': {
+        '$first': {
+          '$filter': {
+            'input': '$somethingCool', 
+            'as': 'posEligRec', 
+            'cond': {
+              '$eq': [
+                '$$posEligRec._id.season', 2021
+              ]
+            }
+          }
+        }
+      }, 
+      'currentYearElig': {
+        '$first': {
+          '$filter': {
+            'input': '$somethingCool', 
+            'as': 'posEligRec', 
+            'cond': {
+              '$eq': [
+                '$$posEligRec._id.season', 2022
+              ]
+            }
+          }
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'priorYearElig': '$priorYearElig.maxPosition.pos', 
+      'currentYearElig': '$currentYearElig.eligiblePositions'
+    }
+  }, {
+    '$addFields': {
+      'player.eligible': '$currentYearElig.eligiblePositions'
+    }
+  }, {
+    '$lookup': {
+      'from': 'positions', 
+      'localField': 'player.mlbID', 
+      'foreignField': 'mlbId', 
+      'as': 'posRec'
+    }
+  }, {
+    '$addFields': {
+      'commishPos': {
+        '$ifNull': [
+          {
+            '$first': '$posRec.position'
+          }, '$priorYearElig'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'allPos': {
+        '$concatArrays': [
+          [
+            '$commishPos'
+          ], '$currentYearElig.pos'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'player.eligible': {
+        '$reduce': {
+          'input': '$allPos', 
+          'initialValue': [], 
+          'in': {
+            '$cond': [
+              {
+                '$in': [
+                  '$$this', '$$value'
+                ]
+              }, '$$value', {
+                '$concatArrays': [
+                  '$$value', [
+                    '$$this'
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }, {
+    '$project': {
+      'somethingCool': 0, 
+      'posRec': 0
+    }
+  }
+], function(err, players) {
       if (err) return next(err);
 
       res.send(players);

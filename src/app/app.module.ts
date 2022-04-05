@@ -82,6 +82,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
 import { LocalMaterialModule } from './core/local-material-module/local-material.module';
 import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
+import { MlbComponent } from './pages/admin/mlb/mlb.component';
                                        
 
 @NgModule({
@@ -132,7 +133,8 @@ import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.co
     StandingsComponent,
     DialogOverviewExampleDialog,
     RosterImportComponent,
-    ManageGamesComponent
+    ManageGamesComponent,
+    MlbComponent
   ],
   imports: [
     BrowserModule,

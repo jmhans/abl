@@ -346,6 +346,16 @@ export class ApiService {
       catchError((error) => this._handleError(error)) 
     )
   }
+  
+  getSchedule$(dt): Observable<any> {
+    return this.http
+      .get<any[]>(`${this.v2_api}mlb/schedule/${dt}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
 
 
   
