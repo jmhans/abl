@@ -495,6 +495,7 @@ class ABLRosterController extends BaseController{
   async _addPlayerToTeamAllFutureRosters(req, res, next) {
     
     try {
+
       var mlbPlayer = await MlbPlayer.findById(req.body.player._id);
       mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : req.body.acqType, onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save()
@@ -503,23 +504,38 @@ class ABLRosterController extends BaseController{
       var firstDate = req.body.effective_date ? new Date(req.body.effective_date) : new Date()
       
       var mostRecent = await this._getRosterForTeamAndDate(req.params.id, firstDate)  
+      
       var rosterDeadline =  this.getRosterDeadline(firstDate);
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
+      var newLineup;
+          
       
+      if (mostRecent) {
+        if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
+          // Cool. Move on to update many
 
-      
-      if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
-        // Cool. Move on to update many
+        } else {
+          // Create a new one first. Then, update many
+          if (mostRecent) {
+
+            newLineup = await Lineup.create({
+              ablTeam: mostRecent.ablTeam,
+              roster: mostRecent.roster, 
+              effectiveDate: rosterDeadline
+            }) 
+          }
+
+        }
         
       } else {
-        // Create a new one first. Then, update many
-        var newLineup = await Lineup.create({
-          ablTeam: mostRecent.ablTeam,
-          roster: mostRecent.roster, 
-          effectiveDate: rosterDeadline
-        })
         
+            newLineup = await Lineup.create({
+              ablTeam: new ObjectId(req.params.id),
+              roster: [], 
+              effectiveDate: rosterDeadline
+            })
       }
+
       
       var outputRec;
       var allToUpdate = await Lineup.find({ablTeam: req.params.id, effectiveDate: {$gt: yesterdayDeadline}})
@@ -640,6 +656,8 @@ class ABLRosterController extends BaseController{
     }
    
   }
+  
+  
   
   
 

@@ -1,0 +1,124 @@
+positionEligAggPipeline = [
+  {
+    '$unwind': {
+      'path': '$positions', 
+      'preserveNullAndEmptyArrays': false
+    }
+  }, {
+    '$addFields': {
+      'positions': {
+        '$cond': [
+          {
+            '$in': [
+              '$positions', [
+                'LF', 'RF', 'CF'
+              ]
+            ]
+          }, 'OF', '$positions'
+        ]
+      }
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$in': [
+          '$positions', [
+            '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
+          ]
+        ]
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$mlbId', 
+        'gamePk': '$gamePk', 
+        'pos': '$positions', 
+        'season': {
+          '$year': '$gameDate'
+        }
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$_id.mlbId', 
+        'pos': '$_id.pos', 
+        'season': '$_id.season'
+      }, 
+      'posCount': {
+        '$sum': 1
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$_id.mlbId', 
+        'season': '$_id.season'
+      }, 
+      'positionsLog': {
+        '$push': {
+          'pos': '$_id.pos', 
+          'ct': '$posCount'
+        }
+      }, 
+      'maxPos': {
+        '$max': '$posCount'
+      }
+    }
+  }, {
+    '$addFields': {
+      'eligiblePositions': {
+        '$filter': {
+          'input': '$positionsLog', 
+          'as': 'posObj', 
+          'cond': {
+            '$gte': [
+              '$$posObj.ct', 10
+            ]
+          }
+        }
+      }, 
+      'maxPosition': {
+        '$first': {
+          '$filter': {
+            'input': '$positionsLog', 
+            'as': 'posObj', 
+            'cond': {
+              '$and': [
+                {
+                  '$gte': [
+                    '$$posObj.ct', '$maxPos'
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'maxPosition': '$maxPosition.pos', 
+      'eligiblePositions': '$eligiblePositions.pos', 
+      'mlbId': '$_id.mlbId', 
+      'season': '$_id.season'
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'maxPos': 0
+    }
+  }, {
+    '$limit': 10
+  }, {
+    '$merge': {
+      'into': 'position_log', 
+      'on': [
+        'mlbId', 'season'
+      ], 
+      'whenMatched': 'merge', 
+      'whenNotMatched': 'insert'
+    }
+  }
+]
