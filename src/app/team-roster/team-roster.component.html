@@ -25,7 +25,7 @@
 
     </span>
     
-      {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible.join()}})
+      {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})
 
         <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
         <span  *ngIf="rosterRec.player.stats" class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
