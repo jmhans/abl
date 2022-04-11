@@ -267,7 +267,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.filteredPlayers = this.playerList.filter((p) => {
       
       if (this.filterPos) {
-        return  p.position == this.filterPos && ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
+        return  Array(p.eligible).join(",").indexOf(this.filterPos) >-1 && ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
       } else {
         return  ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
       }
