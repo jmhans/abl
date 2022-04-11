@@ -482,8 +482,13 @@ class ABLRosterController extends BaseController{
         effectiveDate: rosterDeadline
       }, options).exec()
       if (updatedRec) {
-        var populated = await updatedRec.populate('roster.player priorRosters.roster.player').execPopulate()
-        res.json(populated)
+        
+        var updatedLineup = await this._getRosterForTeamAndDate(req.params.id, rosterDeadline)
+        
+        
+        
+        // var populated = await updatedRec.populate('roster.player priorRosters.roster.player').execPopulate()
+        res.json(updatedLineup)
       }
       } catch (err) {
             console.log(err);
@@ -492,18 +497,17 @@ class ABLRosterController extends BaseController{
 
   }
 
-  async _addPlayerToTeamAllFutureRosters(req, res, next) {
-    
+  async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate ) {
     try {
 
-      var mlbPlayer = await MlbPlayer.findById(req.body.player._id);
-      mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : req.body.acqType, onRoster: true};
+      var mlbPlayer = await MlbPlayer.findById(plyr._id);
+      mlbPlayer.ablstatus = {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       
-      var firstDate = req.body.effective_date ? new Date(req.body.effective_date) : new Date()
+      var firstDate = effDate ? new Date(effDate) : new Date()
       
-      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, firstDate)  
+      var mostRecent = await this._getRosterForTeamAndDate(teamId, firstDate)  
       
       var rosterDeadline =  this.getRosterDeadline(firstDate);
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
@@ -530,7 +534,7 @@ class ABLRosterController extends BaseController{
       } else {
         
             newLineup = await Lineup.create({
-              ablTeam: new ObjectId(req.params.id),
+              ablTeam: new ObjectId(teamId),
               roster: [], 
               effectiveDate: rosterDeadline
             })
@@ -538,11 +542,11 @@ class ABLRosterController extends BaseController{
 
       
       var outputRec;
-      var allToUpdate = await Lineup.find({ablTeam: req.params.id, effectiveDate: {$gt: yesterdayDeadline}})
+      var allToUpdate = await Lineup.find({ablTeam: teamId, effectiveDate: {$gt: yesterdayDeadline}})
       for (var i = 0; i<allToUpdate.length; i++) {
         allToUpdate[i].roster.push({
           player: mlbPlayer._id, 
-          lineupPosition: req.body.player.position, 
+          lineupPosition: plyr.position, 
           rosterOrder: allToUpdate[i].roster.length + 1
         })
         
@@ -552,7 +556,22 @@ class ABLRosterController extends BaseController{
         }
         console.log(`Added ${mlbPlayer.name} to roster for ${savedUpdateRec.effectiveDate}`)
       }
-      return res.send({player: savedMlbPlayer, roster: outputRec});
+      return {player: savedMlbPlayer, roster: outputRec};
+
+      
+    } catch(err) {
+      throw {message: err.message}
+    }
+  }
+  
+  
+  
+  async _addPlayerToTeamAllFutureRosters(req, res, next) {
+    
+    try {
+      var result = await this._addPlayerToTeamBackend(req.body.player, req.params.id, req.body.acqType, req.body.effectiveDate)
+      
+      return res.send(result);
 
       
     } catch(err) {
@@ -605,67 +624,12 @@ class ABLRosterController extends BaseController{
   
   
   
-  
-  
-  
-  async _draftPlayersToTeam(req, res, next) {
-    try {
-      // expecting an array in req.body...
-      
-      var roster = []
-      
-      for (var p=0; p<req.body.length; p++) {
-        var mlbPlayer = await MlbPlayer.findById(req.body[p]._id);
-        mlbPlayer.ablstatus = {ablTeam : new ObjectId(req.params.id), acqType : 'draft', onRoster: true};
-        var savedMlbPlayer = await mlbPlayer.save();
-        roster.push({
-          player: mlbPlayer._id,
-          lineupPosition: req.body[p].position,
-          rosterOrder: roster.length + 1
-        })
-
-      }
-      var existingLineupRec = await Lineup.findOne({ablTeam: req.params.id});
-      
-      if (existingLineupRec) {
-        var priorLineupRec = {
-          effectiveDate: existingLineupRec.effectiveDate,
-          roster: existingLineupRec.roster
-        }
-        existingLineupRec.priorRosters.push(priorLineupRec);
-        existingLineupRec.roster = roster
-        existingLineupRec.effectiveDate = new Date("2021-03-01"); //Should update. But not going to right now. 
-        var savedExistingLineupRec = await existingLineupRec.save();
-        return res.send(savedExistingLineupRec);
-        
-      } else {
-
-        const RR = new Lineup({
-          ablTeam: new ObjectId(req.params.id),
-          roster: roster,
-          effectiveDate: new Date("2021-03-01"),
-          priorRosters: []
-        });
-        
-        var savedRR = await RR.save();
-        return res.send(savedRR);
-        
-      }
-    } catch(err) {
-      return res.status(500).send({message : err.message})
-    }
-   
-  }
-  
-  
-  
-  
+ 
 
    
   reroute() {
     router = this.route();
     router.post('/team/:id/addPlayer', (...args) => this._addPlayerToTeamAllFutureRosters(...args));
-    router.post('/team/:id/draftPlayers', (...args) => this._draftPlayersToTeam(...args));
     router.get('/team/:id/lineup' , (...args) => this._getLineup(...args));
     router.put('/lineup_roster/:id', (...args) => this._newUpdateLineup(...args));
     router.get('/team/:id/lineup/:dt', (...args) => this._getLineupForTeamAndDate2(...args));
