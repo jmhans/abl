@@ -125,48 +125,267 @@ class StatlineController extends BaseController {
     }
   }
   
-  
-  async _getStatsForDate(req, res, next) {
-
-    try {
+    
+  async _generatePositionLog(req, res, next) {
+    
+      try {
+        var currentSeason = 2022;
+        var regSeasonStart = new Date('2022-04-07T00:00:00Z')
+        
       
-       const day = new Date(req.params.dt + "T12:00:00Z")
-       var nextDay = new Date(day.toISOString());
-       nextDay.setDate(day.getDate() +1)
-      
-      var stats = await this.model.aggregate([
-          {
-            '$match': {
-              'gameDate': {
-                '$gte': day, 
-                '$lt': nextDay
+      var position_log_records = await this.model.aggregate([
+  {
+    '$project': {
+      'stats': 0, 
+      'statlineType': 0
+    }
+  }, {
+    '$addFields': {
+      'season': {
+        '$year': '$gameDate'
+      }
+    }
+  }, {
+    '$match': {
+      'season': currentSeason
+    }
+  }, {
+    '$addFields': {
+      'regSeason': {
+        '$switch': {
+          'branches': [
+            {
+              'case': {
+                '$eq': [
+                  '$season', currentSeason
+                ]
+              }, 
+              'then': {
+                '$gte': [
+                  '$gameDate', regSeasonStart
+                ]
               }
             }
-          }, {
-            '$lookup': {
-              'from': 'players', 
-              'localField': 'mlbId', 
-              'foreignField': 'mlbID', 
-              'as': 'player'
-            }
-          }, {
-            '$addFields': {
-              'player': {
-                '$first': '$player'
-              }, 
-              'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
+          ]
+        }
+      }
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$and': [
+          {
+            '$eq': [
+              '$regSeason', true
+            ]
+          }
+        ]
+      }
+    }
+  }, {
+    '$unwind': {
+      'path': '$positions', 
+      'includeArrayIndex': 'posIdx', 
+      'preserveNullAndEmptyArrays': false
+    }
+  }, {
+    '$addFields': {
+      'positions': {
+        '$cond': [
+          {
+            '$in': [
+              '$positions', [
+                'LF', 'RF', 'CF'
+              ]
+            ]
+          }, 'OF', '$positions'
+        ]
+      }
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$in': [
+          '$positions', [
+            '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
+          ]
+        ]
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$mlbId', 
+        'gamePk': '$gamePk', 
+        'pos': '$positions'
+      }, 
+      'inGameCount': {
+        '$sum': 1
+      }, 
+      'season': {
+        '$max': {
+          '$year': '$gameDate'
+        }
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$_id.mlbId', 
+        'pos': '$_id.pos', 
+        'season': '$season'
+      }, 
+      'posCount': {
+        '$sum': '$inGameCount'
+      }
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'mlbId': '$_id.mlbId', 
+        'season': '$_id.season'
+      }, 
+      'positionsLog': {
+        '$push': {
+          'pos': '$_id.pos', 
+          'ct': '$posCount'
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'eligiblePositions': {
+        '$filter': {
+          'input': '$positionsLog', 
+          'as': 'posObj', 
+          'cond': {
+            '$gte': [
+              '$$posObj.ct', 10
+            ]
+          }
+        }
+      }, 
+      'maxPosition': {
+        '$first': {
+          '$filter': {
+            'input': '$positionsLog', 
+            'as': 'posObj', 
+            'cond': {
+              '$and': [
+                {
+                  '$gte': [
+                    '$$posObj.ct', {
+                      '$max': '$positionsLog.ct'
+                    }
+                  ]
+                }
+              ]
             }
           }
-        ])
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'mlbId': '$_id.mlbId', 
+      'season': '$_id.season', 
+      'eligiblePositions': '$eligiblePositions.pos'
+    }
+  }, {
+    '$project': {
+      '_id': 0
+    }
+  }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'mlbId': '$mlbId', 
+        'ssn': '$season'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$mlbId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', '$$ssn'
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'outcoll'
+    }
+  }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'lastSsn': {'$subtract': ['$season', 1]}, 
+        'mlbId': '$mlbId'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$mlbId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', '$$lastSsn'
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'lastSsnPos'
+    }
+  }, {
+    '$addFields': {
+      '_id': {
+        '$first': '$outcoll._id'
+      }, 
+      'maxPosition': '$maxPosition.pos', 
+      'priorSeasonMaxPos': {
+        '$first': '$lastSsnPos.maxPosition.pos'
+      }
+    }
+  }, {
+    '$project': {
+      'outcoll': 0, 
+      'lastSsnPos': 0
+    }
+  }, {
+    '$merge': {
+      'into': 'position_log', 
+      'on': '_id', 
+      'whenMatched': 'replace', 
+      'whenNotMatched': 'insert'
+    }
+  }
+])
 
-      if (!stats) {
+      if (!position_log_records) {
         return res.status(400).send({message: 'No stats found.'});
       }
-      return res.send(stats)
+      return res.send(position_log_records)
 
     } catch (err) {
       return res.status(500).send({message: err.message });
     }
+    
+    
   }
 
     
