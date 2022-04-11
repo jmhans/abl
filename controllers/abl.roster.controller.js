@@ -319,7 +319,7 @@ class ABLRosterController extends BaseController{
         '$concatArrays': [
           [
             '$commishPos'
-          ], '$currentYearElig.pos'
+          ], {'$ifNull': ['$currentYearElig.pos', []]}
         ]
       }
     }
