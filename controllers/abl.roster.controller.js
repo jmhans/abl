@@ -62,7 +62,7 @@ class ABLRosterController extends BaseController{
         [
   {
     '$match': {
-      'ablTeam': new ObjectId(teamId), 
+      'ablTeam':new ObjectId(teamId), 
       'effectiveDate': {
         '$lte': this.getRosterDeadline(gmDate)
       }
@@ -98,6 +98,44 @@ class ABLRosterController extends BaseController{
       }, 
       'pipeline': [
         {
+          '$addFields': {
+            'season': {
+              '$year': '$gameDate'
+            }
+          }
+        }, {
+          '$addFields': {
+            'regSeason': {
+              '$switch': {
+                'branches': [
+                  {
+                    'case': {
+                      '$eq': [
+                        '$season', 2021
+                      ]
+                    }, 
+                    'then': {
+                      '$gte': [
+                        '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
+                      ]
+                    }
+                  }, {
+                    'case': {
+                      '$eq': [
+                        '$season', 2022
+                      ]
+                    }, 
+                    'then': {
+                      '$gte': [
+                        '$gameDate', new Date('Thu, 07 Apr 2022 00:00:00 GMT')
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }, {
           '$match': {
             '$expr': {
               '$and': [
@@ -106,8 +144,8 @@ class ABLRosterController extends BaseController{
                     '$mlbId', '$$plyrId'
                   ]
                 }, {
-                  '$gte': [
-                    '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
+                  '$eq': [
+                    '$regSeason', true
                   ]
                 }
               ]
