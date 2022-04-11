@@ -15,7 +15,7 @@
        >
        
     <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">
-      <option *ngFor="let pos of availablePositions"  [value]="pos">{{pos}}</option>
+      <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
     </select>
     
     <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>

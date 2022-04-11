@@ -62,7 +62,7 @@ class ABLRosterController extends BaseController{
         [
   {
     '$match': {
-      'ablTeam':new ObjectId(teamId), 
+      'ablTeam': new ObjectId(teamId), 
       'effectiveDate': {
         '$lte': this.getRosterDeadline(gmDate)
       }
@@ -92,50 +92,12 @@ class ABLRosterController extends BaseController{
     }
   }, {
     '$lookup': {
-      'from': 'statlines', 
+      'from': 'position_log', 
       'let': {
         'plyrId': '$player.mlbID'
       }, 
       'pipeline': [
         {
-          '$addFields': {
-            'season': {
-              '$year': '$gameDate'
-            }
-          }
-        }, {
-          '$addFields': {
-            'regSeason': {
-              '$switch': {
-                'branches': [
-                  {
-                    'case': {
-                      '$eq': [
-                        '$season', 2021
-                      ]
-                    }, 
-                    'then': {
-                      '$gte': [
-                        '$gameDate', new Date('Thu, 01 Apr 2021 00:00:00 GMT')
-                      ]
-                    }
-                  }, {
-                    'case': {
-                      '$eq': [
-                        '$season', 2022
-                      ]
-                    }, 
-                    'then': {
-                      '$gte': [
-                        '$gameDate', new Date('Thu, 07 Apr 2022 00:00:00 GMT')
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }, {
           '$match': {
             '$expr': {
               '$and': [
@@ -145,156 +107,30 @@ class ABLRosterController extends BaseController{
                   ]
                 }, {
                   '$eq': [
-                    '$regSeason', true
+                    '$season', 2022
                   ]
                 }
               ]
-            }
-          }
-        }, {
-          '$unwind': {
-            'path': '$positions', 
-            'includeArrayIndex': 'posIdx', 
-            'preserveNullAndEmptyArrays': false
-          }
-        }, {
-          '$addFields': {
-            'positions': {
-              '$cond': [
-                {
-                  '$in': [
-                    '$positions', [
-                      'LF', 'RF', 'CF'
-                    ]
-                  ]
-                }, 'OF', '$positions'
-              ]
-            }
-          }
-        }, {
-          '$match': {
-            '$expr': {
-              '$in': [
-                '$positions', [
-                  '1B', '2B', '3B', 'DH', 'OF', 'SS', 'C'
-                ]
-              ]
-            }
-          }
-        }, {
-          '$group': {
-            '_id': {
-              'mlbId': '$mlbId', 
-              'gamePk': '$gamePk', 
-              'pos': '$positions'
-            }, 
-            'inGameCount': {
-              '$sum': 1
-            }, 
-            'season': {
-              '$max': {
-                '$year': '$gameDate'
-              }
-            }
-          }
-        }, {
-          '$group': {
-            '_id': {
-              'mlbId': '$_id.mlbId', 
-              'pos': '$_id.pos', 
-              'season': '$season'
-            }, 
-            'posCount': {
-              '$sum': '$inGameCount'
-            }
-          }
-        }, {
-          '$group': {
-            '_id': {
-              'mlbId': '$_id.mlbId', 
-              'season': '$_id.season'
-            }, 
-            'positionsLog': {
-              '$push': {
-                'pos': '$_id.pos', 
-                'ct': '$posCount'
-              }
-            }
-          }
-        }, {
-          '$addFields': {
-            'eligiblePositions': {
-              '$filter': {
-                'input': '$positionsLog', 
-                'as': 'posObj', 
-                'cond': {
-                  '$gte': [
-                    '$$posObj.ct', 10
-                  ]
-                }
-              }
-            }, 
-            'maxPosition': {
-              '$first': {
-                '$filter': {
-                  'input': '$positionsLog', 
-                  'as': 'posObj', 
-                  'cond': {
-                    '$and': [
-                      {
-                        '$gte': [
-                          '$$posObj.ct', {
-                            '$max': '$positionsLog.ct'
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                }
-              }
             }
           }
         }
       ], 
-      'as': 'somethingCool'
+      'as': 'posLog'
     }
   }, {
     '$addFields': {
+      'posLog': {
+        '$first': '$posLog'
+      }, 
       'priorYearElig': {
-        '$first': {
-          '$filter': {
-            'input': '$somethingCool', 
-            'as': 'posEligRec', 
-            'cond': {
-              '$eq': [
-                '$$posEligRec._id.season', 2021
-              ]
-            }
-          }
-        }
+        '$first': '$posLog.priorSeasonMaxPos'
       }, 
       'currentYearElig': {
-        '$first': {
-          '$filter': {
-            'input': '$somethingCool', 
-            'as': 'posEligRec', 
-            'cond': {
-              '$eq': [
-                '$$posEligRec._id.season', 2022
-              ]
-            }
-          }
-        }
+        '$first': '$posLog.eligiblePositions'
+      }, 
+      'player.eligible': {
+        '$first': '$posLog.eligiblePositions'
       }
-    }
-  }, {
-    '$addFields': {
-      'priorYearElig': '$priorYearElig.maxPosition.pos', 
-      'currentYearElig': '$currentYearElig.eligiblePositions'
-    }
-  }, {
-    '$addFields': {
-      'player.eligible': '$currentYearElig.eligiblePositions'
     }
   }, {
     '$lookup': {
@@ -319,7 +155,11 @@ class ABLRosterController extends BaseController{
         '$concatArrays': [
           [
             '$commishPos'
-          ], {'$ifNull': ['$currentYearElig.pos', []]}
+          ], {
+            '$ifNull': [
+              '$currentYearElig', []
+            ]
+          }
         ]
       }
     }
@@ -346,6 +186,10 @@ class ABLRosterController extends BaseController{
           }
         }
       }
+    }
+  }, {
+    '$project': {
+      'player.position': 0
     }
   }, {
     '$group': {
@@ -660,10 +504,6 @@ class ABLRosterController extends BaseController{
    
   }
   
-  
-  
- 
-
    
   reroute() {
     router = this.route();

@@ -92,7 +92,7 @@
       <td>{{player.mlbID}}</td>
       <td>{{player.ablstatus?.ablTeam ? player.ablstatus.ablTeam.nickname : ''}}</td> 
       <td>{{player.ablstatus?.acqType ? player.ablstatus.acqType : ''}}</td>
-      <td>{{player.position}}</td>
+      <td>{{player.eligible?.join(",")}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>
       <td> {{abl(player.stats.batting) | number }} </td>

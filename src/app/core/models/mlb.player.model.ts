@@ -11,6 +11,7 @@ class MlbPlayerModel {
     public games: Object[], 
     public positionLog: Object,
     public ablstatus: {onRoster: boolean, ablTeam: Object, acqType: string},
+     public eligible: string[],
      public _id?: string , 
      public draftMe?: boolean, 
      public dougstatsName?: string

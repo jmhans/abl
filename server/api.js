@@ -97,7 +97,7 @@ module.exports = function(app, config) {
   app.get("/api3/mlbPlayers", (req, res, next) => {
     
     Player.aggregate(
-      [
+     [
   {
     '$lookup': {
       'from': 'ablteams', 
@@ -109,6 +109,112 @@ module.exports = function(app, config) {
     '$unwind': {
       'path': '$ablstatus.ablTeam', 
       'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'plyrId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', 2022
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'posLog'
+    }
+  }, {
+    '$addFields': {
+      'posLog': {
+        '$first': '$posLog'
+      }, 
+      'priorYearElig': {
+        '$first': '$posLog.priorSeasonMaxPos'
+      }, 
+      'currentYearElig': {
+        '$first': '$posLog.eligiblePositions'
+      }, 
+      'eligible': {
+        '$first': '$posLog.eligiblePositions'
+      }
+    }
+  }, {
+    '$lookup': {
+      'from': 'positions', 
+      'localField': 'player.mlbID', 
+      'foreignField': 'mlbId', 
+      'as': 'posRec'
+    }
+  }, {
+    '$addFields': {
+      'commishPos': {
+        '$ifNull': [
+          {
+            '$first': '$posRec.position'
+          }, '$priorYearElig'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'allPos': {
+        '$concatArrays': [
+          [
+            '$commishPos'
+          ], {
+            '$ifNull': [
+              '$currentYearElig', []
+            ]
+          }
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'eligible': {
+        '$reduce': {
+          'input': '$allPos', 
+          'initialValue': [], 
+          'in': {
+            '$cond': [
+              {
+                '$in': [
+                  '$$this', '$$value'
+                ]
+              }, '$$value', {
+                '$concatArrays': [
+                  '$$value', [
+                    '$$this'
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }, {
+    '$project': {
+      'commishPos': 0, 
+      'posRec': 0, 
+      'allPos': 0, 
+      'currentYearElig': 0, 
+      'priorYearElig': 0, 
+      'position': 0
     }
   }
 ], function(err, players) {
@@ -148,7 +254,8 @@ module.exports = function(app, config) {
   
   app.get("/api3/statlines", makeGet(Statline));
   app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));
-  app.get("/api3/statlines/date/:dt", (...args) =>  new StatlineController()._getStatsForDate(...args));
+  app.get("/api3/positionlogs", (...args) =>  new StatlineController()._generatePositionLog(...args));
+
   
   app.get("/data/:flname", jwtCheck, BulkAdd._getFile);
   var bl = new BulkLoad();
