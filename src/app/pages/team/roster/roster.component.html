@@ -50,10 +50,11 @@
 
     <span *ngIf="current_roster">
 <!--       <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv> -->
+
+      <div>Last Updated: {{lineup.effectiveDate | date : 'fullDate'}}</div>
       
  <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()"><mdb-icon fas icon="file-download"></mdb-icon> Download Lineup</button>
  <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button>
-
     <app-team-roster [lineup]="current_roster"
                      [originalLineup] = "active_roster"
                      [editable]="editable()"

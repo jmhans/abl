@@ -244,17 +244,6 @@ export class PlayersComponent implements OnInit, OnDestroy {
  
   }
 
-   _addSelectedToTeam(tm) {
-     var selectedPlyrs = this.playerList.filter((p)=> {return p.draftMe});
-     console.log(selectedPlyrs);
-     this.rosterUpdateSub = this.rosterService
-        .draftPlayersToTeam$(selectedPlyrs, this.draftTeam._id)
-        .subscribe(
-          data => this._handleSubmitSuccess(data, selectedPlyrs),
-          err => this._handleSubmitError(err)
-        );
-   }
-
   
 //   searchPlayers() {
 //     this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
