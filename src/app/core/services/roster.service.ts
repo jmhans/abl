@@ -4,19 +4,31 @@ import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.r
 import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
-import { throwError as ObservableThrowError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject } from 'rxjs';
+import { catchError, switchMap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
+
 export class RosterService {
   private base_api= '/api2/'
+  currentLineup$: Observable<LineupModel>;
+  retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
+  
   
   
   constructor(    
     private http: HttpClient,
-    private auth: AuthService) { }
+    private auth: AuthService) {
+    
+        this.currentLineup$ = this.retrieveLineup$.pipe(
+          switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
+        ));
+      
+    }
   
   
   private get _authHeader(): string {
@@ -102,6 +114,25 @@ export class RosterService {
           catchError((error) => this._handleError(error))
         );
   }
+  
+
+  
+  updateRoster(ablTeamId: string, lineup: SubmitLineup): Observable<any> {
+    // First, run the update routine. 
+    // When update returns, switchMap to the normal roster retrieve function. 
+
+    return this.updateRosterRecord$(ablTeamId, lineup).pipe(map((ret)=> {
+      this.retrieveLineup$.next({ablTm: ret.ablTeam["_id"], dt: new Date(ret.effectiveDate)});
+      return ret
+    }))
+    
+    
+    
+    //this.updateRosterRecord$(ablTeamId, lineup).pipe(switchMap((x)=> {this.retrieveLineup$.next()}))
+    //this.retrieveLineup$.next({ablTeamId: ablTeamId, plyr: plyr})
+  }
+  
+  
   
 
 }

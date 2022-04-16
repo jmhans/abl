@@ -3,6 +3,7 @@
   <h2 class="card-title text-center mb-0">Roster</h2>
 </div>
 
+
 <p *ngFor="let alert of alerts">
   <ngb-alert [type]="alert.type" (close)="close(alert)">{{ alert.message }}</ngb-alert>
 </p>
@@ -15,56 +16,49 @@
   </button>
 </div>
 
-<div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+<!-- <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
   <strong>Error</strong> Lineup not saved.
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-</div>
+</div> -->
   
+<div class="card">
+  <div class="card-header" *ngIf="(current_roster_deadline$ | async) as deadline">
+    
+    <mat-form-field color="accent" appearance="fill" *ngIf="(formDate$ | async) as formDateControl">
+        <mat-label>Roster Date</mat-label>
+        <input  matInput [matDatepicker]="roster_date" [max]="deadline" (dateChange)="_date_changed($event)" [formControl]="formDateControl">
+        <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
+        <mat-datepicker #roster_date></mat-datepicker>
+      </mat-form-field>
+      <mat-slide-toggle
+            class="example-margin"
+            color="primary"
+            [checked]="false"
+            [disabled]="!_isAdmin()"
+            [(ngModel)]="edit_lineup">
+          Edit (Admin only)
+        </mat-slide-toggle>
 
+  </div>
+    <span *ngIf="(current_roster$ | async) as myLineup">
 
-<mat-card class="example-result-card " *ngIf='lineup'>
-  <mat-card-subtitle  class="d-flex justify-content-between">
-  
-    <mat-form-field color="accent" appearance="fill">
-      <mat-label>Roster Date</mat-label>
-      <input matInput [matDatepicker]="roster_date" [max]="currentRosterDate()" (dateChange)="_date_changed($event)" [formControl]="formDate">
-      <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
-      <mat-datepicker #roster_date></mat-datepicker>
-    </mat-form-field>
-    <mat-slide-toggle
-          class="example-margin"
-          [color]="primary"
-          [checked]="false"
-          [disabled]="!_isAdmin()"
-          [(ngModel)]="edit_lineup">
-        Edit (Admin only)
-      </mat-slide-toggle>
-  </mat-card-subtitle>
-  <mat-card-content>   
-    <span *ngIf='current_roster'> 
+      <div >Last Updated: {{active_roster.effectiveDate | date : 'fullDate'}}</div>
       
-
-    </span>
-
-    <span *ngIf="current_roster">
-<!--       <angular2csv [data]="_getDLFile()" [filename]="dlFileName()" [options]="dlOptions"></angular2csv> -->
-
-      <div>Last Updated: {{lineup.effectiveDate | date : 'fullDate'}}</div>
-      
- <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()"><mdb-icon fas icon="file-download"></mdb-icon> Download Lineup</button>
- <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button>
-    <app-team-roster [lineup]="current_roster"
+      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()">
+         <mdb-icon fas icon="file-download"></mdb-icon> 
+        Download Lineup
+      </button>
+      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button> 
+      <app-team-roster [lineup]="current_roster"
                      [originalLineup] = "active_roster"
                      [editable]="editable()"
                      (update)="_createNewRoster($event)"
                      (dropPlyr)="_dropPlayer($event)"
                      ></app-team-roster>
     </span>
-    
-    
-  </mat-card-content>
 
-</mat-card>
-    
+</div>
+
+

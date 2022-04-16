@@ -48,6 +48,14 @@ export class ApiService {
     );
   }
   
+  getleagueConfig$(): Observable<any> {
+    return this.http
+      .get<any>(`${this.base_api}league`)
+      .pipe(
+        catchError((error) => this._handleError(error))  
+    );
+  }
+  
   getMlbPlayers$(): Observable<MlbPlayerModel[]> {
     return this.http
       .get<MlbPlayerModel[]>(`${this.base_api}mlbplayers`)

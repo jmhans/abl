@@ -23,7 +23,7 @@ const BulkAddController = require('./../controllers/bulkadd.controller');
 const BulkAdd = BulkAddController.BulkAdd;
 const BulkLoad = BulkAddController.BulkLoad;
 
-
+var  league = require('./../data/league.json');
 
 /*
  |--------------------------------------
@@ -68,7 +68,10 @@ module.exports = function(app, config) {
     res.send('API works');
   });
   
-  
+  app.get("/api3/league", (req, res)=> {
+    
+    res.send(league);
+  })
   app.get("/api3/team/:id", AblTeamController._getById);
   app.post('/api3/team/new', jwtCheck, AblTeamController._post );
   app.put('/api3/team/:id', jwtCheck, AblTeamController._put);
