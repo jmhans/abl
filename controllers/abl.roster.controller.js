@@ -449,9 +449,7 @@ class ABLRosterController extends BaseController{
       throw {message: err.message}
     }
   }
-  
-  
-  
+    
   async _addPlayerToTeamAllFutureRosters(req, res, next) {
     
     try {

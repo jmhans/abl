@@ -15,14 +15,28 @@
             <tr mdbTableCol *ngFor="let team of standings">
               <th scope="row">
                 <a [routerLink]="['/team', team._id]">
-                  <strong *ngIf="team">{{team.nickname }}</strong> 
+                  <strong *ngIf="team">{{team.tm.nickname }}</strong> 
                 </a>
               </th>
 
-              <td>{{team.record.g}}</td>
-              <td>{{team.record.w}}</td>
-              <td>{{team.record.l}}</td>
-              <td>{{team.record.w / team.record.g | number: '1.3-3'}}</td>
+              <td>{{team.g}}</td>
+              <td>{{team.w}}</td>
+              <td>{{team.l}}</td>
+              <td>{{team.w / team.g | number: '1.3-3'}}</td>
+                            <td>{{team.abl_runs | number: '1.3-3'}}</td>
+                            <td>{{team.ab | number: '1.0-0'}}</td>
+                            <td>{{team.h | number: '1.0-0'}}</td>
+                            <td>{{team['2b'] | number: '1.0-0'}}</td>
+                            <td>{{team['3b'] | number: '1.0-0'}}</td>
+                            <td>{{team.hr | number: '1.0-0'}}</td>
+                            <td>{{team.bb + team.hbp | number: '1.0-0'}}</td>
+                            <td>{{team.sac + team.sf | number: '1.0-0'}}</td>
+                            <td>{{team.sb | number: '1.0-0'}}</td>
+                            <td>{{team.cs | number: '1.0-0'}}</td>
+                            <td>{{team.e | number: '1.0-0'}}</td>
+                            <td>{{team.era | number: '1.3-3'}}</td>
+                            <td>{{team.hr_allowed | number: '1.0-0'}}</td>
+              
 
             </tr>
           </tbody>

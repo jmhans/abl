@@ -122,24 +122,6 @@ export class PlayersComponent implements OnInit, OnDestroy {
         res => {
           this.playerList = res;
           this.filteredPlayers = this.playerList;
-     //     this.dataSource = new MatTableDataSource(this.filteredPlayers);
-     //     this.dataSource.paginator = this.paginator;
-          
-     //      this.dataSource.sortingDataAccessor = (item, property) => {
-            
-//              switch(property) {
-
-//                 case 'abl': return this.abl(item.stats['batting']);
-//                 default: 
-//                   if (typeof item[property] == 'undefined') {
-//                     return item.stats['batting'][property];
-//                   } else {
-//                     return item[property];
-//                   }
-//               }
-//             };
-          //this._getTeamList();
-//          this.dataSource.sort = this.sort;
           this.updateTakenPlayers('all');
           this.loading = false;
           this.dtTrigger.next();
@@ -218,7 +200,6 @@ export class PlayersComponent implements OnInit, OnDestroy {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
         console.log(result)
         
         if (result) {
@@ -234,7 +215,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
     } else {
        
      this.rosterUpdateSub = this.rosterService
-        .addPlayertoTeam$({player: plyr}, this.ownerPrimaryTeam._id)
+        .addPlayertoTeam$({player: plyr, effective_date: new Date(), acqType: 'pickup'}, this.ownerPrimaryTeam._id)
         .subscribe(
           data => this._handleSubmitSuccess(data, plyr),
           err => this._handleSubmitError(err)
