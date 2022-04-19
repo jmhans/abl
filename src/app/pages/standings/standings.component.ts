@@ -18,8 +18,8 @@ export class StandingsComponent implements OnInit, OnDestroy {
   
   loading: boolean;
   error: boolean;
-  headings = ['Team', 'G', 'W', 'L', 'WPct']
-  
+  headings = ['Team', 'G', 'W', 'L', 'WPct', 'AVG Runs', 'AB', 'H', '2B', '3B', 'HR', 'BB+HBP', 'SF+SAC', 'SB', 'CS', 'Error', 'ERA', 'HR Allowed']
+
   
   constructor(
     private title: Title,

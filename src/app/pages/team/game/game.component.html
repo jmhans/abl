@@ -21,12 +21,14 @@
           <div class="row">
             <div class="col">
               <button mat-button [routerLink]="['/game', game._id]">
-                <strong *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</strong> @ <strong *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</strong>
+                <span class="fw-bold"><span *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</span> @ <span *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</span></span>
               </button>
             </div>
 
               
-            <span class="col ">{{game.gameDate | date:'longDate'}}</span>
+            <span class="col ">
+              <span > {{game.gameDate | date:'longDate'}}</span>
+            </span>
             <div class="col"> 
               
               <span *ngFor="let game_result of game.results; index as resIdx">

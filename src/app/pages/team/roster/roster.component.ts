@@ -2,13 +2,17 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
 import { LineupModel , LineupCollectionModel, LineupFormModel} from './../../../core/models/lineup.model';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription, Subject, combineLatest, Observable } from 'rxjs';
+import { takeUntil, combineAll , map, switchMap } from 'rxjs/operators';
+
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
+import { LeagueConfigService } from './../../../core/services/league-config.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UtilsService } from './../../../core/utils.service';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+
 
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import { RosterImportComponent } from './roster-import/roster-import.component'
@@ -31,24 +35,38 @@ interface Alert {
 export class RosterComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
   
-  editTimeLimit: string = "12:00:00";
-  editTimeLimitInantz: string = "America/Chicago"
+  //editTimeLimit: string;
+  //editTimeLimitInantz: string;
+  leagueSub: Subscription;
   
+
+  
+  
+  
+  
+  currRosterEffDate: Date;
   
   lineup: LineupCollectionModel;
   current_roster: LineupFormModel;
   paramSub: Subscription;
+  
+  roster_date$: Observable<Date>;
+  roster_deadline$: Observable<Date>;
+  formDate$: Observable<FormControl>;
+  current_roster_deadline$: Observable<Date>;
+  current_roster$: Observable<LineupFormModel>;
+  lineup$: Observable<LineupCollectionModel>;
+  
   roster_date: Date;
   roster_deadline: Date;
   formDate: FormControl;
+  
   roster_editable: boolean;
   edit_lineup: boolean;
   csvLineupInput: string;
   active_roster : LineupModel;
   lineupSub: Subscription;
   saveRosterRecordSub: Subscription;
-  loading: boolean;
-  error: boolean;
   saveLineupSub: Subscription;
   message: string = '';
   alerts: Alert[] = [];
@@ -56,7 +74,10 @@ export class RosterComponent implements OnInit, OnDestroy {
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
   
   dlOptions: any;
+  dlFileName: string ;
   
+    unsubscribe$: Subject<void> = new Subject<void>();
+
   
   
   constructor(  private router: Router, 
@@ -64,12 +85,53 @@ export class RosterComponent implements OnInit, OnDestroy {
                 public auth: AuthService,
                 public rosterService: RosterService,
                 private utils: UtilsService,
-                 public dialog: MatDialog
+                 public dialog: MatDialog,
+                 public leagueConfig: LeagueConfigService
 
                 ) { }
 
   ngOnInit() {
-    this._routeSubs();
+    
+    this.roster_date$ = this.route.queryParams.pipe(map((qp)=> {
+      return qp['dt'] ? new Date(qp['dt']) : new Date();  
+    }))
+    
+    this.roster_deadline$ = combineLatest(this.leagueConfig.league$, this.roster_date$).pipe(map(([lg, rd])=> {
+      // this.editTimeLimit = lg.rosterLockTime
+      // this.editTimeLimitInantz = lg.rosterLockTimeZone
+      var rosterEffDate = this.actualRosterEffectiveDate(rd, lg.rosterLockTime, lg.rosterLockTimeZone)
+      this.dlFileName = this.team.nickname + '_Lineup_' + rosterEffDate.toISOString().substring(0, 10)
+      this.roster_deadline = rosterEffDate
+      return rosterEffDate
+    }))
+    
+    this.formDate$ = this.roster_deadline$.pipe(map((deadline)=> {
+      return new FormControl(deadline)
+    }))
+    
+    this.current_roster_deadline$ = this.leagueConfig.league$.pipe(map((lg)=> {
+      return this.actualRosterEffectiveDate(new Date(), lg.rosterLockTime, lg.rosterLockTimeZone)
+    }))
+    
+    this.lineup$ = this.roster_deadline$.pipe(switchMap((deadline)=> {
+      return this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)
+    }))
+    
+    this.current_roster$ = combineLatest(this.lineup$, this.roster_deadline$).pipe(map(([lineup, deadline])=>{
+            this.active_roster = lineup;
+            this.current_roster = new LineupFormModel(
+              lineup._id, 
+              this.active_roster._id, 
+              this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
+              new Date(deadline)
+            );
+            return this.current_roster
+    }))
+    
+    
+    //this.getLeagueInfo();
+    
+    //this._routeSubs();
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     
     // option veriable
@@ -89,9 +151,6 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   }
   
-  dlFileName() {
-    return this.team.nickname + '_Lineup_' + this.actualRosterEffectiveDate(this.current_roster.effectiveDate).toISOString().substring(0, 10)
-  }
   
   submitCSV() {
     
@@ -115,34 +174,30 @@ export class RosterComponent implements OnInit, OnDestroy {
     
   }
   
+
   
-  currentRosterDate() {
-    return this.actualRosterEffectiveDate(new Date())
-  }
-  
-  private _routeSubs() {
+//   private _routeSubs() {
     
-    // Subscribe to query params to watch for tab changes
-     var that = this;
-    this.paramSub = this.route.queryParams
-      .subscribe(queryParams => {
-        this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
-        this.roster_deadline = this.actualRosterEffectiveDate(this.roster_date)
-        this.formDate = new FormControl(this.roster_deadline)
+//     // Subscribe to query params to watch for tab changes
+//     this.paramSub = this.route.queryParams
+//       .subscribe(queryParams => {
+//         this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
+//         this.roster_deadline = this.actualRosterEffectiveDate(this.roster_date)
+//         this.formDate = new FormControl(this.roster_deadline)
       
-        this._getRosterRecords();
-      });
-  }
+//         //this._getRosterRecords();
+//       });
+//   }
   
-  actualRosterEffectiveDate(curDt) {
+  actualRosterEffectiveDate(curDt, deadlineTime, deadlineTimeZone) {
     //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call. 
     
-    var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + this.editTimeLimit)
+    var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + deadlineTime)
     if (globalrosterDeadline < curDt) {
       globalrosterDeadline.setDate(globalrosterDeadline.getDate() +1)
     }
-    return this.utils.changeTimezone(globalrosterDeadline, this.editTimeLimitInantz)
+    return this.utils.changeTimezone(globalrosterDeadline, deadlineTimeZone)
   }
   
     
@@ -189,39 +244,12 @@ export class RosterComponent implements OnInit, OnDestroy {
   }
 
  
-  private _getRosterRecords() {
-    this.loading = true;
-    
-    this.lineupSub = this.rosterService
-      .getLineupForTeamAndDate$(this.team._id, this.roster_deadline)
-      .subscribe(
-        res => {
-          this._handleLineupSuccess(res, false);
-        }, 
-        err => {
-          console.error(err);
-          this.loading = false;
-          this.error = true;
-        }
-     );
-  }
-  
-  _set_Active_Roster() { 
-      this.active_roster = this.lineup
-      this.current_roster = new LineupFormModel(
-        this.lineup._id, 
-        this.active_roster._id, 
-        this.active_roster.roster.map((rr)=> {return {player: rr.player, lineupPosition: rr.lineupPosition, rosterOrder: rr.rosterOrder}}), 
-        new Date(this.roster_deadline)
-      );
-  }
-
   
   ngOnDestroy() {
-    this.lineupSub.unsubscribe();
-    if (this.saveLineupSub) {
-      this.saveLineupSub.unsubscribe();
-    }
+
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+    
   }
 
   
@@ -272,9 +300,13 @@ export class RosterComponent implements OnInit, OnDestroy {
       
         // editing lineup for the roster_deadline date   
       this.saveRosterRecordSub = this.rosterService
-        .updateRosterRecord$(this.team._id, newRec)
+        .updateRoster(this.team._id, newRec)
         .subscribe(
-          data => this._handleLineupSuccess(data, true),
+          data => {   
+            this.alerts.push({type: 'success', message:'Lineup saved successfully'})
+            //this.lineup = data;
+            //this._set_Active_Roster() //this.active_roster_index);
+          },
           err => this._handleUpdateError(err)
         )
          
@@ -296,22 +328,20 @@ export class RosterComponent implements OnInit, OnDestroy {
   }
 
   
-  private _handleLineupSuccess(res, update) {
-    this.error = false;
-    this.loading = false;
-    if (update) {
-      this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
-    }
-    this.lineup = res;
-    this._set_Active_Roster() //this.active_roster_index);
+//   private _handleLineupSuccess(res, update) {
+    
+//     if (update) {
+//       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
+//     }
+//     this.lineup = res;
+//     this._set_Active_Roster() //this.active_roster_index);
         
-  }
+//   }
   
   
   private _handleUpdateError(err) {
     console.error(err);
     this.alerts.push({type:'danger', message:'Lineup not saved'});
-    this.error = true;
   }
   
   close(alert: Alert) {
@@ -334,7 +364,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   
   
     download(){
-    this.downloadFile2(this._getDLFile(), this.dlFileName());
+    this.downloadFile2(this._getDLFile(), this.dlFileName);
   }
 
   ConvertToCSV(objArray, headerList) {

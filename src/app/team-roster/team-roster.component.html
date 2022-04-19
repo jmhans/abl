@@ -1,38 +1,60 @@
+
+
+
+
 <button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
 
-<div class="container example-list"  cdkDropList  
-     [cdkDropListDisabled] = !editable 
-     (cdkDropListDropped)="dropLineupRecord($event)" 
-     *ngIf='lineup'>
-  <div class="example-box alt row" 
-       *ngFor="let rosterRec of lineup.roster; index as i;" 
-       cdkDrag
-       [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition || 
-          rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}"
-       >
+<div class="container" >
+  <div class="row" >
     <div class="col-sm-1">
-      <span class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
+      <span class="fw-bold">Position </span>
+    </div>
+
+    <div class="col-sm-3">
+      <span class="fw-bold">Player</span>
+    </div>
+    <div class="col-sm-1">
+      <span class="fw-bold">ABL Runs</span>
+    </div>
+    <div class="col-sm-7">
+      <span class="fw-bold">Stat Summary</span>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+<div class="container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)" *ngIf='true'>
+  <div class="example-box alt row" *ngFor="let rosterRec of lineup.roster; index as i;" cdkDrag [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
+          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition || 
+          rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}">
+    <div class="col-sm-1">
+      <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
       <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1">
         <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
       </select>
       <span *ngIf="!editable || rosterRec.player.eligible.length <= 1">{{rosterRec.lineupPosition}}</span>
+      
+    </div>
+
+    <div class="col-sm-3">
       <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
         Pickup
         <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
 
       </span>
+      <span>{{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})</span>
     </div>
-
-    <div class="col-sm-2">
-      {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})
-    </div>
-    <div class="col-sm-2">
-        <strong *ngIf="rosterRec.player.stats">ABL Runs: {{ abl(rosterRec.player.stats.batting) | number }}</strong> 
+    <div class="col-sm-1">
+      <strong *ngIf="rosterRec.player.stats">{{ abl(rosterRec.player.stats.batting) | number }}</strong>
 
     </div>
     <div class="col-sm-7">
-      <span  *ngIf="rosterRec.player.stats" class=" d-none d-md-block">({{rosterRec.player.stats.batting.gamesPlayed}} G, 
+      <span *ngIf="rosterRec.player.stats" class=" d-none d-md-block">{{rosterRec.player.stats.batting.gamesPlayed}} G, 
         {{rosterRec.player.stats.batting.atBats}} AB,
         {{rosterRec.player.stats.batting.hits}} H,
         {{rosterRec.player.stats.batting.doubles}} 2B, 
@@ -41,11 +63,11 @@
         {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB, 
         {{rosterRec.player.stats.batting.hitByPitch}} HBP,
         {{rosterRec.player.stats.batting.stolenBases}} SB, 
-        {{rosterRec.player.stats.batting.caughtStealing}} CS)
+        {{rosterRec.player.stats.batting.caughtStealing}} CS
         </span>
 
     </div>
-    
+
   </div>
 </div>
 
@@ -53,6 +75,9 @@
 
 
 <!-- 
+
+<button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
+
 
 <div cdkDropList class="example-list" 
      [cdkDropListDisabled] = !editable 
@@ -66,15 +91,12 @@
           rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition || 
           rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}"
        >
-    <span class="example-handle" cdkDragHandle>
-      <mat-icon> drag_handle</mat-icon>
-    </span>
        
-    <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1">
+    <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable">
       <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
     </select>
     
-    <span *ngIf="!editable || rosterRec.player.eligible.length <= 1">{{rosterRec.lineupPosition}}</span>
+    <span *ngIf="!editable">{{rosterRec.lineupPosition}}</span>
     <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
       Pickup
       <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
@@ -95,8 +117,7 @@
         {{rosterRec.player.stats.batting.stolenBases}} SB, 
         {{rosterRec.player.stats.batting.caughtStealing}} CS)
         </span>
-       {{rosterRec.player.positionLog | json}}
+
       
   </div>
-</div>
- -->
+</div> -->

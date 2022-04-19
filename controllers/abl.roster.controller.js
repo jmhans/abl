@@ -3,6 +3,8 @@
 const request = require('request');
 const BaseController = require('./base.controller');
 
+
+
 var express = require('express');
 var router = express.Router();
 
@@ -11,6 +13,8 @@ const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const AblTeam = require('./../models/owner').AblTeam;
 const MlbPlayer = require('./../models/player').Player;
 const Lineup = require('./../models/lineup').Lineup;
+
+var some_league_variable = require('./../data/league.json');
 
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -327,10 +331,10 @@ class ABLRosterController extends BaseController{
   
   getRosterDeadline(dt) {
     
-        var noonLocalVal = new Date(dt.toISOString().substr(0, 10)+"T12:00:00")
+        var noonLocalVal = new Date(dt.toISOString().substr(0, 10)+"T" + some_league_variable.rosterLockTime)
         
         var deadlineAdjCompare = new Date(noonLocalVal.toLocaleString('en-US', {
-          timeZone: "America/Chicago"
+          timeZone: some_league_variable.rosterLockTimeZone
         }));
 
         // then invdate will be 07:00 in Toronto
@@ -445,9 +449,7 @@ class ABLRosterController extends BaseController{
       throw {message: err.message}
     }
   }
-  
-  
-  
+    
   async _addPlayerToTeamAllFutureRosters(req, res, next) {
     
     try {

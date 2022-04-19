@@ -1,6 +1,7 @@
 const request = require('request');
 
 
+
 var today = new Date()
 
 var pad = function(num, size) {
@@ -36,8 +37,9 @@ request('https://abl-prod.herokuapp.com/api2/mlbGame/' + year + '-' + month + '-
   }
     console.log('statusCode:', resp && resp.statusCode);
   if (resp.statusCode == 200) {
-    this._updatePositionsLog()
-    console.log(JSON.parse(body).length + " records added");
+    _updatePositionsLog()
+    console.log(`${JSON.parse(body).length} records added for ${year + '-' + month + '-'+ day}`);
+    console.log(`${resp.body}`);
   }
   
 });
