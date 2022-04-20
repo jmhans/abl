@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragSortEvent, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Subscription, Subject } from 'rxjs';
 import { RosterService } from './../core/services/roster.service';
 import { LineupModel, SubmitLineup, LineupFormModel } from './../core/models/lineup.model';
@@ -31,6 +31,7 @@ export class TeamRosterComponent implements OnInit {
   @Input() editable: boolean;
   @Output() dropPlyr = new EventEmitter<{playerId: string}>(); 
   @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
+  @Output() raiseAlert = new EventEmitter<any>();
   
   formLineup: LineupFormModel;
   
@@ -44,7 +45,36 @@ export class TeamRosterComponent implements OnInit {
   }
   
   dropLineupRecord(event: CdkDragDrop<any>) {
-    moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
+    console.log(`Item moved:`);
+    console.log(event)
+    console.log(this.lineup.roster);
+
+    var pickupMin = this.lineup.roster.reduce((prev, cur)=> {
+      if (cur.player.ablstatus.acqType == 'pickup') {
+        return Math.min(cur.rosterOrder, prev)
+      } else {
+        return prev
+      }
+    }, Infinity)
+    
+    if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'pickup' && event.currentIndex +1 < pickupMin) {
+      // This is an issue. I've tried to move a pickup ahead of a drafted player. 
+      this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a post-draft pickup, and cannot be placed higher than a drafted player.`)
+    } else if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' && event.currentIndex + 1 >= pickupMin) {
+      // This is an issue. You've tried to move a drafted player lower than a pickup.          
+      this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
+    } else {
+      moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);  
+    }
+      
+    
+    
+    
+    
+  }
+  
+  sorted(event: CdkDragSortEvent<any>) {
+    console.log(`Sorted: ${event}`);
   }
   
   lineupDirty(): boolean {
@@ -62,6 +92,10 @@ export class TeamRosterComponent implements OnInit {
   
   _dropPlyr(playerId) {
     this.dropPlyr.emit({playerId: playerId});
+  }
+  
+  _rosterAlert(msg) {
+    this.raiseAlert.emit({message: msg})
   }
   
   _getSubmitRoster() {

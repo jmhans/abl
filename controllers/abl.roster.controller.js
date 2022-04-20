@@ -429,10 +429,16 @@ class ABLRosterController extends BaseController{
       
       var outputRec;
       var allToUpdate = await Lineup.find({ablTeam: teamId, effectiveDate: {$gt: yesterdayDeadline}})
+      var plyrPos = null;
+      
+      if (plyr.eligible && plyr.eligible.length > 0) {
+        plyrPos = plyr.eligible[0]
+      }
+      
       for (var i = 0; i<allToUpdate.length; i++) {
         allToUpdate[i].roster.push({
           player: mlbPlayer._id, 
-          lineupPosition: plyr.position, 
+          lineupPosition: plyrPos, 
           rosterOrder: allToUpdate[i].roster.length + 1
         })
         

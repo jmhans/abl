@@ -203,6 +203,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
         console.log(result)
         
         if (result) {
+         
           this.rosterUpdateSub = this.rosterService
           .addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString(), acqType: result.acqType}, result.team._id)
           .subscribe(
