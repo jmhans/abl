@@ -12,7 +12,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angul
 import { Router, ActivatedRoute } from '@angular/router';
 import { UtilsService } from './../../../core/utils.service';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import { RosterImportComponent } from './roster-import/roster-import.component'
@@ -38,11 +38,6 @@ export class RosterComponent implements OnInit, OnDestroy {
   //editTimeLimit: string;
   //editTimeLimitInantz: string;
   leagueSub: Subscription;
-  
-
-  
-  
-  
   
   currRosterEffDate: Date;
   
@@ -86,7 +81,8 @@ export class RosterComponent implements OnInit, OnDestroy {
                 public rosterService: RosterService,
                 private utils: UtilsService,
                  public dialog: MatDialog,
-                 public leagueConfig: LeagueConfigService
+                 public leagueConfig: LeagueConfigService, 
+                 private _rosterWarning: MatSnackBar
 
                 ) { }
 
@@ -176,19 +172,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   
 
   
-//   private _routeSubs() {
-    
-//     // Subscribe to query params to watch for tab changes
-//     this.paramSub = this.route.queryParams
-//       .subscribe(queryParams => {
-//         this.roster_date = queryParams['dt'] ? new Date(queryParams['dt']) : new Date();
-//         this.roster_deadline = this.actualRosterEffectiveDate(this.roster_date)
-//         this.formDate = new FormControl(this.roster_deadline)
-      
-//         //this._getRosterRecords();
-//       });
-//   }
-  
+ 
   actualRosterEffectiveDate(curDt, deadlineTime, deadlineTimeZone) {
     //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call. 
@@ -326,21 +310,24 @@ export class RosterComponent implements OnInit, OnDestroy {
       )
     }
   }
-
   
-//   private _handleLineupSuccess(res, update) {
+  private _rosterAlert(evt) {
     
-//     if (update) {
-//       this.alerts.push({type: 'success', message:'Lineup saved successfully'}) ;
-//     }
-//     this.lineup = res;
-//     this._set_Active_Roster() //this.active_roster_index);
-        
-//   }
+    this.alerts.push({type: 'danger', message: evt.message})
+
+  }
+
+  _showRosterWarning(message: string) {
+    this._rosterWarning.open(message, 'dismiss', {
+      duration: 3000
+    });
+  }
   
   
   private _handleUpdateError(err) {
     console.error(err);
+    
+    this._rosterWarning.open('Lineup not saved.', 'Okay');
     this.alerts.push({type:'danger', message:'Lineup not saved'});
   }
   
