@@ -49,6 +49,15 @@ _get(req, res, next) {
             ]
           }, 'w', 'l'
         ]
+      }, 
+      'results.scores.unadjusted_runs': {
+        '$subtract': [
+          {
+            '$divide': [
+              '$results.scores.final.abl_points', '$results.scores.final.ab'
+            ]
+          }, 4.5
+        ]
       }
     }
   }, {
@@ -127,6 +136,9 @@ _get(req, res, next) {
     '$addFields': {
       'abl_runs': {
         '$avg': '$scores.final.abl_runs'
+      }, 
+      'avg_runs': {
+        '$avg': '$scores.unadjusted_runs'
       }, 
       'ab': {
         '$sum': '$scores.final.ab'

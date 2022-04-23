@@ -17,7 +17,7 @@ var year = today.getUTCFullYear();
 
 function _updatePositionsLog() {
 
-  request('https://abl-prod.herokuapp.com/api3/positionslog', function(err, resp, body) {
+  request('https://abl-prod.herokuapp.com/api3/positionlogs', function(err, resp, body) {
     if (err) {
       console.error(err)
     }

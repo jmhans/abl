@@ -1,53 +1,143 @@
 <!-- src/app/pages/games/games.component.html -->
 <h1 class="text-center">{{ pageTitle }}</h1>
 
-<ng-template [ngIf]="utils.isLoaded(loading)">
-  <ng-template [ngIf]="standings">
-    <ng-template [ngIf]="standings.length">
-      <ng-container class ="table-responsive">
-        <table mdbTable>
-          <thead class="primary-color-dark white-text">
-            <tr>
-              <th *ngFor="let head of headings" scope="col">{{head}} </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr mdbTableCol *ngFor="let team of standings">
-              <th scope="row">
-                <a [routerLink]="['/team', team._id]">
-                  <strong *ngIf="team">{{team.tm.nickname }}</strong> 
-                </a>
-              </th>
+      
+        <div class="example-table-container" >
 
-              <td>{{team.g}}</td>
-              <td>{{team.w}}</td>
-              <td>{{team.l}}</td>
-              <td>{{team.w / team.g | number: '1.3-3'}}</td>
-                            <td>{{team.abl_runs | number: '1.3-3'}}</td>
-                            <td>{{team.ab | number: '1.0-0'}}</td>
-                            <td>{{team.h | number: '1.0-0'}}</td>
-                            <td>{{team['2b'] | number: '1.0-0'}}</td>
-                            <td>{{team['3b'] | number: '1.0-0'}}</td>
-                            <td>{{team.hr | number: '1.0-0'}}</td>
-                            <td>{{team.bb + team.hbp | number: '1.0-0'}}</td>
-                            <td>{{team.sac + team.sf | number: '1.0-0'}}</td>
-                            <td>{{team.sb | number: '1.0-0'}}</td>
-                            <td>{{team.cs | number: '1.0-0'}}</td>
-                            <td>{{team.e | number: '1.0-0'}}</td>
-                            <td>{{team.era | number: '1.3-3'}}</td>
-                            <td>{{team.hr_allowed | number: '1.0-0'}}</td>
-              
+          <table mat-table [dataSource]="standingsData$ | async" class="example-table table-responsive"
+                 matSort matSortActive="wpct" matSortDisableClear matSortDirection="desc"
+                 (matSortChange)="sortChange($event)" >
 
-            </tr>
-          </tbody>
-        </table>
-     </ng-container>
-    </ng-template>
-  </ng-template>
+            <ng-container matColumnDef="team" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Team</th>
+              <td mat-cell *matCellDef="let row">            
+                <a [routerLink]="['/team', row.tm._id]"><strong>{{row.tm.nickname }}</strong> </a>
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="g">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>G</th>
+              <td mat-cell *matCellDef="let row">{{row.g}}</td>
+            </ng-container>
 
+            
+            <ng-container matColumnDef="w">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>W</th>
+              <td mat-cell *matCellDef="let row">{{row.w}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="l">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>L</th>
+              <td mat-cell *matCellDef="let row">{{row.l}}</td>
+            </ng-container>
+            
+             <ng-container matColumnDef="wpct">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Win%</th>
+              <td mat-cell *matCellDef="let row">{{row.w / row.g | number: '1.3-3'}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="gb">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>GB</th>
+              <td mat-cell *matCellDef="let row">{{ row.gb != 0 ? (row.gb | number: '1.1-1') : '-'}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="abl">
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Avg Runs</th>
+              <td mat-cell *matCellDef="let row">{{row.abl_runs | number: '1.2-2'}}</td>
+            </ng-container>
+            
+             <ng-container matColumnDef="ab">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>AB</th>
+              <td mat-cell *matCellDef="let row">{{row.ab }}</td>
+            </ng-container>
+             <ng-container matColumnDef="h">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>H</th>
+              <td mat-cell *matCellDef="let row">{{row.h }}</td>
+            </ng-container>
+            <ng-container matColumnDef="2b">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>2B</th>
+              <td mat-cell *matCellDef="let row">{{row['2b'] }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="3b">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>3B</th>
+              <td mat-cell *matCellDef="let row">{{row['3b'] }}</td>
+            </ng-container>
+                        <ng-container matColumnDef="hr">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>HR</th>
+              <td mat-cell *matCellDef="let row">{{row['hr'] }}</td>
+            </ng-container>
+            <ng-container matColumnDef="bb">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>BB + HBP</th>
+              <td mat-cell *matCellDef="let row">{{row.bb + row.hbp }}</td>
+            </ng-container>
+            <ng-container matColumnDef="sac" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>SAC + SF</th>
+              <td mat-cell *matCellDef="let row">{{row.sac+row.sf }}</td>
+            </ng-container>
+            <ng-container matColumnDef="sb" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>SB</th>
+              <td mat-cell *matCellDef="let row">{{row.sb }}</td>
+            </ng-container>
+            <ng-container matColumnDef="cs"  fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>CS</th>
+              <td mat-cell *matCellDef="let row">{{row.cs }}</td>
+            </ng-container>
+            <ng-container matColumnDef="sb%" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>SB%</th>
+              <td mat-cell *matCellDef="let row">{{row.sb / (row.cs + row.sb) | percent:'0.2-2' }}</td>
+            </ng-container>
+            
+            
+            <ng-container matColumnDef="e" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header >ERR</th>
+              <td mat-cell *matCellDef="let row">{{row.e }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="bat_avg" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header >Bat Avg</th>
+              <td mat-cell *matCellDef="let row">{{row.h / row.ab | number:'1.3-3' }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="slg_pct" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>SLG</th>
+              <td mat-cell *matCellDef="let row">{{(row.h + row['2b'] + 2*row['3b'] + 3*row.hr) / row.ab | number:'1.3-3' }}</td>
+            </ng-container>
+            
+            
+            <ng-container matColumnDef="era"  fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>ERA</th>
+              <td mat-cell *matCellDef="let row">{{row.era | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="hr_allowed" fxShow fxHide.lt-sm>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>HR Allowed</th>
+              <td mat-cell *matCellDef="let row">{{row.hr_allowed }}</td>
+            </ng-container>
+            
+
+            
+<!--             
+             <ng-container *ngFor="let colHead of colHeads" [matColumnDef]="colHead.name">
+               <th mat-header-cell *matHeaderCellDef>{{colHead.title}}</th>
+                 <td mat-cell  *matCellDef="let row" > 
+                   <span *ngIf="colHead.pipe; else elseBlock">
+                     {{ (colHead.map) ? (colHead.map(row) | colHead.pipe ) : ( row[colHead.prop] | colHead.pipe) }}
+                   </span>
+                   <ng-template #elseBlock>{{colHead.map ? colHead.map(row) : row[colHead.prop]}}</ng-template>
+                  </td>
+            </ng-container> -->
+            
+            
+            
+
+            <tr mat-header-row *matHeaderRowDef="colNames"></tr>
+            <tr mat-row *matRowDef="let row; columns: colNames"></tr>
+          </table>
+      </div>
+
+<!--       <mat-paginator [length]="sortedStandings.length" [pageSize]="30" aria-label="Some label"></mat-paginator> -->
+      
   <!-- Error loading events -->
   <p *ngIf="error" class="alert alert-danger">
-    <strong>Oops!</strong> There was an error retrieving game data.
+    <strong>Oops!</strong> There was an error retrieving standings data.
   </p>
-
-</ng-template>
