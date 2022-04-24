@@ -4,7 +4,7 @@
       
         <div class="example-table-container" >
 
-          <table mat-table [dataSource]="standingsData$ | async" class="example-table table-responsive"
+          <table mat-table [dataSource]="standingsData$ | async" class="example-table"
                  matSort matSortActive="wpct" matSortDisableClear matSortDirection="desc"
                  (matSortChange)="sortChange($event)" >
 
@@ -71,47 +71,55 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header>BB + HBP</th>
               <td mat-cell *matCellDef="let row">{{row.bb + row.hbp }}</td>
             </ng-container>
-            <ng-container matColumnDef="sac" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="sac" >
               <th mat-header-cell *matHeaderCellDef mat-sort-header>SAC + SF</th>
               <td mat-cell *matCellDef="let row">{{row.sac+row.sf }}</td>
             </ng-container>
-            <ng-container matColumnDef="sb" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="sb">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>SB</th>
               <td mat-cell *matCellDef="let row">{{row.sb }}</td>
             </ng-container>
-            <ng-container matColumnDef="cs"  fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="cs">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>CS</th>
               <td mat-cell *matCellDef="let row">{{row.cs }}</td>
             </ng-container>
-            <ng-container matColumnDef="sb%" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="sb%">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>SB%</th>
               <td mat-cell *matCellDef="let row">{{row.sb / (row.cs + row.sb) | percent:'0.2-2' }}</td>
             </ng-container>
             
             
-            <ng-container matColumnDef="e" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="e">
               <th mat-header-cell *matHeaderCellDef mat-sort-header >ERR</th>
               <td mat-cell *matCellDef="let row">{{row.e }}</td>
             </ng-container>
             
-            <ng-container matColumnDef="bat_avg" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="bat_avg">
               <th mat-header-cell *matHeaderCellDef mat-sort-header >Bat Avg</th>
               <td mat-cell *matCellDef="let row">{{row.h / row.ab | number:'1.3-3' }}</td>
             </ng-container>
             
-            <ng-container matColumnDef="slg_pct" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="slg_pct">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>SLG</th>
               <td mat-cell *matCellDef="let row">{{(row.h + row['2b'] + 2*row['3b'] + 3*row.hr) / row.ab | number:'1.3-3' }}</td>
             </ng-container>
             
             
-            <ng-container matColumnDef="era"  fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="era">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>ERA</th>
               <td mat-cell *matCellDef="let row">{{row.era | number:'1.2-2' }}</td>
             </ng-container>
-            <ng-container matColumnDef="hr_allowed" fxShow fxHide.lt-sm>
+            <ng-container matColumnDef="hr_allowed">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>HR Allowed</th>
               <td mat-cell *matCellDef="let row">{{row.hr_allowed }}</td>
+            </ng-container>
+            <ng-container matColumnDef="l10">
+              <th mat-header-cell *matHeaderCellDef>L10</th>
+              <td mat-cell *matCellDef="let row">{{row.l10.w +'-' + row.l10.l }}</td>
+            </ng-container>
+            <ng-container matColumnDef="streak">
+              <th mat-header-cell *matHeaderCellDef>STR</th>
+              <td mat-cell *matCellDef="let row">{{row.streak.type + row.streak.count | uppercase}}</td>
             </ng-container>
             
 
