@@ -49,7 +49,21 @@ _get(req, res, next) {
             ]
           }, 'w', 'l'
         ]
+      }, 
+      'results.scores.unadjusted_runs': {
+        '$subtract': [
+          {
+            '$divide': [
+              '$results.scores.final.abl_points', '$results.scores.final.ab'
+            ]
+          }, 4.5
+        ]
       }
+    }
+  }, {
+    '$sort': {
+      'teams': 1, 
+      'gameDate': -1
     }
   }, {
     '$group': {
@@ -64,6 +78,19 @@ _get(req, res, next) {
                 }, '$teams'
               ]
             }, '$results.scores', '$$REMOVE'
+          ]
+        }
+      }, 
+      'outcomes': {
+        '$push': {
+          '$cond': [
+            {
+              '$eq': [
+                {
+                  '$toObjectId': '$results.scores.team'
+                }, '$teams'
+              ]
+            }, '$outcome', '$$REMOVE'
           ]
         }
       }, 
@@ -128,6 +155,9 @@ _get(req, res, next) {
       'abl_runs': {
         '$avg': '$scores.final.abl_runs'
       }, 
+      'avg_runs': {
+        '$avg': '$scores.unadjusted_runs'
+      }, 
       'ab': {
         '$sum': '$scores.final.ab'
       }, 
@@ -183,6 +213,84 @@ _get(req, res, next) {
             ]
           }
         ]
+      }, 
+      'l10': {
+        '$reduce': {
+          'input': {
+            '$slice': [
+              '$outcomes', 10
+            ]
+          }, 
+          'initialValue': {
+            'w': 0, 
+            'l': 0
+          }, 
+          'in': {
+            '$cond': [
+              {
+                '$eq': [
+                  '$$this', 'w'
+                ]
+              }, {
+                'w': {
+                  '$sum': [
+                    '$$value.w', 1
+                  ]
+                }, 
+                'l': '$$value.l'
+              }, {
+                'w': '$$value.w', 
+                'l': {
+                  '$sum': [
+                    '$$value.l', 1
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'streak': {
+        '$reduce': {
+          'input': '$outcomes', 
+          'initialValue': {
+            'type': null, 
+            'count': 0, 
+            'active': true
+          }, 
+          'in': {
+            '$cond': [
+              {
+                '$and': [
+                  {
+                    '$eq': [
+                      {
+                        '$ifNull': [
+                          '$$value.type', '$$this'
+                        ]
+                      }, '$$this'
+                    ]
+                  }, '$$value.active'
+                ]
+              }, {
+                'type': '$$this', 
+                'count': {
+                  '$add': [
+                    '$$value.count', 1
+                  ]
+                }, 
+                'active': true
+              }, {
+                'type': '$$value.type', 
+                'count': '$$value.count', 
+                'active': false
+              }
+            ]
+          }
+        }
       }
     }
   }, {

@@ -375,11 +375,12 @@ class StatlineController extends BaseController {
     }
   }
 ])
-
+      
+   
       if (!position_log_records) {
         return res.status(400).send({message: 'No stats found.'});
       }
-      return res.send(position_log_records)
+      return res.send({message: "Positions updated successfully"})
 
     } catch (err) {
       return res.status(500).send({message: err.message });
