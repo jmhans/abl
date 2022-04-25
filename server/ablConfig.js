@@ -10,6 +10,7 @@ function _isPositionPlayer(plyr) {
   return false;
 }
 
+
 module.exports = {
   POSITION_MAP : { 'LF': 'OF', 
                   'RF': 'OF', 

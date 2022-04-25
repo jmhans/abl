@@ -17,7 +17,7 @@ var StatlineController = require('../controllers/statline.controller');
 var AttestationController = require('../controllers/game.attestation.controller');
 var AblRosterController = require('../controllers/abl.roster.controller');
 var MLBAPI = require('../controllers/mlbapi.controller').altMlbApiController;
-var MLBAPI2 = require('../controllers/mlbapi.controller').mlbAPI;
+//var MLBAPI2 = require('../controllers/mlbapi.controller').mlbAPI;
 var Standings = require('../controllers/standings.controller');
 
 router.use(new PlayersController().route());
@@ -28,7 +28,7 @@ router.use(new StatlineController().route());
 router.use(new AttestationController().route());
 router.use(new AblRosterController().reroute());
 router.use(new MLBAPI().route());
-router.use(new MLBAPI2().route());
+//router.use(new MLBAPI2().route());
 router.use(new Standings().route());
 
 

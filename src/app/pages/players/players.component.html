@@ -5,9 +5,6 @@
 </h3>
 
 
-
-
-
 <div class="btn-group shadow-0" role="group">
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'available'; updateTakenPlayers('available')">Available</button>
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'taken'; updateTakenPlayers('taken')">Taken</button>
@@ -22,11 +19,6 @@
           >
         Advanced Mode
       </mat-slide-toggle>
-
-
-  
-
-
 
 <table datatable 
        [dtOptions]="dtOptions" 
@@ -61,6 +53,7 @@
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
     <tr>
     <th>Player Name</th>
@@ -70,8 +63,10 @@
 
       <th>Position</th>
     <th>Team</th>
+      
       <th>Status</th>
-    <th>ABL Runs</th>
+    <th>Updated</th>
+      <th>ABL Runs</th>
      <th>G</th>
      <th>AB</th>
      <th>H</th>
@@ -95,6 +90,7 @@
       <td>{{player.eligible?.join(",")}}</td>
       <td>{{player.team}}</td>
       <td>{{player.status}}</td>
+      <td> {{player.lastUpdate | date:'shortDate'}}</td>
       <td> {{abl(player.stats.batting) | number }} </td>
       <td> {{player.stats.batting.gamesPlayed}}</td>
       <td> {{player.stats.batting.atBats }}</td>
