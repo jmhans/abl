@@ -54,7 +54,7 @@
                 <span *ngIf="!editable"> {{player.ablPlayedType}} </span>
               </th>
               <td>
-                <span [contentEditable]="editable" (blur)="updateList(i, player.player, 'name', $event)" (mousedown)="$event.stopPropagation()">{{player.player.name}}</span> <small> ({{player.player.position}} - {{player.player.team}})</small></td>
+                <span [contentEditable]="editable" (blur)="updateList(i, player.player, 'name', $event)" (mousedown)="$event.stopPropagation()">{{player.player.name}}</span> <small> ({{player.player.eligible?.join()}} - {{player.player.team}})</small></td>
               <td>
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'g', $event)" (mousedown)="$event.stopPropagation()">{{player.dailyStats ?  player.dailyStats.g : 0 }} </span>
               </td>
