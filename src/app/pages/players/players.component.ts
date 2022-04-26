@@ -1,5 +1,5 @@
 // src/app/pages/player/players.component.ts
-import { Component, OnInit, OnDestroy, ViewChild , Inject} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -14,8 +14,8 @@ import { RosterService } from './../../core/services/roster.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject} from 'rxjs';
-import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map } from 'rxjs/operators';
+import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
+import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
 import { DataTableDirective } from 'angular-datatables';
@@ -62,15 +62,18 @@ export class PlayersComponent implements OnInit, OnDestroy {
   
   overrideData: any[];
   dataSub: Subscription;
+  playerSub: Subscription;
+  redraw$: Observable<any>;
 
-  animal: string;
-  name: string;
   
-  
+  colNames= ['player', 'mlbID', 'ablTeam', 'acqType', 'position', 'team', 'status', 'lastUpdate', 'abl_runs', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'bb', 'hbp', 'sb', 'cs']
+  resultLength: number;
   
   displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
+  playerData$: Observable<MatTableDataSource<MlbPlayerModel>>;
 
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(DataTableDirective, {static: false})
@@ -86,8 +89,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
   formData : Observable<Array<any>>;
 
-
-
+  players$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([])
+  filter$: BehaviorSubject<{}> = new BehaviorSubject({});
   
   constructor(private title: Title, 
               public utils: UtilsService, 
@@ -109,8 +112,103 @@ export class PlayersComponent implements OnInit, OnDestroy {
     }
     this._getPlayerList();
     this._getOwner();
+    
+    
     //this._getOverride();
   }
+  
+    ngAfterViewInit() {
+      
+      this.redraw$ = merge(of({}), this.sort.sortChange, this.paginator.page, 3)
+      
+      this.playerData$ = combineLatest(this.api.getMlbPlayers$(), this.redraw$, this.filter$).pipe(
+        map(([players, pageEvt, filterObj])=> {
+        
+        const adjustedPlayers = players.map((p)=> {
+          if (p && p.stats && p.stats.batting) {
+            p.abl_runs = this.abl(p.stats.batting)
+          }
+          return p
+          
+        })
+        
+        const filteredPlayers = adjustedPlayers.filter(this.filterer(filterObj))
+        const dataSource = new MatTableDataSource<MlbPlayerModel>();
+        this.resultLength = filteredPlayers.length //adjustedPlayers.length;
+        dataSource.data = filteredPlayers //adjustedPlayers;
+        dataSource.sort = this.sort;
+        dataSource.paginator = this.paginator;
+        //dataSource.filterPredicate = this.filterer
+        return dataSource
+      }
+      ))
+          this._initializePlayers();
+
+      
+      
+//     this.playerData$ = this.sort.sortChange.pipe(
+//       startWith({}),
+//       switchMap(()=> {return this.api.getMlbPlayers$()}), 
+//       map(players=> {
+        
+//         const dataSource = new MatTableDataSource<MlbPlayerModel>();
+//         dataSource.data = players;
+//         //dataSource.sortingDataAccessor = this.customSort;
+//         dataSource.sort = this.sort;
+
+//         return dataSource
+//       })
+//     )
+  }
+  
+  private _initializePlayers() {
+    this.playerSub = this.api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
+      res=> {
+        this.players$.next(res)
+      }, 
+      err => {
+        console.error(err)
+      })
+    }
+  
+  filterer(filterObj) {
+    return (obj)=> {
+        var criteria = [true];
+        // If 'taken' show only players with ablstatus.onRoster == true
+        // If 'available' show only players with ablstatus.onRoster == false || null
+        // If 'all' show all players. 
+
+        switch (filterObj.ablstatus) {
+          case 'taken': 
+            criteria.push(obj.ablstatus.onRoster == true)
+            break;
+          case 'available': 
+            criteria.push(obj.ablstatus.onRoster == false )
+            break;
+          case 'all': 
+            criteria.push(true)
+            break;
+          default:
+            // Show available only
+            criteria.push(obj.ablstatus.onRoster == false)
+        }
+      
+        switch (filterObj.position) {
+          case undefined:
+            criteria.push(true)
+            break;
+          default:
+            criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
+        }
+        
+        
+      
+      
+        return criteria.reduce((overall, cur)=>{ return overall && cur}, true)
+      
+    }
+  }
+  
   
   private _getPlayerList() {
     this.loading = true;
@@ -134,6 +232,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
       );
   }
   
+  addFilterProp(obj) {
+    this.filter$.next(obj)
+  }
 
   
   
@@ -243,6 +344,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
     })
     
   }
+  
+  
+  
   
   
   changePositionFilter() {

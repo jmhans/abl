@@ -20,7 +20,7 @@ var MLBAPI = require('../controllers/mlbapi.controller').altMlbApiController;
 //var MLBAPI2 = require('../controllers/mlbapi.controller').mlbAPI;
 var Standings = require('../controllers/standings.controller');
 
-router.use(new PlayersController().route());
+router.use(new PlayersController().reroute());
 router.use(new OwnersController().route());
 router.use(new RostersController().route());
 router.use(new TeamsController().route());

@@ -3,12 +3,20 @@
 <h3>
    Players
 </h3>
+<!-- src/app/pages/games/games.component.html -->
 
-
-<div class="btn-group shadow-0" role="group">
+<!-- <div class="btn-group shadow-0" role="group">
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'available'; updateTakenPlayers('available')">Available</button>
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'taken'; updateTakenPlayers('taken')">Taken</button>
   <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="showPlayers = 'all'; updateTakenPlayers('all')">All</button>
+</div> -->
+
+
+
+<div class="btn-group shadow-0" role="group">
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="addFilterProp({'ablstatus': 'available'})">Available</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="addFilterProp({'ablstatus': 'taken'})">Taken</button>
+  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="addFilterProp({'ablstatus': 'all'})">All</button>
 </div>
 
 <mat-slide-toggle
@@ -20,6 +28,131 @@
         Advanced Mode
       </mat-slide-toggle>
 
+
+<div class="example-table-container" >
+
+          <table mat-table [dataSource]="playerData$ | async" class="example-table"
+                 matSort matSortActive="abl_runs" matSortDisableClear matSortDirection="desc">
+
+            <ng-container matColumnDef="player" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Player</th>
+              <td mat-cell *matCellDef="let row">       <strong>{{row.name}}</strong>
+              </td>
+            </ng-container>
+            
+
+            
+            <ng-container matColumnDef="mlbID" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>MLB Id</th>
+              <td mat-cell *matCellDef="let row">{{row.mlbID}}</td>
+            </ng-container>
+            <ng-container matColumnDef="ablTeam" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>ABL Team</th>
+              <td mat-cell *matCellDef="let row">{{row.ablstatus?.ablTeam ? row.ablstatus.ablTeam.nickname: ''}}</td>
+            </ng-container>
+            <ng-container matColumnDef="acqType" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Acq</th>
+              <td mat-cell *matCellDef="let row">{{row.ablstatus?.acqType ? row.ablstatus.acqType : ''}}</td>
+            </ng-container>
+            <ng-container matColumnDef="position" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Positions</th>
+              <td mat-cell *matCellDef="let row">{{row.eligible?.join(",")}}</td>
+            </ng-container>
+            <ng-container matColumnDef="team" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>MLB Team</th>
+              <td mat-cell *matCellDef="let row">{{row.team}}</td>
+            </ng-container>
+            <ng-container matColumnDef="status" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Status</th>
+              <td mat-cell *matCellDef="let row">{{row.status}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="lastUpdate" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>Updated</th>
+              <td mat-cell *matCellDef="let row">{{row.lastUpdate | date:'shortDate'}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="abl_runs" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>ABL Runs</th>
+              <td mat-cell *matCellDef="let row">{{row.abl_runs | number}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="gamesPlayed" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>G</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.gamesPlayed}}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="atBats" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>AB</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.atBats}}</td>
+            </ng-container>
+            <ng-container matColumnDef="hits" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>H</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.hits}}</td>
+            </ng-container>
+            <ng-container matColumnDef="doubles" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>2B</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.doubles}}</td>
+            </ng-container>
+            <ng-container matColumnDef="triples" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>3B</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.triples}}</td>
+            </ng-container>
+            <ng-container matColumnDef="homeRuns" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>HR</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.homeRuns}}</td>
+            </ng-container>
+            <ng-container matColumnDef="bb" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>BB</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.baseOnBalls + row.stats.batting.intentionalWalks}}</td>
+            </ng-container>
+            <ng-container matColumnDef="hbp" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>HBP</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.hitByPitch}}</td>
+            </ng-container>
+          <ng-container matColumnDef="sb" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>SB</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.stolenBases}}</td>
+            </ng-container>
+            <ng-container matColumnDef="cs" >
+              <th mat-header-cell *matHeaderCellDef  mat-sort-header>CS</th>
+              <td mat-cell *matCellDef="let row">{{row.stats.batting.caughtStealing}}</td>
+            </ng-container>
+      
+            
+            
+            
+            
+            
+            
+
+            <tr mat-header-row *matHeaderRowDef="colNames"></tr>
+            <tr mat-row *matRowDef="let row; columns: colNames"></tr>
+            
+            
+          </table>
+      </div>
+
+
+
+      <mat-paginator [length]="resultLength" [pageSize]="30" aria-label="Some label"></mat-paginator> 
+      
+  <!-- Error loading events -->
+  <p *ngIf="error" class="alert alert-danger">
+    <strong>Oops!</strong> There was an error retrieving standings data.
+  </p>
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
 <table datatable 
        [dtOptions]="dtOptions" 
        [dtTrigger]="dtTrigger"
@@ -118,7 +251,7 @@
     </tr>
   </tbody>
 </table>
-
+ -->
 
 
   <!-- Error loading events -->

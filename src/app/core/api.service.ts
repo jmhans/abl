@@ -58,7 +58,7 @@ export class ApiService {
   
   getMlbPlayers$(): Observable<MlbPlayerModel[]> {
     return this.http
-      .get<MlbPlayerModel[]>(`${this.base_api}mlbplayers`)
+      .get<MlbPlayerModel[]>(`${this.v2_api}players`)
       .pipe(
         catchError((error) => this._handleError(error))  
     );
