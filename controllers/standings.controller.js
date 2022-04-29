@@ -155,9 +155,10 @@ _get(req, res, next) {
       'abl_runs': {
         '$avg': '$scores.final.abl_runs'
       }, 
-      'avg_runs': {
-        '$avg': '$scores.unadjusted_runs'
-      }, 
+      'avg_runs': {'$subtract': [{
+          '$divide': [{'$sum': '$scores.final.abl_points'}, 
+          {'$sum': '$scores.final.ab'}]}, 4.5]
+        }, 
       'ab': {
         '$sum': '$scores.final.ab'
       }, 

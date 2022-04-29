@@ -15,7 +15,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
-import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll } from 'rxjs/operators';
+import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
 import { DataTableDirective } from 'angular-datatables';
@@ -34,68 +34,60 @@ export interface DialogData {
 })
 export class PlayersComponent implements OnInit, OnDestroy {
   pageTitle = 'Players';
-  playerListSub: Subscription;
-  playerList: MlbPlayerModel[];
-  filteredPlayers: MlbPlayerModel[];
+
+  // filteredPlayers: MlbPlayerModel[];
   loading: boolean;
   error: boolean;
   query: '';
-  dtOptions: DataTables.Settings = {};
-  dtTrigger: Subject<any> = new Subject();
-  actionPlayer: MlbPlayerModel;
   rosterUpdateSub: Subscription;
   submitting: boolean;
-  takenFilter: boolean;
   ownerTeams: AblTeamModel[];
   ownerPrimaryTeam: AblTeamModel;
   ownerSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
   draftTeam: AblTeamModel;
   draftMode: boolean = false;
-  teamList: AblTeamModel[];
-  teamsListSub: Subscription;
-  showTaken: boolean = false;
-  filterGroup: any = {value: 'showAll'};
-  showPlayers: string = 'all';
   advancedMode: boolean = false; 
-  filterPos: string;
   
-  overrideData: any[];
-  dataSub: Subscription;
   playerSub: Subscription;
   redraw$: Observable<any>;
+  fullFilter$: Observable<any>;
+  
+  colNames= ['name', 'mlbID', 'ablstatus.ablTeam.nickname', 'ablstatus.acqType', 'position', 'team', 'status', 'lastUpdate', 'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles', 
+             'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
+
 
   
-  colNames= ['player', 'mlbID', 'ablTeam', 'acqType', 'position', 'team', 'status', 'lastUpdate', 'abl_runs', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'bb', 'hbp', 'sb', 'cs']
+  
+  
   resultLength: number;
   
-  displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
+  //displayedColumns: string[] = ['name', 'mlbID', 'ablTeam', '_id', 'position', 'team', 'status', 'abl', 'gamesPlayed', 'atBats', 'hits', 'doubles', 'triples', 'homeRuns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing', 'action'];
   dataSource: MatTableDataSource<MlbPlayerModel>;
   playerData$: Observable<MatTableDataSource<MlbPlayerModel>>;
 
   
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(DataTableDirective, {static: false})
-  dtElement: DataTableDirective;
+//   @ViewChild(DataTableDirective, {static: false})
+//   dtElement: DataTableDirective;
   
   
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+//   applyFilter(filterValue: string) {
+//     this.dataSource.filter = filterValue.trim().toLowerCase();
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-  formData : Observable<Array<any>>;
+//     if (this.dataSource.paginator) {
+//       this.dataSource.paginator.firstPage();
+//     }
+//   }
+//  formData : Observable<Array<any>>;
 
-  players$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([])
+  players$: Subject<MlbPlayerModel[]> = new Subject<MlbPlayerModel[]>();
   filter$: BehaviorSubject<{}> = new BehaviorSubject({});
   
   constructor(private title: Title, 
               public utils: UtilsService, 
               public api: ApiService, 
-              public fs: FilterSortService, 
               private rosterService: RosterService, 
               private auth: AuthService, 
               public userContext: UserContextService,
@@ -104,61 +96,57 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    this.formData = this.api.getAblTeams$();
-    this.dtOptions = {
-      pagingType: 'full_numbers', 
-      pageLength: 50, 
-      responsive: true
-    }
-    this._getPlayerList();
+//    this.formData = this.api.getAblTeams$();
+
     this._getOwner();
     
     
-    //this._getOverride();
   }
   
     ngAfterViewInit() {
       
       this.redraw$ = merge(of({}), this.sort.sortChange, this.paginator.page, 3)
+      this.fullFilter$ = this.filter$.pipe(
+        scan((acc, curr)=> {
+            for (const prop in curr) {
+              acc[prop] = curr[prop]
+            }
+          
+          return acc
+        }, {'ablstatus': 'available'})
+      )
       
-      this.playerData$ = combineLatest(this.api.getMlbPlayers$(), this.redraw$, this.filter$).pipe(
+     // this.fullFilter$.subscribe(val => console.log(`Output is: ${val}`) );
+      this.playerData$ = combineLatest(this.players$, this.redraw$, this.fullFilter$).pipe(
         map(([players, pageEvt, filterObj])=> {
         
         const adjustedPlayers = players.map((p)=> {
           if (p && p.stats && p.stats.batting) {
             p.abl_runs = this.abl(p.stats.batting)
+          } else {
+            p.abl_runs = null
           }
           return p
           
         })
         
-        const filteredPlayers = adjustedPlayers.filter(this.filterer(filterObj))
-        const dataSource = new MatTableDataSource<MlbPlayerModel>();
-        this.resultLength = filteredPlayers.length //adjustedPlayers.length;
-        dataSource.data = filteredPlayers //adjustedPlayers;
-        dataSource.sort = this.sort;
-        dataSource.paginator = this.paginator;
-        //dataSource.filterPredicate = this.filterer
-        return dataSource
+          //const filteredPlayers = adjustedPlayers //.filter(this.filterer(filterObj))
+          const dataSource = new MatTableDataSource<MlbPlayerModel>();
+        
+          dataSource.data =  adjustedPlayers //adjustedPlayers;
+          dataSource.sortingDataAccessor = this.getSorter();
+          dataSource.sort = this.sort;
+          dataSource.paginator = this.paginator;
+          
+          dataSource.filterPredicate = this.getFilterer()
+          dataSource.filter = JSON.stringify(filterObj)
+          this.resultLength = dataSource.filteredData.length;
+        
+          return dataSource
       }
       ))
           this._initializePlayers();
 
-      
-      
-//     this.playerData$ = this.sort.sortChange.pipe(
-//       startWith({}),
-//       switchMap(()=> {return this.api.getMlbPlayers$()}), 
-//       map(players=> {
-        
-//         const dataSource = new MatTableDataSource<MlbPlayerModel>();
-//         dataSource.data = players;
-//         //dataSource.sortingDataAccessor = this.customSort;
-//         dataSource.sort = this.sort;
-
-//         return dataSource
-//       })
-//     )
   }
   
   private _initializePlayers() {
@@ -171,72 +159,92 @@ export class PlayersComponent implements OnInit, OnDestroy {
       })
     }
   
-  filterer(filterObj) {
-    return (obj)=> {
+  
+  getSorter() {
+    
+    
+    return (obj, sortString: string) => {
+      let returnVal;
+      
+      if (sortString == 'bb') {
+        const battingObj = ((obj.stats || {}).batting || {})
+        return battingObj.baseOnBalls + battingObj.intentionalWalks
+      }
+      
+          // Split '.' to allow accessing property of nested object
+      if (sortString.includes('.')) {
+          const accessor = sortString.split('.');
+          let value: any = obj;
+          accessor.forEach((a) => {
+              value = (value || {})[a];
+          });
+          return value;
+      }
+      // Access as normal
+      return obj[sortString];
+    
+    }
+  }
+  
+  getFilterer() {
+    return (obj, filters: string) => {
+      
+        const filterObj = JSON.parse(filters)
         var criteria = [true];
         // If 'taken' show only players with ablstatus.onRoster == true
         // If 'available' show only players with ablstatus.onRoster == false || null
         // If 'all' show all players. 
+      
+        
+         for (const prop in filterObj) {
+            switch (prop) {
+              case 'ablstatus':
+                switch (filterObj.ablstatus) {
+                  case 'taken': 
+                    criteria.push(obj.ablstatus.onRoster == true)
+                    break;
+                  case 'available': 
+                    criteria.push(obj.ablstatus.onRoster == false )
+                    break;
+                  case 'all': 
+                    criteria.push(true)
+                    break;
+                  default:
+                    // Show available only
+                    criteria.push(obj.ablstatus.onRoster == false)
+                }      
+                break;
+              case 'position': 
+                switch (filterObj.position) {
+                  case undefined:
+                    criteria.push(true)
+                    break;
+                  default:
+                    criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
+                }
+                break;
+              default:
+                criteria.push(obj[prop].toLowerCase().includes(filterObj[prop])) 
+            }
+          }
 
-        switch (filterObj.ablstatus) {
-          case 'taken': 
-            criteria.push(obj.ablstatus.onRoster == true)
-            break;
-          case 'available': 
-            criteria.push(obj.ablstatus.onRoster == false )
-            break;
-          case 'all': 
-            criteria.push(true)
-            break;
-          default:
-            // Show available only
-            criteria.push(obj.ablstatus.onRoster == false)
-        }
-      
-        switch (filterObj.position) {
-          case undefined:
-            criteria.push(true)
-            break;
-          default:
-            criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
-        }
-        
-        
-      
-      
-        return criteria.reduce((overall, cur)=>{ return overall && cur}, true)
+          return criteria.every(Boolean)
       
     }
   }
   
   
-  private _getPlayerList() {
-    this.loading = true;
-    // Get future, public events
-    
-    this.playerListSub = this.api
-      .getMlbPlayers$()
-      .subscribe(
-        res => {
-          this.playerList = res;
-          this.filteredPlayers = this.playerList;
-          this.updateTakenPlayers('all');
-          this.loading = false;
-          this.dtTrigger.next();
-        },
-        err => {
-          console.error(err);
-          this.loading = false;
-          this.error = true;
-        }
-      );
-  }
+addFilter(prop: string, evt) {
+  
+  var filterObj = {};
+  filterObj[prop] = evt.srcElement.value;
+  this.addFilterProp(filterObj)
+  //this.filter$.next()
+}
   
   addFilterProp(obj) {
     this.filter$.next(obj)
   }
-
-  
   
   
   _getOwner() {
@@ -249,41 +257,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
     )
   }
   
-  _selectedItems() {
-    return this.playerList.filter((p)=> {return p.draftMe}).length
+
+
     
-  }
-  
-  _getOverride() {
-    this.dataSub = this.api.getData$("draft").subscribe(
-      data => {
-        this.overrideData = data
-        
-      }
-    )
-  }
-  
-  _updateSelectionsWithOverride(tmNickname) {
-    var matchList = this.overrideData.filter((draft) => {
-      return draft.Team == tmNickname
-    })
-    
-    this.playerList.forEach((p) => {
-      if (p.name == "Cody Bellinger") {
-        console.log(p)
-      }
-      var match = matchList.find((m)=> {return m.mlbId == p.mlbID})
-      // There is a match, so this guy was selected by the tm in the draft. 
-      if (match) {
-        p.draftMe = true
-      } else {
-        p.draftMe = false
-      }
-      
-    })
-  }
-  
-  
   
   _isAdmin() {
     const userProf = this.auth.userProfile; 
@@ -301,8 +277,6 @@ export class PlayersComponent implements OnInit, OnDestroy {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log(result)
-        
         if (result) {
          
           this.rosterUpdateSub = this.rosterService
@@ -327,56 +301,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
  
   }
 
-  
-//   searchPlayers() {
-//     this.filteredPlayers = this.fs.search(this.playerList, this.query, '_id', 'mediumDate');
-//   }
-  
-  updateTakenPlayers(filterType: string) {
-//     if (this.showTaken) {
-//       this.filteredPlayers = this.playerList
-//     } else {
-//       this.filteredPlayers = this.playerList.filter((p)=> {return p.ablstatus.onRoster == this.showTaken})  
-//     }
-    
-    this.filteredPlayers = this.playerList.filter((p) => {
-      return (p.ablstatus.onRoster == (filterType == 'taken')) || filterType == "all"
-    })
-    
-  }
-  
-  
-  
-  
-  
-  changePositionFilter() {
-    this.filteredPlayers = this.playerList.filter((p) => {
-      
-      if (this.filterPos) {
-        return  Array(p.eligible).join(",").indexOf(this.filterPos) >-1 && ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
-      } else {
-        return  ((p.ablstatus.onRoster == (this.showPlayers == 'taken')) || this.showPlayers == 'all')  
-      }
-      
-    })
-    this.rerender()
 
-  }
-                                                  
-  rerender(): void {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      // Destroy the table first
-      dtInstance.destroy();
-      // Call the dtTrigger to rerender again
-      this.dtTrigger.next();
-    });
-  }
   
 
-  resetQuery() {
-    this.query = '';
-    this.filteredPlayers = this.playerList;
-  }
   
    private _handleSubmitSuccess(res, plyr) { 
     plyr.ablstatus = res.player.ablstatus;
@@ -389,6 +316,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this.submitting = false;
     this.error = true;
   }
+  
+  
   abl(plyrStats) { 
     if(plyrStats.atBats >0) {
       return (plyrStats.hits * 25 + 
@@ -406,21 +335,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
     
   }
   
-   
-  openDialog(): void {
-    
-    if (this.advancedMode) {
-      
-    }
-    
-
-  }
-  
 
   ngOnDestroy() {
-    this.playerListSub.unsubscribe();
-    //this.dataSub.unsubscribe();
-    this.dtTrigger.unsubscribe();
     if(this.rosterUpdateSub) { 
       this.rosterUpdateSub.unsubscribe();
     }

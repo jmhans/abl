@@ -87,7 +87,6 @@ class PlayersController extends BaseController {
                 _playerRecord.status = player.status.description; 
                 _playerRecord.lastUpdate = new Date();
           }
-          
         const newRec = await _playerRecord.save();
         return _playerRecord;
       } catch (err) {
@@ -331,12 +330,39 @@ class PlayersController extends BaseController {
       'as': 'posLog'
     }
   }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'plyrId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', 2021
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'posLogLastYear'
+    }
+  }, {
     '$addFields': {
       'posLog': {
         '$first': '$posLog'
       }, 
       'priorYearElig': {
-        '$first': '$posLog.priorSeasonMaxPos'
+        '$first': '$posLogLastYear.maxPosition'
       }, 
       'currentYearElig': {
         '$first': '$posLog.eligiblePositions'
@@ -348,7 +374,7 @@ class PlayersController extends BaseController {
   }, {
     '$lookup': {
       'from': 'positions', 
-      'localField': 'player.mlbID', 
+      'localField': 'mlbID', 
       'foreignField': 'mlbId', 
       'as': 'posRec'
     }

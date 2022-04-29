@@ -101,7 +101,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
           switch (header) {
             case 'team': return item.tm.nickname;
             case 'wpct': return (item.g > 0) ? item.w / item.g : 0;
-            case 'abl': return item.abl_runs;
+            case 'abl': return item.avg_runs;
             case 'bb': return item.bb + item.hbp;
             case 'sac': return item.sac + item.sf;
             case 'sb%': return (item.sb + item.cs > 0 ) ? item.sb / (item.sb + item.cs) : 0;

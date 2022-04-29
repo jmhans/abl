@@ -185,10 +185,14 @@ class altMlbApiController extends BaseController{
         for (var t=0; t<teams.length; t++) {
           var roster = await this.getRosterInfo(teams[t].id)
           
+
           for (var p=0; p<roster.length; p++) {
+            if (teams[t].abbreviation == 'ATL' ) {
+              console.log(roster[p].person.fullName);
+            }
             const plyr = await this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
             output.push(roster[p].person.id)
-            
+           
           }
 
         }
