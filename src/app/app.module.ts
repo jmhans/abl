@@ -23,7 +23,7 @@ import { DataTablesModule } from 'angular-datatables';
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { Angular2CsvModule } from 'angular2-csv';
+//import { Angular2CsvModule } from 'angular2-csv';
  
 
 import { AppRoutingModule } from './app-routing.module';
@@ -150,7 +150,7 @@ import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.co
     CollapseModule,
     IconsModule,
     TableModule,
-    Angular2CsvModule,
+  //  Angular2CsvModule,
     LocalMaterialModule,
     AuthModule.forRoot({
       domain: AUTH_CONFIG.CLIENT_DOMAIN,

@@ -5,7 +5,7 @@
  |--------------------------------------
  */
 
-const jwt = require('express-jwt');
+const { expressjwt: jwt} = require('express-jwt');
 const jwks = require('jwks-rsa');
 
 const https = require('https');
@@ -42,7 +42,7 @@ module.exports = function(app, config) {
     }),
     audience: config.AUTH0_API_AUDIENCE,
     issuer: `https://${config.AUTH0_DOMAIN}/`,
-    algorithm: 'RS256'
+    algorithms: ['RS256']
   });
 
   const adminCheck = (req, res, next) => {
