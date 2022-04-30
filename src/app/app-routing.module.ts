@@ -26,7 +26,6 @@ import { CreateGameComponent } from './pages/admin/game/create-game/create-game.
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
-import { MlbComponent } from './pages/admin/mlb/mlb.component';
 
 
 const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch: 'full'}, 
@@ -37,8 +36,7 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path: 'callback', component: CallbackComponent}, 
                        {path: 'admin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AdminComponent }, 
                                                                                           {path: 'event/new', component: CreateEventComponent}, 
-                                                                                         {path: 'event/update/:id', component: UpdateEventComponent}, 
-                                                                                         {path: 'mlb', component: MlbComponent}]}, 
+                                                                                         {path: 'event/update/:id', component: UpdateEventComponent}]}, 
                        {path: 'event/:id', component: EventComponent, canActivate:[ AuthGuard ]}, 
                        {path: 'team', canActivate:[ AuthGuard ], children: [ {path: ':id', component: TeamComponent}, 
                                                                             {path: 'update/:id', component: UpdateTeamComponent},

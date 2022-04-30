@@ -59,6 +59,48 @@ class PlayersController extends BaseController {
     }  
   }
   
+    async _updatePlayerStatus(player,team) {
+    
+    if (player.position.abbreviation != 'P') {
+   
+      var query = {
+        'mlbID': player.person.id
+      }
+      
+      try {
+        var _playerRecord = await this.model.findOne(query);
+        
+          if (_playerRecord) {
+
+          } else {
+            // Create a new player record. 
+              _playerRecord = new this.model({
+                mlbID: player.person.id,
+                lastUpdate: new Date ("2000-01-01"), 
+                //games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
+                //positionLog : []
+              })
+          }
+          if (new Date() >= new Date(_playerRecord.lastUpdate) || _playerRecord.lastUpdate == null) {
+                _playerRecord.name = player.person.fullName;
+                _playerRecord.team = team.abbreviation; 
+                _playerRecord.status = player.status.description; 
+                _playerRecord.lastUpdate = new Date();
+          }
+        const newRec = await _playerRecord.save();
+        return _playerRecord;
+      } catch (err) {
+        console.error(`Error in _updatePlayer:${err}`)
+      }
+
+      
+      
+
+    }  
+  }
+  
+  
+  
  async _getEligibility(req, res, next) {
    if (req.params.plyrId) {
      console.log(req.params.plyrId);
@@ -238,10 +280,191 @@ class PlayersController extends BaseController {
    }
  }
   
-    route() {
-    router.get('/' + this.routeString + '/:plyrId/eligibility' , (...args) => this._getEligibility(...args));
+  
+  
+  _get(req, res, next) {
+  this.model.aggregate([
+  {
+    '$match': {
+      'lastUpdate': {
+        '$gte': new Date('Fri, 01 Apr 2022 00:00:00 GMT')
+      }
+    }
+  }, {
+    '$lookup': {
+      'from': 'ablteams', 
+      'localField': 'ablstatus.ablTeam', 
+      'foreignField': '_id', 
+      'as': 'ablstatus.ablTeam'
+    }
+  }, {
+    '$unwind': {
+      'path': '$ablstatus.ablTeam', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'plyrId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', 2022
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'posLog'
+    }
+  }, {
+    '$lookup': {
+      'from': 'position_log', 
+      'let': {
+        'plyrId': '$mlbID'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': [
+                {
+                  '$eq': [
+                    '$mlbId', '$$plyrId'
+                  ]
+                }, {
+                  '$eq': [
+                    '$season', 2021
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'posLogLastYear'
+    }
+  }, {
+    '$addFields': {
+      'posLog': {
+        '$first': '$posLog'
+      }, 
+      'priorYearElig': {
+        '$first': '$posLogLastYear.maxPosition'
+      }, 
+      'currentYearElig': {
+        '$first': '$posLog.eligiblePositions'
+      }, 
+      'eligible': {
+        '$first': '$posLog.eligiblePositions'
+      }
+    }
+  }, {
+    '$lookup': {
+      'from': 'positions', 
+      'localField': 'mlbID', 
+      'foreignField': 'mlbId', 
+      'as': 'posRec'
+    }
+  }, {
+    '$addFields': {
+      'commishPos': {
+        '$ifNull': [
+          {
+            '$first': '$posRec.position'
+          }, '$priorYearElig'
+        ]
+      }
+    }
+  }, {
+    '$addFields': {
+      'allPos': {
+        '$filter': {
+          'input': {
+            '$concatArrays': [
+              [
+                '$commishPos'
+              ], {
+                '$ifNull': [
+                  '$currentYearElig', []
+                ]
+              }
+            ]
+          }, 
+          'as': 'p', 
+          'cond': {
+            '$ne': [
+              '$$p', null
+            ]
+          }
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'eligible': {
+        '$reduce': {
+          'input': '$allPos', 
+          'initialValue': [], 
+          'in': {
+            '$cond': [
+              {
+                '$in': [
+                  '$$this', '$$value'
+                ]
+              }, '$$value', {
+                '$concatArrays': [
+                  '$$value', [
+                    '$$this'
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }, {
+    '$project': {
+      'commishPos': 0, 
+      'posRec': 0, 
+      'allPos': 0, 
+      'currentYearElig': 0, 
+      'priorYearElig': 0, 
+      'position': 0
+    }
+  }
+]
+
+    
+      , function(err, players) {
+      if (err) return next(err);
+
+      res.send(players);
+    });
+  }
+  
+  
+  
+     
+  reroute() {
+    router = this.route();
+        router.get('/' + this.routeString + '/:plyrId/eligibility' , (...args) => this._getEligibility(...args));
     return router;
   }
+  
   
   
   

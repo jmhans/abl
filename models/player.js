@@ -21,10 +21,17 @@ var playerSchema = new mongoose.Schema({
 //     stats: {type: mongoose.Schema.Types.Mixed, required: false}, 
 //     positions: {type: [], required: false}
 //   }], 
-  lastUpdate: {type: String, required: false}, 
+  lastUpdate: {type: Date, required: false, default: Date.now()}, 
   //positionLog: {type: [String], required: false}
   dougstatsName: {type: String, required: false}
 })
+
+
+playerSchema.pre('save', function preSave(next){
+  var plyr = this;
+  plyr.lastUpdate = Date.now();
+  next();
+});
 
 module.exports = {Player: mongoose.model('Player', playerSchema), 
                   PlayerSchema: playerSchema};

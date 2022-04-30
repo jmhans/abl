@@ -58,7 +58,7 @@ export class ApiService {
   
   getMlbPlayers$(): Observable<MlbPlayerModel[]> {
     return this.http
-      .get<MlbPlayerModel[]>(`${this.base_api}mlbplayers`)
+      .get<MlbPlayerModel[]>(`${this.v2_api}players`)
       .pipe(
         catchError((error) => this._handleError(error))  
     );
@@ -355,17 +355,6 @@ export class ApiService {
     )
   }
   
-  getSchedule$(dt): Observable<any> {
-    return this.http
-      .get<any[]>(`${this.v2_api}mlb/schedule/${dt}`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
-
-
   
   
 
