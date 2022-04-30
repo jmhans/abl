@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+//import {hammerjs} from 'node_modules/hammerjs';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,7 @@ import { debounceTime } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  //hammerjs=hammerjs;
   navOpen: boolean;
   minHeight: string;
   private _initWinHeight = 0;
