@@ -1,5 +1,4 @@
-const request = require('request');
-
+const axios = require('axios').default;
 
 
 var today = new Date()
@@ -11,40 +10,50 @@ var pad = function(num, size) {
 }
 
 
-var day = pad(today.getUTCDate()-1, 2); 
+var day = pad(today.getUTCDate()-1, 2);
 var month = pad(today.getUTCMonth() + 1, 2);
 var year = today.getUTCFullYear();
 
 function _updatePositionsLog() {
 
-  request('https://abl-prod.herokuapp.com/api3/positionlogs', function(err, resp, body) {
-    if (err) {
-      console.error(err)
-    }
-      console.log('statusCode:', resp && resp.statusCode);
-    if (resp.statusCode == 200) {
+  axios.get('https://abl-prod.herokuapp.com/api3/positionlogs')
+  .then(function (resp) {
+    // handle success
+    console.log('PosLog statusCode:', resp && resp.status);
+    if (resp.status == 200) {
       console.log('Positions Log Updated');
     }
 
-  });  
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
 }
 
 
 
-request('https://abl-prod.herokuapp.com/api2/mlbGame/' + year + '-' + month + '-' + day, function(err, resp, body) {
-  if (err) {
-    console.error(err)
-  }
-    console.log('statusCode:', resp && resp.statusCode);
-  if (resp.statusCode == 200) {
-    _updatePositionsLog()
-    console.log(`${JSON.parse(body).length} records added for ${year + '-' + month + '-'+ day}`);
-    console.log(`${resp.body}`);
-  }
-  
-});
+axios.get('https://abl-prod.herokuapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
+  .then(function (resp) {
+    // handle success
+    console.log('Game Score statusCode:', resp && resp.status);
+    if (resp.status == 200) {
 
-
+      console.log(`${JSON.parse(body).length} records added for ${year + '-' + month + '-'+ day}`);
+      console.log(`${resp.body}`);
+      _updatePositionsLog()
+    }
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
 
 
 

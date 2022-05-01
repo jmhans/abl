@@ -13,7 +13,7 @@
 
 
 .example-list {
-  
+
   border: solid 1px #ccc;
   background: white;
   border-radius: 4px;
@@ -54,7 +54,7 @@
   right: 2px;
   color: #ccc;
   cursor: move;
-  
+
         display: inline-flex;
 
       vertical-align: middle;
@@ -80,7 +80,7 @@
   background-color: #fcffc1;
 }
 
-body { 
+body {
   font-family: Roboto, Arial, sans-serif;
   margin: 0;
 }
@@ -94,5 +94,11 @@ body {
   .mat-select-value {
     max-width: 100%;
     width: auto;
-  }  
+  }
+}
+
+.roster-table {
+  .mat-row{
+height:auto !important;
+  }
 }

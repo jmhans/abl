@@ -4,6 +4,57 @@
 
 <button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
 
+
+<div class="example-table-container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)"  *ngIf='true'>
+
+  <table mat-table [dataSource]="(roster$ | async)" class="roster-table" >
+
+    <ng-container matColumnDef="player.name" >
+      <th mat-header-cell *matHeaderCellDef >Player</th>
+      <td mat-cell *matCellDef="let rosterRec">{{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})</td>
+    </ng-container>
+    <ng-container matColumnDef="lineupPosition" >
+        <th mat-header-cell *matHeaderCellDef >Position</th>
+        <td mat-cell *matCellDef="let rosterRec">
+
+            <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
+            <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1">
+                <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
+            </select>
+            <span *ngIf="!editable || rosterRec.player.eligible.length <= 1">{{rosterRec.lineupPosition}}</span>
+
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="abl_runs" >
+        <th mat-header-cell *matHeaderCellDef >ABL</th>
+        <td mat-cell *matCellDef="let rosterRec">{{ abl(rosterRec.player.stats.batting) | number }}</td>
+      </ng-container>
+      <ng-container matColumnDef="stats" >
+        <th mat-header-cell *matHeaderCellDef >Stats</th>
+        <td mat-cell *matCellDef="let rosterRec"><span *ngIf="rosterRec.player.stats" class=" d-none d-md-block">{{rosterRec.player.stats.batting.gamesPlayed}} G,
+            {{rosterRec.player.stats.batting.atBats}} AB,
+            {{rosterRec.player.stats.batting.hits}} H,
+            {{rosterRec.player.stats.batting.doubles}} 2B,
+            {{rosterRec.player.stats.batting.triples}} 3B,
+            {{rosterRec.player.stats.batting.homeRuns}} HR,
+            {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB,
+            {{rosterRec.player.stats.batting.hitByPitch}} HBP,
+            {{rosterRec.player.stats.batting.stolenBases}} SB,
+            {{rosterRec.player.stats.batting.caughtStealing}} CS
+            </span>
+        </td>
+      </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['lineupPosition', 'player.name', 'abl_runs', 'stats']"></tr>
+    <tr class="alt" [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
+    rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition ||
+    rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}"
+    cdkDrag mat-row *matRowDef="let row; columns: ['lineupPosition', 'player.name' , 'abl_runs', 'stats']; let i = dataIndex;"></tr>
+  </table>
+</div>
+
+
+
 <div class="container" >
   <div class="row" >
     <div class="col-sm-1">
@@ -30,7 +81,7 @@
 
 <div class="container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)"  *ngIf='true'>
   <div class="example-box alt row" *ngFor="let rosterRec of lineup.roster; index as i;" cdkDrag [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition || 
+          rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition ||
           rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}">
     <div class="col-sm-1">
       <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
@@ -38,7 +89,7 @@
         <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
       </select>
       <span *ngIf="!editable || rosterRec.player.eligible.length <= 1">{{rosterRec.lineupPosition}}</span>
-      
+
     </div>
 
     <div class="col-sm-3">
@@ -54,15 +105,15 @@
 
     </div>
     <div class="col-sm-7">
-      <span *ngIf="rosterRec.player.stats" class=" d-none d-md-block">{{rosterRec.player.stats.batting.gamesPlayed}} G, 
+      <span *ngIf="rosterRec.player.stats" class=" d-none d-md-block">{{rosterRec.player.stats.batting.gamesPlayed}} G,
         {{rosterRec.player.stats.batting.atBats}} AB,
         {{rosterRec.player.stats.batting.hits}} H,
-        {{rosterRec.player.stats.batting.doubles}} 2B, 
-        {{rosterRec.player.stats.batting.triples}} 3B, 
-        {{rosterRec.player.stats.batting.homeRuns}} HR, 
-        {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB, 
+        {{rosterRec.player.stats.batting.doubles}} 2B,
+        {{rosterRec.player.stats.batting.triples}} 3B,
+        {{rosterRec.player.stats.batting.homeRuns}} HR,
+        {{rosterRec.player.stats.batting.baseOnBalls + rosterRec.player.stats.batting.intentionalWalks}} BB/IBB,
         {{rosterRec.player.stats.batting.hitByPitch}} HBP,
-        {{rosterRec.player.stats.batting.stolenBases}} SB, 
+        {{rosterRec.player.stats.batting.stolenBases}} SB,
         {{rosterRec.player.stats.batting.caughtStealing}} CS
         </span>
 

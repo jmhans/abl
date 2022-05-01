@@ -1,6 +1,5 @@
 /*jshint esversion: 8 */
 
-const request = require('request');
 const axios = require('axios');
 var   express = require('express');
 var   router = express.Router();
@@ -29,7 +28,7 @@ class altMlbApiController extends BaseController{
     super(mlbGame, 'mlbgame');
     this.PlyrCntl = new PlayersController();
   }
-  
+
   async _getGames(req, res, next) {
     try {
       const games = await this._getGamesForDate(req.params.gm_dt);
@@ -38,7 +37,7 @@ class altMlbApiController extends BaseController{
       return res.status(500).send({message: err.message});
     }
   }
-  
+
   async _getRosters(req, res, next) {
     try {
       const rosters = await this.getAllRosters();
@@ -47,35 +46,35 @@ class altMlbApiController extends BaseController{
       return res.status(500).send({message: err.message});
     }
   }
-  
-  
+
+
   async _getGamesForDate(gm_date) {
     try {
       var inputDate = new Date(gm_date)
-      var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.  
+      var day = pad(inputDate.getUTCDate(), 2); //getDate returns the date for the local timezone.
       var month = pad(inputDate.getUTCMonth() + 1, 2);
       var year = inputDate.getUTCFullYear();
       const APIUrl = BASE_URL + "/schedule/?sportId=1&date=" + month + "%2F" + day + "%2F" + year
-      var retBody = await axios.get(APIUrl);      
+      var retBody = await axios.get(APIUrl);
       var gamesList = [];
-      
+
       var dateItem = retBody.data.dates.find(x=>x.date == (year + "-" + month + "-" + day));
-      
+
       if (dateItem) {
         gamesList = dateItem.games
         this._loadGamesToDB(gamesList);
       }
       return gamesList
-      
+
     } catch(err) {
       console.error(`Error in _getGames: ${err}`)
     }
   }
-  
+
   async _loadGamesToDB(gamesList) {
     try {
       gamesList.forEach((gm) => {
-        
+
           var query = {
             'gamePk': gm.gamePk
           };
@@ -88,42 +87,46 @@ class altMlbApiController extends BaseController{
 
             //return res.send("succesfully saved");
           });
-        
+
           if (gm.status.codedGameState != 'D') {
-            this.loadPlayersInGame(gm);    
+            this.loadPlayersInGame(gm);
           }
-        
-        
-        
+
+
+
       });
     } catch(err) {
       console.error(`Error in _loadGamesToDB: ${err}`)
     }
   }
-  
-  
-  
+
+  async handleLoadPlayersResponse(body) {
+    try {
+      const awayPlayers = await this.loadTeamPlayers(body.teams, "away", gm);
+      const homePlayers = await this.loadTeamPlayers(body.teams, "home", gm);
+      console.log(awayPlayers.length + " away team players and " + homePlayers.length + " home team players logged.")
+      return {away: awayPlayers, home: homePlayers};
+
+    } catch (err) {
+
+    }
+   }
+
+
  async loadPlayersInGame(gm) {
     const APIUrl = BASE_URL + "/game/" + gm.gamePk + "/boxscore";
-    request(APIUrl, {
-      json: true
-    }, async (err, resp, body) => {
-      if (err) {
-        return console.log(err);
-      }    
-      
-      try {
-        const awayPlayers = await this.loadTeamPlayers(body.teams, "away", gm);
-        const homePlayers = await this.loadTeamPlayers(body.teams, "home", gm);
-        console.log(awayPlayers.length + " away team players and " + homePlayers.length + " home team players logged.")
-        return {away: awayPlayers, home: homePlayers};
+    try {
+      const getResponse = await axios.get(APIUrl)
+      this.handleLoadPlayersResponse(getResponse.data)
 
-      } catch (err) {
-        
-      }
-    })
+    } catch (err) {
+      console.error(err);
+
+    }
  }
-  
+
+
+
  async loadTeamPlayers(teams, teamType, gm) {
   var PositionPlayers = []
   var players = teams[teamType].players
@@ -132,7 +135,7 @@ class altMlbApiController extends BaseController{
   var playerKeys = [];
   for (var playerKey in players) {
     if (players.hasOwnProperty(playerKey)) {
-      playerKeys.push(playerKey)  
+      playerKeys.push(playerKey)
     }
 
   }
@@ -140,7 +143,7 @@ class altMlbApiController extends BaseController{
 
   try {
     var plyrs = [];
-    for (var pk = 0; pk<playerKeys.length; pk++) { 
+    for (var pk = 0; pk<playerKeys.length; pk++) {
       let player = players[playerKeys[pk]]
       const plyr = await new PlayersController()._updatePlayer(player, team , gm); // appendPlayerRecord(player, team, gm);
       const sl = await new StatlineController()._updateStatline(player, gm);  //updateStatlineRecord(player, team, gamePk, gameDt);
@@ -152,39 +155,39 @@ class altMlbApiController extends BaseController{
     console.error(`Error in getTeamPlayers:${err}`)
   }
 }
-  
+
  async getRosterInfo(tm) {
-   
+
         try {
-          
+
         const APIUrl = BASE_URL + `/teams/${tm}/roster?rosterType=40Man`  ;
-       var retBody = await axios.get(APIUrl);      
+       var retBody = await axios.get(APIUrl);
        return retBody.data.roster
      } catch (err) {
        console.error(`Error in getAllTeams: ${err}`)
      }
  }
-  
+
    async getAllTeams() {
      try {
        const APIUrl = BASE_URL + "/teams?sportId=1" ;
-       var retBody = await axios.get(APIUrl);      
+       var retBody = await axios.get(APIUrl);
        return retBody.data.teams
      } catch (err) {
        console.error(`Error in getAllTeams: ${err}`)
      }
 
  }
-  
+
  async getAllRosters() {
    try {
      var output = []
 
         const teams = await this.getAllTeams();
-        
+
         for (var t=0; t<teams.length; t++) {
           var roster = await this.getRosterInfo(teams[t].id)
-          
+
 
           for (var p=0; p<roster.length; p++) {
             if (teams[t].abbreviation == 'ATL' ) {
@@ -192,7 +195,7 @@ class altMlbApiController extends BaseController{
             }
             const plyr = await this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
             output.push(roster[p].person.id)
-           
+
           }
 
         }
@@ -202,16 +205,16 @@ class altMlbApiController extends BaseController{
               console.error(`Error in getAllRosters: ${err}`)
 
       }
-   
+
  }
-  
-   
+
+
   route() {
     router.get('/' + this.routeString + '/:gm_dt' , (...args) => this._getGames(...args));
     router.get('/' + this.routeString + '/r/rosters', (...args)=> this._getRosters(...args));
     return router;
   }
- 
+
 }
 
 
@@ -222,15 +225,15 @@ class altMlbApiController extends BaseController{
 
 
 // class mlbAPI {
-  
+
 //   constructor() {
 //     this.mlbStats = new MLBStatsAPI();
 //   }
-  
+
 
 
 //   async _getGame(gmPk) {
-    
+
 //     try {
 //       const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
 //       return response.data;
@@ -240,7 +243,7 @@ class altMlbApiController extends BaseController{
 //     }
 
 //   async _getBoxHttp(req, res, next) {
-    
+
 //       try {
 //           const gm = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: req.params.id }}); //await this._getGame(529572);
 //           return res.send(gm);
@@ -259,34 +262,34 @@ class altMlbApiController extends BaseController{
 //         console.error(`Error in getSchedule(): ${err}`);
 //       }
 //   }
-  
+
 //   async _getResourceHttp(req, res, next) {
 //     try {
 //       var fn;
 //       switch (req.params.resource) {
-//         case "game": 
+//         case "game":
 //           fn = this.mlbStats.getGameBoxscore
 //           break;
-//         case "schedule": 
+//         case "schedule":
 //           fn = this.mlbStats.getSchedule
 //           break;
-//         default: 
+//         default:
 
 //       }
 
 
 //       const results = await fn({params: req.query});
-//       return res.send(results.data)  
+//       return res.send(results.data)
 //     } catch (err) {
 //       console.error(`Error in getResourceHttp(): ${err}`);
 //       return res.status(500).send({message: err.message});
 //     }
-  
-    
+
+
 //   }
-  
+
 //   async _getSimpleBox(gmPk) {
-    
+
 //     try {
 //       const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
 //       return {gamePk: gmPk, boxscore: this.simplifyBox(response.data)};
@@ -294,13 +297,13 @@ class altMlbApiController extends BaseController{
 //         console.error(`Error in _getSimpleBox: ${err}`);
 //       }
 //     }
-  
+
 //   simplifyBox(bx) {
 //     return {
 //       "teams": {
 //         "away": {
-//           "team": bx.teams.away.team, 
-//           "teamCode": bx.teams.away.teamCode, 
+//           "team": bx.teams.away.team,
+//           "teamCode": bx.teams.away.teamCode,
 //           "abbreviation": bx.teams.away.abbreviation,
 //           "players": bx.teams.away.batters.reduce((allBatters, thisBatter)=> {
 //             allBatters.push(bx.teams.away.players["ID" + thisBatter]);
@@ -308,35 +311,35 @@ class altMlbApiController extends BaseController{
 //           }, [])
 //         },
 //         "home": {
-//           "team": bx.teams.home.team, 
-//           "teamCode": bx.teams.home.teamCode, 
+//           "team": bx.teams.home.team,
+//           "teamCode": bx.teams.home.teamCode,
 //           "abbreviation": bx.teams.home.abbreviation,
 //           "players": bx.teams.home.batters.reduce((allBatters, thisBatter)=> {
 //             allBatters.push(this.simplifyBatter(bx.teams.home.players["ID" + thisBatter]));
 //             return allBatters;
 //           }, [])
-//         }, 
-        
+//         },
+
 //       }
-           
+
 //     }
 //   }
-  
+
 //   simplifyBatter(batter) {
 //     return {
-//       "person": batter.person, 
-//       "position": batter.position, 
+//       "person": batter.person,
+//       "position": batter.position,
 //       "stats": {
-//         "batting": batter.stats.batting, 
+//         "batting": batter.stats.batting,
 //         "fielding": batter.stats.fielding
-//       }, 
+//       },
 //       "allPositions": batter.allPositions
 //     }
 //   }
-  
-  
-  
-  
+
+
+
+
 //   async _getBoxesForDate(dt) {
 //     try {
 //       const sched = await this._getSchedule(dt);
@@ -346,17 +349,17 @@ class altMlbApiController extends BaseController{
 //           const gmBox = await this._getSimpleBox(gmRec.gamePk);
 //             collection.push(gmBox);
 //           return collection;
-                 
-//         }, Promise.resolve([]));    
+
+//         }, Promise.resolve([]));
 //       }
-      
+
 //     } catch (err) {
 //       console.error(`Error in _getBoxesForDate: ${err}`);
 //     }
 //   }
-  
+
 //   async _getBoxesHttp(req, res, next) {
-    
+
 //       try {
 //           const boxes = await this._getBoxesForDate( req.query.date ); //await this._getGame(529572);
 //           return res.send(boxes);
@@ -368,7 +371,7 @@ class altMlbApiController extends BaseController{
 
 //   }
 //   async _getScheduleForDate(req, res, next) {
-    
+
 //       try {
 //           const scores = await this._getSchedule( req.params.date ); //await this._getGame(529572);
 //           return res.send(scores);
@@ -378,11 +381,11 @@ class altMlbApiController extends BaseController{
 
 //       }
 //   }
-  
 
 
-  
-  
+
+
+
 //   route() {
 //     router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args));
 //     router.get('/mlb2/:resource', (...args) => this._getResourceHttp(...args));

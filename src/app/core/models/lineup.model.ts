@@ -9,19 +9,19 @@ interface Roster {
 
 class LineupModel {
   constructor(
-    public _id: string, 
-    public ablTeam: object, 
-    public roster: Roster[], 
+    public _id: string,
+    public ablTeam: object,
+    public roster: Roster[],
     public effectiveDate: Date
   ) { }
 }
 
 class LineupCollectionModel {
     constructor(
-    public _id: string, 
-    public ablTeam: object, 
-    public roster: Roster[], 
-    public effectiveDate: Date, 
+    public _id: string,
+    public ablTeam: object,
+    public roster: Roster[],
+    public effectiveDate: Date,
     public priorRosters?: LineupModel[]
   ) { }
 }
@@ -29,8 +29,8 @@ class LineupCollectionModel {
 class LineupFormModel {
     constructor(
     public lineupId: string,
-    public rosterId: string, 
-    public roster: Roster[], 
+    public rosterId: string,
+    public roster: Roster[],
     public effectiveDate: Date
   ) { }
 }
@@ -38,20 +38,20 @@ class LineupFormModel {
 
 class LineupAddPlayerModel {
   constructor(
-    public player: object, 
-    public ablTeamId: string 
+    public player: object,
+    public ablTeamId: string
   ) { }
 }
 
 interface PopulatedRoster {
-  player: object 
+  player: object
   lineupPosition: string
   rosterOrder: number
   originalPosition?: string
 }
 
 interface SubmitLineup {
-  _id?: string;  
+  _id?: string;
   effectiveDate: Date;
   roster: [{
     "_id": string;
@@ -61,6 +61,6 @@ interface SubmitLineup {
            }];
 
 }
- 
+
 
 export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel, LineupFormModel};

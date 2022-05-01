@@ -1,6 +1,5 @@
 /*jshint esversion: 8 */
 
-const request = require('request');
 //const Player = require('../models/player');
 var express = require('express');
 var router = express.Router();
@@ -11,7 +10,7 @@ const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const BaseController = require('./base.controller');
 
 var AblTeamController = {
-  
+
   _getById: function(req, res) {
 
     AblTeam.findById(req.params.id).exec(function (err, team) {
@@ -23,9 +22,9 @@ var AblTeamController = {
       }
       res.send(team);
     });
-   
+
   },
-  
+
   _getTeams: function(req, res) {
     AblTeam.find({}).exec(function (err, teams) {
       let teamsArr = [];
@@ -40,7 +39,7 @@ var AblTeamController = {
       res.send(teamsArr);
     });
   },
-  
+
   _getOwners: function(req, res) {
      Owner.find({}, (err, owners) => {
       let ownersArr = [];
@@ -55,7 +54,7 @@ var AblTeamController = {
       res.send(ownersArr);
     });
   },
-  
+
   _post: function(req, res) {
 
     AblTeam.findOne({
@@ -70,8 +69,8 @@ var AblTeamController = {
       }
       const team = new AblTeam({
         nickname: req.body.nickname || "Team " + req.body.owners[0].email,
-        location: req.body.location, 
-        stadium: req.body.stadium, 
+        location: req.body.location,
+        stadium: req.body.stadium,
         owners: req.body.owners
       });
       team.save((err) => {
@@ -86,10 +85,10 @@ var AblTeamController = {
         res.send(team);
       });
     });
-    
-    
+
+
   },
-    
+
   _put: function(req, res) {
     AblTeam.findById(req.params.id, (err, team) => {
       if (err) {
@@ -102,7 +101,7 @@ var AblTeamController = {
       team.location = req.body.location;
       team.stadium = req.body.stadium;
       team.owners = req.body.owners;
-      
+
       team.save(err => {
         if (err) {
           return res.status(500).send({message: err.message});
@@ -110,7 +109,7 @@ var AblTeamController = {
         res.send(team);
       });
     });
-}, 
+},
   _delete: function(req, res) {
     AblTeam.findById(req.params.id, (err, team) => {
       if (err) {
@@ -127,7 +126,7 @@ var AblTeamController = {
         });
     });
   },
-  
+
 
 
 }
