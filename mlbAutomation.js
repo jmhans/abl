@@ -36,7 +36,7 @@ function _updatePositionsLog() {
 
 
 
-axios.get('https://abl-prod.herokuapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
+/* axios.get('https://abl-prod.herokuapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
   .then(function (resp) {
     // handle success
     console.log('Game Score statusCode:', resp && resp.status);
@@ -53,8 +53,24 @@ axios.get('https://abl-prod.herokuapp.com/api2/mlbGame/'+ year + '-' + month + '
   })
   .then(function () {
     // always executed
-  });
+  }); */
 
+  axios.get('https://abl-jmhans33439.codeanyapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
+  .then(function (resp) {
+    // handle success
+    console.log('Game Score statusCode:', resp && resp.status);
+    if (resp.status == 200) {
+      console.log(`${resp.data.length} records added for ${year + '-' + month + '-'+ day}`);
+      _updatePositionsLog()
+    }
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
 
 
 
