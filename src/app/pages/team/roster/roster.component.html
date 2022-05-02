@@ -11,14 +11,14 @@
     </button>
     <strong>Notice:</strong> {{alert.message}}
   </div>
-  
+
 </div>
 
 
-  
+
 <div class="card">
   <div class="card-header" *ngIf="(current_roster_deadline$ | async) as deadline">
-    
+
     <mat-form-field color="accent" appearance="fill" *ngIf="(formDate$ | async) as formDateControl">
         <mat-label>Roster Date</mat-label>
         <input  matInput [matDatepicker]="roster_date" [max]="deadline" (dateChange)="_date_changed($event)" [formControl]="formDateControl">
@@ -38,13 +38,13 @@
     <span *ngIf="(current_roster$ | async) as myLineup">
 
       <div >Last Updated: {{active_roster.effectiveDate | date : 'fullDate'}}</div>
-      
+
       <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()">
-         <mdb-icon fas icon="file-download"></mdb-icon> 
+         <mdb-icon fas icon="file-download"></mdb-icon>
         Download Lineup
       </button>
-      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button> 
-      <app-team-roster [lineup]="current_roster"
+      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button>
+       <app-team-roster [lineup]="current_roster"
                      [originalLineup] = "active_roster"
                      [editable]="editable()"
                      (update)="_createNewRoster($event)"
