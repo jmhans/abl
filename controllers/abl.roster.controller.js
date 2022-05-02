@@ -206,7 +206,14 @@ class ABLRosterController extends BaseController{
       },
       'ablTeam': {
         '$first': '$ablTeam'
+      },
+      'latest40Man': {
+        '$max': '$player.lastUpdate'
       }
+    }
+  }, {
+    '$addFields': {
+      'roster.latest40Man': '$latest40Man'
     }
   }
 ])

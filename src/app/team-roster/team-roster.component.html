@@ -24,13 +24,26 @@
 
       </td>
     </ng-container>
+    <ng-container matColumnDef="player.status">
+      <th mat-header-cell *matHeaderCellDef>Status<th>
+      <td mat-cell *matCellDef="let rosterRec">
+        {{rosterRec.player.status}}
+        {{rosterRec.player.fortyMan ? '' : 'Not on 40-Man Roster'}}
+      </td>
+    </ng-container>
     <ng-container matColumnDef="lineupPosition" >
         <th mat-header-cell *matHeaderCellDef >Position</th>
         <td mat-cell *matCellDef="let rosterRec">
 
-            <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1">
+          <mat-select *ngIf="editable && rosterRec.player.eligible.length > 1" [(ngModel)]="rosterRec.lineupPosition" (selectionChange)="changePos($event)" >
+            <mat-option *ngFor="let pos of rosterRec.player.eligible" [value]="pos">{{pos}}</mat-option>
+          </mat-select>
+
+
+<!--
+            <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1" (onchange)="changePos($event)">
                 <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
-            </select>
+            </select> -->
             <span *ngIf="!editable || rosterRec.player.eligible.length <= 1">{{rosterRec.lineupPosition}}</span>
 
         </td>
@@ -61,8 +74,8 @@
         </td>
       </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['drag_handle', 'lineupPosition', 'player.name', 'abl_runs', 'stats']"></tr>
-    <tr cdkDrag mat-row *matRowDef="let row; columns: ['drag_handle', 'lineupPosition', 'player.name' , 'abl_runs', 'stats'];"
+    <tr mat-header-row *matHeaderRowDef="['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'stats']"></tr>
+    <tr cdkDrag mat-row *matRowDef="let row; columns: ['drag_handle', 'lineupPosition', 'player.name' , 'player.status', 'abl_runs', 'stats'];"
     [ngClass]="{ 'dirty-box': row.changed}"
     ></tr>
   </table>

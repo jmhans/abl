@@ -6,6 +6,7 @@ interface Roster {
   rosterOrder: number
   originalPosition? : string
   changed? : Boolean
+  latest40Man?: Date
 }
 
 class LineupModel {
@@ -13,7 +14,8 @@ class LineupModel {
     public _id: string,
     public ablTeam: object,
     public roster: Roster[],
-    public effectiveDate: Date
+    public effectiveDate: Date,
+    public latest40Man?: Date
   ) { }
 }
 
@@ -23,7 +25,8 @@ class LineupCollectionModel {
     public ablTeam: object,
     public roster: Roster[],
     public effectiveDate: Date,
-    public priorRosters?: LineupModel[]
+    public priorRosters?: LineupModel[],
+    public latest40Man?: Date
   ) { }
 }
 
@@ -32,7 +35,8 @@ class LineupFormModel {
     public lineupId: string,
     public rosterId: string,
     public roster: Roster[],
-    public effectiveDate: Date
+    public effectiveDate: Date,
+    public latest40Man?: Date
   ) { }
 }
 

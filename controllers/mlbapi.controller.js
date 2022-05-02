@@ -190,9 +190,6 @@ class altMlbApiController extends BaseController{
 
 
           for (var p=0; p<roster.length; p++) {
-            if (teams[t].abbreviation == 'ATL' ) {
-              console.log(roster[p].person.fullName);
-            }
             const plyr = await this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
             output.push(roster[p].person.id)
 
@@ -211,7 +208,7 @@ class altMlbApiController extends BaseController{
 
   route() {
     router.get('/' + this.routeString + '/:gm_dt' , (...args) => this._getGames(...args));
-    router.get('/' + this.routeString + '/r/rosters', (...args)=> this._getRosters(...args));
+    router.get('/mlb/rosters', (...args)=> this._getRosters(...args));
     return router;
   }
 

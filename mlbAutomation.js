@@ -1,5 +1,9 @@
 const axios = require('axios').default;
 
+currentURLDomain = 'https://abl-jmhans33439.codeanyapp.com'
+//currentURLDomain = 'https://abl-prod.herokuapp.com'
+
+
 
 var today = new Date()
 
@@ -14,16 +18,16 @@ var day = pad(today.getUTCDate()-1, 2);
 var month = pad(today.getUTCMonth() + 1, 2);
 var year = today.getUTCFullYear();
 
-function _updatePositionsLog() {
+async function _updatePositionsLog() {
 
-  axios.get('https://abl-prod.herokuapp.com/api3/positionlogs')
+  axios.get(currentURLDomain + '/api3/positionlogs')
   .then(function (resp) {
     // handle success
     console.log('PosLog statusCode:', resp && resp.status);
     if (resp.status == 200) {
       console.log('Positions Log Updated');
     }
-
+    return 'Complete'
   })
   .catch(function (error) {
     // handle error
@@ -34,35 +38,37 @@ function _updatePositionsLog() {
   });
 }
 
-
-
-/* axios.get('https://abl-prod.herokuapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
+async function _updateRosterStatus() {
+  axios.get(currentURLDomain + '/api2/mlb/rosters')
   .then(function (resp) {
     // handle success
-    console.log('Game Score statusCode:', resp && resp.status);
+    console.log('Roster statusCode:', resp && resp.status);
     if (resp.status == 200) {
-
-      console.log(`${JSON.parse(body).length} records added for ${year + '-' + month + '-'+ day}`);
-      console.log(`${resp.body}`);
-      _updatePositionsLog()
+      console.log('Roster Statuses Updated');
     }
+    return 'Complete'
   })
   .catch(function (error) {
     // handle error
     console.error(error);
   })
-  .then(function () {
-    // always executed
-  }); */
+}
 
-  axios.get('https://abl-jmhans33439.codeanyapp.com/api2/mlbGame/'+ year + '-' + month + '-' + day)
-  .then(function (resp) {
+
+  axios.get(currentURLDomain + '/api2/mlbGame/'+ year + '-' + month + '-' + day)
+  .then(async function (resp) {
     // handle success
-    console.log('Game Score statusCode:', resp && resp.status);
-    if (resp.status == 200) {
-      console.log(`${resp.data.length} records added for ${year + '-' + month + '-'+ day}`);
-      _updatePositionsLog()
+    try{
+      console.log('Game Score statusCode:', resp && resp.status);
+      if (resp.status == 200) {
+        console.log(`${resp.data.length} records added for ${year + '-' + month + '-'+ day}`);
+        const pos = await _updatePositionsLog()
+        const ros = await _updateRosterStatus()
+      }
+    } catch(err) {
+      console.error(err);
     }
+
   })
   .catch(function (error) {
     // handle error

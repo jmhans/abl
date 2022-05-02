@@ -6,9 +6,9 @@ const ablConfig = require('../server/ablConfig');
 
 
 // function _isPositionPlayer(plyr) {
-  
-//   if (plyr.allPositions) { 
-    
+
+//   if (plyr.allPositions) {
+
 //     nonPitcherPosList = plyr.allPositions.filter((posRec) => {return posRec.abbreviation != 'P'});
 
 //     return (nonPitcherPosList.length > 0);
@@ -21,9 +21,9 @@ class StatlineController extends BaseController {
 
   constructor() {
     super(Statline, 'statlines');
-    
+
   }
- 
+
   _getStatsForPlayer(req, res, next) {
 
      var searchObj = {};
@@ -39,37 +39,37 @@ class StatlineController extends BaseController {
        var nextDay = new Date(day.toISOString());
        nextDay.setDate(day.getDate() +1)
        searchObj.gameDate = {$gte: day.toISOString().substring(0, 10), $lt: nextDay.toISOString().substring(0, 10)}
-       
+
      }
-     
+
      this.model.find(searchObj , (err, results) => {
         if (err) return next(err);
         res.json(results);
       });
 
    }
-  
+
   async _updateStatline(plyr, gm) {
     if (plyr.allPositions) {
-      
-    
+
+
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
-    
+
     const originalDate = gm.resumedFrom ? gm.resumedFrom : gm.gameDate
       var query = {
-        'mlbId': plyr.person.id, 
+        'mlbId': plyr.person.id,
         'gamePk': gm.gamePk,
         'gameDate': originalDate
       }
-      
+
       if (gm.officialDate) {
         // console.log(`${gm.gamePk}: - ` )
       }
-      
+
        var _statline = {
                 mlbId: plyr.person.id,
-                gameDate: gm.gameDate, 
-                gamePk: gm.gamePk, 
+                gameDate: gm.gameDate,
+                gamePk: gm.gamePk,
                 stats: plyr.stats,
                 positions: shortPositions,
                 statlineType: gm.status.detailedState
@@ -77,10 +77,10 @@ class StatlineController extends BaseController {
       try {
         const doc = await this.model.findOne(query);
         if (doc) {
-          // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc. 
-          
+          // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc.
+
           if (new Date(doc.gameDate).toString != new Date(gm.gameDate).toString) {
-            // They have stats from the original date. Find the diff for the new date.  
+            // They have stats from the original date. Find the diff for the new date.
             console.log(`Doc: ${doc.gameDate} vs. stats: ${new Date(gm.gameDate)}`)
             console.log(`Doc: ${typeof(new Date(doc.gameDate))} vs. stats: ${typeof(new Date(gm.gameDate))}`)
             _statline.stats = await this._getStatlineDiff(plyr.stats, doc.stats)
@@ -88,21 +88,21 @@ class StatlineController extends BaseController {
             query = {
               'mlbId': plyr.person.id,
               'gamePk' : gm.gamePk,
-              'gameDate': gm.gameDate // Modify the query so it won't replace the existing doc. 
+              'gameDate': gm.gameDate // Modify the query so it won't replace the existing doc.
             }
           }
-        } 
+        }
         const doc2 = await this.model.updateMany(query, _statline, { upsert: true });
           return doc2;
-        
-        
+
+
       } catch (err) {
         console.error(`Error in _updateStatline:${err}`);
       }
 }
- 
+
   }
-  
+
   async _getStatlineDiff(fullStat, partialStat) {
     var ret = {batting: {}, fielding: {}, pitching: {}}
     if (fullStat) {
@@ -124,19 +124,18 @@ class StatlineController extends BaseController {
       return ret
     }
   }
-  
-    
+
+
   async _generatePositionLog(req, res, next) {
-    
+
       try {
         var currentSeason = 2022;
         var regSeasonStart = new Date('2022-04-07T00:00:00Z')
-        
-      
+
       var position_log_records = await this.model.aggregate([
   {
     '$project': {
-      'stats': 0, 
+      'stats': 0,
       'statlineType': 0
     }
   }, {
@@ -159,7 +158,7 @@ class StatlineController extends BaseController {
                 '$eq': [
                   '$season', currentSeason
                 ]
-              }, 
+              },
               'then': {
                 '$gte': [
                   '$gameDate', regSeasonStart
@@ -184,8 +183,8 @@ class StatlineController extends BaseController {
     }
   }, {
     '$unwind': {
-      'path': '$positions', 
-      'includeArrayIndex': 'posIdx', 
+      'path': '$positions',
+      'includeArrayIndex': 'posIdx',
       'preserveNullAndEmptyArrays': false
     }
   }, {
@@ -215,13 +214,13 @@ class StatlineController extends BaseController {
   }, {
     '$group': {
       '_id': {
-        'mlbId': '$mlbId', 
-        'gamePk': '$gamePk', 
+        'mlbId': '$mlbId',
+        'gamePk': '$gamePk',
         'pos': '$positions'
-      }, 
+      },
       'inGameCount': {
         '$sum': 1
-      }, 
+      },
       'season': {
         '$max': {
           '$year': '$gameDate'
@@ -231,10 +230,10 @@ class StatlineController extends BaseController {
   }, {
     '$group': {
       '_id': {
-        'mlbId': '$_id.mlbId', 
-        'pos': '$_id.pos', 
+        'mlbId': '$_id.mlbId',
+        'pos': '$_id.pos',
         'season': '$season'
-      }, 
+      },
       'posCount': {
         '$sum': '$inGameCount'
       }
@@ -242,12 +241,12 @@ class StatlineController extends BaseController {
   }, {
     '$group': {
       '_id': {
-        'mlbId': '$_id.mlbId', 
+        'mlbId': '$_id.mlbId',
         'season': '$_id.season'
-      }, 
+      },
       'positionsLog': {
         '$push': {
-          'pos': '$_id.pos', 
+          'pos': '$_id.pos',
           'ct': '$posCount'
         }
       }
@@ -256,20 +255,20 @@ class StatlineController extends BaseController {
     '$addFields': {
       'eligiblePositions': {
         '$filter': {
-          'input': '$positionsLog', 
-          'as': 'posObj', 
+          'input': '$positionsLog',
+          'as': 'posObj',
           'cond': {
             '$gte': [
               '$$posObj.ct', 10
             ]
           }
         }
-      }, 
+      },
       'maxPosition': {
         '$first': {
           '$filter': {
-            'input': '$positionsLog', 
-            'as': 'posObj', 
+            'input': '$positionsLog',
+            'as': 'posObj',
             'cond': {
               '$and': [
                 {
@@ -287,8 +286,8 @@ class StatlineController extends BaseController {
     }
   }, {
     '$addFields': {
-      'mlbId': '$_id.mlbId', 
-      'season': '$_id.season', 
+      'mlbId': '$_id.mlbId',
+      'season': '$_id.season',
       'eligiblePositions': '$eligiblePositions.pos'
     }
   }, {
@@ -297,11 +296,11 @@ class StatlineController extends BaseController {
     }
   }, {
     '$lookup': {
-      'from': 'position_log', 
+      'from': 'position_log',
       'let': {
-        'mlbId': '$mlbId', 
+        'mlbId': '$mlbId',
         'ssn': '$season'
-      }, 
+      },
       'pipeline': [
         {
           '$match': {
@@ -320,16 +319,16 @@ class StatlineController extends BaseController {
             }
           }
         }
-      ], 
+      ],
       'as': 'outcoll'
     }
   }, {
     '$lookup': {
-      'from': 'position_log', 
+      'from': 'position_log',
       'let': {
-        'lastSsn': {'$subtract': ['$season', 1]}, 
+        'lastSsn': {'$subtract': ['$season', 1]},
         'mlbId': '$mlbId'
-      }, 
+      },
       'pipeline': [
         {
           '$match': {
@@ -348,35 +347,35 @@ class StatlineController extends BaseController {
             }
           }
         }
-      ], 
+      ],
       'as': 'lastSsnPos'
     }
   }, {
     '$addFields': {
       '_id': {
         '$first': '$outcoll._id'
-      }, 
-      'maxPosition': '$maxPosition.pos', 
+      },
+      'maxPosition': '$maxPosition.pos',
       'priorSeasonMaxPos': {
         '$first': '$lastSsnPos.maxPosition.pos'
       }
     }
   }, {
     '$project': {
-      'outcoll': 0, 
+      'outcoll': 0,
       'lastSsnPos': 0
     }
   }, {
     '$merge': {
-      'into': 'position_log', 
-      'on': '_id', 
-      'whenMatched': 'replace', 
+      'into': 'position_log',
+      'on': '_id',
+      'whenMatched': 'replace',
       'whenNotMatched': 'insert'
     }
   }
 ])
-      
-   
+
+
       if (!position_log_records) {
         return res.status(400).send({message: 'No stats found.'});
       }
@@ -385,20 +384,20 @@ class StatlineController extends BaseController {
     } catch (err) {
       return res.status(500).send({message: err.message });
     }
-    
-    
+
+
   }
 
-    
-  
-    
+
+
+
 //   route() {
 //     router.get("/statlines/:mlbId", (...args)=> this._getStatsForPlayer(...args))
 //     //router = super.route();
-    
+
 //     return router;
 //   }
-  
+
 }
 
 module.exports = StatlineController

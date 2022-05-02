@@ -63,6 +63,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
             }
           }
           plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
+          plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
 
           return plyr
         })
@@ -127,6 +128,10 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
 
     }
   }
+  changePos(evt) {
+    this.roster$.next(this.lineup.roster);
+  }
+
 
   _dropPlyr(playerId) {
     this.dropPlyr.emit({playerId: playerId});

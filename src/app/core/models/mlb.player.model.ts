@@ -16,7 +16,9 @@ class MlbPlayerModel {
      public _id?: string ,
      public draftMe?: boolean,
      public dougstatsName?: string,
-     public abl?:Number
+     public abl?:Number,
+     public lastUpdate? : Date,
+     public fortyMan? : Boolean
 
   ) { }
 }
