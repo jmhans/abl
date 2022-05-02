@@ -5,6 +5,7 @@ interface Roster {
   lineupPosition: string
   rosterOrder: number
   originalPosition? : string
+  changed? : Boolean
 }
 
 class LineupModel {

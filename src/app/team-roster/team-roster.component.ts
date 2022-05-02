@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter , AfterViewInit} from '@angular/core';
 import { CdkDragDrop, CdkDragSortEvent, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Subscription, Subject, Observable,  of } from 'rxjs'
+import { map , startWith} from 'rxjs/operators';
 import { RosterService } from './../core/services/roster.service';
 import { LineupModel, SubmitLineup, LineupFormModel , Roster} from './../core/models/lineup.model';
 import { MatTableDataSource } from '@angular/material/table'
@@ -35,9 +36,10 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   @Output() dropPlyr = new EventEmitter<{playerId: string}>();
   @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
   @Output() raiseAlert = new EventEmitter<any>();
-
+  lineupChanged: Boolean = false;
   formLineup: LineupFormModel;
-  roster$: Subject<MatTableDataSource<Roster>> = new Subject();
+  roster$: Subject<Roster[]>= new Subject();
+  displayRoster$: Observable<MatTableDataSource<Roster>>
 
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
@@ -46,11 +48,38 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
 
-  }
-ngAfterViewInit() {
-  this.roster$.next(new MatTableDataSource(this.lineup.roster));
 
-}
+    this.displayRoster$ = this.roster$.pipe(
+      map((r)=> {
+        this.lineupChanged = false
+        const plyrs = r.map((plyr, pIdx)=> {
+
+          const originalPlyr = this.originalLineup.roster.find((op)=> {return op.player.mlbID == plyr.player.mlbID})
+          if (originalPlyr) {
+            plyr.changed = (originalPlyr.lineupPosition != plyr.lineupPosition || (pIdx + 1) != originalPlyr.rosterOrder)
+
+            if (plyr.changed) {
+              this.lineupChanged = true
+            }
+          }
+          plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
+
+          return plyr
+        })
+        const ds = new MatTableDataSource(plyrs)
+        return ds
+      })
+    )
+
+
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.roster$.next(this.lineup.roster);
+    });
+
+  }
   dropLineupRecord(event: CdkDragDrop<any>) {
     console.log(`Item moved:`);
     console.log(event)
@@ -72,8 +101,8 @@ ngAfterViewInit() {
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
     } else {
       moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
-      const ds = new MatTableDataSource(this.lineup.roster);
-      this.roster$.next(ds)
+      //const ds = new MatTableDataSource(this.lineup.roster);
+      this.roster$.next(this.lineup.roster)
     }
 
 

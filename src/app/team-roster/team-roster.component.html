@@ -2,22 +2,32 @@
 
 
 
-<button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupDirty()" (click)="_updateRosterRecord()">Save Changes</button>
+<button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="editable && lineupChanged" (click)="_updateRosterRecord()">Save Changes</button>
 
 
-<div class="example-table-container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)"  *ngIf='true'>
+<div class="container example-table-container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)" >
 
-  <table mat-table [dataSource]="(roster$ | async)" class="roster-table" >
+  <table mat-table [dataSource]="(displayRoster$ | async)" class="roster-table" >
 
     <ng-container matColumnDef="player.name" >
       <th mat-header-cell *matHeaderCellDef >Player</th>
-      <td mat-cell *matCellDef="let rosterRec">{{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})</td>
+      <td mat-cell *matCellDef="let rosterRec"> {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})
+        <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
+          Pickup
+          <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
+        </span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="player.drop">
+      <th mat-header-cell *matHeaderCellDef><th>
+      <td mat-cell *matCellDef="let rosterRec">
+
+      </td>
     </ng-container>
     <ng-container matColumnDef="lineupPosition" >
         <th mat-header-cell *matHeaderCellDef >Position</th>
         <td mat-cell *matCellDef="let rosterRec">
 
-            <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
             <select [(ngModel)]="rosterRec.lineupPosition" *ngIf="editable && rosterRec.player.eligible.length > 1">
                 <option *ngFor="let pos of rosterRec.player.eligible"  [value]="pos">{{pos}}</option>
             </select>
@@ -25,9 +35,15 @@
 
         </td>
       </ng-container>
+      <ng-container matColumnDef="drag_handle">
+        <th mat-header-cell *matHeaderCellDef>Move</th>
+        <td mat-cell *matCellDef="let rosterRec">
+          <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
+        </td>
+      </ng-container>
       <ng-container matColumnDef="abl_runs" >
         <th mat-header-cell *matHeaderCellDef >ABL</th>
-        <td mat-cell *matCellDef="let rosterRec">{{ abl(rosterRec.player.stats.batting) | number }}</td>
+        <td mat-cell *matCellDef="let rosterRec">{{ rosterRec.player.abl  | number:'1.2-2' }}</td>
       </ng-container>
       <ng-container matColumnDef="stats" >
         <th mat-header-cell *matHeaderCellDef >Stats</th>
@@ -45,16 +61,15 @@
         </td>
       </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['lineupPosition', 'player.name', 'abl_runs', 'stats']"></tr>
-    <tr class="alt" [ngClass]="{ 'dirty-box': rosterRec.rosterOrder != (i+1) ||
-    rosterRec.lineupPosition != originalLineup.roster[i].lineupPosition ||
-    rosterRec.player?.mlbID != originalLineup.roster[i].player?.mlbID}"
-    cdkDrag mat-row *matRowDef="let row; columns: ['lineupPosition', 'player.name' , 'abl_runs', 'stats']; let i = dataIndex;"></tr>
+    <tr mat-header-row *matHeaderRowDef="['drag_handle', 'lineupPosition', 'player.name', 'abl_runs', 'stats']"></tr>
+    <tr cdkDrag mat-row *matRowDef="let row; columns: ['drag_handle', 'lineupPosition', 'player.name' , 'abl_runs', 'stats'];"
+    [ngClass]="{ 'dirty-box': row.changed}"
+    ></tr>
   </table>
 </div>
 
 
-
+<!--
 <div class="container" >
   <div class="row" >
     <div class="col-sm-1">
@@ -120,4 +135,4 @@
     </div>
 
   </div>
-</div>
+</div> -->

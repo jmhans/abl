@@ -1,12 +1,4 @@
 
-.example-container {
-  width: 400px;
-  max-width: 100%;
-  margin: 0 25px 25px 0;
-  display: inline-block;
-  vertical-align: top;
-}
-
 .container {
     max-width: unset;
 }
@@ -98,7 +90,19 @@ body {
 }
 
 .roster-table {
-  .mat-row{
-height:auto !important;
-  }
+  width: 100%;
+
+}
+.mat-cell{
+  justify-content: flex-start;
+}
+.mat-row{
+  height:auto !important;
+  width: 100%;
+  justify-content: space-between;
+
+}
+.mat-header-row{
+  width: 100%;
+
 }
