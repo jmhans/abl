@@ -1,6 +1,9 @@
 const axios = require('axios').default;
+const dotenv = require('dotenv');
 
-currentURLDomain = 'https://abl-jmhans33439.codeanyapp.com'
+var result = dotenv.config();
+
+currentURLDomain = process.env.DOMAIN // 'https://abl-jmhans33439.codeanyapp.com'
 //currentURLDomain = 'https://abl-prod.herokuapp.com'
 
 
