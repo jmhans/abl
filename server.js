@@ -29,7 +29,6 @@ var db = mongoose.connection;
 // Not actually sure if I want this to be called...
 require('./server/api')(app, config2);
 
-
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
   console.log("Database connection ready");
@@ -50,6 +49,7 @@ function handleError(res, reason, message, code) {
 
 var api = require('./routes/api.route');
 app.use('/api', api);
+
 app.use('/', function (req, res) {
     res.sendFile(distDir+'/index.html');
 });

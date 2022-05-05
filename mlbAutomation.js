@@ -47,7 +47,7 @@ async function _updateRosterStatus() {
     // handle success
     console.log('Roster statusCode:', resp && resp.status);
     if (resp.status == 200) {
-      console.log('Roster Statuses Updated');
+      console.log('Roster statuses actively being updated');
     }
     return 'Complete'
   })
@@ -64,8 +64,8 @@ async function _updateRosterStatus() {
     try{
       console.log('Game Score statusCode:', resp && resp.status);
       if (resp.status == 200) {
-        console.log(`${resp.data.length} records added for ${year + '-' + month + '-'+ day}`);
-        const pos = await _updatePositionsLog()
+        console.log(`${resp.data.games.length} games found for ${year + '-' + month + '-'+ day}; Server working on obtaining player information.`);
+        //const pos = await _updatePositionsLog()
         const ros = await _updateRosterStatus()
       }
     } catch(err) {

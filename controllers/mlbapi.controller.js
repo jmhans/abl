@@ -32,7 +32,7 @@ class altMlbApiController extends BaseController{
   async _getGames(req, res, next) {
     try {
       const games = await this._getGamesForDate(req.params.gm_dt);
-      return res.send(games);
+      return res.send({'message': 'Loading games on server side. See server logs for more infromation.' , 'games': games});
     } catch (err) {
       return res.status(500).send({message: err.message});
     }
@@ -59,10 +59,9 @@ class altMlbApiController extends BaseController{
       var gamesList = [];
 
       var dateItem = retBody.data.dates.find(x=>x.date == (year + "-" + month + "-" + day));
-
       if (dateItem) {
         gamesList = dateItem.games
-        this._loadGamesToDB(gamesList);
+        const gameLoad = this._loadGamesToDB(gamesList); // Do not await this. Requests will time out. The load processes carry on behind the scenes.
       }
       return gamesList
 
@@ -73,34 +72,37 @@ class altMlbApiController extends BaseController{
 
   async _loadGamesToDB(gamesList) {
     try {
-      gamesList.forEach((gm) => {
 
-          var query = {
-            'gamePk': gm.gamePk
-          };
-          mlbGame.findOneAndUpdate(query, gm, {
-            upsert: true
-          }, function(err, doc) {
-            if (err) return res.send(500, {
-              error: err
-            });
+      var returnArr = []
 
-            //return res.send("succesfully saved");
+      for (var g=0; g<gamesList.length; g++ ){
+        var gm = gamesList[g]
+        var query = {
+          'gamePk': gm.gamePk
+        };
+        mlbGame.findOneAndUpdate(query, gm, {
+          upsert: true
+        }, function(err, doc) {
+          if (err) return res.send(500, {
+            error: err
           });
 
-          if (gm.status.codedGameState != 'D') {
-            this.loadPlayersInGame(gm);
-          }
+        });
 
+        if (gm.status.codedGameState != 'D') {
+          const plyrLoad = await this.loadPlayersInGame(gm);
+          returnArr.push(plyrLoad)
+        }
+      }
 
+      return returnArr
 
-      });
     } catch(err) {
       console.error(`Error in _loadGamesToDB: ${err}`)
     }
   }
 
-  async handleLoadPlayersResponse(body) {
+  async handleLoadPlayersResponse(body, gm) {
     try {
       const awayPlayers = await this.loadTeamPlayers(body.teams, "away", gm);
       const homePlayers = await this.loadTeamPlayers(body.teams, "home", gm);
@@ -117,7 +119,10 @@ class altMlbApiController extends BaseController{
     const APIUrl = BASE_URL + "/game/" + gm.gamePk + "/boxscore";
     try {
       const getResponse = await axios.get(APIUrl)
-      this.handleLoadPlayersResponse(getResponse.data)
+      console.log(`Received data from ${APIUrl}`)
+//      console.log(getResponse)
+      const resp = await this.handleLoadPlayersResponse(getResponse.data, gm)
+      return resp
 
     } catch (err) {
       console.error(err);
@@ -164,7 +169,7 @@ class altMlbApiController extends BaseController{
        var retBody = await axios.get(APIUrl);
        return retBody.data.roster
      } catch (err) {
-       console.error(`Error in getAllTeams: ${err}`)
+       console.error(`Error in getRosterInfo: ${err}; URL: ${APIUrl}`)
      }
  }
 
@@ -174,7 +179,7 @@ class altMlbApiController extends BaseController{
        var retBody = await axios.get(APIUrl);
        return retBody.data.teams
      } catch (err) {
-       console.error(`Error in getAllTeams: ${err}`)
+       console.error(`Error in getAllTeams: ${err}; URL: ${APIUrl}`)
      }
 
  }
@@ -190,7 +195,7 @@ class altMlbApiController extends BaseController{
 
 
           for (var p=0; p<roster.length; p++) {
-            const plyr = await this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
+            const plyr = this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
             output.push(roster[p].person.id)
 
           }

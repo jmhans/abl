@@ -281,10 +281,6 @@ module.exports = function(app, config) {
   }
 
 
-  //One time use:
-//   AblRosterController._updatePlayerRecordsFromRosters();
-  // Delete after completing.
-
 
   var api = require('../routes/api.route');
   app.use('/api2', api);
