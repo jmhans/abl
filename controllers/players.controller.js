@@ -13,78 +13,78 @@ class PlayersController extends BaseController {
   constructor() {
     super(Player, 'players');
   }
-  
+
   async _updatePlayer(player,team, gm) {
-    
+
     if (ablConfig._isPositionPlayer(player)) {
-   
+
       var query = {
         'mlbID': player.person.id
       }
       var shortPositions = player.allPositions.map((pos) => {return pos.abbreviation;})
-      
+
       try {
         var _playerRecord = await this.model.findOne(query);
-        
+
           if (_playerRecord) {
 
           } else {
-            // Create a new player record. 
+            // Create a new player record.
               _playerRecord = new this.model({
                 mlbID: player.person.id,
-                lastUpdate: new Date ("2000-01-01"), 
+                lastStatUpate: new Date ("2000-01-01"),
                 //games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
                 //positionLog : []
               })
           }
-          if (new Date(gm.gameDate) >= new Date(_playerRecord.lastUpdate) || _playerRecord.lastUpdate == null) {
+          if (new Date(gm.gameDate) >= new Date(_playerRecord.lastStatUpdate) || _playerRecord.lastStatUpdate == null) {
                 _playerRecord.name = player.person.fullName;
-                _playerRecord.team = team.abbreviation; 
-                _playerRecord.status = player.status.description; 
-                _playerRecord.stats = player.seasonStats; 
-                _playerRecord.position = ablConfig.POSITION_MAP[player.position.abbreviation] || player.position.abbreviation;
-                _playerRecord.lastUpdate = gm.gameDate;
-            
+                _playerRecord.team = team.abbreviation;
+              //  _playerRecord.status = player.status.description;
+                _playerRecord.stats = player.seasonStats;
+              //  _playerRecord.position = ablConfig.POSITION_MAP[player.position.abbreviation] || player.position.abbreviation;
+                _playerRecord.lastStatUpdate = gm.gameDate;
+
           }
-          
+
         const newRec = await _playerRecord.save();
         return _playerRecord;
       } catch (err) {
         console.error(`Error in _updatePlayer:${err}`)
       }
 
-      
-      
 
-    }  
+
+
+    }
   }
-  
+
     async _updatePlayerStatus(player,team) {
-    
+
     if (player.position.abbreviation != 'P') {
-   
+
       var query = {
         'mlbID': player.person.id
       }
-      
+
       try {
         var _playerRecord = await this.model.findOne(query);
-        
+
           if (_playerRecord) {
 
           } else {
-            // Create a new player record. 
+            // Create a new player record.
               _playerRecord = new this.model({
                 mlbID: player.person.id,
-                lastUpdate: new Date ("2000-01-01"), 
+                lastUpdate: new Date ("2000-01-01"),
                 //games: [{gameDate: gameDt, gamePk: gamePk , stats: player.stats, positions: shortPositions}],
                 //positionLog : []
               })
           }
           if (new Date() >= new Date(_playerRecord.lastUpdate) || _playerRecord.lastUpdate == null) {
                 _playerRecord.name = player.person.fullName;
-                _playerRecord.team = team.abbreviation; 
-                _playerRecord.status = player.status.description; 
+                _playerRecord.team = team.abbreviation;
+                _playerRecord.status = player.status.description;
                 _playerRecord.lastUpdate = new Date();
           }
         const newRec = await _playerRecord.save();
@@ -93,14 +93,14 @@ class PlayersController extends BaseController {
         console.error(`Error in _updatePlayer:${err}`)
       }
 
-      
-      
 
-    }  
+
+
+    }
   }
-  
-  
-  
+
+
+
  async _getEligibility(req, res, next) {
    if (req.params.plyrId) {
      console.log(req.params.plyrId);
@@ -111,10 +111,10 @@ class PlayersController extends BaseController {
     }
   }, {
     '$lookup': {
-      'from': 'statlines', 
+      'from': 'statlines',
       'let': {
         'mlbId': '$mlbID'
-      }, 
+      },
       'pipeline': [
         {
           '$match': {
@@ -134,8 +134,8 @@ class PlayersController extends BaseController {
           }
         }, {
           '$unwind': {
-            'path': '$positions', 
-            'includeArrayIndex': 'posIdx', 
+            'path': '$positions',
+            'includeArrayIndex': 'posIdx',
             'preserveNullAndEmptyArrays': false
           }
         }, {
@@ -163,10 +163,10 @@ class PlayersController extends BaseController {
         }, {
           '$group': {
             '_id': {
-              'mlbId': '$mlbId', 
-              'gamePk': '$gamePk', 
+              'mlbId': '$mlbId',
+              'gamePk': '$gamePk',
               'pos': '$positions'
-            }, 
+            },
             'inGameCount': {
               '$sum': 1
             }
@@ -174,9 +174,9 @@ class PlayersController extends BaseController {
         }, {
           '$group': {
             '_id': {
-              'mlbId': '$_id.mlbId', 
+              'mlbId': '$_id.mlbId',
               'pos': '$_id.pos'
-            }, 
+            },
             'posCount': {
               '$sum': '$inGameCount'
             }
@@ -185,10 +185,10 @@ class PlayersController extends BaseController {
           '$group': {
             '_id': {
               'mlbId': '$_id.mlbId'
-            }, 
+            },
             'positionsLog': {
               '$push': {
-                'pos': '$_id.pos', 
+                'pos': '$_id.pos',
                 'ct': '$posCount'
               }
             }
@@ -197,8 +197,8 @@ class PlayersController extends BaseController {
           '$addFields': {
             'eligiblePositions': {
               '$filter': {
-                'input': '$positionsLog', 
-                'as': 'posObj', 
+                'input': '$positionsLog',
+                'as': 'posObj',
                 'cond': {
                   '$gte': [
                     '$$posObj.ct', 10
@@ -212,12 +212,12 @@ class PlayersController extends BaseController {
             'eligiblePositions': '$eligiblePositions.pos'
           }
         }
-      ], 
+      ],
       'as': 'stats'
     }
   }, {
     '$unwind': {
-      'path': '$stats', 
+      'path': '$stats',
       'preserveNullAndEmptyArrays': true
     }
   }, {
@@ -226,14 +226,14 @@ class PlayersController extends BaseController {
     }
   }, {
     '$lookup': {
-      'from': 'draft', 
-      'localField': 'mlbID', 
-      'foreignField': 'mlbId', 
+      'from': 'draft',
+      'localField': 'mlbID',
+      'foreignField': 'mlbId',
       'as': 'draftRec'
     }
   }, {
     '$unwind': {
-      'path': '$draftRec', 
+      'path': '$draftRec',
       'preserveNullAndEmptyArrays': true
     }
   }, {
@@ -242,8 +242,8 @@ class PlayersController extends BaseController {
         '$concatArrays': [
           {
             '$filter': {
-              'input': '$eligiblePositions', 
-              'as': 'eligPos', 
+              'input': '$eligiblePositions',
+              'as': 'eligPos',
               'cond': {
                 '$ne': [
                   '$$eligPos', '$draftRec.Position'
@@ -258,7 +258,7 @@ class PlayersController extends BaseController {
     }
   }, {
     '$project': {
-      'stats': 0, 
+      'stats': 0,
       'draftRec': 0
     }
   }
@@ -273,15 +273,15 @@ class PlayersController extends BaseController {
             return res.status(400).send({
               message: 'No player found.'
             });
-          } 
+          }
         console.log(positions);
           return res.send(positions[0].eligiblePositions)
         })
    }
  }
-  
-  
-  
+
+
+
   _get(req, res, next) {
   this.model.aggregate([
   {
@@ -292,22 +292,22 @@ class PlayersController extends BaseController {
     }
   }, {
     '$lookup': {
-      'from': 'ablteams', 
-      'localField': 'ablstatus.ablTeam', 
-      'foreignField': '_id', 
+      'from': 'ablteams',
+      'localField': 'ablstatus.ablTeam',
+      'foreignField': '_id',
       'as': 'ablstatus.ablTeam'
     }
   }, {
     '$unwind': {
-      'path': '$ablstatus.ablTeam', 
+      'path': '$ablstatus.ablTeam',
       'preserveNullAndEmptyArrays': true
     }
   }, {
     '$lookup': {
-      'from': 'position_log', 
+      'from': 'position_log',
       'let': {
         'plyrId': '$mlbID'
-      }, 
+      },
       'pipeline': [
         {
           '$match': {
@@ -326,15 +326,15 @@ class PlayersController extends BaseController {
             }
           }
         }
-      ], 
+      ],
       'as': 'posLog'
     }
   }, {
     '$lookup': {
-      'from': 'position_log', 
+      'from': 'position_log',
       'let': {
         'plyrId': '$mlbID'
-      }, 
+      },
       'pipeline': [
         {
           '$match': {
@@ -353,29 +353,29 @@ class PlayersController extends BaseController {
             }
           }
         }
-      ], 
+      ],
       'as': 'posLogLastYear'
     }
   }, {
     '$addFields': {
       'posLog': {
         '$first': '$posLog'
-      }, 
+      },
       'priorYearElig': {
         '$first': '$posLogLastYear.maxPosition'
-      }, 
+      },
       'currentYearElig': {
         '$first': '$posLog.eligiblePositions'
-      }, 
+      },
       'eligible': {
         '$first': '$posLog.eligiblePositions'
       }
     }
   }, {
     '$lookup': {
-      'from': 'positions', 
-      'localField': 'mlbID', 
-      'foreignField': 'mlbId', 
+      'from': 'positions',
+      'localField': 'mlbID',
+      'foreignField': 'mlbId',
       'as': 'posRec'
     }
   }, {
@@ -402,8 +402,8 @@ class PlayersController extends BaseController {
                 ]
               }
             ]
-          }, 
-          'as': 'p', 
+          },
+          'as': 'p',
           'cond': {
             '$ne': [
               '$$p', null
@@ -416,8 +416,8 @@ class PlayersController extends BaseController {
     '$addFields': {
       'eligible': {
         '$reduce': {
-          'input': '$allPos', 
-          'initialValue': [], 
+          'input': '$allPos',
+          'initialValue': [],
           'in': {
             '$cond': [
               {
@@ -438,36 +438,36 @@ class PlayersController extends BaseController {
     }
   }, {
     '$project': {
-      'commishPos': 0, 
-      'posRec': 0, 
-      'allPos': 0, 
-      'currentYearElig': 0, 
-      'priorYearElig': 0, 
+      'commishPos': 0,
+      'posRec': 0,
+      'allPos': 0,
+      'currentYearElig': 0,
+      'priorYearElig': 0,
       'position': 0
     }
   }
 ]
 
-    
+
       , function(err, players) {
       if (err) return next(err);
 
       res.send(players);
     });
   }
-  
-  
-  
-     
+
+
+
+
   reroute() {
     router = this.route();
         router.get('/' + this.routeString + '/:plyrId/eligibility' , (...args) => this._getEligibility(...args));
     return router;
   }
-  
-  
-  
-  
+
+
+
+
 }
 
 module.exports = PlayersController

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy , AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy , AfterViewInit,ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ApiService } from './../../../core/api.service';
 import { UtilsService } from './../../../core/utils.service';
@@ -13,6 +13,9 @@ import {FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AuthService } from './../../../auth/auth.service';
 import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+
 
 
 @Component({
@@ -32,6 +35,11 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
   query: string = '';
   submitSub: Subscription;
   games$:Observable<MatTableDataSource<GameModel>>;
+  currentWeek: number = 0
+  dataLength: number;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     private title: Title,
@@ -45,7 +53,7 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    this._getGamesList();
+   // this._getGamesList();
 
   }
 
@@ -53,30 +61,45 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
     // Establish MatTableDataSource with games content.
     this.games$ =this.api.getAblGames$().pipe(
       map(d=> {
-        const ds = new MatTableDataSource(d);
+        let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
+
+        data.sort((a,b)=> {
+          let ad =new Date(a.gameDate)
+          let bd = new Date(b.gameDate)
+
+          return (ad < bd) ? -1 : ((ad == bd) ? 0 : 1) })
+
+        let nextGameIdx = data.findIndex(gm=> {return new Date(gm.gameDate) > new Date()})
+
+ //       this.currentWeek = Math.floor(  nextGameIdx /5)
+        this.paginator.pageIndex = Math.floor( nextGameIdx / 5)
+        this.dataLength = data.length
+        const ds = new MatTableDataSource(data);
+        ds.paginator = this.paginator;
+
         return ds;
       })
     )
   }
 
-  private _getGamesList() {
-    this.loading = true;
-    // Get future, public events
-    this.gamesListSub = this.api
-      .getAblGames$()
-      .subscribe(
-        res => {
-          this.gamesList = res;
-          this.filteredGames = res.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
-          this.loading = false;
-        },
-        err => {
-          console.error(err);
-          this.loading = false;
-          this.error = true;
-        }
-      );
-  }
+  // private _getGamesList() {
+  //   this.loading = true;
+  //   // Get future, public events
+  //   this.gamesListSub = this.api
+  //     .getAblGames$()
+  //     .subscribe(
+  //       res => {
+  //         this.gamesList = res;
+  //         this.filteredGames = res.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
+  //         this.loading = false;
+  //       },
+  //       err => {
+  //         console.error(err);
+  //         this.loading = false;
+  //         this.error = true;
+  //       }
+  //     );
+  // }
 
   attest(gm: GameModel, result_id: string, resultIdx: number, loc: string) {
     //this.api.postData$({})
