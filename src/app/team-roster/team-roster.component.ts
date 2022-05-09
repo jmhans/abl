@@ -41,6 +41,8 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   roster$: Subject<Roster[]>= new Subject();
   displayRoster$: Observable<MatTableDataSource<Roster>>
 
+  columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'gamesPlayed', 'hits', 'doubles', 'triples', 'homeruns', 'baseOnBalls', 'hitByPitch', 'stolenBases', 'caughtStealing']
+
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
 
