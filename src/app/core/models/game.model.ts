@@ -9,7 +9,7 @@ class GameModel {
     public homeTeam: AblTeamModel,
     public description?: string,
     public _id?: string,
-    public awayTeamRoster?: Roster[], 
+    public awayTeamRoster?: Roster[],
     public homeTeamRoster?: Roster[],
     public results?: GameResultsModel[]
   ) { }
@@ -19,7 +19,7 @@ class FormGameModel {
   constructor(
     public gameDate: string,
     public awayTeam: AblTeamModel,
-    public homeTeam: AblTeamModel, 
+    public homeTeam: AblTeamModel,
     public description?: string
   ) { }
 }
@@ -30,7 +30,7 @@ interface PopulatedGameModel {
     homeTeam: AblTeamModel
     description?: string
     _id?: string
-    awayTeamRoster?: PopulatedRoster[] 
+    awayTeamRoster?: PopulatedRoster[]
     homeTeamRoster?: PopulatedRoster[]
     results?: GameResultsModel[]
 }
@@ -53,30 +53,31 @@ interface gameLineModel {
   abl_points: number
 }
 
- 
+
 
 interface GameResultsModel  {
         status: string
-        scores: {team: string, location: string, regulation: rosterScoreRecord, final: rosterScoreRecord  , players:  playerModel[]}[] 
-        winner: {} 
+        scores: {team: string, location: string, regulation: rosterScoreRecord, final: rosterScoreRecord  , players:  playerModel[]}[]
+        winner: {}
         loser: {}
         attestations: {attester: string, attesterType: string, time: Date, _id?: string}[]
         attestation_status?: string
         created_by?: string
         _id?: string
+        needsAttest?:boolean
       }
 
 class GameResultForm {
       status: string
-      scores: {team: string, location: string, regulation: rosterScoreRecord, final: rosterScoreRecord  , players:  playerModel[]}[] 
-      winner: {} 
+      scores: {team: string, location: string, regulation: rosterScoreRecord, final: rosterScoreRecord  , players:  playerModel[]}[]
+      winner: {}
       loser: {}
       attestations: {attester: string, attesterType: string, time: Date}[]
       attestation_status: string
       created_by: string
       constructor(
     public result: GameResultsModel
-  ) { 
+  ) {
       this.status = result.status
       this.scores = result.scores
       this.winner = result.winner
@@ -84,7 +85,7 @@ class GameResultForm {
       this.attestations = result.attestations
       this.attestation_status = result.attestation_status
       this.created_by = result.created_by
-      
+
     }
 }
 

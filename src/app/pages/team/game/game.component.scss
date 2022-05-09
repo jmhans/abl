@@ -5,3 +5,25 @@
   flex-direction: column;
   width: 100%;
 }
+
+.row {
+  height: auto;
+}
+
+.mat-cell{
+  justify-content: flex-start;
+}
+.mat-row{
+  height:auto !important;
+  width: 100%;
+  justify-content: space-between;
+
+}
+.mat-header-row{
+  width: 100%;
+
+}
+
+.mat-table {
+  width: 100%;
+}
