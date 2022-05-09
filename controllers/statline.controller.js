@@ -5,16 +5,7 @@ var router = express.Router();
 const ablConfig = require('../server/ablConfig');
 
 
-// function _isPositionPlayer(plyr) {
 
-//   if (plyr.allPositions) {
-
-//     nonPitcherPosList = plyr.allPositions.filter((posRec) => {return posRec.abbreviation != 'P'});
-
-//     return (nonPitcherPosList.length > 0);
-//   }
-//   return false;
-// }
 
 
 class StatlineController extends BaseController {
