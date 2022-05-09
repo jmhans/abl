@@ -172,7 +172,7 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
 
 
   ngOnDestroy() {
-    this.gamesListSub.unsubscribe();
+
     if (this.submitSub) {this.submitSub.unsubscribe()};
   }
 
