@@ -60,163 +60,192 @@ class ABLRosterController extends BaseController{
 
       var atomicLineup = await Lineup.aggregate(
         [
-  {
-    '$match': {
-      'ablTeam': new ObjectId(teamId),
-      'effectiveDate': {
-        '$lte': this.getRosterDeadline(gmDate)
-      }
-    }
-  }, {
-    '$sort': {
-      'effectiveDate': -1
-    }
-  }, {
-    '$limit': 1
-  }, {
-    '$unwind': {
-      'path': '$roster',
-      'preserveNullAndEmptyArrays': false
-    }
-  }, {
-    '$lookup': {
-      'from': 'players',
-      'localField': 'roster.player',
-      'foreignField': '_id',
-      'as': 'player'
-    }
-  }, {
-    '$unwind': {
-      'path': '$player',
-      'preserveNullAndEmptyArrays': false
-    }
-  }, {
-    '$lookup': {
-      'from': 'position_log',
-      'let': {
-        'plyrId': '$player.mlbID'
-      },
-      'pipeline': [
-        {
-          '$match': {
-            '$expr': {
-              '$and': [
-                {
-                  '$eq': [
-                    '$mlbId', '$$plyrId'
-                  ]
-                }, {
-                  '$eq': [
-                    '$season', 2022
-                  ]
-                }
-              ]
-            }
-          }
-        }
-      ],
-      'as': 'posLog'
-    }
-  }, {
-    '$addFields': {
-      'posLog': {
-        '$first': '$posLog'
-      },
-      'priorYearElig': {
-        '$first': '$posLog.priorSeasonMaxPos'
-      },
-      'currentYearElig': {
-        '$first': '$posLog.eligiblePositions'
-      },
-      'player.eligible': {
-        '$first': '$posLog.eligiblePositions'
-      }
-    }
-  }, {
-    '$lookup': {
-      'from': 'positions',
-      'localField': 'player.mlbID',
-      'foreignField': 'mlbId',
-      'as': 'posRec'
-    }
-  }, {
-    '$addFields': {
-      'commishPos': {
-        '$ifNull': [
           {
-            '$first': '$posRec.position'
-          }, '$priorYearElig'
-        ]
-      }
-    }
-  }, {
-    '$addFields': {
-      'allPos': {
-        '$concatArrays': [
-          [
-            '$commishPos'
-          ], {
-            '$ifNull': [
-              '$currentYearElig', []
-            ]
-          }
-        ]
-      }
-    }
-  }, {
-    '$addFields': {
-      'player.eligible': {
-        '$reduce': {
-          'input': '$allPos',
-          'initialValue': [],
-          'in': {
-            '$cond': [
-              {
-                '$in': [
-                  '$$this', '$$value'
-                ]
-              }, '$$value', {
-                '$concatArrays': [
-                  '$$value', [
-                    '$$this'
-                  ]
+            '$match': {
+              'ablTeam':  new ObjectId(teamId),
+              'effectiveDate': {
+                '$lte':  this.getRosterDeadline(gmDate)
+              }
+            }
+          }, {
+            '$sort': {
+              'effectiveDate': -1
+            }
+          }, {
+            '$limit': 1
+          }, {
+            '$unwind': {
+              'path': '$roster',
+              'preserveNullAndEmptyArrays': false
+            }
+          }, {
+            '$lookup': {
+              'from': 'players',
+              'localField': 'roster.player',
+              'foreignField': '_id',
+              'as': 'player'
+            }
+          }, {
+            '$unwind': {
+              'path': '$player',
+              'preserveNullAndEmptyArrays': false
+            }
+          }, {
+            '$lookup': {
+              'from': 'position_log',
+              'let': {
+                'plyrId': '$player.mlbID'
+              },
+              'pipeline': [
+                {
+                  '$match': {
+                    '$expr': {
+                      '$and': [
+                        {
+                          '$eq': [
+                            '$mlbId', '$$plyrId'
+                          ]
+                        }, {
+                          '$eq': [
+                            '$season', 2022
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              'as': 'posLog'
+            }
+          }, {
+            '$lookup': {
+              'from': 'position_log',
+              'let': {
+                'plyrId': '$player.mlbID'
+              },
+              'pipeline': [
+                {
+                  '$match': {
+                    '$expr': {
+                      '$and': [
+                        {
+                          '$eq': [
+                            '$mlbId', '$$plyrId'
+                          ]
+                        }, {
+                          '$eq': [
+                            '$season', 2021
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              'as': 'posLogLastYear'
+            }
+          }, {
+            '$addFields': {
+              'posLog': {
+                '$first': '$posLog'
+              },
+              'priorYearElig': {
+                '$first': '$posLogLastYear.maxPosition'
+              },
+              'currentYearElig': {
+                '$first': '$posLog.eligiblePositions'
+              },
+              'player.eligible': {
+                '$first': '$posLog.eligiblePositions'
+              }
+            }
+          }, {
+            '$lookup': {
+              'from': 'positions',
+              'localField': 'player.mlbID',
+              'foreignField': 'mlbId',
+              'as': 'posRec'
+            }
+          }, {
+            '$addFields': {
+              'commishPos': {
+                '$ifNull': [
+                  {
+                    '$first': '$posRec.position'
+                  }, '$priorYearElig'
                 ]
               }
-            ]
+            }
+          }, {
+            '$addFields': {
+              'allPos': {
+                '$concatArrays': [
+                  [
+                    '$commishPos'
+                  ], {
+                    '$ifNull': [
+                      '$currentYearElig', []
+                    ]
+                  }
+                ]
+              }
+            }
+          }, {
+            '$addFields': {
+              'player.eligible': {
+                '$reduce': {
+                  'input': '$allPos',
+                  'initialValue': [],
+                  'in': {
+                    '$cond': [
+                      {
+                        '$in': [
+                          '$$this', '$$value'
+                        ]
+                      }, '$$value', {
+                        '$concatArrays': [
+                          '$$value', [
+                            '$$this'
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }, {
+            '$project': {
+              'player.position': 0
+            }
+          }, {
+            '$group': {
+              '_id': '$_id',
+              'roster': {
+                '$push': {
+                  'player': '$player',
+                  'lineupPosition': '$roster.lineupPosition',
+                  'rosterOrder': '$roster.rosterOrder'
+                }
+              },
+              'effectiveDate': {
+                '$first': '$effectiveDate'
+              },
+              'ablTeam': {
+                '$first': '$ablTeam'
+              },
+              'latest40Man': {
+                '$max': '$player.lastUpdate'
+              }
+            }
+          }, {
+            '$addFields': {
+              'roster.latest40Man': '$latest40Man'
+            }
           }
-        }
-      }
-    }
-  }, {
-    '$project': {
-      'player.position': 0
-    }
-  }, {
-    '$group': {
-      '_id': '$_id',
-      'roster': {
-        '$push': {
-          'player': '$player',
-          'lineupPosition': '$roster.lineupPosition',
-          'rosterOrder': '$roster.rosterOrder'
-        }
-      },
-      'effectiveDate': {
-        '$first': '$effectiveDate'
-      },
-      'ablTeam': {
-        '$first': '$ablTeam'
-      },
-      'latest40Man': {
-        '$max': '$player.lastUpdate'
-      }
-    }
-  }, {
-    '$addFields': {
-      'roster.latest40Man': '$latest40Man'
-    }
-  }
-])
+        ]
+
+)
       if (atomicLineup) {
         return atomicLineup[0]
       } else {
