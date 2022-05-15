@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter , AfterViewInit} from '@angular/core';
 import { CdkDragDrop, CdkDragSortEvent, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
-import { Subscription, Subject, Observable,  of } from 'rxjs'
-import { map , startWith} from 'rxjs/operators';
+import { Subscription, Subject, Observable,  of , BehaviorSubject} from 'rxjs'
+import { map , startWith, switchMap} from 'rxjs/operators';
 import { RosterService } from './../core/services/roster.service';
 import { LineupModel, SubmitLineup, LineupFormModel , Roster} from './../core/models/lineup.model';
 import { MatTableDataSource } from '@angular/material/table'
@@ -30,6 +30,7 @@ const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   styleUrls: ['./team-roster.component.scss']
 })
 export class TeamRosterComponent implements OnInit, AfterViewInit {
+  lineup$: BehaviorSubject<LineupFormModel> = new BehaviorSubject(undefined);
   @Input() lineup: LineupFormModel;
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
@@ -40,8 +41,10 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   formLineup: LineupFormModel;
   roster$: Subject<Roster[]>= new Subject();
   displayRoster$: Observable<MatTableDataSource<Roster>>
+  dispRoster$: Observable<MatTableDataSource<Roster>>
+  refreshLineup$:Subject<void> = new Subject();
 
-  columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeruns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
+  columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
 
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
@@ -50,22 +53,16 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
 
-
+    this.lineup$.next(this.lineup)
     this.displayRoster$ = this.roster$.pipe(
       map((r)=> {
-        this.lineupChanged = false
+        //this.lineupChanged = false
+
+
         const plyrs = r.map((plyr, pIdx)=> {
 
-          const originalPlyr = this.originalLineup.roster.find((op)=> {return op.player.mlbID == plyr.player.mlbID})
-          if (originalPlyr) {
-            plyr.changed = (originalPlyr.lineupPosition != plyr.lineupPosition || (pIdx + 1) != originalPlyr.rosterOrder)
-
-            if (plyr.changed) {
-              this.lineupChanged = true
-            }
-          }
-          plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
-          plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
+          //plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
+          //plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
 
           return plyr
         })
@@ -74,12 +71,30 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
       })
     )
 
+this.dispRoster$ = this.refreshLineup$.pipe(
+  switchMap(() => this.lineup$),
+  map((l)=> {
+    //this.lineupChanged = false
+    //l.recalcOrder();
+    //const plyrs = l.roster.map((plyr, pIdx)=> {
+      // plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
+      //plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
+
+    //  return plyr
+    //})
+    const ds = new MatTableDataSource(l.roster)
+    return ds
+  })
+)
+
+
 
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
       this.roster$.next(this.lineup.roster);
+      this.refreshLineup$.next();
     });
 
   }
@@ -103,9 +118,13 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
       // This is an issue. You've tried to move a drafted player lower than a pickup.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
     } else {
+      //this.lineup.roster[event.previousIndex].rosterOrder = event.currentIndex + 1
       moveItemInArray(this.lineup.roster, event.previousIndex, event.currentIndex);
       //const ds = new MatTableDataSource(this.lineup.roster);
+      //this.lineup.recalcOrder();
+
       this.roster$.next(this.lineup.roster)
+      this.refreshLineup$.next()
     }
 
 
@@ -132,8 +151,17 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   }
   changePos(evt) {
     this.roster$.next(this.lineup.roster);
+    this.refreshLineup$.next();
   }
 
+  plyrChanged<Boolean>(plyr) {
+
+    const rosterPlyrIdx = this.lineup.roster.findIndex((r)=> {return JSON.stringify(r) == JSON.stringify(plyr)})
+
+    const rosterOrderCheck =rosterPlyrIdx != plyr.rosterOrder - 1
+    const positionCheck = plyr.changed
+    return rosterOrderCheck || positionCheck
+  }
 
   _dropPlyr(playerId) {
     this.dropPlyr.emit({playerId: playerId});
