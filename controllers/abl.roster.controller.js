@@ -92,6 +92,38 @@ class ABLRosterController extends BaseController{
     }
   }, {
     '$lookup': {
+      'from': 'mlbrosters',
+      'let': {
+        'plyrId': '$player.mlbID'
+      },
+      'pipeline': [
+        {
+          '$unwind': {
+            'path': '$roster',
+            'preserveNullAndEmptyArrays': true
+          }
+        }, {
+          '$project': {
+            'teamId': 1,
+            'player': '$roster.person',
+            'status': '$roster.status'
+          }
+        }, {
+          '$match': {
+            '$expr': {
+              '$eq': [
+                '$$plyrId', {
+                  '$toString': '$player.id'
+                }
+              ]
+            }
+          }
+        }
+      ],
+      'as': 'rosterStatus'
+    }
+  }, {
+    '$lookup': {
       'from': 'position_log',
       'let': {
         'plyrId': '$player.mlbID'
@@ -105,10 +137,6 @@ class ABLRosterController extends BaseController{
                   '$eq': [
                     '$mlbId', '$$plyrId'
                   ]
-                }, {
-                  '$eq': [
-                    '$season', 2022
-                  ]
                 }
               ]
             }
@@ -119,17 +147,42 @@ class ABLRosterController extends BaseController{
     }
   }, {
     '$addFields': {
-      'posLog': {
-        '$first': '$posLog'
-      },
-      'priorYearElig': {
-        '$first': '$posLog.priorSeasonMaxPos'
-      },
-      'currentYearElig': {
-        '$first': '$posLog.eligiblePositions'
-      },
-      'player.eligible': {
-        '$first': '$posLog.eligiblePositions'
+      'newPosLog': {
+        '$reduce': {
+          'input': '$posLog',
+          'initialValue': {
+            'curr': null,
+            'prior': null
+          },
+          'in': {
+            '$switch': {
+              'branches': [
+                {
+                  'case': {
+                    '$eq': [
+                      '$$this.season', 2022
+                    ]
+                  },
+                  'then': {
+                    'curr': '$$this.eligiblePositions',
+                    'prior': '$$value.prior'
+                  }
+                }, {
+                  'case': {
+                    '$eq': [
+                      '$$this.season', 2021
+                    ]
+                  },
+                  'then': {
+                    'curr': '$$value.curr',
+                    'prior': '$$this.maxPosition'
+                  }
+                }
+              ],
+              'default': '$$value'
+            }
+          }
+        }
       }
     }
   }, {
@@ -137,27 +190,26 @@ class ABLRosterController extends BaseController{
       'from': 'positions',
       'localField': 'player.mlbID',
       'foreignField': 'mlbId',
-      'as': 'posRec'
+      'as': 'tempCommish'
     }
   }, {
     '$addFields': {
-      'commishPos': {
-        '$ifNull': [
-          {
-            '$first': '$posRec.position'
-          }, '$priorYearElig'
-        ]
-      }
-    }
-  }, {
-    '$addFields': {
+      'player.status': {
+        '$first': '$rosterStatus.status.description'
+      },
       'allPos': {
         '$concatArrays': [
           [
-            '$commishPos'
+            {
+              '$ifNull': [
+                {
+                  '$first': '$tempCommish.position'
+                }, '$newPosLog.prior'
+              ]
+            }
           ], {
             '$ifNull': [
-              '$currentYearElig', []
+              '$newPosLog.curr', []
             ]
           }
         ]
@@ -189,7 +241,12 @@ class ABLRosterController extends BaseController{
     }
   }, {
     '$project': {
-      'player.position': 0
+      'player.position': 0,
+      'allPos': 0,
+      'tempCommish': 0,
+      'posLog': 0,
+      'newPosLog': 0,
+      'rosterStatus': 0
     }
   }, {
     '$group': {
@@ -206,17 +263,13 @@ class ABLRosterController extends BaseController{
       },
       'ablTeam': {
         '$first': '$ablTeam'
-      },
-      'latest40Man': {
-        '$max': '$player.lastUpdate'
       }
     }
-  }, {
-    '$addFields': {
-      'roster.latest40Man': '$latest40Man'
-    }
   }
-])
+]
+
+
+)
       if (atomicLineup) {
         return atomicLineup[0]
       } else {

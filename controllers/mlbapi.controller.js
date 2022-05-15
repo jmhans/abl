@@ -5,7 +5,8 @@ var   express = require('express');
 var   router = express.Router();
 const BASE_URL = "https://statsapi.mlb.com/api/v1";//"http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
 const mlbGame = require('./../models/mlbGame');
-const player = require('./../models/player').Player
+const player = require('./../models/player').Player;
+const mlbRoster = require('./../models/mlbRoster');
 
 const BaseController = require('./base.controller');
 
@@ -167,7 +168,7 @@ class altMlbApiController extends BaseController{
 
         const APIUrl = BASE_URL + `/teams/${tm}/roster?rosterType=40Man`  ;
        var retBody = await axios.get(APIUrl);
-       return retBody.data.roster
+       return retBody.data
      } catch (err) {
        console.error(`Error in getRosterInfo: ${err}; URL: ${APIUrl}`)
      }
@@ -191,14 +192,19 @@ class altMlbApiController extends BaseController{
         const teams = await this.getAllTeams();
 
         for (var t=0; t<teams.length; t++) {
-          var roster = await this.getRosterInfo(teams[t].id)
+          var resp = await this.getRosterInfo(teams[t].id)
 
+          const rQuery = {teamId: teams[t].id}
 
-          for (var p=0; p<roster.length; p++) {
-            const plyr = this.PlyrCntl._updatePlayerStatus(roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
-            output.push(roster[p].person.id)
+          // Add logic to upsert the roster record for the team.
 
-          }
+          const upsertedRoster = await mlbRoster.findOneAndUpdate(rQuery, resp, {upsert: true});
+
+          // for (var p=0; p<resp.roster.length; p++) {
+          //   const plyr = this.PlyrCntl._updatePlayerStatus(resp.roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
+          //   output.push(resp.roster[p].person.id)
+
+          // }
 
         }
         return output;
@@ -218,184 +224,6 @@ class altMlbApiController extends BaseController{
   }
 
 }
-
-
-
-
-
-//const MLBStatsAPI = require('mlb-stats-api');
-
-
-// class mlbAPI {
-
-//   constructor() {
-//     this.mlbStats = new MLBStatsAPI();
-//   }
-
-
-
-//   async _getGame(gmPk) {
-
-//     try {
-//       const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
-//       return response.data;
-//       } catch (err) {
-//         console.error(`Error in _getGame: ${err}`);
-//       }
-//     }
-
-//   async _getBoxHttp(req, res, next) {
-
-//       try {
-//           const gm = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: req.params.id }}); //await this._getGame(529572);
-//           return res.send(gm);
-//        } catch (err) {
-//         console.error(`Error in getGameHttp(): ${err}`);
-//         return res.status(500).send({message: err.message});
-
-//       }
-
-//   }
-//   async _getSchedule(dt) {
-//     try {
-//           const sched = await this.mlbStats.getSchedule({ params: { date: dt, sportId: 1 }}); //await this._getGame(529572);
-//           return sched.data;
-//        } catch (err) {
-//         console.error(`Error in getSchedule(): ${err}`);
-//       }
-//   }
-
-//   async _getResourceHttp(req, res, next) {
-//     try {
-//       var fn;
-//       switch (req.params.resource) {
-//         case "game":
-//           fn = this.mlbStats.getGameBoxscore
-//           break;
-//         case "schedule":
-//           fn = this.mlbStats.getSchedule
-//           break;
-//         default:
-
-//       }
-
-
-//       const results = await fn({params: req.query});
-//       return res.send(results.data)
-//     } catch (err) {
-//       console.error(`Error in getResourceHttp(): ${err}`);
-//       return res.status(500).send({message: err.message});
-//     }
-
-
-//   }
-
-//   async _getSimpleBox(gmPk) {
-
-//     try {
-//       const response = await this.mlbStats.getGameBoxscore({ pathParams: { gamePk: gmPk }});
-//       return {gamePk: gmPk, boxscore: this.simplifyBox(response.data)};
-//       } catch (err) {
-//         console.error(`Error in _getSimpleBox: ${err}`);
-//       }
-//     }
-
-//   simplifyBox(bx) {
-//     return {
-//       "teams": {
-//         "away": {
-//           "team": bx.teams.away.team,
-//           "teamCode": bx.teams.away.teamCode,
-//           "abbreviation": bx.teams.away.abbreviation,
-//           "players": bx.teams.away.batters.reduce((allBatters, thisBatter)=> {
-//             allBatters.push(bx.teams.away.players["ID" + thisBatter]);
-//             return allBatters;
-//           }, [])
-//         },
-//         "home": {
-//           "team": bx.teams.home.team,
-//           "teamCode": bx.teams.home.teamCode,
-//           "abbreviation": bx.teams.home.abbreviation,
-//           "players": bx.teams.home.batters.reduce((allBatters, thisBatter)=> {
-//             allBatters.push(this.simplifyBatter(bx.teams.home.players["ID" + thisBatter]));
-//             return allBatters;
-//           }, [])
-//         },
-
-//       }
-
-//     }
-//   }
-
-//   simplifyBatter(batter) {
-//     return {
-//       "person": batter.person,
-//       "position": batter.position,
-//       "stats": {
-//         "batting": batter.stats.batting,
-//         "fielding": batter.stats.fielding
-//       },
-//       "allPositions": batter.allPositions
-//     }
-//   }
-
-
-
-
-//   async _getBoxesForDate(dt) {
-//     try {
-//       const sched = await this._getSchedule(dt);
-//       if (sched) {
-//         return sched.dates[0].games.reduce(async (prevProm, gmRec)=> {
-//           const collection = await prevProm;
-//           const gmBox = await this._getSimpleBox(gmRec.gamePk);
-//             collection.push(gmBox);
-//           return collection;
-
-//         }, Promise.resolve([]));
-//       }
-
-//     } catch (err) {
-//       console.error(`Error in _getBoxesForDate: ${err}`);
-//     }
-//   }
-
-//   async _getBoxesHttp(req, res, next) {
-
-//       try {
-//           const boxes = await this._getBoxesForDate( req.query.date ); //await this._getGame(529572);
-//           return res.send(boxes);
-//        } catch (err) {
-//         console.error(`Error in getGameHttp(): ${err}`);
-//         return res.status(500).send({message: err.message});
-
-//       }
-
-//   }
-//   async _getScheduleForDate(req, res, next) {
-
-//       try {
-//           const scores = await this._getSchedule( req.params.date ); //await this._getGame(529572);
-//           return res.send(scores);
-//        } catch (err) {
-//         console.error(`Error in getGameHttp(): ${err}`);
-//         return res.status(500).send({message: err.message});
-
-//       }
-//   }
-
-
-
-
-
-//   route() {
-//     router.get('/mlb/game/:id', (...args) => this._getBoxHttp(...args));
-//     router.get('/mlb2/:resource', (...args) => this._getResourceHttp(...args));
-//     router.get('/mlb/boxes', (...args) => this._getBoxesHttp(...args));
-//     router.get('/mlb/schedule/:dt', (...args)=> this._getScheduleForDate(...args));
-//     return router;
-//   }
-// }
 
 
 module.exports =  {altMlbApiController} // , mlbAPI} //mlbAPI
