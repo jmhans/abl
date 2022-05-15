@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, AfterViewInit } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
-import { LineupModel , LineupCollectionModel, LineupFormModel} from './../../../core/models/lineup.model';
-import { Subscription, Subject, combineLatest, Observable } from 'rxjs';
-import { takeUntil, combineAll , map, switchMap } from 'rxjs/operators';
+import { LineupModel , LineupCollectionModel, LineupFormModel, Roster} from './../../../core/models/lineup.model';
+import {MlbPlayerModel} from './../../../core/models/mlb.player.model';
+import { Subscription, Subject, combineLatest, Observable, BehaviorSubject } from 'rxjs';
+import { takeUntil, combineAll , map, switchMap, share } from 'rxjs/operators';
 
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
@@ -50,7 +51,11 @@ export class RosterComponent implements OnInit, OnDestroy {
   formDate$: Observable<FormControl>;
   current_roster_deadline$: Observable<Date>;
   current_roster$: Observable<LineupFormModel>;
-  lineup$: Observable<LineupCollectionModel>;
+  //lineup$: Observable<LineupCollectionModel>;
+  retrieveLineup$:  BehaviorSubject<void> = new BehaviorSubject(null);
+  //current_roster_deadline_subject$: BehaviorSubject<Date> = new BehaviorSubject(new Date());
+  //refreshableLineup$: Observable<LineupCollectionModel>;
+
 
   roster_date: Date;
   roster_deadline: Date;
@@ -92,14 +97,14 @@ export class RosterComponent implements OnInit, OnDestroy {
       return qp['dt'] ? new Date(qp['dt']) : new Date();
     }))
 
-    this.roster_deadline$ = combineLatest(this.leagueConfig.league$, this.roster_date$).pipe(map(([lg, rd])=> {
+    this.roster_deadline$ = combineLatest([this.leagueConfig.league$, this.roster_date$]).pipe(map(([lg, rd])=> {
       // this.editTimeLimit = lg.rosterLockTime
       // this.editTimeLimitInantz = lg.rosterLockTimeZone
       var rosterEffDate = this.actualRosterEffectiveDate(rd, lg.rosterLockTime, lg.rosterLockTimeZone)
       this.dlFileName = this.team.nickname + '_Lineup_' + rosterEffDate.toISOString().substring(0, 10)
       this.roster_deadline = rosterEffDate
       return rosterEffDate
-    }))
+    }), share())
 
     this.formDate$ = this.roster_deadline$.pipe(map((deadline)=> {
       return new FormControl(deadline)
@@ -109,26 +114,54 @@ export class RosterComponent implements OnInit, OnDestroy {
       return this.actualRosterEffectiveDate(new Date(), lg.rosterLockTime, lg.rosterLockTimeZone)
     }))
 
-    this.lineup$ = this.roster_deadline$.pipe(switchMap((deadline)=> {
-      return this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)
-    }))
+    // this.lineup$ = this.roster_deadline$.pipe(switchMap((deadline)=> {
+    //   return this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)
+    // }))
 
-    this.current_roster$ = combineLatest(this.lineup$, this.roster_deadline$).pipe(map(([lineup, deadline])=>{
-            this.active_roster = lineup;
-            this.current_roster = new LineupFormModel(
-              lineup._id,
-              this.active_roster._id,
-              this.active_roster.roster.map((rr)=> {return {
-                player: rr.player
-                , lineupPosition: rr.lineupPosition
-                , rosterOrder: rr.rosterOrder
-                ,latest40Man: rr.latest40Man
-              }}),
-              new Date(deadline)
-            );
-            return this.current_roster
-    }))
+    // this.refreshableLineup$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
+    //   switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline))
+    //   )
 
+
+
+    this.current_roster$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
+      switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)),
+      map((lineup)=>{
+              this.active_roster = lineup;
+              this.current_roster = new LineupFormModel(
+                lineup._id,
+                this.active_roster._id,
+                this.active_roster.roster.map((rr)=> {
+                  let p = new MlbPlayerModel(rr.player.name,
+                    rr.player.mlbID,
+                    rr.player.position,
+                    rr.player.commish_position,
+                    rr.player.team,
+                    rr.player.status,
+                    rr.player.stats,
+                    rr.player.games,
+                    rr.player.positionLog,
+                    rr.player.ablstatus,
+                    rr.player.eligible,
+                    rr.player.abl_runs,
+                    rr.player._id,
+                    rr.player.draftMe,
+                    rr.player.dougstatsName,
+                    rr.player.lastUpdate
+                    )
+                  return new Roster(p, rr.lineupPosition, rr.rosterOrder, rr.latest40Man)
+                }),
+                // this.active_roster.roster.map((rr)=> {return {
+                //   player: rr.player,
+                //   lineupPosition: rr.lineupPosition,
+                //   rosterOrder: rr.rosterOrder,
+                //   originalPosition: rr.originalPosition,
+                //   changed: rr.changed,
+                //   latest40Man: rr.latest40Man}}),
+                new Date(this.roster_deadline)
+              );
+              return this.current_roster
+      }))
 
     //this.getLeagueInfo();
 
@@ -151,7 +184,10 @@ export class RosterComponent implements OnInit, OnDestroy {
 
 
   }
+ngAfterViewInit() {
+  //this.retrieveLineup$.next();
 
+}
 
   submitCSV() {
 
@@ -293,6 +329,8 @@ export class RosterComponent implements OnInit, OnDestroy {
         .subscribe(
           data => {
             this.alerts.push({type: 'success', message:'Lineup saved successfully'})
+            this.retrieveLineup$.next();
+            //this.lineup$.next(data)
             //this.lineup = data;
             //this._set_Active_Roster() //this.active_roster_index);
           },
