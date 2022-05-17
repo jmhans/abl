@@ -284,169 +284,187 @@ class PlayersController extends BaseController {
 
   _get(req, res, next) {
   this.model.aggregate([
-  {
-    '$match': {
-      'lastUpdate': {
-        '$gte': new Date('Fri, 01 Apr 2022 00:00:00 GMT')
-      }
-    }
-  }, {
-    '$lookup': {
-      'from': 'ablteams',
-      'localField': 'ablstatus.ablTeam',
-      'foreignField': '_id',
-      'as': 'ablstatus.ablTeam'
-    }
-  }, {
-    '$unwind': {
-      'path': '$ablstatus.ablTeam',
-      'preserveNullAndEmptyArrays': true
-    }
-  }, {
-    '$lookup': {
-      'from': 'position_log',
-      'let': {
-        'plyrId': '$mlbID'
-      },
-      'pipeline': [
-        {
-          '$match': {
-            '$expr': {
-              '$and': [
-                {
-                  '$eq': [
-                    '$mlbId', '$$plyrId'
-                  ]
-                }, {
-                  '$eq': [
-                    '$season', 2022
-                  ]
-                }
-              ]
-            }
-          }
+    {
+      '$match': {
+        'lastUpdate': {
+          '$gte': new Date('Fri, 01 Apr 2022 00:00:00 GMT')
         }
-      ],
-      'as': 'posLog'
-    }
-  }, {
-    '$lookup': {
-      'from': 'position_log',
-      'let': {
-        'plyrId': '$mlbID'
-      },
-      'pipeline': [
-        {
-          '$match': {
-            '$expr': {
-              '$and': [
-                {
-                  '$eq': [
-                    '$mlbId', '$$plyrId'
-                  ]
-                }, {
-                  '$eq': [
-                    '$season', 2021
-                  ]
-                }
-              ]
-            }
-          }
-        }
-      ],
-      'as': 'posLogLastYear'
-    }
-  }, {
-    '$addFields': {
-      'posLog': {
-        '$first': '$posLog'
-      },
-      'priorYearElig': {
-        '$first': '$posLogLastYear.maxPosition'
-      },
-      'currentYearElig': {
-        '$first': '$posLog.eligiblePositions'
-      },
-      'eligible': {
-        '$first': '$posLog.eligiblePositions'
       }
-    }
-  }, {
-    '$lookup': {
-      'from': 'positions',
-      'localField': 'mlbID',
-      'foreignField': 'mlbId',
-      'as': 'posRec'
-    }
-  }, {
-    '$addFields': {
-      'commishPos': {
-        '$ifNull': [
+    }, {
+      '$lookup': {
+        'from': 'ablteams',
+        'localField': 'ablstatus.ablTeam',
+        'foreignField': '_id',
+        'as': 'ablstatus.ablTeam'
+      }
+    }, {
+      '$unwind': {
+        'path': '$ablstatus.ablTeam',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'position_log',
+        'let': {
+          'plyrId': '$mlbID'
+        },
+        'pipeline': [
           {
-            '$first': '$posRec.position'
-          }, '$priorYearElig'
-        ]
-      }
-    }
-  }, {
-    '$addFields': {
-      'allPos': {
-        '$filter': {
-          'input': {
-            '$concatArrays': [
-              [
-                '$commishPos'
-              ], {
-                '$ifNull': [
-                  '$currentYearElig', []
+            '$match': {
+              '$expr': {
+                '$and': [
+                  {
+                    '$eq': [
+                      '$mlbId', '$$plyrId'
+                    ]
+                  }
                 ]
               }
-            ]
-          },
-          'as': 'p',
-          'cond': {
-            '$ne': [
-              '$$p', null
-            ]
+            }
+          }
+        ],
+        'as': 'newPosLog'
+      }
+    }, {
+      '$addFields': {
+        'newPosLog': {
+          '$reduce': {
+            'input': '$newPosLog',
+            'initialValue': {
+              'curr': null,
+              'prior': null
+            },
+            'in': {
+              '$switch': {
+                'branches': [
+                  {
+                    'case': {
+                      '$eq': [
+                        '$$this.season', 2022
+                      ]
+                    },
+                    'then': {
+                      'curr': '$$this.eligiblePositions',
+                      'prior': '$$value.prior'
+                    }
+                  }, {
+                    'case': {
+                      '$eq': [
+                        '$$this.season', 2021
+                      ]
+                    },
+                    'then': {
+                      'curr': '$$value.curr',
+                      'prior': '$$this.maxPosition'
+                    }
+                  }
+                ],
+                'default': '$$value'
+              }
+            }
           }
         }
       }
-    }
-  }, {
-    '$addFields': {
-      'eligible': {
-        '$reduce': {
-          'input': '$allPos',
-          'initialValue': [],
-          'in': {
-            '$cond': [
+    }, {
+      '$lookup': {
+        'from': 'positions',
+        'localField': 'mlbID',
+        'foreignField': 'mlbId',
+        'as': 'tempCommish'
+      }
+    }, {
+      '$lookup': {
+        'from': 'mlbrosters',
+        'let': {
+          'plyrId': '$mlbID'
+        },
+        'pipeline': [
+          {
+            '$unwind': {
+              'path': '$roster',
+              'preserveNullAndEmptyArrays': true
+            }
+          }, {
+            '$project': {
+              'teamId': 1,
+              'player': '$roster.person',
+              'status': '$roster.status'
+            }
+          }, {
+            '$match': {
+              '$expr': {
+                '$eq': [
+                  '$$plyrId', {
+                    '$toString': '$player.id'
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        'as': 'rosterStatus'
+      }
+    }, {
+      '$addFields': {
+        'status': {
+          '$first': '$rosterStatus.status.description'
+        },
+        'allPos': {
+          '$concatArrays': [
+            [
               {
-                '$in': [
-                  '$$this', '$$value'
-                ]
-              }, '$$value', {
-                '$concatArrays': [
-                  '$$value', [
-                    '$$this'
-                  ]
+                '$ifNull': [
+                  {
+                    '$first': '$tempCommish.position'
+                  }, '$newPosLog.prior'
                 ]
               }
-            ]
+            ], {
+              '$ifNull': [
+                '$newPosLog.curr', []
+              ]
+            }
+          ]
+        }
+      }
+    }, {
+      '$addFields': {
+        'eligible': {
+          '$reduce': {
+            'input': '$allPos',
+            'initialValue': [],
+            'in': {
+              '$cond': [
+                {
+                  '$in': [
+                    '$$this', '$$value'
+                  ]
+                }, '$$value', {
+                  '$concatArrays': [
+                    '$$value', [
+                      '$$this'
+                    ]
+                  ]
+                }
+              ]
+            }
           }
         }
       }
+    }, {
+      '$project': {
+        'commishPos': 0,
+        'posLog': 0,
+        'newPosLog': 0,
+        'tempCommish': 0,
+        'allPos': 0,
+        'currentYearElig': 0,
+        'priorYearElig': 0,
+        'position': 0,
+        'rosterStatus': 0
+      }
     }
-  }, {
-    '$project': {
-      'commishPos': 0,
-      'posRec': 0,
-      'allPos': 0,
-      'currentYearElig': 0,
-      'priorYearElig': 0,
-      'position': 0
-    }
-  }
-]
+  ]
 
 
       , function(err, players) {

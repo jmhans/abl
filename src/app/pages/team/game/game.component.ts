@@ -8,9 +8,6 @@ import {map} from 'rxjs/operators';
 import { AblGameService } from './../../../core/services/abl-game.service';
 import { GameModel } from './../../../core/models/game.model';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
-import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {FormControl} from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { AuthService } from './../../../auth/auth.service';
 import { MatTableDataSource } from '@angular/material/table'
 import { MatPaginator } from '@angular/material/paginator';
@@ -23,7 +20,7 @@ import { MatSort } from '@angular/material/sort';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class TeamGameComponent implements OnInit, AfterViewInit {
+export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() team: AblTeamModel;
 
   pageTitle = 'Games';
@@ -46,7 +43,6 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
     public utils: UtilsService,
     private api: ApiService,
     public fs: FilterSortService,
-    private datePipe: DatePipe,
     private ablGame: AblGameService,
          public auth: AuthService
   ) { }
@@ -82,27 +78,8 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
     )
   }
 
-  // private _getGamesList() {
-  //   this.loading = true;
-  //   // Get future, public events
-  //   this.gamesListSub = this.api
-  //     .getAblGames$()
-  //     .subscribe(
-  //       res => {
-  //         this.gamesList = res;
-  //         this.filteredGames = res.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
-  //         this.loading = false;
-  //       },
-  //       err => {
-  //         console.error(err);
-  //         this.loading = false;
-  //         this.error = true;
-  //       }
-  //     );
-  // }
 
   attest(gm: GameModel, result_id: string, resultIdx: number, loc: string) {
-    //this.api.postData$({})
     console.log(gm);
 
     this.submitSub = this.ablGame.addAttestation$(gm._id,
@@ -115,7 +92,7 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
         })
   }
 
-  _needsAttest(gm, gm_result) {
+  _needsAttest(gm: GameModel, gm_result) {
 
     const ownerLoc = this._findOwnerLoc(gm);
     if (ownerLoc) {
@@ -162,7 +139,6 @@ export class TeamGameComponent implements OnInit, AfterViewInit {
 
   protest(gm) {
     console.log(gm);
-    //this.api.postData$({})
   }
   getGameScore(gm_result, loc) {
     if (gm_result && gm_result.scores) {
