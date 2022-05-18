@@ -48,12 +48,13 @@ export class PlayersComponent implements OnInit, OnDestroy {
   draftTeam: AblTeamModel;
   draftMode: boolean = false;
   advancedMode: boolean = false;
+  dispStatuses: string[];
 
   playerSub: Subscription;
   redraw$: Observable<any>;
   fullFilter$: Observable<any>;
 
-  colNames= ['name', 'mlbID', 'ablstatus.ablTeam.nickname', 'ablstatus.acqType', 'position', 'team', 'status', 'lastUpdate', 'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
+  colNames= ['name', 'mlbID', 'ablstatus.ablTeam.nickname', 'ablstatus.acqType', 'position', 'team', 'status', 'lastStatUpdate', 'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
 
 
@@ -100,7 +101,7 @@ export class PlayersComponent implements OnInit, OnDestroy {
       )
 
      // this.fullFilter$.subscribe(val => console.log(`Output is: ${val}`) );
-      this.playerData$ = combineLatest(this.players$, this.redraw$, this.fullFilter$).pipe(
+      this.playerData$ = combineLatest([this.players$, this.redraw$, this.fullFilter$]).pipe(
         map(([players, pageEvt, filterObj])=> {
 
         const adjustedPlayers = players.map((p)=> {
@@ -123,6 +124,13 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
           dataSource.filterPredicate = this.getFilterer()
           dataSource.filter = JSON.stringify(filterObj)
+          this.dispStatuses = dataSource.filteredData.reduce((prev: string[] ,  curr )=> {
+            let retArr = prev
+            if (prev.indexOf(curr.status) == -1 && curr.status) {
+              prev.push(curr.status)
+            }
+            return prev
+          }, ['Not on 40-man roster'])
           this.resultLength = dataSource.filteredData.length;
 
           return dataSource
@@ -206,8 +214,17 @@ export class PlayersComponent implements OnInit, OnDestroy {
                     criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
                 }
                 break;
+              case 'status':
+                switch (filterObj.status) {
+                  case 'Not on 40-man roster':
+                    criteria.push(typeof obj.status === 'undefined')
+                    break;
+                  default:
+                    criteria.push((obj[prop] || '').toLowerCase().includes((filterObj[prop] || '').toLowerCase()))
+                  }
+                break;
               default:
-                criteria.push(obj[prop].toLowerCase().includes(filterObj[prop]))
+                criteria.push((obj[prop] || '').toLowerCase().includes((filterObj[prop] || '').toLowerCase()))
             }
           }
 
