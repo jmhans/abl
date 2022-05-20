@@ -24,7 +24,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 //import { Angular2CsvModule } from 'angular2-csv';
- 
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -43,14 +43,8 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { CallbackComponent } from './pages/callback/callback.component';
 import { AdminComponent } from './pages/admin/admin.component';
-import { EventComponent } from './pages/event/event.component';
-import { EventDetailComponent } from './pages/event/event-detail/event-detail.component';
-import { RsvpComponent } from './pages/event/rsvp/rsvp.component';
-import { RsvpFormComponent } from './pages/event/rsvp/rsvp-form/rsvp-form.component';
+
 import { SubmittingComponent } from './core/forms/submitting.component';
-import { CreateEventComponent } from './pages/admin/create-event/create-event.component';
-import { UpdateEventComponent } from './pages/admin/update-event/update-event.component';
-import { EventFormComponent } from './pages/admin/event-form/event-form.component';
 import { AblAdminComponent } from './pages/admin/abl-admin/abl-admin.component';
 import { GameComponent } from './pages/game/game.component';
 import { TeamGameComponent } from './pages/team/game/game.component';
@@ -82,7 +76,7 @@ import { StandingsComponent } from './pages/standings/standings.component';
 import { LocalMaterialModule } from './core/local-material-module/local-material.module';
 import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
-                                       
+
 
 @NgModule({
     declarations: [
@@ -97,14 +91,7 @@ import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.co
         HeaderComponent,
         FooterComponent,
         AdminComponent,
-        EventComponent,
-        EventDetailComponent,
-        RsvpComponent,
-        RsvpFormComponent,
         SubmittingComponent,
-        CreateEventComponent,
-        UpdateEventComponent,
-        EventFormComponent,
         AblAdminComponent,
         GameComponent,
         GameDetailComponent,

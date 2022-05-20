@@ -20,6 +20,7 @@ var MLBAPI = require('../controllers/mlbapi.controller').altMlbApiController;
 //var MLBAPI2 = require('../controllers/mlbapi.controller').mlbAPI;
 var Standings = require('../controllers/standings.controller');
 var mlbEvt = require('../controllers/mlbEventHandler').mlbEventHandler
+var AblGameController= require('../controllers/abl.game.controller copy');
 
 router.use(new PlayersController().reroute());
 router.use(new OwnersController().route());
@@ -32,6 +33,7 @@ router.use(new MLBAPI().route());
 //router.use(new MLBAPI2().route());
 router.use(new Standings().route());
 router.use(new mlbEvt().route())
+router.use(new AblGameController().reroute());
 
 
 module.exports = router;
