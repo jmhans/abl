@@ -31,14 +31,7 @@ export class ApiService {
     return `Bearer ${this.auth.accessToken}`;
   }
 
-  // GET list of public, future events
-  getEvents$(): Observable<EventModel[]> {
-    return this.http
-      .get<EventModel[]>(`${this.base_api}events`)
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
+
 
   getGames$(): Observable<MlbGameModel[]> {
     return this.http
@@ -90,16 +83,7 @@ export class ApiService {
     );
   }
 
-  // GET all events - private and public (admin only)
-  getAdminEvents$(): Observable<EventModel[]> {
-    return this.http
-      .get<EventModel[]>(`${this.base_api}events/admin`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
+
 
   // GET all admin games - private and public (admin only)
   getAdminGames$(): Observable<MlbGameModel[]> {
@@ -112,16 +96,7 @@ export class ApiService {
       );
   }
 
-  // GET an event by ID (login required)
-  getEventById$(id: string): Observable<EventModel> {
-    return this.http
-      .get<EventModel>(`${this.base_api}event/${id}`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
+
 
   // GET an event by ID (login required)
   getPlayerById$(id: string): Observable<MlbPlayerModel> {
@@ -156,38 +131,8 @@ export class ApiService {
       );
   }
 
-  // GET a roster by ID (login required)
-//   getRosterById$(id: string): Observable<RosterModel> {
-//     return this.http
-//       .get<RosterModel>(`${this.base_api}roster/${id}`, {
-//         headers: new HttpHeaders().set('Authorization', this._authHeader)
-//       })
-//       .pipe(
-//         catchError((error) => this._handleError(error))
-//       );
-//   }
 
-  // GET RSVPs by event ID (login required)
-  getRsvpsByEventId$(eventId: string): Observable<RsvpModel[]> {
-    return this.http
-      .get<RsvpModel[]>(`${this.base_api}event/${eventId}/rsvps`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
 
-  // POST new RSVP (login required)
-  postRsvp$(rsvp: RsvpModel): Observable<RsvpModel> {
-    return this.http
-      .post<RsvpModel>(`${this.base_api}rsvp/new`, rsvp, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
 
 
      // POST new event (admin only)
@@ -213,17 +158,6 @@ export class ApiService {
   }
 
 
-
-  // DELETE existing event and all associated RSVPs (admin only)
-  deleteEvent$(id: string): Observable<any> {
-    return this.http
-      .delete(`${this.base_api}event/${id}`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
 
   // DELETE existing team (admin only)
   deleteTeam$(id: string): Observable<any> {

@@ -15,7 +15,7 @@ const Statline = require('./../models/statline');
 
 const Game = require('./../models/Game');
 const AblTeamController = require('./../controllers/ablteam.controller');
-const AblGameController = require('./../controllers/abl.game.controller');
+//const AblGameController = require('./../controllers/abl.game.controller');
 const AblRosterController = require('./../controllers/abl.roster.controller').AblRosterController;
 const StatlineController = require('./../controllers/statline.controller');
 const BulkAddController = require('./../controllers/bulkadd.controller');
@@ -77,8 +77,8 @@ module.exports = function(app, config) {
   app.delete('/api3/team/:id', jwtCheck, adminCheck, AblTeamController._delete);
   app.get('/api3/teams', AblTeamController._getTeams);
   app.get('/api3/owners', AblTeamController._getOwners);
-  app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
-  app.delete('/api3/game/:id', jwtCheck, adminCheck, AblGameController._delete);
+  //app.get('/api3/games', /*jwtCheck,*/ AblGameController._getAllGames);
+ // app.delete('/api3/game/:id', jwtCheck, adminCheck, AblGameController._delete);
 
   app.get("/api3/mlbGames", (req, res) => {
     mlbGame.find({}, (err, games) => {
@@ -240,19 +240,19 @@ module.exports = function(app, config) {
   });
 
 
-  app.get('/api3/game/:id', jwtCheck, AblGameController._getById);
-  app.get('/api3/game/:id/rosters', (...args) => AblGameController._getRosters(...args))
+  //app.get('/api3/game/:id', jwtCheck, AblGameController._getById);
+  //app.get('/api3/game/:id/rosters', (...args) => AblGameController._getRosters(...args))
 
-  app.post('/api3/game/new', jwtCheck, AblGameController._post );
-  app.put('/api3/game/:id', jwtCheck, AblGameController._put);
-  app.put('/api3/game/:id/results', jwtCheck, AblGameController._updateResults);
+  //app.post('/api3/game/new', jwtCheck, AblGameController._post );
+  //app.put('/api3/game/:id', jwtCheck, AblGameController._put);
+ // app.put('/api3/game/:id/results', jwtCheck, AblGameController._updateResults);
   //app.put('/api3/game/:id/attestations', jwtCheck, AblGameController._removeAttestation);
-  app.post('/api3/game/:id/score/:scoreIdx/attestations', jwtCheck, AblGameController._addAttestation);
-  app.delete('/api3/game/:id/score/:scoreId/attestations/:attId', jwtCheck, AblGameController._removeAttestation2);
-  app.post('/api3/game/:id/results', jwtCheck, AblGameController._postResults);
-  app.delete('/api3/game/:id/results/:resultId', jwtCheck, AblGameController._deleteResult);
-  app.get('/api3/games/oldResults', jwtCheck, AblGameController._getOldResultGames);
-  app.post('/api3/games/oldResults/:gameId', jwtCheck, AblGameController._addIdToResult);
+  //app.post('/api3/game/:id/score/:scoreIdx/attestations', jwtCheck, AblGameController._addAttestation);
+  //app.delete('/api3/game/:id/score/:scoreId/attestations/:attId', jwtCheck, AblGameController._removeAttestation2);
+  //app.post('/api3/game/:id/results', jwtCheck, AblGameController._postResults);
+  //app.delete('/api3/game/:id/results/:resultId', jwtCheck, AblGameController._deleteResult);
+  //app.get('/api3/games/oldResults', jwtCheck, AblGameController._getOldResultGames);
+  //app.post('/api3/games/oldResults/:gameId', jwtCheck, AblGameController._addIdToResult);
 
   app.get("/api3/statlines", makeGet(Statline));
   app.get("/api3/statlines/:mlbId", (...args) =>  new StatlineController()._getStatsForPlayer(...args));
