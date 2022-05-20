@@ -9,15 +9,13 @@ import { AuthGuard } from './auth/auth.guard';
 import { AdminGuard } from './auth/admin.guard';
 import { AdminComponent } from './pages/admin/admin.component';
 import { AblAdminComponent } from './pages/admin/abl-admin/abl-admin.component';
-import { EventComponent } from './pages/event/event.component';
-import { TeamComponent } from './pages/team/team.component'; 
+import { TeamComponent } from './pages/team/team.component';
 import { GameComponent } from './pages/game/game.component';
 import { GamesComponent } from './pages/games/games.component';
 import { PlayersComponent } from './pages/players/players.component';
 import { StandingsComponent } from './pages/standings/standings.component';
 
-import { CreateEventComponent } from './pages/admin/create-event/create-event.component';
-import { UpdateEventComponent } from './pages/admin/update-event/update-event.component';
+
 import { UpdateTeamComponent } from './pages/admin/update-team/update-team.component';
 import { CreateTeamComponent } from './pages/admin/create-team/create-team.component';
 import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.component';
@@ -28,38 +26,35 @@ import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rost
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
 
 
-const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch: 'full'}, 
-                       {path:'owners2', component: OwnersComponent}, 
-                       {path: 'dashboard', component: DashboardComponent}, 
+const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch: 'full'},
+                       {path:'owners2', component: OwnersComponent},
+                       {path: 'dashboard', component: DashboardComponent},
                        {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-                       {path: 'games', canActivate: [AuthGuard], component: GamesComponent}, 
-                       {path: 'callback', component: CallbackComponent}, 
-                       {path: 'admin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AdminComponent }, 
-                                                                                          {path: 'event/new', component: CreateEventComponent}, 
-                                                                                         {path: 'event/update/:id', component: UpdateEventComponent}]}, 
-                       {path: 'event/:id', component: EventComponent, canActivate:[ AuthGuard ]}, 
-                       {path: 'team', canActivate:[ AuthGuard ], children: [ {path: ':id', component: TeamComponent}, 
+                       {path: 'games', canActivate: [AuthGuard], component: GamesComponent},
+                       {path: 'callback', component: CallbackComponent},
+                       {path: 'admin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AdminComponent }]},
+                       {path: 'team', canActivate:[ AuthGuard ], children: [ {path: ':id', component: TeamComponent},
                                                                             {path: 'update/:id', component: UpdateTeamComponent},
                                                                             {path: 'update/:id/owner/:ownerId', component: UpdateTeamComponent},
-                                                                            {path: 'new', component: CreateTeamComponent}, 
+                                                                            {path: 'new', component: CreateTeamComponent},
                                                                             {path: 'delete/:id', component: DeleteTeamComponent}]},
-                       {path: 'abladmin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AblAdminComponent }, 
-                                                                                            {path: 'player/addToRoster/:id', component: ManageRostersComponent}, 
+                       {path: 'abladmin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AblAdminComponent },
+                                                                                            {path: 'player/addToRoster/:id', component: ManageRostersComponent},
                                                                                             {path: 'games', component: ManageGamesComponent}]},
-                       {path: 'create/team', component: CreateTeamComponent, canActivate: [ AuthGuard ]}, 
-                        {path: 'create/game', component: CreateGameComponent, canActivate: [ AuthGuard ]}, 
-                        {path: 'game', canActivate:[ AuthGuard ], children: [ {path: ':id', component: GameComponent}, 
+                       {path: 'create/team', component: CreateTeamComponent, canActivate: [ AuthGuard ]},
+                        {path: 'create/game', component: CreateGameComponent, canActivate: [ AuthGuard ]},
+                        {path: 'game', canActivate:[ AuthGuard ], children: [ {path: ':id', component: GameComponent},
                                                                             {path: 'update/:id', component: UpdateGameComponent},
-                                                                            {path: 'update/:id/owner/:ownerId', component: UpdateGameComponent}, 
+                                                                            {path: 'update/:id/owner/:ownerId', component: UpdateGameComponent},
                                                                             {path: 'delete/:id', component: DeleteGameComponent}]},
-                       {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]}, 
+                       {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]},
                         {path: 'standings', component: StandingsComponent, canActivate: [ AuthGuard ]}
-                       
+
                        ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'})],
-  exports: [RouterModule], 
+  exports: [RouterModule],
   providers: [
     AuthGuard,
     AdminGuard
