@@ -1102,6 +1102,66 @@ console.error(err)
 }
 }
 
+async processGames(req, res){
+  try {
+
+    let myDt = req.params.gameDate ? new Date(req.params.gameDate) : new Date()
+    if (req.params.gameDate) {
+      myDt = new Date((new Date(myDt)).setDate(myDt.getDate() +1))
+    }
+
+    let gms = await this.getAllUnprocessedGames(myDt);
+    for (let g=0; g<gms.length; g++) {
+      this.createAndSaveResult(gms[g]._id)
+
+    }
+
+    console.log(`${gms.length} game results saved.`)
+
+
+    res.json(gms);
+ } catch (e) {
+   console.log(e)
+     return res.status(422).send({
+         error: { message: e, resend: true }
+     });
+ }
+}
+
+convertRosterScores(players, team,  location, score) {
+  return {
+    players: players,
+    team: team,
+    location: location,
+    regulation: score.regulation,
+    final: score.final
+  }
+}
+
+async createAndSaveResult(gmId) {
+try {
+  const gm = await this._getByIdBackend(gmId);
+  let rosters = await this._getRostersForGame(gmId)
+  let saveResults ={}
+  if (rosters) {
+    const gameContent =rosters //.data
+    const live_result = {
+      status: gameContent.status,
+      scores: [this.convertRosterScores(gameContent.homeTeam, gm.data.homeTeam._id, 'H', gameContent.home_score), this.convertRosterScores(gameContent.awayTeam, gm.data.awayTeam._id, 'A', gameContent.away_score)],
+      winner: gameContent.result.winner,
+      loser: gameContent.result.loser,
+      attestations: []
+    }
+    saveResults = await this._updateResultsServer(gmId, live_result);
+
+    console.log(`Game result saved: ${gmId}`);
+  }
+  return saveResults
+} catch (err) {
+  console.error(err)
+}
+}
+
 
 
 reroute() {
@@ -1119,6 +1179,7 @@ reroute() {
   router.delete('/game/:id/results/:resultId', (...args)=>this._deleteResult(...args));
   router.get('/games/oldResults', (...args)=>this._getOldResultGames(...args));
   router.post('/games/oldResults/:gameId', (...args)=>this._addIdToResult(...args));
+  router.get('/games/process/:gameDate', (...args)=>this.processGames(...args));
   return router;
 }
 

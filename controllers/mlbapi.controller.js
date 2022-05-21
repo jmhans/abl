@@ -15,6 +15,12 @@ const ablConfig = require('./../server/ablConfig');
 var   StatlineController = require('../controllers/statline.controller');
 var   PlayersController = require('../controllers/players.controller');
 
+const dotenv = require('dotenv');
+
+var result = dotenv.config();
+
+let currentURLDomain = process.env.DOMAIN
+
 
     var pad = function(num, size) {
       var s = num + "";
@@ -62,7 +68,8 @@ class altMlbApiController extends BaseController{
       var dateItem = retBody.data.dates.find(x=>x.date == (year + "-" + month + "-" + day));
       if (dateItem) {
         gamesList = dateItem.games
-        const gameLoad = this._loadGamesToDB(gamesList); // Do not await this. Requests will time out. The load processes carry on behind the scenes.
+        const gameLoad = this._loadGamesToDB(gamesList, year+'-'+month+'-'+day); // Do not await this. Requests will time out. The load processes carry on behind the scenes.
+
       }
       return gamesList
 
@@ -71,7 +78,7 @@ class altMlbApiController extends BaseController{
     }
   }
 
-  async _loadGamesToDB(gamesList) {
+  async _loadGamesToDB(gamesList, gmDtString) {
     try {
 
       var returnArr = []
@@ -92,9 +99,17 @@ class altMlbApiController extends BaseController{
 
         if (gm.status.codedGameState != 'D') {
           const plyrLoad = await this.loadPlayersInGame(gm);
+
           returnArr.push(plyrLoad)
         }
       }
+
+      // Update all position logs.
+      const posLog = await new StatlineController()._genPositionLog();
+      // Process Games for date.
+      const APIUrl = currentURLDomain + "/api2/games/process/" + gmDtString;
+      const getResponse = await axios.get(APIUrl)
+
 
       return returnArr
 
@@ -156,6 +171,7 @@ class altMlbApiController extends BaseController{
       plyrs.push(player.person.id)
 
     }
+
     return plyrs;
   } catch (err) {
     console.error(`Error in getTeamPlayers:${err}`)

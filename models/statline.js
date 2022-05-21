@@ -23,29 +23,29 @@ var statLineSchema = new Schema({
 })
 
 
-statLineSchema.post('updateMany', async function(qry) {
-//  console.log('%s has completed', qry);
+// statLineSchema.post('updateMany', async function(qry) {
+// //  console.log('%s has completed', qry);
 
-  try {
+//   try {
 
-      if(qry.modifiedCount + qry.upsertedCount > 0) {
-        const APIUrl = `${currentURLDomain}/api2/position_log/${qry.upsertedId}?year=2022`  ;
-        if (!APIUrl) {
-          console.log( `Cur Domain: ${currentURLDomain}`)
-          console.log( `Qry: ${qry}`)
-        }
-        var retBody = await axios.get(APIUrl);
-        console.log(retBody.data)
-        return retBody.data
+//       if(qry.modifiedCount + qry.upsertedCount > 0) {
+//         const APIUrl = `${currentURLDomain}/api2/position_log/${qry.upsertedId}?year=2022`  ;
+//         if (!APIUrl) {
+//           console.log( `Cur Domain: ${currentURLDomain}`)
+//           console.log( `Qry: ${qry}`)
+//         }
+//         var retBody = await axios.get(APIUrl);
+//         console.log(retBody.data)
+//         return retBody.data
 
-      }
+//       }
 
-  } catch (err) {
-    console.error(`Error in statlinePostMiddleware: ${err}; URL: ${APIUrl}`)
-  }
+//   } catch (err) {
+//     console.error(`Error in statlinePostMiddleware: ${err}; URL: ${APIUrl}`)
+//   }
 
 
-})
+// })
 
 
 const Statline = mongoose.model('Statline', statLineSchema);
