@@ -360,7 +360,7 @@ class ABLGameController extends BaseController{
           ]).exec()
 
 
-          const populatedGame = await AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' })
+          const populatedGame = await AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' }).exec()
           if (populatedGame) {
             return {status: 'success', data: populatedGame[0]}
           } else {

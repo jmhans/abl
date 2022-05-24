@@ -264,10 +264,10 @@ _get(req, res, next) {
       if (err) return next(err);
 
 
-        let scoreDateSorter =(a,b)=> {return new Date(b.gameDate) - new Date(a.gameDate)}
+        let scoreDateSorter =(a,b)=> {return new Date(b.gameDate)- new Date(a.gameDate)}
 
         for (let tm = 0 ; tm<standings.length; tm++) {
-          let outcomes = standings[tm].outcomes.sort((a,b)=>scoreDateSorter);
+          let outcomes = standings[tm].outcomes.sort(scoreDateSorter);
           //let scores = standings[tm].scores.sort((a,b)=> scoreDateSorter)
           //let scoresAgainst = standings[tm].scores
           let strType = outcomes[0].outcome
@@ -288,6 +288,8 @@ _get(req, res, next) {
 
           standings[tm].l10 = l10
           standings[tm].streak = {type: strType, count: strCount, active: false}
+          console.log(standings[tm].streak)
+          console.log(outcomes.slice(0,10))
         }
 
 
