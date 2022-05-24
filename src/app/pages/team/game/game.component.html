@@ -1,8 +1,5 @@
 <!-- src/app/pages/games/games.component.html -->
-<h1 class="text-center">{{ pageTitle }}</h1>
-
-<mat-paginator [length]="dataLength" [pageSize]="5" hidePageSize="true" aria-label="Games per page"></mat-paginator>
-
+<mat-paginator [length]="dataLength" [pageSize]="5" [pageSizeOptions]="[5, dataLength]" hidePageSize="false" aria-label="Games per page"></mat-paginator>
 <div  >
 
   <table mat-table [dataSource]="(games$ | async)" >
