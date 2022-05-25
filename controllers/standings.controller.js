@@ -23,6 +23,63 @@ _get(req, res, next) {
         }
       }, {
         '$addFields': {
+          'results.winner': {
+            '$cond': [
+              {
+                '$eq': [
+                  {
+                    '$type': '$results.winner'
+                  }, 'string'
+                ]
+              }, {
+                '$toString': '$results.winner'
+              }, {
+                '$cond': [
+                  {
+                    '$eq': [
+                      {
+                        '$type': '$results.winner'
+                      }, 'objectId'
+                    ]
+                  }, {
+                    '$toString': '$results.winner'
+                  }, {
+                    '$toString': '$results.winner._id'
+                  }
+                ]
+              }
+            ]
+          },
+          'results.loser': {
+            '$cond': [
+              {
+                '$eq': [
+                  {
+                    '$type': '$results.loser'
+                  }, 'string'
+                ]
+              }, {
+                '$toString': '$results.loser'
+              }, {
+                '$cond': [
+                  {
+                    '$eq': [
+                      {
+                        '$type': '$results.loser'
+                      }, 'objectId'
+                    ]
+                  }, {
+                    '$toString': '$results.loser'
+                  }, {
+                    '$toString': '$results.loser._id'
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }, {
+        '$addFields': {
           'teams': [
             '$awayTeam', '$homeTeam'
           ]
@@ -39,17 +96,6 @@ _get(req, res, next) {
         }
       }, {
         '$addFields': {
-          'outcome': {
-            '$cond': [
-              {
-                '$eq': [
-                  {
-                    '$toObjectId': '$results.winner._id'
-                  }, '$teams'
-                ]
-              }, 'w', 'l'
-            ]
-          },
           'results.scores.unadjusted_runs': {
             '$subtract': [
               {
@@ -64,9 +110,9 @@ _get(req, res, next) {
             '$cond': [
               {
                 '$eq': [
-                  {
-                    '$toObjectId': '$results.winner._id'
-                  }, '$teams'
+                  '$results.winner', {
+                    '$toString': '$results.scores.team'
+                  }
                 ]
               }, 'w', 'l'
             ]
