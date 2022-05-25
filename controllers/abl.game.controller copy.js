@@ -435,7 +435,7 @@ class ABLGameController extends BaseController{
           }
 
         ]).exec();
-        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
+        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player results.winner results.loser'}, function(err, games) {
 
           if (err) {
             return res.status(500).send({
@@ -778,6 +778,7 @@ async _updateResultsServer(gmId, result) {
 
          // This is a new result. We want to push it to the list.
          result._id = ObjectId();
+         console.log(result);
           updatedGame = await AblGame.findByIdAndUpdate(
             gmId,
             { $addToSet: {results: result} },
