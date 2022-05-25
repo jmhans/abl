@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var parseArgs = require('minimist')
 
 let args = parseArgs(process.argv.slice(2));
-var GameController = require('./controllers/abl.game.controller copy');
+var GameController = require('./controllers/abl.game.controller');
 let someGame = require('./models/Game')
 
 var gc = new GameController();

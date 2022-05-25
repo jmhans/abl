@@ -1,10 +1,14 @@
 /*jshint esversion: 8 */
 
-const AblGame = require('./../models/Game');
+const BaseController = require('./base.controller');
+var express = require('express');
+var router = express.Router();
+
+const AblGame = require('../models/Game');
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
-const Statline = require('./../models/statline');
+const Statline = require('../models/statline');
 
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -192,260 +196,200 @@ function  _updateAttestStatus(attCount) {
   }
   return status
   }
-var AblGameController = {
 
-  canPlayPosition: function(playerPosition, lineupSlot) {
-    switch (lineupSlot) {
-      case "DH":
-      case "XTRA":
-        return true;
-      default:
-        return (playerPosition == lineupSlot)
+class ABLGameController extends BaseController{
+
+    constructor() {
+      super(AblGame, 'games');
     }
-  },
 
-  _getDailyStats: function(statlineObj) {
-    var retObj = {};
+    canPlayPosition(playerPosition, lineupSlot) {
+      switch (lineupSlot) {
+        case "DH":
+        case "XTRA":
+          return true;
+        default:
+          return (playerPosition == lineupSlot)
+      }
+    }
 
+    _getDailyStats(statlineObj) {
+      var retObj = {};
+      if (typeof(statlineObj.stats) != 'undefined') {
+        if (statlineObj.stats.modified) {
+           retObj = {
+            'mlbId': statlineObj.mlbId,
+            'gamePk': statlineObj.gamePk,
+            'gameDate': statlineObj.gameDate,
+            'g': statlineObj.stats.g,
+            'ab': statlineObj.stats.ab,
+            'h': statlineObj.stats.h,
+            '2b': statlineObj.stats['2b'] ,
+            '3b': statlineObj.stats['3b'] ,
+            'hr': statlineObj.stats.hr ,
+            'bb': statlineObj.stats.bb ,
+            'ibb': statlineObj.stats.ibb,
+            'hbp': statlineObj.stats.hbp ,
+            'sb': statlineObj.stats.sb ,
+            'cs': statlineObj.stats.cs ,
+            'sac': statlineObj.stats.sac,
+            'sf': statlineObj.stats.sf ,
+            'e': statlineObj.stats.e ,
+            'position(s)': statlineObj.positions
 
-    if (typeof(statlineObj.stats) != 'undefined') {
-      if (statlineObj.stats.modified) {
-         retObj = {
+          }
+        }
+        else {
+
+        retObj = {
           'mlbId': statlineObj.mlbId,
           'gamePk': statlineObj.gamePk,
           'gameDate': statlineObj.gameDate,
-          'g': statlineObj.stats.g,
-          'ab': statlineObj.stats.ab,
-          'h': statlineObj.stats.h,
-          '2b': statlineObj.stats['2b'] ,
-          '3b': statlineObj.stats['3b'] ,
-          'hr': statlineObj.stats.hr ,
-          'bb': statlineObj.stats.bb ,
-          'ibb': statlineObj.stats.ibb,
-          'hbp': statlineObj.stats.hbp ,
-          'sb': statlineObj.stats.sb ,
-          'cs': statlineObj.stats.cs ,
-          'sac': statlineObj.stats.sac,
-          'sf': statlineObj.stats.sf ,
-          'e': statlineObj.stats.e ,
+          'g':  statlineObj.stats.batting.gamesPlayed,
+          'ab':  statlineObj.stats.batting.atBats,
+          'h':  statlineObj.stats.batting.hits,
+          '2b':  statlineObj.stats.batting.doubles,
+          '3b':  statlineObj.stats.batting.triples,
+          'hr':  statlineObj.stats.batting.homeRuns,
+          'bb':  statlineObj.stats.batting.baseOnBalls,
+          'ibb':  statlineObj.stats.batting.intentionalWalks,
+          'hbp':  statlineObj.stats.batting.hitByPitch,
+          'sb':  statlineObj.stats.batting.stolenBases,
+          'cs':  statlineObj.stats.batting.caughtStealing,
+          'sac':  statlineObj.stats.batting.sacBunts,
+          'sf':  statlineObj.stats.batting.sacFlies,
+          'e':  statlineObj.stats.fielding.errors,
           'position(s)': statlineObj.positions
 
         }
-      }
-      else {
-
-      retObj = {
-        'mlbId': statlineObj.mlbId,
-        'gamePk': statlineObj.gamePk,
-        'gameDate': statlineObj.gameDate,
-        'g':  statlineObj.stats.batting.gamesPlayed,
-        'ab':  statlineObj.stats.batting.atBats,
-        'h':  statlineObj.stats.batting.hits,
-        '2b':  statlineObj.stats.batting.doubles,
-        '3b':  statlineObj.stats.batting.triples,
-        'hr':  statlineObj.stats.batting.homeRuns,
-        'bb':  statlineObj.stats.batting.baseOnBalls,
-        'ibb':  statlineObj.stats.batting.intentionalWalks,
-        'hbp':  statlineObj.stats.batting.hitByPitch,
-        'sb':  statlineObj.stats.batting.stolenBases,
-        'cs':  statlineObj.stats.batting.caughtStealing,
-        'sac':  statlineObj.stats.batting.sacBunts,
-        'sf':  statlineObj.stats.batting.sacFlies,
-        'e':  statlineObj.stats.fielding.errors,
-        'position(s)': statlineObj.positions
-
-      }
-      }
-
-
-
-
-    } else {
-      retObj = {
-        'mlbId': statlineObj.mlbId,
-        'gamePk': statlineObj.gamePk,
-        'gameDate': statlineObj.gameDate,
-        'g': 0,
-        'ab': 0,
-        'h': 0,
-        '2b': 0,
-        '3b': 0,
-        'hr': 0,
-        'bb': 0,
-        'ibb': 0,
-        'hbp': 0,
-        'sb': 0,
-        'cs': 0,
-        'sac': 0,
-        'sf': 0,
-        'e': 0,
-        'position(s)': []
-      }
-
-    }
-        var ablPts =
-        25 * (retObj.h || 0) +
-        10 * (retObj["2b"] || 0)+
-        20 * (retObj["3b"] || 0) +
-        30 * (retObj.hr || 0) +
-        10 * (retObj.bb || 0) +
-        //10 * (retObj.ibb || 0)+
-        10 * (retObj.hbp || 0) +
-        7 * (retObj.sb - retObj.cs || 0) +
-        5 * (retObj.sac + retObj.sf || 0);
-
-     var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
-    retObj.abl_points = ablPts;
-    retObj.abl_score = ablruns;
-    return retObj;
-  },
-
-  _saveGameRoster: function(roster, gameObj, rosterType) {
-    switch (rosterType) {
-      case "H":
-        gameObj.homeTeamRoster = roster;
-        break;
-      case "A":
-        gameObj.awayTeamRoster = roster;
-        break;
-      default:
-        // code block
-    }
-    gameObj.save(err => {
-      if (err) {
-        return '';
-      }
-    })
-  },
-
-  _needanewname: async function(gmId) {
-    try {
-      console.log('gbib');
-      var result = await AblGame.aggregate([
-          {
-            '$match': {
-              '_id': new ObjectId(gmId)
-            }
-          }, {
-            '$addFields': {
-              'results': {
-                '$cond': {
-                  'if': {
-                    '$isArray': '$results'
-                  },
-                  'then': '$results',
-                  'else': [
-                    '$results'
-                  ]
-                }
-              }
-            }
-          }, {
-            '$addFields': {
-              'results': {
-                '$filter': {
-                  'input': '$results',
-                  'as': 'res',
-                  'cond': {'$ne': ['$$res', null]}
-                }
-              }
-            }
-          }
-        ]).exec()
-
-        console.log(result);
-
-        const populatedGame = await AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' })
-        if (populatedGame) {
-          console.log('Returning data')
-          return {status: 'success', data: populatedGame[0]}
-        } else {
-          console.log('had some populate game issue')
-          return {status: 'error', message: 'Game not found'}
         }
-    } catch (err) {
-      return {status: 'error', message: err}
+
+
+
+
+      } else {
+        retObj = {
+          'mlbId': statlineObj.mlbId,
+          'gamePk': statlineObj.gamePk,
+          'gameDate': statlineObj.gameDate,
+          'g': 0,
+          'ab': 0,
+          'h': 0,
+          '2b': 0,
+          '3b': 0,
+          'hr': 0,
+          'bb': 0,
+          'ibb': 0,
+          'hbp': 0,
+          'sb': 0,
+          'cs': 0,
+          'sac': 0,
+          'sf': 0,
+          'e': 0,
+          'position(s)': []
+        }
+
+      }
+          var ablPts =
+          25 * (retObj.h || 0) +
+          10 * (retObj["2b"] || 0)+
+          20 * (retObj["3b"] || 0) +
+          30 * (retObj.hr || 0) +
+          10 * (retObj.bb || 0) +
+          //10 * (retObj.ibb || 0)+
+          10 * (retObj.hbp || 0) +
+          7 * (retObj.sb - retObj.cs || 0) +
+          5 * (retObj.sac + retObj.sf || 0);
+
+       var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
+      retObj.abl_points = ablPts;
+      retObj.abl_score = ablruns;
+      return retObj;
     }
 
-},
-
-_getById: async function(req, res) {
-  try {
-    console.log('gbi');
-    var result = await this._needanewname(req.params.id)
-    console.log(result);
-    if (result.status != 'error') {
-      res.send(result.data)
-    } else {
-      res.status(500).send({
-        message: result.message
+    _saveGameRoster(roster , gameObj, rosterType) {
+      switch (rosterType) {
+        case "H":
+          gameObj.homeTeamRoster = roster;
+          break;
+        case "A":
+          gameObj.awayTeamRoster = roster;
+          break;
+        default:
+          // code block
+      }
+      gameObj.save(err => {
+        if (err) {
+          return '';
+        }
       })
     }
+
+    async _getByIdBackend(gmId) {
+      try {
+        var result = await AblGame.aggregate([
+            {
+              '$match': {
+                '_id': new ObjectId(gmId)
+              }
+            }, {
+              '$addFields': {
+                'results': {
+                  '$cond': {
+                    'if': {
+                      '$isArray': '$results'
+                    },
+                    'then': '$results',
+                    'else': [
+                      '$results'
+                    ]
+                  }
+                }
+              }
+            }, {
+              '$addFields': {
+                'results': {
+                  '$filter': {
+                    'input': '$results',
+                    'as': 'res',
+                    'cond': {'$ne': ['$$res', null]}
+                  }
+                }
+              }
+            }
+          ]).exec()
+
+
+          const populatedGame = await AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' })
+          if (populatedGame) {
+            return {status: 'success', data: populatedGame[0]}
+          } else {
+            return {status: 'error', message: 'Game not found'}
+          }
+      } catch (err) {
+        return {status: 'error', message: err}
+      }
+
   }
-  catch (err) {
-    return res.status(500).send({message: err.message})
+
+ async _getById(req, res) {
+    try {
+
+      var result = await this._getByIdBackend(req.params.id)
+      if (result.status != 'error') {
+        res.send(result.data)
+      } else {
+        res.status(500).send({
+          message: result.message
+        })
+      }
+    }
+    catch (err) {
+      return res.status(500).send({message: err.message})
+    }
+
   }
-
-},
-
-  //   _getById: async function(req, res) {
-  //     try {
-  //       var result = await AblGame.aggregate([
-  //           {
-  //             '$match': {
-  //               '_id': new ObjectId(req.params.id)
-  //             }
-  //           }, {
-  //             '$addFields': {
-  //               'results': {
-  //                 '$cond': {
-  //                   'if': {
-  //                     '$isArray': '$results'
-  //                   },
-  //                   'then': '$results',
-  //                   'else': [
-  //                     '$results'
-  //                   ]
-  //                 }
-  //               }
-  //             }
-  //           }, {
-  //             '$addFields': {
-  //               'results': {
-  //                 '$filter': {
-  //                   'input': '$results',
-  //                   'as': 'res',
-  //                   'cond': {'$ne': ['$$res', null]}
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         ])
-
-  //       AblGame.populate(result, {path:'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player' }, function (err, game) {
-  //           if (err) {
-  //           return res.status(500).send({
-  //             message: err.message
-  //           });
-  //         }
-  //         if (!game) {
-  //           return res.status(400).send({
-  //             message: 'Game not found.'
-  //           });
-  //         }
-  //         res.send(game[0]);
-  //       })
-  //     }
-  //     catch (err) {
-  //       return res.status(500).send({message: err.message})
-  //     }
-
-  // },
-
-
-
-
-  _getRosters: async function(req, res, next) {
+  async _getRosters(req, res, next) {
     try {
       var out = await this._getRostersForGame(req.params.id);
 
@@ -458,10 +402,11 @@ _getById: async function(req, res) {
       })
     }
 
-  },
+  }
 
-  _getAllGames: async function(req, res) {
+  async _getAllGames(req, res) {
     try {
+      console.log("getting games");
         var result = await AblGame.aggregate([{
               '$addFields': {
                 'results': {
@@ -489,8 +434,8 @@ _getById: async function(req, res) {
             }
           }
 
-        ]);
-        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player'}, function(err, games) {
+        ]).exec();
+        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player results.winner results.loser'}, function(err, games) {
 
           if (err) {
             return res.status(500).send({
@@ -516,33 +461,8 @@ _getById: async function(req, res) {
             });
     }
 
-  },
-  _delete: function(req, res) {
-    AblGame.findById(req.params.id, (err, gm) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (!gm) {
-        return res.status(400).send({
-          message: 'Game not found.'
-        });
-      }
-      gm.remove(err => {
-        if (err) {
-          return res.status(500).send({
-            message: err.message
-          });
-        }
-        res.status(200).send({
-          message: 'Game successfully deleted.'
-        });
-      });
-    });
-  },
-
-  _getRostersForGame: async function(gmID) {
+  }
+  async _getRostersForGame(gmID) {
 
     try {
 
@@ -626,560 +546,646 @@ _getById: async function(req, res) {
       console.log("Error in _getRostersForGame:" + err);
     }
 
-
-
-    //        AblGameController._saveGameRoster( finalRoster, gameObj, rosterType);
-
-
-
-  },
-
-
-  _getActiveStarters: function (lineups) {
-     return lineups.map((lineup) => {
-      var newLineup = new lineupArray(...lineup)
-
-      for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-        // Loop through position players first, placing only the first player into the spot.
-        if(ABL_STARTERS[starter] != "DH" ) {
-          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true );
-        }
-      }
-
-      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
-        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH).
-        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false);
-      }
-
-
-      return newLineup
-    })
-  },
-
-  _getStartersOnly: function(lineups) {
-     return lineups.map((lineup) => {
-      var newLineup = new lineupArray(...lineup)
-
-      for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
-        // Loop through position players first, placing only the first player into the spot.
-        if(ABL_STARTERS[starter] != "DH" ) {
-          newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
-        }
-      }
-
-      for (starter = 0; starter < ABL_STARTERS.length; starter++) {
-        // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH).
-        newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false);
-      }
-
-
-      return newLineup
-    })
-  },
-
-
-
-
-
-  _getStatsForLineups: async function(lineups, current_date) {
-
-    var nextDay = new Date(current_date.toISOString());
-    nextDay.setDate(current_date.getDate() + 1)
-    console.log("Searching stats between " + current_date + " and " + nextDay);
-    var dailyStats = await Statline.aggregate([
-          {
-            '$match': {
-              'gameDate': {
-                '$gte': new Date(current_date.toISOString().substring(0, 10) + "T08:00:00Z"),
-                '$lt': new Date(nextDay.toISOString().substring(0, 10) + "T08:00:00Z")
-              }
-            }
-          }, {
-            '$lookup': {
-              'from': 'players',
-              'localField': 'mlbId',
-              'foreignField': 'mlbID',
-              'as': 'player'
-            }
-          }, {
-            '$addFields': {
-              'player': {
-                '$first': '$player'
-              },
-              'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
-            }
-          }
-        ]);
-
-    console.log(dailyStats.length + " stat records found.");
-
-    return lineups.map( (lineup) => {
-      if (lineup) {
-        return lineup.map((plyr) => {
-
-
-          var player_stats =  dailyStats.filter((statline) => {
-                return (statline.mlbId == plyr.player.mlbID);
-
-            })
-            .map(this._getDailyStats)
-            .reduce( function getSum(total, thisRec) {
-              for (var propertyName in thisRec) {
-                // propertyName is what you want
-                // you can get the value like this: myObject[propertyName]
-                switch (propertyName) {
-                  case 'mlbId':
-                    total.mlbId = thisRec.mlbId;
-                    break;
-                  case 'gamePk':
-                  case 'gameDate':
-                  case 'position(s)':
-                    total[propertyName].push(thisRec[propertyName])
-                    break;
-                  case 'abl_score':
-                    total.abl_score.abl_points += ( thisRec.abl_points || 0);
-                    total.abl_score.e += (thisRec.e || 0);
-                    total.abl_score.ab += (thisRec.ab || 0);
-                    total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
-                    break;
-                  default:
-                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
-                }
-
-              }
-
-              return total;
-            }, {
-              'gamePk': [],
-              'gameDate': [],
-              'position(s)': [],
-              'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
-            });
-          //console.log(`Stats for ${plyr.player.name} updating.`);
-
-          plyr.player.stats = {};
-         // console.log("before update");
-        //  console.log(plyr);
-          plyr.dailyStats = player_stats;
-         // if (plyr.player.name == "Max Muncy") {
-           // console.log( plyr.dailyStats)
-
-         //   console.log(plyr)
-         //   console.log("after update");
-         //   plyr.prop = "New Prop"
-         // }
-
-          return plyr;
-  //         return {
-  //           player: plyr,
-  //           dailyStats: player_stats
-  //         }
-        });
-      } else {
-        return []
-      }
-
-    });
-
-  },
-
-
-  _post: function(req, res) {
-
-    AblGame.findOne({
-      awayTeam: req.body.awayTeam,
-      homeTeam: req.body.homeTeam,
-      gameDate: req.body.gameDate
-    }, (err, existingGame) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (existingGame) {
-        return res.status(409).send({
-          message: 'You have already created a game with those details.'
-        });
-      }
-      const game = new AblGame({
-        awayTeam: (typeof req.body.awayTeam === "object") ? req.body.awayTeam._id : new ObjectId(req.body.awayTeam),
-        homeTeam: (typeof req.body.homeTeam === "object") ? req.body.homeTeam._id : new ObjectId(req.body.homeTeam),
-        gameDate: req.body.gameDate,
-        description: req.body.description
-      });
-      game.save((err) => {
-        if (err) {
-          return res.status(500).send({
-            message: err.message
-          });
-        }
-        res.send(game);
-      });
-    });
-
-
-  },
-
-  _put: function(req, res) {
-    AblGame.findById(req.params.id, (err, game) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      if (!game) {
-        return res.status(400).send({
-          message: 'Game not found.'
-        });
-      }
-      game.description = req.body.description;
-      game.awayTeam = req.body.awayTeam._id;
-      game.homeTeam = req.body.homeTeam._id;
-      game.gameDate = req.body.gameDate;
-
-      game.save(err => {
-        if (err) {
-          return res.status(500).send({
-            message: err.message
-          });
-        }
-        res.send(game);
-      });
-    });
-  },
-
-  _updateResultsServer: async(gmId, result)=> {
-    var updatedGame
-    var result
-       try {
-         var updateStatement
-            result.status = _updateAttestStatus(result.attestations.length)
-
-         if (result._id) {
-           // Saved result exists, want to Overwrite it.
-          updatedGame = await AblGame.findOneAndUpdate(
-            {_id: ObjectId(gmId), "results._id": ObjectId(result._id)},
-              { $set: {"results.$": result} },
-              { new: true, useFindAndModify: false }
-          );
-
-
-
-         } else {
-
-           // This is a new result. We want to push it to the list.
-           result._id = ObjectId();
-            updatedGame = await AblGame.findByIdAndUpdate(
-              gmId,
-              { $addToSet: {results: result} },
-              { new: true, useFindAndModify: false }
-          );
-         }
-         updatedResult = await updatedGame.results.find((qresult)=> {
-           return JSON.stringify(qresult._id) == JSON.stringify(result._id)
-         })
-          return updatedResult
-      } catch (e) {
-        console.log(e)
-        return {
-              error: { message: 'e', resend: true }
-          };
-      }
-  },
-
-  _updateResults: async (req, res) => {
-    // Needs to be refactored to use the "_updateResultsServer" function.
-    var updatedGame
-    var result
-       try {
-         var updateStatement
-            req.body.status = _updateAttestStatus(req.body.attestations.length)
-
-         if (req.body._id) {
-           // Saved result exists, want to Overwrite it.
-          updatedGame = await AblGame.findOneAndUpdate(
-            {_id: ObjectId(req.params.id), "results._id": ObjectId(req.body._id)},
-              { $set: {"results.$": req.body} },
-              { new: true, useFindAndModify: false }
-          );
-
-
-
-         } else {
-
-           // This is a new result. We want to push it to the list.
-           req.body._id = ObjectId();
-            updatedGame = await AblGame.findByIdAndUpdate(
-              req.params.id,
-              { $addToSet: {results: req.body} },
-              { new: true, useFindAndModify: false }
-          );
-         }
-         result = await updatedGame.results.find((result)=> {
-           return JSON.stringify(result._id) == JSON.stringify(req.body._id)
-         })
-          res.json(result);
-      } catch (e) {
-        console.log(e)
-        return res.status(422).send({
-              error: { message: 'e', resend: true }
-          });
-      }
-  },
-
-    _postResults: async (req, res) => {
-
-    var updatedGame
-    var result
-       try {
-         var updateStatement
-            req.body.status = _updateAttestStatus(req.body.attestations.length)
-
-
-         // This is a new result. We want to push it to the list.
-           req.body._id = ObjectId();
-            updatedGame = await AblGame.findByIdAndUpdate(
-              req.params.id,
-              { $addToSet: {results: req.body} },
-              { new: true, useFindAndModify: false }
-          );
-         result = updatedGame.results.find((thingy)=> {
-           return JSON.stringify(thingy._id) == JSON.stringify(req.body._id)
-         })
-         res.json(result);
-      } catch (e) {
-        console.log(e)
-        return res.status(422).send({
-              error: { message: 'e', resend: true }
-          });
-      }
-  },
-
-  _removeAttestation: async (req, res) => {
-
-       try {
-
-          const updatedGame = await AblGame.findById(req.params.id)
-          //
-          var r = req.body.result_index
-            for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
-              console.log(`Stored AttId: ${updatedGame.results[r].attestations[a]._id}`)
-              console.log(`Passed AttId: ${ObjectId(req.body.attestation_id)}`)
-              console.log(updatedGame.results[r].attestations[a]._id == req.body.attestation_id)
-              if (updatedGame.results[r].attestations[a]._id == req.body.attestation_id) {
-                console.log("Removing something!!")
-                updatedGame.results[r].attestations.splice(a, 1)
-                updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
-              }
-            }
-          //}
-          var output = await updatedGame.save()
-          res.json(output);
-      } catch (e) {
-        console.log(e)
-          return res.status(422).send({
-              error: { message: e, resend: true }
-          });
-      }
-  },
-
-  _removeAttestation2: async (req, res) => {
-
-       try {
-
-          const updatedGame = await AblGame.findById(req.params.id)
-          //
-          var r = updatedGame.results.indexOf(updatedGame.results.find((result)=>{return result._id == req.params.scoreId}));
-          console.log(`scoreId: ${req.params.scoreId}`);
-         console.log(`found Result at index: ${r}`);
-            for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
-
-              if (updatedGame.results[r].attestations[a]._id == req.params.attId) {
-                updatedGame.results[r].attestations.splice(a, 1)
-                updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
-              }
-            }
-          //}
-          var output = await updatedGame.save()
-          res.json(output);
-      } catch (e) {
-        console.log(e)
-          return res.status(422).send({
-              error: { message: e, resend: true }
-          });
-      }
-  },
-    _addAttestation: async (req, res) => {
-
-       try {
-
-          const updatedGame = await AblGame.findById(req.params.id)
-          //
-          var r = req.params.scoreIdx
-
-         var updatedResult = updatedGame.results.find((result)=> {
-           return result._id == r
-         });
-
-         var updateAtt
-         if (req.body._id) {
-           // Prior Att exists. Overwrite it.
-           updateAtt = updatedResult.attestations.find((att)=> {return att._id == req.body._id})
-           updateAtt.time = new Date();
-         } else {
-           // Prior att doesn't exist. Create new.
-          updateAtt = req.body
-          updateAtt._id = ObjectId();
-          updateAtt.time = new Date()
-          updatedResult.attestations.push(updateAtt);
-         }
-
-         updatedResult.status = _updateAttestStatus(updatedResult.attestations.length)
-
-         var output = await updatedGame.save()
-          res.json(updatedResult);
-      } catch (e) {
-        console.log(e)
-          return res.status(422).send({
-              error: { message: e, resend: true }
-          });
-      }
-  },
-    _deleteResult: async (req, res) => {
-
-       try {
-
-         const updatedGame = await AblGame.update( { _id: req.params.id }, { $pull: { results: {_id: ObjectId(req.params.resultId) } }} )
-
-         res.json(updatedGame);
-      } catch (e) {
-        console.log(e)
-          return res.status(422).send({
-              error: { message: e, resend: true }
-          });
-      }
-  },
-
-   _getOldResultGames: async function(req, res) {
-    try {
-        var result = await AblGame.aggregate([
-                                              {
-                                                '$addFields': {
-                                                  'results': {
-                                                    '$cond': {
-                                                      'if': {
-                                                        '$isArray': '$results'
-                                                      },
-                                                      'then': '$results',
-                                                      'else': [
-                                                        '$results'
-                                                      ]
-                                                    }
-                                                  }
-                                                }
-                                              }, {
-                                                '$addFields': {
-                                                  'results': {
-                                                    '$filter': {
-                                                      'input': '$results',
-                                                      'as': 'res',
-                                                      'cond': {
-                                                        '$ne': [
-                                                          '$$res', null
-                                                        ]
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }, {
-                                                '$match': {
-                                                  'results': {
-                                                    '$elemMatch': {
-                                                      '_id': {
-                                                        '$eq': null
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            ]
-                                            ).exec(function(err, games) {
-
-          if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
-          }
-          if (!games) {
-            return res.status(400).send({
-              message: 'No games found.'
-            });
-          }
-          return res.send(games)
-        })
-
-    } catch (err) {
-      return res.status(500).send({
-              message: err.message
-            });
-    }
-
-  },
-
-   _addIdToResult: async function(req, res) {
-    try {
-
-      var pre = await AblGame.findById(ObjectId(req.params.gameId))
-      console.log(req.params.gameId);
-
-      console.log(pre)
-
-      if (pre) {
-        if (Array.isArray(pre.results)) {
-
-              pre.results.forEach((gameRes)=> {
-                if (!gameRes._id) {
-                  gameRes._id = ObjectId()
-                }
-              })
-            } else {
-              if(!pre.results._id) {
-                pre.results._id = ObjectId()
-              }
-            }
-      }
-
-      pre.save(function(err, gm) {
-              if (err) {
-            return res.status(500).send({
-              message: err.message
-            });
-          }
-          if (!gm) {
-            return res.status(400).send({
-              message: 'No games found.'
-            });
-          }
-          return res.send(gm)
-      })
-
-
-
-    } catch (err) {
-      return res.status(500).send({
-              message: err.message
-            });
-    }
-
   }
 
+  _getActiveStarters(lineups) {
+    return lineups.map((lineup) => {
+     var newLineup = new lineupArray(...lineup)
 
+     for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
+       // Loop through position players first, placing only the first player into the spot.
+       if(ABL_STARTERS[starter] != "DH" ) {
+         newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true );
+       }
+     }
+
+     for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+       // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH).
+       newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false);
+     }
+
+
+     return newLineup
+   })
+ }
+
+ _getStartersOnly(lineups) {
+    return lineups.map((lineup) => {
+     var newLineup = new lineupArray(...lineup)
+
+     for (var starter = 0; starter < ABL_STARTERS.length; starter++) {
+       // Loop through position players first, placing only the first player into the spot.
+       if(ABL_STARTERS[starter] != "DH" ) {
+         newLineup.startNextPlayer(ABL_STARTERS[starter], starter, true);
+       }
+     }
+
+     for (starter = 0; starter < ABL_STARTERS.length; starter++) {
+       // Loop through again, ensuring that all positions fill all their PAs (and then fill in the DH).
+       newLineup.startNextPlayer(ABL_STARTERS[starter], starter, false);
+     }
+
+
+     return newLineup
+   })
+ }
+
+
+async _getStatsForLineups(lineups, current_date) {
+
+   var nextDay = new Date(current_date.toISOString());
+   nextDay.setDate(current_date.getDate() + 1)
+   console.log("Searching stats between " + current_date + " and " + nextDay);
+   var dailyStats = await Statline.aggregate([
+         {
+           '$match': {
+             'gameDate': {
+               '$gte': new Date(current_date.toISOString().substring(0, 10) + "T08:00:00Z"),
+               '$lt': new Date(nextDay.toISOString().substring(0, 10) + "T08:00:00Z")
+             }
+           }
+         }, {
+           '$lookup': {
+             'from': 'players',
+             'localField': 'mlbId',
+             'foreignField': 'mlbID',
+             'as': 'player'
+           }
+         }, {
+           '$addFields': {
+             'player': {
+               '$first': '$player'
+             },
+             'stats': { '$ifNull': [ "$updatedStats", "$stats" ] }
+           }
+         }
+       ]);
+
+   console.log(dailyStats.length + " stat records found.");
+
+   return lineups.map( (lineup) => {
+     if (lineup) {
+       return lineup.map((plyr) => {
+
+
+         var player_stats =  dailyStats.filter((statline) => {
+               return (statline.mlbId == plyr.player.mlbID);
+
+           })
+           .map(this._getDailyStats)
+           .reduce( function getSum(total, thisRec) {
+             for (var propertyName in thisRec) {
+               // propertyName is what you want
+               // you can get the value like this: myObject[propertyName]
+               switch (propertyName) {
+                 case 'mlbId':
+                   total.mlbId = thisRec.mlbId;
+                   break;
+                 case 'gamePk':
+                 case 'gameDate':
+                 case 'position(s)':
+                   total[propertyName].push(thisRec[propertyName])
+                   break;
+                 case 'abl_score':
+                   total.abl_score.abl_points += ( thisRec.abl_points || 0);
+                   total.abl_score.e += (thisRec.e || 0);
+                   total.abl_score.ab += (thisRec.ab || 0);
+                   total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
+                   break;
+                 default:
+                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+               }
+
+             }
+
+             return total;
+           }, {
+             'gamePk': [],
+             'gameDate': [],
+             'position(s)': [],
+             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
+           });
+         //console.log(`Stats for ${plyr.player.name} updating.`);
+
+         plyr.player.stats = {};
+        // console.log("before update");
+       //  console.log(plyr);
+         plyr.dailyStats = player_stats;
+        // if (plyr.player.name == "Max Muncy") {
+          // console.log( plyr.dailyStats)
+
+        //   console.log(plyr)
+        //   console.log("after update");
+        //   plyr.prop = "New Prop"
+        // }
+
+         return plyr;
+ //         return {
+ //           player: plyr,
+ //           dailyStats: player_stats
+ //         }
+       });
+     } else {
+       return []
+     }
+
+   });
+
+ }
+
+ _post(req, res) {
+
+  AblGame.findOne({
+    awayTeam: req.body.awayTeam,
+    homeTeam: req.body.homeTeam,
+    gameDate: req.body.gameDate
+  }, (err, existingGame) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message
+      });
+    }
+    if (existingGame) {
+      return res.status(409).send({
+        message: 'You have already created a game with those details.'
+      });
+    }
+    const game = new AblGame({
+      awayTeam: (typeof req.body.awayTeam === "object") ? req.body.awayTeam._id : new ObjectId(req.body.awayTeam),
+      homeTeam: (typeof req.body.homeTeam === "object") ? req.body.homeTeam._id : new ObjectId(req.body.homeTeam),
+      gameDate: req.body.gameDate,
+      description: req.body.description
+    });
+    game.save((err) => {
+      if (err) {
+        return res.status(500).send({
+          message: err.message
+        });
+      }
+      res.send(game);
+    });
+  });
 
 
 }
 
+_put(req, res) {
+  AblGame.findById(req.params.id, (err, game) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message
+      });
+    }
+    if (!game) {
+      return res.status(400).send({
+        message: 'Game not found.'
+      });
+    }
+    game.description = req.body.description;
+    game.awayTeam = req.body.awayTeam._id;
+    game.homeTeam = req.body.homeTeam._id;
+    game.gameDate = req.body.gameDate;
+
+    game.save(err => {
+      if (err) {
+        return res.status(500).send({
+          message: err.message
+        });
+      }
+      res.send(game);
+    });
+  });
+}
+
+async _updateResultsServer(gmId, result) {
+  var updatedGame
+  var result
+     try {
+       var updateStatement
+          result.status = _updateAttestStatus(result.attestations.length)
+
+       if (result._id) {
+         // Saved result exists, want to Overwrite it.
+        updatedGame = await AblGame.findOneAndUpdate(
+          {_id: ObjectId(gmId), "results._id": ObjectId(result._id)},
+            { $set: {"results.$": result} },
+            { new: true, useFindAndModify: false }
+        );
 
 
 
+       } else {
 
-module.exports = AblGameController
+         // This is a new result. We want to push it to the list.
+         result._id = ObjectId();
+         console.log(result);
+          updatedGame = await AblGame.findByIdAndUpdate(
+            gmId,
+            { $addToSet: {results: result} },
+            { new: true, useFindAndModify: false }
+        );
+       }
+       let updatedResult = await updatedGame.results.find((qresult)=> {
+         return JSON.stringify(qresult._id) == JSON.stringify(result._id)
+       })
+        return updatedResult
+    } catch (e) {
+      console.log(e)
+      return {
+            error: { message: 'e', resend: true }
+        };
+    }
+}
+
+async _updateResults(req, res)  {
+  // Needs to be refactored to use the "_updateResultsServer" function.
+  var updatedGame
+  var result
+     try {
+       var updateStatement
+          req.body.status = _updateAttestStatus(req.body.attestations.length)
+
+       if (req.body._id) {
+         // Saved result exists, want to Overwrite it.
+        updatedGame = await AblGame.findOneAndUpdate(
+          {_id: ObjectId(req.params.id), "results._id": ObjectId(req.body._id)},
+            { $set: {"results.$": req.body} },
+            { new: true, useFindAndModify: false }
+        );
+
+
+
+       } else {
+
+         // This is a new result. We want to push it to the list.
+         req.body._id = ObjectId();
+          updatedGame = await AblGame.findByIdAndUpdate(
+            req.params.id,
+            { $addToSet: {results: req.body} },
+            { new: true, useFindAndModify: false }
+        );
+       }
+       result = await updatedGame.results.find((result)=> {
+         return JSON.stringify(result._id) == JSON.stringify(req.body._id)
+       })
+        res.json(result);
+    } catch (e) {
+      console.log(e)
+      return res.status(422).send({
+            error: { message: 'e', resend: true }
+        });
+    }
+}
+
+ async _postResults(req, res) {
+
+  var updatedGame
+  var result
+     try {
+       var updateStatement
+          req.body.status = _updateAttestStatus(req.body.attestations.length)
+
+
+       // This is a new result. We want to push it to the list.
+         req.body._id = ObjectId();
+          updatedGame = await AblGame.findByIdAndUpdate(
+            req.params.id,
+            { $addToSet: {results: req.body} },
+            { new: true, useFindAndModify: false }
+        );
+       result = updatedGame.results.find((thingy)=> {
+         return JSON.stringify(thingy._id) == JSON.stringify(req.body._id)
+       })
+       res.json(result);
+    } catch (e) {
+      console.log(e)
+      return res.status(422).send({
+            error: { message: 'e', resend: true }
+        });
+    }
+}
+
+async _removeAttestation(req, res) {
+
+     try {
+
+        const updatedGame = await AblGame.findById(req.params.id)
+        //
+        var r = req.body.result_index
+          for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
+            console.log(`Stored AttId: ${updatedGame.results[r].attestations[a]._id}`)
+            console.log(`Passed AttId: ${ObjectId(req.body.attestation_id)}`)
+            console.log(updatedGame.results[r].attestations[a]._id == req.body.attestation_id)
+            if (updatedGame.results[r].attestations[a]._id == req.body.attestation_id) {
+              console.log("Removing something!!")
+              updatedGame.results[r].attestations.splice(a, 1)
+              updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
+            }
+          }
+        //}
+        var output = await updatedGame.save()
+        res.json(output);
+    } catch (e) {
+      console.log(e)
+        return res.status(422).send({
+            error: { message: e, resend: true }
+        });
+    }
+}
+
+async _removeAttestation2(req, res) {
+
+     try {
+
+        const updatedGame = await AblGame.findById(req.params.id)
+        //
+        var r = updatedGame.results.indexOf(updatedGame.results.find((result)=>{return result._id == req.params.scoreId}));
+        console.log(`scoreId: ${req.params.scoreId}`);
+       console.log(`found Result at index: ${r}`);
+          for (var a = 0; a<updatedGame.results[r].attestations.length; a++) {
+
+            if (updatedGame.results[r].attestations[a]._id == req.params.attId) {
+              updatedGame.results[r].attestations.splice(a, 1)
+              updatedGame.results[r].status = _updateAttestStatus(updatedGame.results[r].attestations.length)
+            }
+          }
+        //}
+        var output = await updatedGame.save()
+        res.json(output);
+    } catch (e) {
+      console.log(e)
+        return res.status(422).send({
+            error: { message: e, resend: true }
+        });
+    }
+}
+ async _addAttestation(req, res) {
+
+     try {
+
+        const updatedGame = await AblGame.findById(req.params.id)
+        //
+        var r = req.params.scoreIdx
+
+       var updatedResult = updatedGame.results.find((result)=> {
+         return result._id == r
+       });
+
+       var updateAtt
+       if (req.body._id) {
+         // Prior Att exists. Overwrite it.
+         updateAtt = updatedResult.attestations.find((att)=> {return att._id == req.body._id})
+         updateAtt.time = new Date();
+       } else {
+         // Prior att doesn't exist. Create new.
+        updateAtt = req.body
+        updateAtt._id = ObjectId();
+        updateAtt.time = new Date()
+        updatedResult.attestations.push(updateAtt);
+       }
+
+       updatedResult.status = _updateAttestStatus(updatedResult.attestations.length)
+
+       var output = await updatedGame.save()
+        res.json(updatedResult);
+    } catch (e) {
+      console.log(e)
+        return res.status(422).send({
+            error: { message: e, resend: true }
+        });
+    }
+}
+ async _deleteResult(req, res) {
+
+     try {
+
+       const updatedGame = await AblGame.update( { _id: req.params.id }, { $pull: { results: {_id: ObjectId(req.params.resultId) } }} )
+
+       res.json(updatedGame);
+    } catch (e) {
+      console.log(e)
+        return res.status(422).send({
+            error: { message: e, resend: true }
+        });
+    }
+}
+
+ async _getOldResultGames(req, res) {
+  try {
+      var result = await AblGame.aggregate([
+                                            {
+                                              '$addFields': {
+                                                'results': {
+                                                  '$cond': {
+                                                    'if': {
+                                                      '$isArray': '$results'
+                                                    },
+                                                    'then': '$results',
+                                                    'else': [
+                                                      '$results'
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            }, {
+                                              '$addFields': {
+                                                'results': {
+                                                  '$filter': {
+                                                    'input': '$results',
+                                                    'as': 'res',
+                                                    'cond': {
+                                                      '$ne': [
+                                                        '$$res', null
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }, {
+                                              '$match': {
+                                                'results': {
+                                                  '$elemMatch': {
+                                                    '_id': {
+                                                      '$eq': null
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          ]
+                                          ).exec(function(err, games) {
+
+        if (err) {
+          return res.status(500).send({
+            message: err.message
+          });
+        }
+        if (!games) {
+          return res.status(400).send({
+            message: 'No games found.'
+          });
+        }
+        return res.send(games)
+      })
+
+  } catch (err) {
+    return res.status(500).send({
+            message: err.message
+          });
+  }
+
+}
+
+ async _addIdToResult(req, res) {
+  try {
+
+    var pre = await AblGame.findById(ObjectId(req.params.gameId))
+    console.log(req.params.gameId);
+
+    console.log(pre)
+
+    if (pre) {
+      if (Array.isArray(pre.results)) {
+
+            pre.results.forEach((gameRes)=> {
+              if (!gameRes._id) {
+                gameRes._id = ObjectId()
+              }
+            })
+          } else {
+            if(!pre.results._id) {
+              pre.results._id = ObjectId()
+            }
+          }
+    }
+
+    pre.save(function(err, gm) {
+            if (err) {
+          return res.status(500).send({
+            message: err.message
+          });
+        }
+        if (!gm) {
+          return res.status(400).send({
+            message: 'No games found.'
+          });
+        }
+        return res.send(gm)
+    })
+
+
+
+  } catch (err) {
+    return res.status(500).send({
+            message: err.message
+          });
+  }
+
+}
+
+async getAllUnprocessedGames(dt) {
+
+const toDt = dt //new Date()
+
+const fromDt = new Date((new Date(toDt)).setDate(toDt.getDate() -1))
+try {
+let gms = await this.model.find({
+  $and: [
+    {$or: [{results: {$exists: false}},
+              {results: {$size: 0}}]},
+        {gameDate: {$gte: fromDt}},
+        {gameDate: {$lte: toDt}}
+      ]}).exec()
+
+return gms
+} catch (err) {
+console.error(err)
+}
+}
+
+async processGames(req, res){
+  try {
+
+    let myDt = req.params.gameDate ? new Date(req.params.gameDate) : new Date()
+    if (req.params.gameDate) {
+      myDt = new Date((new Date(myDt)).setDate(myDt.getDate() +1))
+    }
+
+    let gms = await this.getAllUnprocessedGames(myDt);
+    for (let g=0; g<gms.length; g++) {
+      this.createAndSaveResult(gms[g]._id)
+
+    }
+
+    console.log(`${gms.length} game results saved.`)
+
+
+    res.json(gms);
+ } catch (e) {
+   console.log(e)
+     return res.status(422).send({
+         error: { message: e, resend: true }
+     });
+ }
+}
+
+convertRosterScores(players, team,  location, score) {
+  return {
+    players: players,
+    team: team,
+    location: location,
+    regulation: score.regulation,
+    final: score.final
+  }
+}
+
+async createAndSaveResult(gmId) {
+try {
+  const gm = await this._getByIdBackend(gmId);
+  let rosters = await this._getRostersForGame(gmId)
+  let saveResults ={}
+  if (rosters) {
+    const gameContent =rosters //.data
+    const live_result = {
+      status: gameContent.status,
+      scores: [this.convertRosterScores(gameContent.homeTeam, gm.data.homeTeam._id, 'H', gameContent.home_score), this.convertRosterScores(gameContent.awayTeam, gm.data.awayTeam._id, 'A', gameContent.away_score)],
+      winner: gameContent.result.winner,
+      loser: gameContent.result.loser,
+      attestations: []
+    }
+    saveResults = await this._updateResultsServer(gmId, live_result);
+
+    console.log(`Game result saved: ${gmId}`);
+  }
+  return saveResults
+} catch (err) {
+  console.error(err)
+}
+}
+
+
+
+reroute() {
+  router = this.route();
+  router.get('/allgames', (...args) => this._getAllGames(...args));
+  router.get('/game/:id', (...args) => this._getById(...args) );
+  router.get('/game/:id/rosters', (...args) => this._getRosters(...args));
+  router.post('/game/new',  (...args) => this._post(...args));
+  router.put('/game/:id', (...args)=>this._put(...args));
+  router.put('/game/:id/results', (...args)=>this._updateResults(...args));
+  //router.put('/game/:id/attestations', jwtCheck, this._removeAttestation);
+  router.post('/game/:id/score/:scoreIdx/attestations', (...args)=>this._addAttestation(...args));
+  router.delete('/game/:id/score/:scoreId/attestations/:attId', (...args)=>this._removeAttestation2(...args));
+  router.post('/game/:id/results', (...args)=>this._postResults(...args));
+  router.delete('/game/:id/results/:resultId', (...args)=>this._deleteResult(...args));
+  router.get('/games/oldResults', (...args)=>this._getOldResultGames(...args));
+  router.post('/games/oldResults/:gameId', (...args)=>this._addIdToResult(...args));
+  router.get('/games/process/:gameDate', (...args)=>this.processGames(...args));
+  return router;
+}
+
+
+  }
+
+
+module.exports = ABLGameController
