@@ -1,6 +1,6 @@
 
 import {PlayersService } from '../../core/services/players.service';
-import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit, ChangeDetectionStrategy,ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -22,7 +22,8 @@ import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 @Component({
   selector: 'app-supp-draft',
   templateUrl: './supp-draft.component.html',
-  styleUrls: ['./supp-draft.component.scss']
+  styleUrls: ['./supp-draft.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuppDraftComponent implements OnInit, AfterViewInit {
 
@@ -51,6 +52,7 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
   colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing']
 
+  teamData:any;
 
   resultLength: number;
 
@@ -70,7 +72,8 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
               private auth: AuthService,
               public userContext: UserContextService,
               public dialog: MatDialog,
-              public players: PlayersService
+              public players: PlayersService,
+              public cdRef:ChangeDetectorRef
               ) { }
 
   ngOnInit() {
@@ -98,6 +101,19 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
      // this.fullFilter$.subscribe(val => console.log(`Output is: ${val}`) );
       this.playerData$ = combineLatest([this.players.allPlayers$, this.redraw$, this.fullFilter$]).pipe(
         map(([players, pageEvt, filterObj])=> {
+          this.teamData = players.reduce((prev, cur) => {
+            if (cur.ablstatus.ablTeam){
+              let tmRec =prev.find((tm)=> {return tm._id == cur.ablstatus.ablTeam['_id']})
+              if (tmRec) {
+                tmRec.count++
+              } else {
+                prev.push({_id: cur.ablstatus.ablTeam['_id'], count : 1})
+              }
+
+            }
+            return prev
+
+          }, [])
 
         const adjustedPlayers = players.map((p)=> {
           if (p && p.stats && p.stats.batting) {
@@ -131,7 +147,7 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
           return dataSource
       }
       ))
-
+      this.cdRef.detectChanges();
   }
 
 

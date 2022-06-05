@@ -1,5 +1,8 @@
 <p>supp-draft works!</p>
 
+<div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
+
+
 <div class="example-table-container" >
 
   <table mat-table [dataSource]="playerData$ | async" class="example-table"
