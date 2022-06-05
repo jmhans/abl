@@ -214,6 +214,15 @@ export class PlayersComponent implements OnInit, OnDestroy {
                     criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
                 }
                 break;
+              case 'acqType':
+                switch (filterObj.acqType) {
+                  case undefined:
+                    criteria.push(true)
+                    break;
+                  default:
+                    criteria.push(obj.ablstatus.acqType == filterObj.acqType)
+                }
+                break;
               case 'status':
                 switch (filterObj.status) {
                   case 'Not on 40-man roster':
