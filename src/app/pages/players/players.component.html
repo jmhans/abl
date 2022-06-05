@@ -125,6 +125,9 @@
                 <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addPlayerToTeam(row)" *ngIf="!row.ablstatus?.ablTeam && !draftMode">
                   <mdb-icon fas icon="user-plus"></mdb-icon>
                 </button>
+                <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlayerFromTeam(row)" *ngIf="row.ablstatus.onRoster && advancedMode">
+                  <mdb-icon fas icon="user-times"></mdb-icon>
+                </button>
                 <mat-checkbox
                     class="example-margin"
                     [(ngModel)]="row.draftMe"
@@ -135,6 +138,16 @@
               </ng-container>
 
             <!-- Filter setups for various columns -->
+            <ng-container matColumnDef="acqFilter">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-select placeholder="Type" (selectionChange)="addFilterProp({'acqType': $event.value})">
+                    <mat-option> Any </mat-option>
+                    <mat-option *ngFor="let acqType of ['draft', 'pickup', 'supp_draft']" [value]="acqType">
+                      {{ acqType }}
+                    </mat-option>
+                  </mat-select>
+              </th>
+            </ng-container>
             <ng-container matColumnDef="posFilter">
                 <th mat-header-cell *matHeaderCellDef>   <mat-select placeholder="Pos" (selectionChange)="addFilterProp({'position': $event.value})">
                       <mat-option> Any </mat-option>
@@ -169,7 +182,7 @@
 
 
 
-            <tr mat-header-row *matHeaderRowDef="['nameFilter', 'blank', 'blank', 'blank', 'posFilter', 'blank', 'statusFilter']"></tr>
+            <tr mat-header-row *matHeaderRowDef="['nameFilter', 'blank', 'blank', 'acqFilter', 'posFilter', 'blank', 'statusFilter']"></tr>
             <tr mat-header-row *matHeaderRowDef="colNames"></tr>
             <tr mat-row *matRowDef="let row; columns: colNames"></tr>
 
@@ -183,7 +196,7 @@
 
   <!-- Error loading events -->
   <p *ngIf="error" class="alert alert-danger">
-    <strong>Oops!</strong> There was an error retrieving standings data.
+    <strong>Oops!</strong> There was an error retrieving player data.
   </p>
 
 

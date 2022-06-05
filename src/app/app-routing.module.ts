@@ -14,6 +14,7 @@ import { GameComponent } from './pages/game/game.component';
 import { GamesComponent } from './pages/games/games.component';
 import { PlayersComponent } from './pages/players/players.component';
 import { StandingsComponent } from './pages/standings/standings.component';
+import { SuppDraftComponent} from './pages/supp-draft/supp-draft.component';
 
 
 import { UpdateTeamComponent } from './pages/admin/update-team/update-team.component';
@@ -48,7 +49,8 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                                                                             {path: 'update/:id/owner/:ownerId', component: UpdateGameComponent},
                                                                             {path: 'delete/:id', component: DeleteGameComponent}]},
                        {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]},
-                        {path: 'standings', component: StandingsComponent, canActivate: [ AuthGuard ]}
+                        {path: 'standings', component: StandingsComponent, canActivate: [ AuthGuard ]},
+                        {path: 'suppdraft', component: SuppDraftComponent, canActivate: [ AuthGuard ]}
 
                        ];
 

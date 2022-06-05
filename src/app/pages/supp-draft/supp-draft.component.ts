@@ -1,5 +1,6 @@
-// src/app/pages/player/players.component.ts
-import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit} from '@angular/core';
+
+import {PlayersService } from '../../core/services/players.service';
+import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit, ChangeDetectionStrategy,ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -8,8 +9,6 @@ import { UtilsService } from './../../core/utils.service';
 import { ActivatedRoute } from '@angular/router';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
 import { AblTeamModel } from './../../core/models/abl.team.model';
-import { RosterRecordModel } from './../../core/models/roster.record.model';
-import { FilterSortService } from './../../core/filter-sort.service';
 import { RosterService } from './../../core/services/roster.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -17,22 +16,17 @@ import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {FormControl} from '@angular/forms';
-import { DataTableDirective } from 'angular-datatables';
 
-export interface DialogData {
-  team: AblTeamModel;
-  player: string;
-  effective_date: Date;
-  acqType: string;
-}
+
 
 @Component({
-  selector: 'app-players',
-  templateUrl: './players.component.html',
-  styleUrls: ['./players.component.scss']
+  selector: 'app-supp-draft',
+  templateUrl: './supp-draft.component.html',
+  styleUrls: ['./supp-draft.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlayersComponent implements OnInit, OnDestroy {
+export class SuppDraftComponent implements OnInit, AfterViewInit {
+
   pageTitle = 'Players';
 
   // filteredPlayers: MlbPlayerModel[];
@@ -53,10 +47,12 @@ export class PlayersComponent implements OnInit, OnDestroy {
   playerSub: Subscription;
   redraw$: Observable<any>;
   fullFilter$: Observable<any>;
+  selectedRow;
 
-  colNames= ['name', 'mlbID', 'ablstatus.ablTeam.nickname', 'ablstatus.acqType', 'position', 'team', 'status', 'lastStatUpdate', 'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
-             'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
+  colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
+             'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing']
 
+  teamData:any;
 
   resultLength: number;
 
@@ -75,7 +71,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
               private rosterService: RosterService,
               private auth: AuthService,
               public userContext: UserContextService,
-              public dialog: MatDialog
+              public dialog: MatDialog,
+              public players: PlayersService,
+              public cdRef:ChangeDetectorRef
               ) { }
 
   ngOnInit() {
@@ -101,8 +99,21 @@ export class PlayersComponent implements OnInit, OnDestroy {
       )
 
      // this.fullFilter$.subscribe(val => console.log(`Output is: ${val}`) );
-      this.playerData$ = combineLatest([this.players$, this.redraw$, this.fullFilter$]).pipe(
+      this.playerData$ = combineLatest([this.players.allPlayers$, this.redraw$, this.fullFilter$]).pipe(
         map(([players, pageEvt, filterObj])=> {
+          this.teamData = players.reduce((prev, cur) => {
+            if (cur.ablstatus.ablTeam){
+              let tmRec =prev.find((tm)=> {return tm._id == cur.ablstatus.ablTeam['_id']})
+              if (tmRec) {
+                tmRec.count++
+              } else {
+                prev.push({_id: cur.ablstatus.ablTeam['_id'], count : 1})
+              }
+
+            }
+            return prev
+
+          }, [])
 
         const adjustedPlayers = players.map((p)=> {
           if (p && p.stats && p.stats.batting) {
@@ -136,19 +147,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
           return dataSource
       }
       ))
-          this._initializePlayers();
-
+      this.cdRef.detectChanges();
   }
-
-  private _initializePlayers() {
-    this.playerSub = this.api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
-      res=> {
-        this.players$.next(res)
-      },
-      err => {
-        console.error(err)
-      })
-    }
 
 
   getSorter() {
@@ -214,15 +214,6 @@ export class PlayersComponent implements OnInit, OnDestroy {
                     criteria.push(obj.eligible.indexOf(filterObj.position) != -1)
                 }
                 break;
-              case 'acqType':
-                switch (filterObj.acqType) {
-                  case undefined:
-                    criteria.push(true)
-                    break;
-                  default:
-                    criteria.push(obj.ablstatus.acqType == filterObj.acqType)
-                }
-                break;
               case 'status':
                 switch (filterObj.status) {
                   case 'Not on 40-man roster':
@@ -277,53 +268,6 @@ addFilter(prop: string, evt) {
   }
 
 
-  _addPlayerToTeam(plyr) {
-
-    if (this.advancedMode) {
-      const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-        width: '250px',
-        data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: 'pickup'}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-
-          this.rosterUpdateSub = this.rosterService
-          .addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString(), acqType: result.acqType}, result.team._id)
-          .subscribe(
-            data => this._handleSubmitSuccess(data, plyr),
-            err => this._handleSubmitError(err)
-          );
-        }
-
-      });
-    } else {
-
-     this.rosterUpdateSub = this.rosterService
-        .addPlayertoTeam$({player: plyr, effective_date: new Date(), acqType: 'pickup'}, this.ownerPrimaryTeam._id)
-        .subscribe(
-          data => this._handleSubmitSuccess(data, plyr),
-          err => this._handleSubmitError(err)
-        );
-    }
-
-
-
-  }
-
- _dropPlayerFromTeam(plyr) {
-
-    this.rosterUpdateSub = this.rosterService
-    .dropPlayerFromTeam$(plyr.ablstatus.ablTeam._id, plyr._id)
-    .subscribe(
-      data => this._handleSubmitSuccess(data, plyr),
-      err => this._handleSubmitError(err)
-    );
-
-  }
-
-
-
 
    private _handleSubmitSuccess(res, plyr) {
     plyr.ablstatus = res.player.ablstatus;
@@ -355,7 +299,10 @@ addFilter(prop: string, evt) {
 
   }
 
-
+  onRowClicked(row) {
+    console.log(row);
+    this.selectedRow = row;
+  }
   ngOnDestroy() {
     if(this.rosterUpdateSub) {
       this.rosterUpdateSub.unsubscribe();
@@ -366,30 +313,6 @@ addFilter(prop: string, evt) {
     this.unsubscribe$.complete();
   }
 
-}
-
-@Component({
-  selector: 'dialog-overview-example-dialog',
-  templateUrl: 'playerAddDialog.html',
-})
-export class DialogOverviewExampleDialog {
-date = new FormControl(new Date());
-teamList$ = this.api.getAblTeams$()
-acqType: string;
-action: string;
-
-
-  constructor(public api: ApiService,
-    public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-
 
 
 }
-
-
