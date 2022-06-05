@@ -533,7 +533,7 @@ class ABLRosterController extends BaseController{
       var mlbPlayer = await MlbPlayer.findById(req.params.plyr);
       mlbPlayer.ablstatus = {ablTeam : null, acqType : null, onRoster: false};
       var savedMlbPlayer = await mlbPlayer.save()
-      var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
+      var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
 
       var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date())
       var rosterDeadline =  this.getRosterDeadline(new Date());
@@ -559,7 +559,7 @@ class ABLRosterController extends BaseController{
       var remList = await Lineup.updateMany({ablTeam: req.params.id, effectiveDate: {$gt: yesterdayDeadline}}, {$pull : {roster: {player: mlbPlayer._id}}})
       console.log(`Removed ${mlbPlayer.name} from rosters`)
 
-      return res.send({success: true});
+      return res.send({success: true, player: popMlbPlayer});
 
 
     } catch(err) {
