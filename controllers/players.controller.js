@@ -284,13 +284,7 @@ class PlayersController extends BaseController {
 
   _get(req, res, next) {
   this.model.aggregate([
-    {
-      '$match': {
-        'lastUpdate': {
-          '$gte': new Date('Fri, 01 Apr 2022 00:00:00 GMT')
-        }
-      }
-    }, {
+ {
       '$lookup': {
         'from': 'ablteams',
         'localField': 'ablstatus.ablTeam',
