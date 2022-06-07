@@ -199,6 +199,7 @@ this.dispRoster$ = this.refreshLineup$.pipe(
 
 
   abl(plyrStats) {
+    if (plyrStats) {
     return (plyrStats.hits * 25 +
        plyrStats.doubles * 10 +
             plyrStats.triples * 20 +
@@ -208,6 +209,11 @@ this.dispRoster$ = this.refreshLineup$.pipe(
             plyrStats.stolenBases * 7 +
             plyrStats.caughtStealing * (-7)  +
             (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
-  }
+          }
+        else  {
+          return -99.99
+
+        }
+      }
 
 }
