@@ -114,7 +114,7 @@ this.dispRoster$ = this.refreshLineup$.pipe(
     if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'pickup' && event.currentIndex +1 < pickupMin) {
       // This is an issue. I've tried to move a pickup ahead of a drafted player.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a post-draft pickup, and cannot be placed higher than a drafted player.`)
-    } else if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' && event.currentIndex + 1 >= pickupMin) {
+    } else if ((this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' || this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'supp_draft') && event.currentIndex + 1 >= pickupMin) {
       // This is an issue. You've tried to move a drafted player lower than a pickup.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
     } else {
