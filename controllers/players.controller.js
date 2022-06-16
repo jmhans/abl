@@ -324,10 +324,7 @@ class PlayersController extends BaseController {
         'newPosLog': {
           '$reduce': {
             'input': '$newPosLog',
-            'initialValue': {
-              'curr': null,
-              'prior': null
-            },
+            'initialValue': {},
             'in': {
               '$switch': {
                 'branches': [
@@ -424,7 +421,7 @@ class PlayersController extends BaseController {
     }, {
       '$addFields': {
         'eligible': {
-          '$reduce': {
+          '$filter':{'input': {'$reduce': {
             'input': '$allPos',
             'initialValue': [],
             'in': {
@@ -442,7 +439,7 @@ class PlayersController extends BaseController {
                 }
               ]
             }
-          }
+          }}, 'as': 'pos', 'cond': {'$ne': ['$$pos', null]}}
         }
       }
     }, {
