@@ -114,7 +114,7 @@ this.dispRoster$ = this.refreshLineup$.pipe(
     if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'pickup' && event.currentIndex +1 < pickupMin) {
       // This is an issue. I've tried to move a pickup ahead of a drafted player.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a post-draft pickup, and cannot be placed higher than a drafted player.`)
-    } else if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' && event.currentIndex + 1 >= pickupMin) {
+    } else if ((this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' || this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'supp_draft') && event.currentIndex + 1 >= pickupMin) {
       // This is an issue. You've tried to move a drafted player lower than a pickup.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
     } else {
@@ -199,6 +199,7 @@ this.dispRoster$ = this.refreshLineup$.pipe(
 
 
   abl(plyrStats) {
+    if (plyrStats) {
     return (plyrStats.hits * 25 +
        plyrStats.doubles * 10 +
             plyrStats.triples * 20 +
@@ -208,6 +209,11 @@ this.dispRoster$ = this.refreshLineup$.pipe(
             plyrStats.stolenBases * 7 +
             plyrStats.caughtStealing * (-7)  +
             (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
-  }
+          }
+        else  {
+          return -99.99
+
+        }
+      }
 
 }
