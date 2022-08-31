@@ -23,30 +23,30 @@ export class StandingsComponent implements OnInit, OnDestroy {
  pageTitle = 'Standings';
   //standingsSub: Subscription;
   //standings: any[];
-  sortedStandings: MatTableDataSource<any[]>; 
-  
+  sortedStandings: MatTableDataSource<any[]>;
+
   //loading: boolean;
   error: boolean;
   sortEvent$: BehaviorSubject<any> = new BehaviorSubject({});
-  
+
   standingsData$: Observable<MatTableDataSource<any[]>>;
   headings = ['Team', 'G', 'W', 'L', 'WPct', 'AVG Runs', 'AB', 'H', '2B', '3B', 'HR', 'BB+HBP', 'SF+SAC', 'SB', 'CS', 'Error', 'ERA', 'HR Allowed']
-  colHeads = [{'name': 'team', 'title': 'Team', 'map': (itm)=>{return itm.tm.nickname}}, 
-              {'name': 'g', 'title': 'G', 'prop': 'g'}, 
-              {'name': 'w', 'title': 'W', 'prop': 'w'}, 
-              {'name': 'l', 'title': 'L', 'prop': 'l'}, 
-              {'name': 'wpct', 'title': 'Win Pct', 'map': (itm)=>{return itm.w / itm.g}, 'pipe': {'number':'1.3-3'}}, 
-              {'name': 'gb'}, 
+  colHeads = [{'name': 'team', 'title': 'Team', 'map': (itm)=>{return itm.tm.nickname}},
+              {'name': 'g', 'title': 'G', 'prop': 'g'},
+              {'name': 'w', 'title': 'W', 'prop': 'w'},
+              {'name': 'l', 'title': 'L', 'prop': 'l'},
+              {'name': 'wpct', 'title': 'Win Pct', 'map': (itm)=>{return itm.w / itm.g}, 'pipe': {'number':'1.3-3'}},
+              {'name': 'gb'},
               {'name': 'l10'},
               {'name': 'streak'},
-              {'name': 'abl', 'title': 'ABL Runs', 'prop': 'abl_runs'}, 
-              {'name': 'ab', 'title': 'AB', 'prop': 'ab'}, 
-              {'name': 'h', 'title': 'H', 'prop': 'h'}, 
-              {'name': '2b','title': '2B', 'prop': '2b'}, 
-              {'name': '3b','title': '3B', 'prop': '3b'}, 
-              {'name': 'hr','title': 'HR', 'prop': 'hr'}, 
-              {'name': 'bb','title': 'BB', 'prop': 'bb'}, 
-              {'name': 'sac','title': 'SAC', 'prop': 'sac'}, 
+              {'name': 'abl', 'title': 'ABL Runs', 'prop': 'abl_runs'},
+              {'name': 'ab', 'title': 'AB', 'prop': 'ab'},
+              {'name': 'h', 'title': 'H', 'prop': 'h'},
+              {'name': '2b','title': '2B', 'prop': '2b'},
+              {'name': '3b','title': '3B', 'prop': '3b'},
+              {'name': 'hr','title': 'HR', 'prop': 'hr'},
+              {'name': 'bb','title': 'BB', 'prop': 'bb'},
+              {'name': 'sac','title': 'SAC', 'prop': 'sac'},
               {'name': 'sb','title': 'SB', 'prop': 'sb'},
               {'name': 'cs','title': 'CS', 'prop': 'cs'},
               {'name': 'sb%'},
@@ -58,7 +58,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
   colNames = this.colHeads.map((itm)=> {return itm.name});
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  
+
   constructor(
     private title: Title,
     public utils: UtilsService,
@@ -67,25 +67,25 @@ export class StandingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    
+
   }
-  
+
   ngAfterViewInit() {
     this.standingsData$ = this.sort.sortChange.pipe(
       startWith({}),
-      switchMap(()=> {return this.api.getAPIData$('standings')}), 
+      switchMap(()=> {return this.api.getAPIData$('standings')}),
       map(standings=> {
-        
+
         const topRec = standings.reduce(( best, cur)=> {
           return Math.max(best, cur.w - cur.l)
         }, -Infinity)
-        
-        const newStandings = standings.map(s=> { 
-          s.gb = (topRec - (s.w - s.l)) / 2 
+
+        const newStandings = standings.map(s=> {
+          s.gb = (topRec - (s.w - s.l)) / 2
           return s
         })
-        
-        
+
+
         const dataSource = new MatTableDataSource<any[]>();
         dataSource.data = newStandings;
         dataSource.sortingDataAccessor = this.customSort;
@@ -95,8 +95,8 @@ export class StandingsComponent implements OnInit, OnDestroy {
       })
     )
   }
-  
-  
+
+
   customSort(item, header) {
           switch (header) {
             case 'team': return item.tm.nickname;
@@ -115,14 +115,14 @@ export class StandingsComponent implements OnInit, OnDestroy {
 sortChange(sortEvent: Sort): void {
   console.log(sortEvent);
   this.sortEvent$.next(sortEvent);
-  
+
 }
 
 
   ngOnDestroy() {
 
   }
-  
+
 
 }
 

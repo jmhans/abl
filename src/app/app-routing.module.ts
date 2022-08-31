@@ -25,6 +25,7 @@ import { CreateGameComponent } from './pages/admin/game/create-game/create-game.
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
 import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
+import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 
 
 const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch: 'full'},
@@ -50,7 +51,8 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                                                                             {path: 'delete/:id', component: DeleteGameComponent}]},
                        {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]},
                         {path: 'standings', component: StandingsComponent, canActivate: [ AuthGuard ]},
-                        {path: 'suppdraft', component: SuppDraftComponent, canActivate: [ AuthGuard ]}
+                        {path: 'suppdraft', component: SuppDraftComponent, canActivate: [ AuthGuard ]},
+                        {path: 'playoffs', component: PlayoffsComponent, canActivate: [ AuthGuard ]}
 
                        ];
 

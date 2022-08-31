@@ -77,6 +77,7 @@ import { LocalMaterialModule } from './core/local-material-module/local-material
 import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
 import { SuppDraftComponent } from './pages/supp-draft/supp-draft.component';
+import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 
 
 @NgModule({
@@ -121,7 +122,8 @@ import { SuppDraftComponent } from './pages/supp-draft/supp-draft.component';
         DialogOverviewExampleDialog,
         RosterImportComponent,
         ManageGamesComponent,
-        SuppDraftComponent
+        SuppDraftComponent,
+        PlayoffsComponent
     ],
     imports: [
         BrowserModule,

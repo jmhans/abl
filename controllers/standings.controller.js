@@ -9,7 +9,7 @@ class StandingsController extends BaseController {
   }
 _get(req, res, next) {
   Game.aggregate(
-    [
+    [ {'$match': {'gameType': 'R'}},
       {
         '$project': {
           'active': 0,
