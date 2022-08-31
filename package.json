@@ -60,7 +60,7 @@
     "minimist": "^1.2.6",
     "mlb-stats-api": "^1.6.0",
     "mongodb": "^3.5.5",
-    "mongoose": "^6.3.2",
+    "mongoose": "^6.4.6",
     "ng-drag-drop": "^5.0.0",
     "ng-packagr": "^13.3.1",
     "ng2-dragula": "^2.1.1",
