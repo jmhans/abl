@@ -62,7 +62,7 @@ export class GamesComponent implements OnInit, OnDestroy {
     this.loading = true;
     // Get future, public events
     this.gamesListSub = this.api
-      .getAblGames$()
+      .getAblGamesSummary$()
       .subscribe(
         res => {
           this.gamesList = res;

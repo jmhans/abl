@@ -406,36 +406,60 @@ class ABLGameController extends BaseController{
 
   async _getAllGames(req, res) {
     try {
+
       console.log("getting games");
-        var result = await AblGame.aggregate([{
-              '$addFields': {
-                'results': {
-                  '$cond': {
-                    'if': {
-                      '$isArray': '$results'
-                    },
-                    'then': '$results',
-                    'else': [
-                      '$results'
-                    ]
-                  }
-                }
-              }
-            }, {
-            '$addFields': {
-              'attesters': '$results.attestations.attesterType',
-              'results': {
-                  '$filter': {
-                    'input': '$results',
-                    'as': 'res',
-                    'cond': {'$ne': ['$$res', null]}
-                  }
-                }
+
+
+      var fullAgg = [{
+        '$addFields': {
+          'results': {
+            '$cond': {
+              'if': {
+                '$isArray': '$results'
+              },
+              'then': '$results',
+              'else': [
+                '$results'
+              ]
             }
           }
+        }
+      }, {
+      '$addFields': {
+        'attesters': '$results.attestations.attesterType',
+        'results': {
+            '$filter': {
+              'input': '$results',
+              'as': 'res',
+              'cond': {'$ne': ['$$res', null]}
+            }
+          }
+      }
+    }
 
-        ]).exec();
-        AblGame.populate(result, {path: 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player results.winner results.loser'}, function(err, games) {
+  ]
+
+  if (req.query.display == 'playoffs') {
+    fullAgg.unshift({
+      '$match': {'gameDate': {'$gte': ISODate('2022-08-22T00:00:00Z')}}
+    })
+  }
+
+  if (req.query.view = 'summary') {
+    fullAgg.push({'$project': {
+      'awayTeamRoster': 0,
+      'homeTeamRoster': 0,
+      'results.scores.players': 0
+    }})
+  }
+
+        var result = await AblGame.aggregate(fullAgg).exec();
+        var popString = 'awayTeam homeTeam awayTeamRoster.player homeTeamRoster.player results.winner results.loser'
+        if (req.query.view == 'summary') {
+          popString = 'awayTeam homeTeam results.winner results.loser'
+          console.log('Just the summary!')
+        }
+        AblGame.populate(result, {path: popString}, function(err, games) {
 
           if (err) {
             return res.status(500).send({
@@ -447,11 +471,7 @@ class ABLGameController extends BaseController{
               message: 'No games found.'
             });
           }
-//           else {
-//             games.forEach(gm => {
-//               gamesArr.push(gm);
-//             });
-//           }
+
           return res.send(games)
         })
 

@@ -1,0 +1,9 @@
+  <div *ngIf="(std$ | async) as std"> {{std.status}}
+
+    <div *ngFor="let match of std.matchups; index as rank">
+    Matchup: {{rank}}
+    <div *ngFor="let tm of match.teams">
+      {{tm.tm.nickname}}
+    </div>
+  </div>
+</div>

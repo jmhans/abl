@@ -67,6 +67,18 @@ export class ApiService {
     );
   }
 
+
+  getAblGamesSummary$(): Observable<GameModel[]> {
+    return this.http
+      .get<GameModel[]>(`${this.v2_api}allgames?view=summary`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+    );
+  }
+
+
   getAblTeams$(): Observable<AblTeamModel[]> {
     return this.http
       .get<AblTeamModel[]>(`${this.base_api}teams`)
