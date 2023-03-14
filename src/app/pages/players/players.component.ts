@@ -17,7 +17,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import { DataTableDirective } from 'angular-datatables';
 
 export interface DialogData {
@@ -373,7 +373,7 @@ addFilter(prop: string, evt) {
   templateUrl: 'playerAddDialog.html',
 })
 export class DialogOverviewExampleDialog {
-date = new FormControl(new Date());
+date = new UntypedFormControl(new Date());
 teamList$ = this.api.getAblTeams$()
 acqType: string;
 action: string;

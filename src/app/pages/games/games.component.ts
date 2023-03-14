@@ -9,7 +9,7 @@ import { FilterSortService } from './../../core/filter-sort.service';
 import { Subscription } from 'rxjs';
 import { GameModel } from './../../core/models/game.model';
 import {MatDatepickerModule ,MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AuthService } from './../../auth/auth.service';
 
@@ -27,7 +27,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   loading: boolean;
   error: boolean;
   query: string = '';
-  modelDate: FormControl;
+  modelDate: UntypedFormControl;
   attestSub: Subscription;
 
   headings = ['Description', 'Date', 'Away Score', 'Home Score', 'Away Attestation', 'Home Attestation'];
@@ -47,7 +47,7 @@ export class GamesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
     this._getGamesList();
-    this.modelDate = new FormControl(/*new Date()*/);
+    this.modelDate = new UntypedFormControl(/*new Date()*/);
     
   }
   
