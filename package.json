@@ -82,7 +82,6 @@
     "@types/jasmine": "^3.5.10",
     "@types/jasminewd2": "^2.0.8",
     "@types/jquery": "^3.3.34",
-    "@types/mongoose": "^5.7.8",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.1",
     "jasmine-core": "^3.5.0",
