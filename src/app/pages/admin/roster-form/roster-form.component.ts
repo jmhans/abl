@@ -1,6 +1,6 @@
 // src/app/pages/admin/team-form/team-form.component.ts
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
@@ -26,7 +26,7 @@ export class RosterFormComponent implements OnInit, OnDestroy {
   @Input() player: MlbPlayerModel;
   isEdit: boolean;
   // FormBuilder form
-  playerForm: FormGroup;
+  playerForm: UntypedFormGroup;
   // Model storing initial form values
   formRosterRec: CreateRosterRecordModel;
   formTeam: AblTeamModel;
@@ -45,7 +45,7 @@ export class RosterFormComponent implements OnInit, OnDestroy {
   submitBtnText: string;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private api: ApiService,
     private datePipe: DatePipe,
     public rf: RosterFormService,

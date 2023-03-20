@@ -5,7 +5,7 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { AUTH_CONFIG } from './auth/auth.config';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
 
@@ -24,6 +24,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 //import { Angular2CsvModule } from 'angular2-csv';
+// Adding comment for commit bump.
 
 
 import { AppRoutingModule } from './app-routing.module';

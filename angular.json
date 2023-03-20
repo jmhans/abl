@@ -134,7 +134,6 @@
       }
     }
   },
-  "defaultProject": "actuarialgames",
   "schematics": {
     "@schematics/angular:component": {
       "style": "scss"

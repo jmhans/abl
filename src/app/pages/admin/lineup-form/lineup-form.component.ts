@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
@@ -25,7 +25,7 @@ export class LineupFormComponent implements OnInit, OnDestroy {
   @Input() lineupId: string;
   isEdit: boolean;
   // FormBuilder form
-  playerForm: FormGroup;
+  playerForm: UntypedFormGroup;
   // Model storing initial form values
   formRosterRec: LineupFormModel;
   formOwnerSub: Subscription; 
@@ -43,7 +43,7 @@ export class LineupFormComponent implements OnInit, OnDestroy {
   
   
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private api: ApiService,
     private datePipe: DatePipe,
     public rf: RosterFormService,

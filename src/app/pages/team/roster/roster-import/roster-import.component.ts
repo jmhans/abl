@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject , ViewChild, ElementRef} from '@angular/core';
 import { ApiService } from './../../../../core/api.service';
 import { UtilsService } from './../../../../core/utils.service';
-import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog ,MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/legacy-dialog';
 import { LineupModel ,LineupFormModel} from './../../../../core/models/lineup.model';
 
 export interface DialogData {

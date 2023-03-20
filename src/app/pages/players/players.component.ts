@@ -11,13 +11,13 @@ import { AblTeamModel } from './../../core/models/abl.team.model';
 import { RosterRecordModel } from './../../core/models/roster.record.model';
 import { FilterSortService } from './../../core/filter-sort.service';
 import { RosterService } from './../../core/services/roster.service';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
-import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {FormControl} from '@angular/forms';
+import {MatLegacyDialog as MatDialog ,MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/legacy-dialog';
+import {UntypedFormControl} from '@angular/forms';
 import { DataTableDirective } from 'angular-datatables';
 
 export interface DialogData {
@@ -373,7 +373,7 @@ addFilter(prop: string, evt) {
   templateUrl: 'playerAddDialog.html',
 })
 export class DialogOverviewExampleDialog {
-date = new FormControl(new Date());
+date = new UntypedFormControl(new Date());
 teamList$ = this.api.getAblTeams$()
 acqType: string;
 action: string;

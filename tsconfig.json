@@ -9,8 +9,9 @@
     "module": "esnext",
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "skipLibCheck": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "ES2022",
     "types": [
       "hammerjs"
     ],
@@ -20,10 +21,10 @@
     "lib": [
       "es2018",
       "dom"
-    ]
-  }, 
+    ],
+    "useDefineForClassFields": false
+  },
   "angularCompilerOptions": {
-   "enableIvy": true
   }
 }
 
