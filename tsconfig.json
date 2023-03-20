@@ -9,6 +9,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "skipLibCheck": true,
     "importHelpers": true,
     "target": "es2020",
     "types": [
@@ -21,7 +22,7 @@
       "es2018",
       "dom"
     ]
-  }, 
+  },
   "angularCompilerOptions": {
    "enableIvy": true
   }
