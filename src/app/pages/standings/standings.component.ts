@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy ,ViewChild,AfterViewInit} from '@angular/c
 import { Title } from '@angular/platform-browser';
 import { ApiService } from './../../core/api.service';
 import { UtilsService } from './../../core/utils.service';
-import {MatLegacyPaginator as MatPaginator} from '@angular/material/legacy-paginator';
+import {MatPaginator as MatPaginator} from '@angular/material/paginator';
 import {MatSortModule, MatSort, SortDirection, Sort} from '@angular/material/sort';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
 
 
 
