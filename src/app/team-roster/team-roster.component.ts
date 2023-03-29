@@ -4,9 +4,7 @@ import { Subscription, Subject, Observable,  of , BehaviorSubject} from 'rxjs'
 import { map , startWith, switchMap} from 'rxjs/operators';
 import { RosterService } from './../core/services/roster.service';
 import { LineupModel, SubmitLineup, LineupFormModel , Roster} from './../core/models/lineup.model';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-
-
+import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
 
 const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   var output = {_id: rosterId, effectiveDate: effectiveDate, roster: []}
