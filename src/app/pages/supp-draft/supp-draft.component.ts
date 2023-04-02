@@ -16,6 +16,7 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
+import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 
 
 
@@ -40,7 +41,7 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
   ownerSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
   draftTeam: AblTeamModel;
-  draftMode: boolean = false;
+  draftMode: boolean = true;
   advancedMode: boolean = false;
   dispStatuses: string[];
 
@@ -48,9 +49,11 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
   redraw$: Observable<any>;
   fullFilter$: Observable<any>;
   selectedRow;
+  counter = Array;
+
 
   colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
-             'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing']
+             'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
 
   teamData:any;
 
@@ -73,7 +76,8 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
               public userContext: UserContextService,
               public dialog: MatDialog,
               public players: PlayersService,
-              public cdRef:ChangeDetectorRef
+              public cdRef:ChangeDetectorRef,
+              public draftSseService:DraftSseService
               ) { }
 
   ngOnInit() {
@@ -82,7 +86,9 @@ export class SuppDraftComponent implements OnInit, AfterViewInit {
 
     this._getOwner();
 
-
+    this.draftSseService
+    .getServerSentEvent("/refreshDraft")
+    .subscribe(data => console.log(data));
   }
 
     ngAfterViewInit() {

@@ -8,6 +8,8 @@ const config2 = require('./server/config');
 const cors = require('cors');
 const methodOverride = require('method-override');
 const dotenv = require('dotenv');
+const EventEmitter = require('events');
+const Stream = new EventEmitter();
 
 var result = dotenv.config();
 mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true,useUnifiedTopology: true});
@@ -40,6 +42,22 @@ db.once('open', function () {
 
 
 })
+
+app.get('/refreshDraft', function(request, response){
+  response.writeHead(200, {
+'Content-Type' : 'text/event-stream',
+'Cache-Control':'no-cache',
+Connection: 'keep-alive',
+  })
+Stream.on('push', function(event, data) {
+response.write('event: ' + String(event) + '\n' + 'data: ' + JSON.stringify(data) + '\n\n');
+})
+})
+
+setInterval(function() {
+Stream.emit('push', 'message', {msg: 'it works!'});
+}, 10000)
+
 
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {

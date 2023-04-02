@@ -2,6 +2,17 @@
 
 <div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
 
+<div *ngFor='let rowLoop of counter(24) ;let r= index' class="row">
+  <div *ngFor='let colLoop of counter(10); let c=index' class="col">
+    <div class="draft-cell">
+    <div>Pos</div>
+    <div>Plyr</div>
+    <div>r{{r}}c{{c}}</div>
+    </div>
+  </div>
+</div>
+
+
 
 <div class="example-table-container" >
 
