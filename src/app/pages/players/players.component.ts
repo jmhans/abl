@@ -281,7 +281,6 @@ addFilter(prop: string, evt) {
 
     if (this.advancedMode) {
       const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-        width: '250px',
         data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: 'pickup'}
       });
 

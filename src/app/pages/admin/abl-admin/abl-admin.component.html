@@ -8,8 +8,8 @@
 
 
   <p class="lead">Welcome, {{ auth.userProfile?.name }}! You can mess with games below.</p>
-  
-  
+
+
 <div>
   <mat-form-field>
   <mat-label>Data Model</mat-label>
@@ -25,12 +25,12 @@
 <mat-form-field class="example-full-width">
     <input matInput placeholder="Data file name" [(ngModel)]="datafile">
   </mat-form-field>
-  
+
             <button
             class="btn btn-info"
             (click)="_loadData()"
             >Load from file</button>
-  
+
   <mat-form-field class="example-full-width">
     <textarea matInput placeholder="enter records" [(ngModel)]="dataEntry"></textarea>
   </mat-form-field>
@@ -43,8 +43,8 @@
 {{dataEntry}}
 <ng-template [ngIf]="utils.isLoaded(loading)">
 
-  
-  
+
+
   <!-- Events -->
   <ng-template [ngIf]="dataList">
     <ng-template [ngIf]="dataList.length">
@@ -88,18 +88,7 @@
             (type)="button"
               *ngIf="!gm.saved"
                      >Save</button>
-<!--             <div class="event-icons">
-              <img
-                *ngIf="!event.viewPublic"
-                class="event-icon"
-                title="Private"
-                src="/assets/images/eye.svg">
-              <img
-                *ngIf="utils.eventPast(event.endDatetime)"
-                class="event-icon"
-                title="Event is over"
-                src="/assets/images/calendar.svg">
-            </div> -->
+
           </div>
           <p class="mb-1">
             <strong>Date:</strong>{{gm | json}}

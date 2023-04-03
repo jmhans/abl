@@ -23,7 +23,6 @@ import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.compo
 import { UpdateGameComponent } from './pages/admin/game/update-game/update-game.component';
 import { CreateGameComponent } from './pages/admin/game/create-game/create-game.component';
 import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.component';
-import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
 import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 
@@ -41,7 +40,6 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                                                                             {path: 'new', component: CreateTeamComponent},
                                                                             {path: 'delete/:id', component: DeleteTeamComponent}]},
                        {path: 'abladmin', canActivate: [ AuthGuard, AdminGuard ], children: [ { path: '', component: AblAdminComponent },
-                                                                                            {path: 'player/addToRoster/:id', component: ManageRostersComponent},
                                                                                             {path: 'games', component: ManageGamesComponent}]},
                        {path: 'create/team', component: CreateTeamComponent, canActivate: [ AuthGuard ]},
                         {path: 'create/game', component: CreateGameComponent, canActivate: [ AuthGuard ]},
