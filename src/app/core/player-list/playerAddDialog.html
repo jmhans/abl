@@ -1,0 +1,34 @@
+<h1 mat-dialog-title>Pick up {{data.player}}</h1>
+<div mat-dialog-content>
+  <p>Fill in pickup details</p>
+  <mat-form-field>
+  <mat-label>Team</mat-label>
+    <mat-select placeholder="Team" [(ngModel)]="data.team" name="team">
+      <mat-option *ngFor="let tm of (teamList$ | async)" [value]="tm">
+        {{tm.nickname}}
+      </mat-option>
+    </mat-select>
+
+  </mat-form-field>
+    <mat-form-field *ngIf="action != 'drop'">
+
+      <mat-select placeholder="PickupType" [(ngModel)]="data.acqType" name="acqType">
+      <mat-option *ngFor="let pickup_type of ['pickup','supp_draft', 'draft']" [value]="pickup_type">
+        {{pickup_type}}
+      </mat-option>
+    </mat-select>
+    </mat-form-field>
+
+  <mat-form-field *ngIf="action != 'drop'">
+    <mat-label>Effective Date</mat-label>
+
+    <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="data.effective_date">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>
