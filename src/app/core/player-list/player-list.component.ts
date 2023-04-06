@@ -33,6 +33,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() colNames:string[];
   // filteredPlayers: MlbPlayerModel[];
   @Input() ownerPrimaryTeam:AblTeamModel;
+@Input() defaultAddType:String='pickup';
 
   loading: boolean;
   error: boolean;
@@ -249,7 +250,7 @@ _addPlayerToTeam(plyr) {
 
 if (this.advancedMode) {
 const dialogRef = this.dialog.open(PlayerAddDialog, {
-data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: 'pickup'}
+data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: this.defaultAddType}
 });
 
 dialogRef.afterClosed().subscribe(result => {
@@ -267,7 +268,7 @@ this.rosterUpdateSub = this.rosterService
 } else {
 
 this.rosterUpdateSub = this.rosterService
-.addPlayertoTeam$({player: plyr, effective_date: new Date(), acqType: 'pickup'}, this.ownerPrimaryTeam._id)
+.addPlayertoTeam$({player: plyr, effective_date: new Date(), acqType: this.defaultAddType}, this.ownerPrimaryTeam._id)
 .subscribe(
 data => this._handleSubmitSuccess(data, plyr),
 err => this._handleSubmitError(err)

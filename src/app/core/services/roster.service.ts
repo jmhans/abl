@@ -17,27 +17,27 @@ export class RosterService {
   private base_api= '/api2/'
   currentLineup$: Observable<LineupModel>;
   retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
-  
-  
-  
-  constructor(    
+
+
+
+  constructor(
     private http: HttpClient,
     private auth: AuthService) {
-    
+
         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
-      
+
     }
-  
-  
+
+
   private get _authHeader(): string {
     return `Bearer ${this.auth.accessToken}`;
   }
-  
-  
+
+
   // POST new roster record (authorized only)
-  
+
   private _handleError(err: HttpErrorResponse | any): Observable<any> {
     const errorMsg = err.message || 'Error: Unable to complete request.';
     if (err.message && err.message.indexOf('No JWT present') > -1) {
@@ -45,8 +45,8 @@ export class RosterService {
     }
     return ObservableThrowError(errorMsg);
   }
-  
-   
+
+
   getLineupByTeamId$(teamId: string): Observable<LineupModel> {
     return this.http
       .get<LineupModel>(`${this.base_api}team/${teamId}/lineup`, {
@@ -56,7 +56,7 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
-  
+
   getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
     return this.http
       .get<LineupModel>(`${this.base_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
@@ -66,8 +66,8 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
- 
-  
+
+
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.http
       .post<LineupModel>(`${this.base_api}team/${ablTeamId}/addPlayer`, addPlayer, {
@@ -77,14 +77,14 @@ export class RosterService {
         catchError((error) => this._handleError(error))
       );
   }
-  
+
 
   createRosterRecord$(ablTeam: string, lineup: SubmitLineup): Observable<LineupCollectionModel> {
     var submitlineup = {
-      ablTeam: ablTeam, 
-      roster: lineup.roster, 
+      ablTeam: ablTeam,
+      roster: lineup.roster,
       effectiveDate: new Date()
-    }  
+    }
     return this.http
         .post<LineupModel>(`${this.base_api}lineups`, submitlineup, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)
@@ -94,7 +94,7 @@ export class RosterService {
         );
   }
   updateRosterRecord$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
-    
+
     return this.http
         .put<LineupModel>(`${this.base_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)
@@ -103,9 +103,9 @@ export class RosterService {
           catchError((error) => this._handleError(error))
         );
   }
-  
+
   dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
-    
+
     return this.http
         .get<any>(`${this.base_api}lineups/${ablTeamId}/drop/${plyr}`, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)
@@ -114,25 +114,25 @@ export class RosterService {
           catchError((error) => this._handleError(error))
         );
   }
-  
 
-  
+
+
   updateRoster(ablTeamId: string, lineup: SubmitLineup): Observable<any> {
-    // First, run the update routine. 
-    // When update returns, switchMap to the normal roster retrieve function. 
+    // First, run the update routine.
+    // When update returns, switchMap to the normal roster retrieve function.
 
     return this.updateRosterRecord$(ablTeamId, lineup).pipe(map((ret)=> {
       this.retrieveLineup$.next({ablTm: ret.ablTeam["_id"], dt: new Date(ret.effectiveDate)});
       return ret
     }))
-    
-    
-    
+
+
+
     //this.updateRosterRecord$(ablTeamId, lineup).pipe(switchMap((x)=> {this.retrieveLineup$.next()}))
     //this.retrieveLineup$.next({ablTeamId: ablTeamId, plyr: plyr})
   }
-  
-  
-  
+
+
+
 
 }

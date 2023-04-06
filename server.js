@@ -40,6 +40,8 @@ db.once('open', function () {
   });
 
 
+
+
 })
 
 
@@ -51,8 +53,11 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 
-var api = require('./routes/api.route');
-app.use('/api', api);
+
+
+
+//var api = require('./routes/api.route');
+//app.use('/api', api);
 
 app.use('/', function (req, res) {
     res.sendFile(distDir+'/index.html');

@@ -4,12 +4,16 @@ const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();
 
+const EventEmitter = require('events');
+const Stream = new EventEmitter();
 
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const AblTeam = require('./../models/owner').AblTeam;
 const MlbPlayer = require('./../models/player').Player;
 const Lineup = require('./../models/lineup').Lineup;
-
+const DraftPick = require('./../models/draft').DraftPick;
+const DraftController = require('./draft.controller');
+const myDC = new DraftController();
 var some_league_variable = require('./../data/league.json');
 
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -18,6 +22,7 @@ class ABLRosterController extends BaseController{
 
   constructor() {
     super(Lineup, 'lineups');
+
   }
 
 
@@ -452,13 +457,19 @@ class ABLRosterController extends BaseController{
       var mlbPlayer = await MlbPlayer.findById(plyr._id);
       mlbPlayer.ablstatus = {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true};
       var savedMlbPlayer = await mlbPlayer.save()
-      var popMlbPlayer = MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
 
+      var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
+      if (acqType == 'draft') {
+        var newPick = {season: "2023", pickNumber: 1, player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId)}
+        var draftPick = await DraftPick.create(newPick);
+        var popDP = await draftPick.populate('player');
+        Stream.emit('push', 'message', {msg: 'it works!', pick: popDP});
+
+      }
       var firstDate = effDate ? new Date(effDate) : new Date()
-
-      var mostRecent = await this._getRosterForTeamAndDate(teamId, firstDate)
-
       var rosterDeadline =  this.getRosterDeadline(firstDate);
+      var mostRecent = await this._getRosterForTeamAndDate(teamId, rosterDeadline)
+
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
       var newLineup;
 
@@ -519,6 +530,8 @@ class ABLRosterController extends BaseController{
     }
   }
 
+
+
   async _addPlayerToTeamAllFutureRosters(req, res, next) {
 
     try {
@@ -575,6 +588,26 @@ class ABLRosterController extends BaseController{
 
   }
 
+  async _updateDraft(req, res) {
+    req.setTimeout(600000);
+    res.writeHead(200, {
+      'Content-Type' : 'text/event-stream',
+      'Cache-Control':'no-cache',
+      Connection: 'keep-alive',
+        })
+      Stream.on('push', function(event, data) {
+        res.write('event: ' + String(event) + '\n' + 'data: ' + JSON.stringify(data) + '\n\n');
+      })
+      this.establishHeartbeat();
+
+  }
+
+ establishHeartbeat(){
+   setInterval(function() {
+    Stream.emit('push', 'message', {msg: "heartbeat", heartbeat: true})
+   }, 10000)
+ }
+
 
   reroute() {
     router = this.route();
@@ -586,6 +619,7 @@ class ABLRosterController extends BaseController{
     router.put('/' + this.routeString + '/:id/date/:dt', (...args) => this._update(...args))
     router.put('/' + this.routeString + '/:id', (...args) => this._update(...args))
     router.get('/' + this.routeString + '/:id/drop/:plyr', (...args) => this._dropPlayerFromTeamAllFutureRosters(...args))
+    router.get('/refreshDraft', (...args)=>this._updateDraft(...args))
     return router;
   }
 }

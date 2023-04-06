@@ -1,12 +1,13 @@
 
 
 <h3>
-   Players
+  {{pageTitle}}
 </h3>
 <!-- src/app/pages/games/games.component.html -->
 <app-player-list
 [players$]="players$"
 [colNames]="colNames"
 [ownerPrimaryTeam]="ownerPrimaryTeam"
+defaultAddType="pickup"
 >
 </app-player-list>
