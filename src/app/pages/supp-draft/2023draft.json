@@ -1,0 +1,317 @@
+[{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "6237c905f0008a002ecab341"
+  },
+  "pickIdx": 0,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "6237c905f0008a002ecab341"
+      },
+      "nickname": "Heifers",
+      "location": "Hum",
+      "stadium": "TBD",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "62546a92bf13f8002e8febe6"
+          },
+          "userId": "auth0|62546a51eb6bb700687efe2f",
+          "name": "davelew22@msn.com",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 2
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a473b3a0230033312621"
+  },
+  "pickIdx": 1,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a473b3a0230033312621"
+      },
+      "nickname": "Sferics",
+      "location": "Atmore",
+      "stadium": "Storm Center",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "606a72a5dc425f003b51c836"
+          },
+          "userId": "auth0|606a7253a260c600688022f8",
+          "name": "mpouilly@gmail.com",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 1
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a443b3a023003331261d"
+  },
+  "pickIdx": 2,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a443b3a023003331261d"
+      },
+      "nickname": "Cracks",
+      "location": "Butte",
+      "stadium": "2000 Flush-Mr Clean-Tidy Bowl",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "606a8575d073ca002d6150e0"
+          },
+          "userId": "auth0|5e46c3c3f27c910e674db3cf",
+          "name": "Amado Sleiman",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 5
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "6057711a0049fc1c60942e9d"
+  },
+  "pickIdx": 3,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "6057711a0049fc1c60942e9d"
+      },
+      "nickname": "Iguanas",
+      "location": "Orange",
+      "stadium": "The Terrarium",
+      "__v": 3,
+      "owners": [
+        {
+          "_id": {
+            "$oid": "606a603ca515fc002f8d224f"
+          },
+          "userId": "google-oauth2|111095235670076981649",
+          "name": "Andy Martin",
+          "email": "",
+          "verified": true
+        }
+      ]
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "643334b25f0bb4a056fb4e06"
+  },
+  "pickIdx": 4,
+  "tm": []
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a403b3a0230033312618"
+  },
+  "pickIdx": 5,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a403b3a0230033312618"
+      },
+      "nickname": "Vipers",
+      "location": "Black Diamond",
+      "stadium": "The Pit",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "60693d3814c759002df7681d"
+          },
+          "userId": "auth0|60692c4a3ead460069c0edb2",
+          "name": "chris.steensland@yahoo.com",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 1
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a490b3a0230033312623"
+  },
+  "pickIdx": 6,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a490b3a0230033312623"
+      },
+      "nickname": "Rats",
+      "location": "Le Sueur",
+      "stadium": "The BA Crypt",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "606a77ecdc425f003b51c837"
+          },
+          "userId": "auth0|571ee9126e7c9b787ccc8303",
+          "name": "brian_coley@yahoo.com",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 1
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5ca28dbed79ef30033562385"
+  },
+  "pickIdx": 7,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5ca28dbed79ef30033562385"
+      },
+      "nickname": "Machines",
+      "location": "Enigma",
+      "stadium": "Cipher Field",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "6063e49916254406c1d100ad"
+          },
+          "userId": "auth0|56cb65326b9c610446a02b2b",
+          "name": "Justin Hanson",
+          "email": "",
+          "verified": true
+        },
+        {
+          "_id": {
+            "$oid": "6063e49916254406c1d100ae"
+          },
+          "userId": "google-oauth2|109793316122013596702",
+          "name": "Justin Hanson",
+          "email": "",
+          "verified": true
+        },
+        {
+          "_id": {
+            "$oid": "6063e49916254406c1d100af"
+          },
+          "userId": "windowslive|608e667e535f2d0b",
+          "name": "Justin Hanson",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 6
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a459b3a023003331261f"
+  },
+  "pickIdx": 8,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a459b3a023003331261f"
+      },
+      "nickname": "Psychos",
+      "location": "Strange Creek",
+      "stadium": "Delusion Park",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "62556edbeb0e84002e1ca2fd"
+          },
+          "userId": "google-oauth2|114166105322159202070",
+          "name": "Hans Larsen",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 1
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "643333cc5f0bb4a056fb4e03"
+  },
+  "season": "2023",
+  "pickOrder": {
+    "$oid": "5cb0a41fb3a023003331261a"
+  },
+  "pickIdx": 9,
+  "tm": [
+    {
+      "_id": {
+        "$oid": "5cb0a41fb3a023003331261a"
+      },
+      "nickname": "Winers",
+      "location": "Mondovi",
+      "stadium": "The Cellar",
+      "owners": [
+        {
+          "_id": {
+            "$oid": "606d15906199c4002ff45f79"
+          },
+          "userId": "auth0|606d105ddab95700694798b2",
+          "name": "tour8888@comcast.net",
+          "email": "",
+          "verified": true
+        },
+        {
+          "_id": {
+            "$oid": "606d15906199c4002ff45f7a"
+          },
+          "userId": "auth0|606d1571efcfb700707d602e",
+          "name": "lisatourville@gmail.com",
+          "email": "",
+          "verified": true
+        }
+      ],
+      "__v": 4
+    }
+  ]
+}]

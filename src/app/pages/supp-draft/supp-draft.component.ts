@@ -1,6 +1,6 @@
 
 import {PlayersService } from '../../core/services/players.service';
-import { Component, OnInit, OnDestroy, ViewChild , Inject, AfterViewInit, ChangeDetectionStrategy,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone ,OnDestroy, ViewChild , Inject, AfterViewInit, ChangeDetectionStrategy,ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -16,7 +16,7 @@ import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Ob
 import { switchMap, takeUntil, filter, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 
-
+import draftOrder from './2023draft.json';
 
 @Component({
   selector: 'app-supp-draft',
@@ -37,10 +37,15 @@ export class SuppDraftComponent implements OnInit {
   unsubscribe$: Subject<void> = new Subject<void>();
   draftTeam: AblTeamModel;
   dispStatuses: string[];
-
+  draftData$ : Observable<any[]>
+  draftData: any[];
   selectedRow;
   counter = Array;
   draft: any[];
+  order:any;
+
+  private _draftData = new Subject();
+  draftDataNew$ = this._draftData.asObservable();
 
   colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
@@ -58,7 +63,8 @@ export class SuppDraftComponent implements OnInit {
               public dialog: MatDialog,
               public players: PlayersService,
               public cdRef:ChangeDetectorRef,
-              public draftSseService:DraftSseService
+              public draftSseService:DraftSseService,
+              private ngZone: NgZone
               ) { }
 
   ngOnInit() {
@@ -66,19 +72,12 @@ export class SuppDraftComponent implements OnInit {
 //    this.formData = this.api.getAblTeams$();
 
     this._getOwner();
+    this.order = JSON.stringify(draftOrder);
 
-    this.draftSseService
-    .getServerSentEvent("/api2/refreshDraft").pipe(
-      filter((data)=> {
-        const msg =JSON.parse(data.data)
-        return !msg.heartbeat}
-        ),
-      takeUntil(this.unsubscribe$)
-      )
-    .subscribe(data => console.log(JSON.parse(data.data)));
+    this.draftSseService.getDraftResults$();
+    this.draftSseService.establishConnect();
 
   }
-
 
   _getOwner() {
     this.ownerSub = this.userContext.teams$.pipe(takeUntil(this.unsubscribe$)).subscribe(

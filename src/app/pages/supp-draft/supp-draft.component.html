@@ -1,13 +1,12 @@
 <p>{{pageTitle}}</p>
 
 <div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
-<div *ngIf="(draftSseService.draftData$ | async) || []  as draftdata">
+<div *ngIf="(draftSseService.draftData$ | async) as draftdata">
 <div *ngFor='let rowLoop of counter(24) ;let r= index' class="row">
-  <div *ngFor='let colLoop of counter(10); let c=index' class="col">
+  <div *ngFor='let draftTm of order; let c=index' class="col">
     <div class="draft-cell">
-    <div>Pos</div>
-    <div>Plyr{{draftdata[(r)*10 + c] | json}}</div>
-    <div>r{{r}}c{{c}}</div>
+    <div *ngIf="draftdata[(r)*10+col] as pick">{{pick.player.name}} ({{pick.player.team}} - {{pick.player.position}})</div>
+    <div>r{{r}}c{{draftTm | json}}</div>
     </div>
   </div>
 </div>

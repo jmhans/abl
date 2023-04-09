@@ -604,8 +604,8 @@ class ABLRosterController extends BaseController{
 
  establishHeartbeat(){
    setInterval(function() {
-    Stream.emit('push', 'message', {msg: "heartbeat", heartbeat: true})
-   }, 10000)
+    Stream.emit('push', 'ping', {msg: "testing server ping"})
+   }, 30000)
  }
 
 

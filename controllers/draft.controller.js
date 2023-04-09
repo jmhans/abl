@@ -25,6 +25,14 @@ class DraftController extends BaseController {
     }
   }
 
+  _get(req, res, next) {
+    this.model.find().populate('player').exec(function(err, results) {
+      if (err) return next(err);
+      res.json(results);
+    });
+  }
+
+
 }
 
 
