@@ -16,7 +16,6 @@ import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Ob
 import { switchMap, takeUntil, filter, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 
-import draftOrder from './2023draft.json';
 
 @Component({
   selector: 'app-supp-draft',
@@ -42,7 +41,9 @@ export class SuppDraftComponent implements OnInit {
   selectedRow;
   counter = Array;
   draft: any[];
-  order:any;
+
+  draftOrder=[{"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"1"},{"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"2"},{"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"3"},{"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"4"},{"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"5"},{"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"6"},{"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"7"},{"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"8"},{"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"9"},{"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"10"}]
+
 
   private _draftData = new Subject();
   draftDataNew$ = this._draftData.asObservable();
@@ -72,7 +73,6 @@ export class SuppDraftComponent implements OnInit {
 //    this.formData = this.api.getAblTeams$();
 
     this._getOwner();
-    this.order = JSON.stringify(draftOrder);
 
     this.draftSseService.getDraftResults$();
     this.draftSseService.establishConnect();

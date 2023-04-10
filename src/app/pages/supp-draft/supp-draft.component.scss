@@ -2,6 +2,16 @@
 background-color: yellow;
 }
 .draft-cell {
-background-color: yellow;
-border: 1px solid blue;
+background-color: white;
+border: 1px solid darkslategrey;
+}
+.header-cell {
+background-color:lightblue;
+border: 1px solid darkslategrey;
+font-weight: bold;
+text-align: center;
+}
+.next-pick {
+background-color: lightblue;
+border: 3px solid darkblue;
 }

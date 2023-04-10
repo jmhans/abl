@@ -13,9 +13,10 @@ var draftSchema = new mongoose.Schema({
 
 var draftPickSchema = new mongoose.Schema({
   season: {type: String, required: true},
-  pickNumber: {type: Number, required: true},
+  pickNumber: {type: Number, required: false},
   player: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', required: true},
-  ablTeam: {type: mongoose.Schema.Types.ObjectId, ref: 'AblTeam', required: true}
+  ablTeam: {type: mongoose.Schema.Types.ObjectId, ref: 'AblTeam', required: true},
+  pickTime: {type: Date, required: false}
 })
 
 

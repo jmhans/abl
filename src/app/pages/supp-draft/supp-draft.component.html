@@ -1,12 +1,18 @@
 <p>{{pageTitle}}</p>
-
 <div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
 <div *ngIf="(draftSseService.draftData$ | async) as draftdata">
-<div *ngFor='let rowLoop of counter(24) ;let r= index' class="row">
-  <div *ngFor='let draftTm of order; let c=index' class="col">
-    <div class="draft-cell">
-    <div *ngIf="draftdata[(r)*10+col] as pick">{{pick.player.name}} ({{pick.player.team}} - {{pick.player.position}})</div>
-    <div>r{{r}}c{{draftTm | json}}</div>
+<div class="row">
+  <div *ngFor='let draftTm of draftOrder; let c=index' class="col">
+    <div class="header-cell">
+      <div>{{draftTm.nickname}}</div>
+    </div>
+  </div>
+</div>
+<div *ngFor='let rd of draftdata ;let r= index' class="row">
+  <div *ngFor='let draftTm of rd; let c=index' class="col">
+    <div [ngClass]="{'next-pick': draftdata.length == ((r)*10+c+1 + 1), 'draft-cell': draftdata.length != ((r)*10+c+1+1)}">
+    <div *ngIf="draftTm as pick">{{pick?.player?.name}} ({{pick?.player?.team}} - {{pick?.player?.position}})</div>
+    <div>{{r*10+c + 1}}</div>
     </div>
   </div>
 </div>

@@ -4,6 +4,15 @@ import { catchError, switchMap, map, tap, startWith, takeUntil, filter} from 'rx
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../../auth/auth.service';
 
+function isEven(n) {
+  return n % 2 == 0;
+}
+
+function isOdd(n) {
+  return Math.abs(n % 2) == 1;
+}
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +49,56 @@ export class DraftSseService {
 
 
     private notify() {
-      this.draftData$.next(this.draftData);
+      let outData = []
+      for (let r=1; r<=24; r++) {
+        outData[r-1] = []
+        for (let c=1; c<=10; c++) {
+          let effRound = r<=18 ? r : 18+Math.max(0, Math.floor((r-19)/3)+1)
+          let fullRoundPicks = Math.min(18, effRound -1) * 10+ Math.max(0, effRound-19)*30
+
+          let priorPlayers = isEven(effRound) ? 10 - c: c -1
+          let picksPerPlayer = (effRound <=18) ?1 :3
+          let priorPlayerPicks = priorPlayers * picksPerPlayer + (r-19)% picksPerPlayer
+
+          let pickNum = fullRoundPicks + priorPlayerPicks
+          if (this.draftData && pickNum < this.draftData.length) {
+            outData[r-1][c-1] = this.draftData[pickNum-1]
+          } else {
+            outData[r-1][c-1] = {}
+          }
+
+        }
+      }
+
+      // for (let i=0; i<this.draftData.length; i++) {
+      //   let thisPickNum = i + 1
+      //   let effectiveRound = Math.floor( (thisPickNum - 1) / 10) + 1
+      //   let actualRound = effectiveRound
+      //   let effectiveColumn = (thisPickNum-1) % 10 + 1
+      //   if (isEven(effectiveRound)) {
+      //     effectiveColumn = 10- (effectiveColumn -1)
+      //   }
+      //   if (effectiveRound >= 19) {
+      //     let _effectiveRound = Math.floor( (thisPickNum -181) / 10)
+      //     actualRound = 19 + Math.floor(_effectiveRound/3)*3 + (thisPickNum -1) % 3
+      //     if (isEven(Math.floor(_effectiveRound/3+1))) {
+      //       effectiveColumn = 10 - (Math.floor((thisPickNum - 181)/3) % 10)
+      //     } else {
+      //       effectiveColumn = (Math.floor((thisPickNum - 181)/3) % 10) + 1
+      //     }
+
+      //   }
+      //   if (outData.length >= actualRound) {
+      //     outData[actualRound -1].push(this.draftData[i])
+      //   } else {
+      //     outData.push([this.draftData[i]])
+      //   }
+
+      // }
+
+      this.draftData$.next(outData);
+
+
     }
 
     establishConnect() {
@@ -53,6 +111,29 @@ export class DraftSseService {
           })
           ).subscribe(
         data => {
+            // let totalPicks =this.draftData.length;
+            // let thisPickNum = totalPicks + 1;
+            // let effectiveRound = Math.floor( (thisPickNum - 1) / 10) + 1
+            // let actualRound = effectiveRound
+            // let effectiveColumn = (thisPickNum-1) % 10 + 1
+            // if (isEven(effectiveRound)) {
+            //   effectiveColumn = 10- (effectiveColumn -1)
+            // }
+            // if (effectiveRound >= 19) {
+            //   let _effectiveRound = Math.floor( (thisPickNum -181) / 10)
+            //   actualRound = 19 + Math.floor(_effectiveRound/3)*3 + (thisPickNum -1) % 3
+            //   if (isEven(Math.floor(_effectiveRound/3+1))) {
+            //     effectiveColumn = 10 - (Math.floor((thisPickNum - 181)/3) % 10)
+            //   } else {
+            //     effectiveColumn = (Math.floor((thisPickNum - 181)/3) % 10) + 1
+            //   }
+
+            // }
+
+            // let pick = JSON.parse(data.data).pick;
+            // pick.column = effectiveColumn
+            // pick.row = actualRound
+
             this.draftData = [...this.draftData, JSON.parse(data.data).pick];
             this.notify()
           console.log(this.draftData)
