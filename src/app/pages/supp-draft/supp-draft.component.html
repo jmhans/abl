@@ -2,17 +2,16 @@
 <div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
 <div *ngIf="(draftSseService.draftData$ | async) as draftdata">
 <div class="row">
-  <div *ngFor='let draftTm of draftOrder; let c=index' class="col">
+  <div *ngFor='let draftTm of draftdata.order; let c=index' class="col">
     <div class="header-cell">
       <div>{{draftTm.nickname}}</div>
     </div>
   </div>
 </div>
-<div *ngFor='let rd of draftdata ;let r= index' class="row">
+<div *ngFor='let rd of draftdata.picks ;let r= index' class="row">
   <div *ngFor='let draftTm of rd; let c=index' class="col">
-    <div [ngClass]="{'next-pick': draftdata.length == ((r)*10+c+1 + 1), 'draft-cell': draftdata.length != ((r)*10+c+1+1)}">
+    <div [ngClass]="{'next-pick': r == draftdata.currentPick.row && c == draftdata.currentPick.column, 'draft-cell': r != draftdata.currentPick.row || c != draftdata.currentPick.column}">
     <div *ngIf="draftTm as pick">{{pick?.player?.name}} ({{pick?.player?.team}} - {{pick?.player?.position}})</div>
-    <div>{{r*10+c + 1}}</div>
     </div>
   </div>
 </div>
