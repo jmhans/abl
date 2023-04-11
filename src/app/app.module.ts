@@ -5,7 +5,6 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { AUTH_CONFIG } from './auth/auth.config';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
 
