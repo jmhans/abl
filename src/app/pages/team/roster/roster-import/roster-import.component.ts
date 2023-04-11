@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject , ViewChild, ElementRef} from '@angular/core';
 import { ApiService } from './../../../../core/api.service';
 import { UtilsService } from './../../../../core/utils.service';
-import {MatLegacyDialog as MatDialog ,MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/legacy-dialog';
+import {MatDialog as MatDialog ,MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { LineupModel ,LineupFormModel} from './../../../../core/models/lineup.model';
 
 export interface DialogData {
@@ -22,13 +22,13 @@ export class RosterImportComponent {
   unmatchedPlayers: any[] = [];
   errorMessage = ''
   errorsList = [];
-  
+
   @ViewChild('alert', { static: true }) alert: ElementRef;
 
-  
-  constructor(public api: ApiService, 
+
+  constructor(public api: ApiService,
     public dialogRef: MatDialogRef<RosterImportComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData, 
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
                             public utils: UtilsService) {}
 
   onNoClick(): void {
@@ -38,7 +38,7 @@ export class RosterImportComponent {
   closeAlert(i) {
    this.errorsList.splice(i, 1)
   }
-  
+
     submitCSV() {
       this.unmatchedPlayers = [];
       this.outputLineup = null
@@ -46,14 +46,14 @@ export class RosterImportComponent {
             // code that may throw an error...
               if (this.delimiterType == "comma" && (this.csvLineupInput.match(/,/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw `There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`}
               if (this.delimiterType == "tab" && (this.csvLineupInput.match(/\t/g) || []).length < (this.csvLineupInput.match(/\n/g) || []).length) { throw `There weren't many instances of that delimiter type. Are you sure you want to use ${this.delimiterType}?`}
-              
 
-        
+
+
               var importContent = this.utils.CSVToArray(this.csvLineupInput, (this.delimiterType == "tab" ? "\t" : ","))
-              
+
               if (this.includesHeaders && !importContent[0].find((col)=>{return col == 'name'})) {throw "Unexpected field names"}
               if (this.includesHeaders && !importContent[0].find((col)=>{return col == 'position'})) {throw "Unexpected field names"}
-      
+
               var outputArr = []
               if(this.includesHeaders) {
                 for (var row = 1; row<importContent.length; row++) {
@@ -61,12 +61,12 @@ export class RosterImportComponent {
                   for (var idx =0; idx<importContent[0].length; idx++) {
                     if (importContent[row][idx] && importContent[row][idx] != "") {
                       outputObj = outputObj || {}
-                      outputObj[importContent[0][idx]] = importContent[row][idx]  
+                      outputObj[importContent[0][idx]] = importContent[row][idx]
                     }
 
                   }
                   if (outputObj) {
-                    outputArr.push(outputObj)  
+                    outputArr.push(outputObj)
                   }
 
                 }
@@ -76,15 +76,15 @@ export class RosterImportComponent {
                 var match = this.data.actualLineup.roster.find((plyr)=> {return plyr.player.name == item.name})
 
 
-                if (match) { 
+                if (match) {
                  // match.lineupPosition = item.position
                   //match.rosterOrder = index + 1
                   outputRoster.push({player: match.player,  lineupPosition: item.position, rosterOrder: index + 1})
-                  
-                  
-                  
+
+
+
                 } else {
-                  // Did not find a player record that matches. 
+                  // Did not find a player record that matches.
                   this.unmatchedPlayers.push(item)
                 }
               })
@@ -92,8 +92,8 @@ export class RosterImportComponent {
 
               this.outputLineup = new LineupFormModel(this.data.actualLineup.lineupId , this.data.actualLineup.rosterId, outputRoster, this.data.actualLineup.effectiveDate)
 
-        
-        
+
+
         }
         catch(e) {
             if(e instanceof Error) {
@@ -122,10 +122,10 @@ export class RosterImportComponent {
                 throw e;
             }
         }
-      
-      
-      
-      
-      
+
+
+
+
+
   }
 }

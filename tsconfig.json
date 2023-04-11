@@ -11,6 +11,8 @@
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "importHelpers": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "target": "ES2022",
     "types": [
       "hammerjs"

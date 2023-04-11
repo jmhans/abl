@@ -5,7 +5,6 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { AUTH_CONFIG } from './auth/auth.config';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
 import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
 
@@ -59,9 +58,7 @@ import { TeamFormComponent } from './pages/admin/team-form/team-form.component';
 import { CreateTeamComponent } from './pages/admin/create-team/create-team.component';
 import { DeleteTeamComponent } from './pages/admin/delete-team/delete-team.component';
 import { PlayersComponent } from './pages/players/players.component';
-import { DialogOverviewExampleDialog } from './pages/players/players.component';
-import { ManageRostersComponent } from './pages/admin/manage-rosters/manage-rosters.component';
-import { RosterFormComponent } from './pages/admin/roster-form/roster-form.component';
+import { PlayerAddDialog } from './core/player-list/player-list.component';
 import { OwnerFormComponent } from './pages/admin/team-form/owner-form/owner-form.component';
 import { GameFormComponent } from './pages/admin/game-form/game-form.component';
 import { CreateGameComponent } from './pages/admin/game/create-game/create-game.component';
@@ -72,13 +69,13 @@ import { TeamRosterComponent } from './team-roster/team-roster.component';
 import { GameTeamDetailComponent } from './pages/game/game-detail/game-team-detail/game-team-detail.component';
 import { MyFilterPipe } from './core/pipes/filter.pipe';
 import { StandingsComponent } from './pages/standings/standings.component';
-//import { LineupFormComponent } from './pages/admin/lineup-form/lineup-form.component';
 
 import { LocalMaterialModule } from './core/local-material-module/local-material.module';
 import { RosterImportComponent } from './pages/team/roster/roster-import/roster-import.component';
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
 import { SuppDraftComponent } from './pages/supp-draft/supp-draft.component';
 import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
+import { PlayerListComponent } from './core/player-list/player-list.component';
 
 
 @NgModule({
@@ -107,8 +104,6 @@ import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
         CreateTeamComponent,
         DeleteTeamComponent,
         PlayersComponent,
-        ManageRostersComponent,
-        RosterFormComponent,
         OwnerFormComponent,
         GameFormComponent,
         CreateGameComponent,
@@ -120,17 +115,17 @@ import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
         MyFilterPipe,
         TeamGameComponent,
         StandingsComponent,
-        DialogOverviewExampleDialog,
+        PlayerAddDialog,
         RosterImportComponent,
         ManageGamesComponent,
         SuppDraftComponent,
-        PlayoffsComponent
+        PlayoffsComponent,
+        PlayerListComponent
     ],
     imports: [
         BrowserModule,
         FormsModule,
         ReactiveFormsModule,
-        MatFormFieldModule,
         FlexLayoutModule,
         HttpClientModule,
         OwnersModule,

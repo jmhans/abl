@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LineupFormService } from './lineup-form.service';
+import { DraftSseService } from './draft-sse.service';
 
-describe('LineupFormService', () => {
-  let service: LineupFormService;
+describe('DraftSseService', () => {
+  let service: DraftSseService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(LineupFormService);
+    service = TestBed.inject(DraftSseService);
   });
 
   it('should be created', () => {

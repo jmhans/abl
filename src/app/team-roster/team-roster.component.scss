@@ -106,3 +106,8 @@ body {
   width: 100%;
 
 }
+
+
+::ng-deep .myPanel.mat-select-panel {
+  background-color: lightgrey;
+}

@@ -21,6 +21,8 @@ var MLBAPI = require('../controllers/mlbapi.controller').altMlbApiController;
 var Standings = require('../controllers/standings.controller');
 var mlbEvt = require('../controllers/mlbEventHandler').mlbEventHandler
 var AblGameController= require('../controllers/abl.game.controller');
+var DraftController = require('../controllers/draft.controller')
+
 
 router.use(new PlayersController().reroute());
 router.use(new OwnersController().route());
@@ -34,6 +36,7 @@ router.use(new MLBAPI().route());
 router.use(new Standings().route());
 router.use(new mlbEvt().route())
 router.use(new AblGameController().reroute());
+router.use(new DraftController().route())
 
 
 module.exports = router;

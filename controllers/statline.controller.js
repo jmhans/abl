@@ -381,7 +381,7 @@ class StatlineController extends BaseController {
 async _genPositionLog() {
   try {
 
-    var currentSeason = 2022;
+    var currentSeason = 2023;
     var regSeasonStart = new Date('2022-04-07T00:00:00Z')
 
     var position_log_records = await this.model.aggregate([

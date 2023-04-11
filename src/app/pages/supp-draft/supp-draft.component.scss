@@ -1,3 +1,18 @@
 .highlight {
 background-color: yellow;
 }
+.draft-cell {
+background-color: white;
+border: 1px solid darkslategrey;
+}
+.header-cell {
+background-color:darkblue;
+border: 1px solid darkslategrey;
+color: white;
+font-weight: bold;
+text-align: center;
+}
+.next-pick {
+background-color: lightblue;
+border: 3px solid darkblue;
+}

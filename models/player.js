@@ -1,6 +1,10 @@
 let mongoose = require('mongoose')
 let AblTeam = require('./owner').AblTeam;
 
+const EventEmitter = require('events');
+const PlayerStream = new EventEmitter();
+
+
 var playerGameSchema = new mongoose.Schema()
 
 var playerSchema = new mongoose.Schema({
@@ -35,5 +39,14 @@ playerSchema.pre('save', function preSave(next){
   next();
 });
 
+playerSchema.post('save', function(doc, next) {
+  PlayerStream.emit('push', 'message', {msg: 'Player updated', player: doc});
+  next()
+})
+
+
+
+
 module.exports = {Player: mongoose.model('Player', playerSchema),
-                  PlayerSchema: playerSchema};
+                  PlayerSchema: playerSchema,
+                PlayerStream: PlayerStream};

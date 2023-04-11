@@ -12,8 +12,8 @@ import { LeagueConfigService } from './../../../core/services/league-config.serv
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UtilsService } from './../../../core/utils.service';
-import {MatLegacyDialog as MatDialog ,MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/legacy-dialog';
-import {MatLegacySnackBar as MatSnackBar} from '@angular/material/legacy-snack-bar';
+import {MatDialog ,MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatSnackBar as MatSnackBar} from '@angular/material/snack-bar';
 
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import { RosterImportComponent } from './roster-import/roster-import.component'

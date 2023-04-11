@@ -9,8 +9,8 @@ import { AblGameService } from './../../../core/services/abl-game.service';
 import { GameModel } from './../../../core/models/game.model';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { AuthService } from './../../../auth/auth.service';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
 

@@ -9,6 +9,7 @@ const cors = require('cors');
 const methodOverride = require('method-override');
 const dotenv = require('dotenv');
 
+
 var result = dotenv.config();
 mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true,useUnifiedTopology: true});
 
@@ -39,7 +40,12 @@ db.once('open', function () {
   });
 
 
+
+
 })
+
+
+
 
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
@@ -47,8 +53,11 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 
-var api = require('./routes/api.route');
-app.use('/api', api);
+
+
+
+//var api = require('./routes/api.route');
+//app.use('/api', api);
 
 app.use('/', function (req, res) {
     res.sendFile(distDir+'/index.html');
