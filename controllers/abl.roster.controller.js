@@ -7,9 +7,11 @@ var router = express.Router();
 const EventEmitter = require('events');
 const Stream = new EventEmitter();
 
+
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const AblTeam = require('./../models/owner').AblTeam;
 const MlbPlayer = require('./../models/player').Player;
+const PlayerStream =require('./../models/player').PlayerStream;
 const Lineup = require('./../models/lineup').Lineup;
 const DraftPick = require('./../models/draft').DraftPick;
 const DraftController = require('./draft.controller');
@@ -598,13 +600,28 @@ class ABLRosterController extends BaseController{
       Stream.on('push', function(event, data) {
         res.write('event: ' + String(event) + '\n' + 'data: ' + JSON.stringify(data) + '\n\n');
       })
-      this.establishHeartbeat();
+      this.establishHeartbeat(Stream);
 
   }
 
- establishHeartbeat(){
+
+  async _updatePlayers(req, res) {
+    req.setTimeout(600000);
+    res.writeHead(200, {
+      'Content-Type' : 'text/event-stream',
+      'Cache-Control':'no-cache',
+      Connection: 'keep-alive',
+        })
+      PlayerStream.on('push', function(event, data) {
+        res.write('event: ' + String(event) + '\n' + 'data: ' + JSON.stringify(data) + '\n\n');
+      })
+      this.establishHeartbeat(PlayerStream);
+
+  }
+
+ establishHeartbeat(strm){
    setInterval(function() {
-    Stream.emit('push', 'ping', {msg: "testing server ping"})
+    strm.emit('push', 'ping', {msg: "testing server ping"})
    }, 30000)
  }
 
@@ -619,7 +636,8 @@ class ABLRosterController extends BaseController{
     router.put('/' + this.routeString + '/:id/date/:dt', (...args) => this._update(...args))
     router.put('/' + this.routeString + '/:id', (...args) => this._update(...args))
     router.get('/' + this.routeString + '/:id/drop/:plyr', (...args) => this._dropPlayerFromTeamAllFutureRosters(...args))
-    router.get('/refreshDraft', (...args)=>this._updateDraft(...args))
+    router.get('/refreshDraft', (...args)=>this._updateDraft(...args));
+    router.get('/playerUpdates', (...args)=>this._updatePlayers(...args));
     return router;
   }
 }

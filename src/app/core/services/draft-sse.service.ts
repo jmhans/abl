@@ -20,6 +20,7 @@ export class DraftSseService {
   private base_api= '/api2/'
   draftResults$: Observable<any[]>;
   draftData$: BehaviorSubject<any> = new BehaviorSubject([]);
+  playerData$: BehaviorSubject<any> = new BehaviorSubject([]);
   draftOrder=[{"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"1"},{"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"2"},{"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"3"},{"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"4"},{"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"5"},{"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"6"},{"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"7"},{"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"8"},{"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"9"},{"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"10"}]
 
   private draftData: any[];
@@ -43,7 +44,8 @@ export class DraftSseService {
       }).pipe(takeUntil(this.unsubscribe$)).subscribe(
         data => {
           this.draftData = data;
-            this.notify()
+          this.establishConnect()
+          this.notify()
           })
         }
 
@@ -81,44 +83,29 @@ export class DraftSseService {
 
     }
 
+
+
+
     establishConnect() {
-
       this.getServerSentEvent(`${this.base_api}refreshDraft`).pipe(
-        takeUntil(this.unsubscribe$),
-        filter((data)=> {
-            const eventType = data.type
-            return eventType != 'ping'
-          })
-          ).subscribe(
-        data => {
-            // let totalPicks =this.draftData.length;
-            // let thisPickNum = totalPicks + 1;
-            // let effectiveRound = Math.floor( (thisPickNum - 1) / 10) + 1
-            // let actualRound = effectiveRound
-            // let effectiveColumn = (thisPickNum-1) % 10 + 1
-            // if (isEven(effectiveRound)) {
-            //   effectiveColumn = 10- (effectiveColumn -1)
-            // }
-            // if (effectiveRound >= 19) {
-            //   let _effectiveRound = Math.floor( (thisPickNum -181) / 10)
-            //   actualRound = 19 + Math.floor(_effectiveRound/3)*3 + (thisPickNum -1) % 3
-            //   if (isEven(Math.floor(_effectiveRound/3+1))) {
-            //     effectiveColumn = 10 - (Math.floor((thisPickNum - 181)/3) % 10)
-            //   } else {
-            //     effectiveColumn = (Math.floor((thisPickNum - 181)/3) % 10) + 1
-            //   }
+          takeUntil(this.unsubscribe$),
+          filter((data)=> {
+              const eventType = data.type
+              return eventType != 'ping'
+            })
+            ).subscribe(
+          data => {
+              this.draftData = [...this.draftData, JSON.parse(data.data).pick];
+              this.notify()
+            console.log(this.draftData)
+          }
+        )
+    }
 
-            // }
 
-            // let pick = JSON.parse(data.data).pick;
-            // pick.column = effectiveColumn
-            // pick.row = actualRound
 
-            this.draftData = [...this.draftData, JSON.parse(data.data).pick];
-            this.notify()
-          console.log(this.draftData)
-        }
-      )}
+
+
 
 
 

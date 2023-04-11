@@ -68,7 +68,7 @@ export class SuppDraftComponent implements OnInit {
     this._getOwner();
 
     this.draftSseService.getDraftResults$();
-    this.draftSseService.establishConnect();
+    // this.draftSseService.establishConnect(); // Now doing this step in the service after the draft results are returned.
 
   }
 
