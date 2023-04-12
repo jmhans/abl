@@ -14,8 +14,6 @@ const MlbPlayer = require('./../models/player').Player;
 const PlayerStream =require('./../models/player').PlayerStream;
 const Lineup = require('./../models/lineup').Lineup;
 const DraftPick = require('./../models/draft').DraftPick;
-const DraftController = require('./draft.controller');
-const myDC = new DraftController();
 var some_league_variable = require('./../data/league.json');
 
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -456,10 +454,7 @@ class ABLRosterController extends BaseController{
   async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate ) {
     try {
 
-      var mlbPlayer = await MlbPlayer.findById(plyr._id);
-      mlbPlayer.ablstatus = {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true};
-      var savedMlbPlayer = await mlbPlayer.save()
-
+      var savedMlbPlayer = await _updatePlayerRecBackend(plyr, teamId, acqType, effDate )
       var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       if (acqType == 'draft') {
         var newPick = {season: "2023", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date()}
@@ -513,7 +508,7 @@ class ABLRosterController extends BaseController{
 
       for (var i = 0; i<allToUpdate.length; i++) {
         allToUpdate[i].roster.push({
-          player: mlbPlayer._id,
+          player: savedMlbPlayer._id,
           lineupPosition: plyrPos,
           rosterOrder: allToUpdate[i].roster.length + 1
         })
@@ -522,7 +517,7 @@ class ABLRosterController extends BaseController{
         if (allToUpdate[i].effectiveDate <= rosterDeadline) {
           outputRec = allToUpdate[i]
         }
-        console.log(`Added ${mlbPlayer.name} to roster for ${savedUpdateRec.effectiveDate}`)
+        console.log(`Added ${savedMlbPlayer.name} to roster for ${savedUpdateRec.effectiveDate}`)
       }
       return {player: savedMlbPlayer, roster: outputRec};
 
@@ -531,6 +526,27 @@ class ABLRosterController extends BaseController{
       throw {message: err.message}
     }
   }
+
+
+  async _updatePlayerRecBackend(plyr, teamId, acqType, effDate ) {
+    // Just updates the player record to be on a roster. A separate function handles the roster updating.
+    try {
+
+      var mlbPlayer = await MlbPlayer.findById(plyr._id);
+      if (mlbPlayer) {
+        mlbPlayer.ablstatus = {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true};
+        var savedMlbPlayer = await mlbPlayer.save()
+        return savedMlbPlayer;
+      } else {
+        console.log(`Could not find player with _id=${plyr._id}`)
+      }
+
+    } catch(err) {
+      throw {message: err.message}
+    }
+  }
+
+
 
 
 
@@ -547,6 +563,9 @@ class ABLRosterController extends BaseController{
     }
 
   }
+
+
+
 
   async _dropPlayerFromTeamAllFutureRosters(req, res, next) {
 
@@ -638,6 +657,7 @@ class ABLRosterController extends BaseController{
     router.get('/' + this.routeString + '/:id/drop/:plyr', (...args) => this._dropPlayerFromTeamAllFutureRosters(...args))
     router.get('/refreshDraft', (...args)=>this._updateDraft(...args));
     router.get('/playerUpdates', (...args)=>this._updatePlayers(...args));
+
     return router;
   }
 }

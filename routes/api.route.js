@@ -36,7 +36,7 @@ router.use(new MLBAPI().route());
 router.use(new Standings().route());
 router.use(new mlbEvt().route())
 router.use(new AblGameController().reroute());
-router.use(new DraftController().route())
+router.use(new DraftController().reroute())
 
 
 module.exports = router;
