@@ -10,20 +10,20 @@
   height: auto;
 }
 
-.mat-cell{
+.mat-mdc-cell{
   justify-content: flex-start;
 }
-.mat-row{
+.mat-mdc-row{
   height:auto !important;
   width: 100%;
   justify-content: space-between;
 
 }
-.mat-header-row{
+.mat-mdc-header-row{
   width: 100%;
 
 }
 
-.mat-table {
+.mat-mdc-table {
   width: 100%;
 }

@@ -79,10 +79,10 @@ body {
 
 
 .alt {
-  .mat-form-field {
+  .mat-mdc-form-field {
     width: auto !important;
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
   .mat-select-value {
     max-width: 100%;
     width: auto;
@@ -93,21 +93,21 @@ body {
   width: 100%;
 
 }
-.mat-cell{
+.mat-mdc-cell{
   justify-content: flex-start;
 }
-.mat-row{
+.mat-mdc-row{
   height:auto !important;
   width: 100%;
   justify-content: space-between;
 
 }
-.mat-header-row{
+.mat-mdc-header-row{
   width: 100%;
 
 }
 
 
-::ng-deep .myPanel.mat-select-panel {
+::ng-deep .myPanel.mat-mdc-select-panel {
   background-color: lightgrey;
 }
