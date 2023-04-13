@@ -55,22 +55,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
     this._getOwner();
 
-
-  }
-  ngAfterViewInit() {
-    //this._initializePlayers();
-
   }
 
-  // private _initializePlayers() {
-  //   this.playerSub = this.api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
-  //   res=> {
-  //   this.players$.next(res)
-  //   },
-  //   err => {
-  //   console.error(err)
-  //   })
-  //   }
 
 
   _getOwner() {

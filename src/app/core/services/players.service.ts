@@ -74,6 +74,7 @@ export class PlayersService {
       return new EventSource(url);
     }
 
+
   private playerNotify() {
     this.allPlayers$.next(this.playerData);
   }
