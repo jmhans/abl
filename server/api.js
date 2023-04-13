@@ -166,7 +166,7 @@ module.exports = function(app, config) {
       'commishPos': {
         '$ifNull': [
           {
-            '$first': '$posRec.position'
+            '$first': '$posRec.CommishPos'
           }, '$priorYearElig'
         ]
       }
