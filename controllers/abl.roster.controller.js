@@ -454,7 +454,7 @@ class ABLRosterController extends BaseController{
   async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate ) {
     try {
 
-      var savedMlbPlayer = await _updatePlayerRecBackend(plyr, teamId, acqType, effDate )
+      var savedMlbPlayer = await this._updatePlayerRecBackend(plyr, teamId, acqType, effDate )
       var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       if (acqType == 'draft') {
         var newPick = {season: "2023", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date()}

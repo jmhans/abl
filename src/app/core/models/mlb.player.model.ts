@@ -29,8 +29,11 @@ class MlbPlayerModel {
     return true
   }
   get abl() {
-    const plyrStats = this.stats.batting;
-    if (plyrStats) {
+
+
+
+    if (this.stats && this.stats.batting) {
+      let plyrStats = this.stats.batting
       return (plyrStats.hits * 25 +
         plyrStats.doubles * 10 +
               plyrStats.triples * 20 +

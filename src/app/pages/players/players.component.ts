@@ -11,6 +11,7 @@ import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Ob
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog as MatDialog ,MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
+import {PlayersService } from '../../core/services/players.service';
 
 export interface DialogData {
   team: AblTeamModel;
@@ -26,8 +27,8 @@ export interface DialogData {
 })
 export class PlayersComponent implements OnInit, OnDestroy {
   pageTitle = 'Players';
-  players$: Subject<MlbPlayerModel[]> = new Subject<MlbPlayerModel[]>();
-  playerSub: Subscription;
+  //players$: Subject<MlbPlayerModel[]> = new Subject<MlbPlayerModel[]>();
+  //playerSub: Subscription;
 
   ownerTeams: AblTeamModel[];
   ownerPrimaryTeam: AblTeamModel;
@@ -43,7 +44,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
               private rosterService: RosterService,
               private auth: AuthService,
               public userContext: UserContextService,
-              public dialog: MatDialog
+              public dialog: MatDialog,
+              public players: PlayersService,
+
               ) { }
 
   ngOnInit() {
@@ -52,22 +55,8 @@ export class PlayersComponent implements OnInit, OnDestroy {
 
     this._getOwner();
 
-
-  }
-  ngAfterViewInit() {
-    this._initializePlayers();
-
   }
 
-  private _initializePlayers() {
-    this.playerSub = this.api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
-    res=> {
-    this.players$.next(res)
-    },
-    err => {
-    console.error(err)
-    })
-    }
 
 
   _getOwner() {

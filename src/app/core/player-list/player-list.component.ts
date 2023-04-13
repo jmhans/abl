@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild , Inject,Input, AfterViewInit} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild , Inject,Input, AfterViewInit, ChangeDetectorRef} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -60,8 +60,8 @@ export class PlayerListComponent implements OnInit, OnDestroy{
 
   playerData$: Observable<MatTableDataSource<MlbPlayerModel>>;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   filter$: BehaviorSubject<{}> = new BehaviorSubject({});
 
@@ -71,7 +71,8 @@ export class PlayerListComponent implements OnInit, OnDestroy{
     public api: ApiService,
     private rosterService: RosterService,
     private auth: AuthService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private cd: ChangeDetectorRef,
     ) { }
 
 ngOnInit() {
@@ -129,6 +130,7 @@ return dataSource
 }
 ))
 
+this.cd.detectChanges()
 }
 
 
