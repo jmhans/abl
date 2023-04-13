@@ -16,6 +16,8 @@ export class PlayersService {
   private playerData: MlbPlayerModel[];
 
   allPlayers$: BehaviorSubject<MlbPlayerModel[]> =new BehaviorSubject([]);
+  //activePlayers$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([]);
+
 
   constructor(
     private _zone: NgZone,
@@ -30,7 +32,6 @@ export class PlayersService {
         err => {
           console.error(err)
         })
-   //this.playerNotify();
 
   }
 
