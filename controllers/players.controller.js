@@ -336,7 +336,7 @@ class PlayersController extends BaseController {
                     },
                     'then': {
                       'curr': '$$this.eligiblePositions',
-                      'prior': '$$value.prior'
+                      'prior': '$$value.prior',
                     }
                   }, {
                     'case': {
@@ -406,7 +406,7 @@ class PlayersController extends BaseController {
               {
                 '$ifNull': [
                   {
-                    '$first': '$tempCommish.position'
+                    '$first': '$tempCommish.CommishPos'
                   }, '$newPosLog.prior'
                 ]
               }

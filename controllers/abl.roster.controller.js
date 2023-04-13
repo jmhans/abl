@@ -205,7 +205,7 @@ class ABLRosterController extends BaseController{
                     {
                       '$ifNull': [
                         {
-                          '$first': '$tempCommish.position'
+                          '$first': '$tempCommish.CommishPos'
                         }, '$newPosLog.prior'
                       ]
                     }
