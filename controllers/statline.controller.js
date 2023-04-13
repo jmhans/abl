@@ -382,7 +382,7 @@ async _genPositionLog() {
   try {
 
     var currentSeason = 2023;
-    var regSeasonStart = new Date('2022-04-07T00:00:00Z')
+    var regSeasonStart = new Date('2023-03-30T00:00:00Z')
 
     var position_log_records = await this.model.aggregate([
       {
