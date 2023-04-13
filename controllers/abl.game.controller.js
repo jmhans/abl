@@ -441,7 +441,7 @@ class ABLGameController extends BaseController{
 
   if (req.query.display == 'playoffs') {
     fullAgg.unshift({
-      '$match': {'gameDate': {'$gte': ISODate('2022-08-22T00:00:00Z')}}
+      '$match': {'gameDate': {'$gte': ISODate('2023-08-22T00:00:00Z')}}
     })
   }
 
