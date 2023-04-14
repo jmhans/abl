@@ -18,6 +18,9 @@ export class PlayersService {
   allPlayers$: BehaviorSubject<MlbPlayerModel[]> =new BehaviorSubject([]);
   //activePlayers$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([]);
 
+  mlbRosters$: BehaviorSubject<> = new BehaviorSubject([]); // Roster data is source of truth for player status/team/etc.
+
+
 
   constructor(
     private _zone: NgZone,
