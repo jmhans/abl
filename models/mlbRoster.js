@@ -9,10 +9,21 @@ var mlbRosterSchema = new mongoose.Schema({
     status: {type: {code: String, description: String}},
     parentTeamId: Number
   }], required: true},
+team: {type: {}, required: false},
 teamId: {type: Number, required: true},
 rosterType: {type: String, required: false},
 link: {type: String, required: false}
 })
+
+mlbRosterSchema.post('save', function(doc, next) {
+// update player statuses.
+
+ for (var p=0; p<doc.roster.length; p++) {
+  const plyr = this.PlyrCntl._updatePlayerStatus(doc.roster[p], doc.team); // appendPlayerRecord(player, team, gm);
+ }
+
+})
+
 
 
 module.exports = mongoose.model('mlbRoster', mlbRosterSchema);

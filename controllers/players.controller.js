@@ -70,9 +70,7 @@ class PlayersController extends BaseController {
       try {
         var _playerRecord = await this.model.findOne(query);
 
-          if (_playerRecord) {
-
-          } else {
+          if (!_playerRecord) {
             // Create a new player record.
               _playerRecord = new this.model({
                 mlbID: player.person.id,

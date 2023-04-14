@@ -48,7 +48,7 @@ class altMlbApiController extends BaseController{
   async _getRosters(req, res, next) {
     try {
       const rosters = await this.getAllRosters();
-      return res.send(`${rosters.length} players updated.`);
+      return res.send(`${rosters.length} rosters updated.`);
     } catch (err) {
       return res.status(500).send({message: err.message});
     }
@@ -210,18 +210,10 @@ class altMlbApiController extends BaseController{
         for (var t=0; t<teams.length; t++) {
           var resp = await this.getRosterInfo(teams[t].id)
 
-          const rQuery = {teamId: teams[t].id}
-
-          // Add logic to upsert the roster record for the team.
+          const rQuery = {teamId: teams[t].id, team: teams[t]}
 
           const upsertedRoster = await mlbRoster.findOneAndUpdate(rQuery, resp, {upsert: true});
-
-          // for (var p=0; p<resp.roster.length; p++) {
-          //   const plyr = this.PlyrCntl._updatePlayerStatus(resp.roster[p], teams[t]); // appendPlayerRecord(player, team, gm);
-          //   output.push(resp.roster[p].person.id)
-
-          // }
-
+          output.push(upsertedRoster);
         }
         return output;
 
