@@ -3,7 +3,7 @@ import {  Roster } from './roster';
 import {  HttpClient,  HttpErrorResponse , HttpHeaders} from '@angular/common/http';
 
 import { AuthService } from './../auth/auth.service';
-import { MessageService } from '../message.service';
+import { MessageService } from '../core/services/message.service';
 import { Observable, of, throwError as ObservableThrowError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
@@ -15,15 +15,15 @@ const httpOptions = {
 export class RosterService {
   private rostersUrl = '/api/rosters';
 
-  constructor(private http: HttpClient, 
-              private messageService: MessageService, 
+  constructor(private http: HttpClient,
+              private messageService: MessageService,
               private auth: AuthService) {}
-  
+
   private get _authHeader(): string {
     return `Bearer ${this.auth.accessToken}`;
   }
-  
-  
+
+
   getRosters(): Observable < Roster[] > {
     return this.http.get<Roster[]>(`${this.rostersUrl}`, {
       headers: new HttpHeaders().set('Authorization', this._authHeader  )
@@ -47,13 +47,13 @@ export class RosterService {
 
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
-      
-       const errorMsg = error.message || 'Error: Unable to complete request.'; 
+
+       const errorMsg = error.message || 'Error: Unable to complete request.';
         if (error.message && error.message.indexOf('No JWT present') > -1) {
           this.auth.login();
 
-        } 
-      
+        }
+
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
 
@@ -61,7 +61,7 @@ export class RosterService {
       return of(result as T);
     };
   }
-  
+
     /** Log a HeroService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`RosterService: ${message}`);
