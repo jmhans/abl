@@ -16,6 +16,7 @@ export class PlayersService {
   playerUpdates: Subscription;
   private playerData: MlbPlayerModel[];
   private rosterData: MlbRoster[];
+  loadType: string = 'active';
 
   allPlayers$ = new ReplaySubject<MlbPlayerModel[]>(1); // = new Subject();
   //activePlayers$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([]);
