@@ -45,7 +45,7 @@ class altMlbApiController extends BaseController{
     }
   }
 
-  async _getRosters(req, res, next) {
+  async _refreshRosters(req, res, next) {
     try {
       const rosters = await this.getAllRosters();
       return res.send(`${rosters.length} rosters updated.`);
@@ -223,11 +223,19 @@ class altMlbApiController extends BaseController{
       }
 
  }
-
+ async _getRosters(req, res, next) {
+  try {
+    const rosters = await mlbRoster.find({});
+    return res.send(rosters);
+  } catch (err) {
+    return res.status(500).send({message: err.message});
+  }
+}
 
   route() {
     router.get('/' + this.routeString + '/:gm_dt' , (...args) => this._getGames(...args));
-    router.get('/mlb/rosters', (...args)=> this._getRosters(...args));
+    router.get('/mlb/rosters', (...args)=> this._refreshRosters(...args));
+    router.get('/mlbRosters', (...args)=> this._getRosters(...args));
     return router;
   }
 

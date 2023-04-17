@@ -35,7 +35,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() ownerPrimaryTeam:AblTeamModel;
 @Input() defaultAddType:String='pickup';
 
-  loading: boolean;
+  loading: boolean = true;
   error: boolean;
   query: '';
   rosterUpdateSub: Subscription;
@@ -86,7 +86,11 @@ this.redraw$ = merge(of({}), this.sort.sortChange, this.paginator.page, 3)
 this.fullFilter$ = this.filter$.pipe(
 scan((acc, curr)=> {
   for (const prop in curr) {
-    acc[prop] = curr[prop]
+    if (prop) {
+      acc[prop] = curr[prop]
+    } else {
+      delete acc[prop]
+    }
   }
 
 return acc
@@ -125,7 +129,7 @@ this.dispStatuses = dataSource.filteredData.reduce((prev: string[] ,  curr )=> {
   return prev
 }, ['Not on 40-man roster'])
 this.resultLength = dataSource.filteredData.length;
-
+this.loading =false
 return dataSource
 }
 ))
@@ -239,6 +243,11 @@ this.addFilterProp(filterObj)
 addFilterProp(obj) {
 this.filter$.next(obj)
 }
+clearFilterProp(prop) {
+let obj ={}
+obj[prop] = null
+  this.filter$.next(obj)
+  }
 
 
 _isAdmin() {
