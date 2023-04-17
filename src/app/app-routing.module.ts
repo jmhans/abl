@@ -15,6 +15,7 @@ import { GamesComponent } from './pages/games/games.component';
 import { PlayersComponent } from './pages/players/players.component';
 import { StandingsComponent } from './pages/standings/standings.component';
 import { SuppDraftComponent} from './pages/supp-draft/supp-draft.component';
+import { MessagesComponent } from './messages/messages.component';
 
 
 import { UpdateTeamComponent } from './pages/admin/update-team/update-team.component';
@@ -50,7 +51,8 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                        {path: 'players', component: PlayersComponent, canActivate: [ AuthGuard ]},
                         {path: 'standings', component: StandingsComponent, canActivate: [ AuthGuard ]},
                         {path: 'suppdraft', component: SuppDraftComponent, canActivate: [ AuthGuard ]},
-                        {path: 'playoffs', component: PlayoffsComponent, canActivate: [ AuthGuard ]}
+                        {path: 'playoffs', component: PlayoffsComponent, canActivate: [ AuthGuard ]},
+                        {path: 'messages', component: MessagesComponent, canActivate: [ AuthGuard ]}
 
                        ];
 

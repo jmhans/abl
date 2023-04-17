@@ -12,6 +12,7 @@ import { GameModel } from './models/game.model';
 import { AblTeamModel } from './models/abl.team.model';
 import { OwnerModel } from './models/owner.model';
 import { MlbPlayerModel } from './models/mlb.player.model';
+import { MlbRoster } from './models/mlb.roster';
 import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.record.model';
 
 
@@ -52,6 +53,13 @@ export class ApiService {
   getMlbPlayers$(): Observable<MlbPlayerModel[]> {
     return this.http
       .get<MlbPlayerModel[]>(`${this.v2_api}players`)
+      .pipe(
+        catchError((error) => this._handleError(error))
+    );
+  }
+  getMlbRosters$(): Observable<MlbRoster[]> {
+    return this.http
+      .get<MlbRoster[]>(`${this.v2_api}mlbRosters`)
       .pipe(
         catchError((error) => this._handleError(error))
     );
