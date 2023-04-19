@@ -319,9 +319,10 @@ _get(req, res, next) {
           let strType = outcomes[0].outcome
           let strCount = 0
 
+
           do  {
             strCount++
-          } while (outcomes[strCount].outcome == strType)
+          } while ((strCount < outcomes.length) && (outcomes[strCount].outcome == strType))
 
           let l10 =outcomes.slice(0, 10).reduce((tot,cur)=> {
 
