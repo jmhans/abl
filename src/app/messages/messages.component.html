@@ -9,3 +9,20 @@
 </div>
 <button
 (click)="messageService.add('some message')">add</button>
+<div *ngIf='messageService.allPosts$ | async as posts'>
+  <mat-card *ngFor='let message of posts' class="example-card">
+    <mat-card-header>
+      <mat-card-title>{{message.title}}</mat-card-title>
+      <mat-card-subtitle>{{message.author}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{message.content}}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button>LIKE</button>
+      <button mat-button>SHARE</button>
+    </mat-card-actions>
+  </mat-card>
+
+
+</div>

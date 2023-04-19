@@ -242,12 +242,30 @@ export class ApiService {
       catchError((error) => this._handleError(error))
     )
   }
-
+     // POST new game (admin only)
+     postAPIData$(model: string, data: any[]): Observable<any[]> {
+      return this.http
+        .post<any[]>(`${this.v2_api}${model}`,data, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+        );
+    }
 
      // POST new game (admin only)
   postData$(model: string, data: any[]): Observable<any[]> {
     return this.http
       .post<any[]>(`${this.data_api}${model}`,data, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+  putData$(model: string, data: any[]): Observable<any[]> {
+    return this.http
+      .put<any[]>(`${this.data_api}${model}`,data, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
