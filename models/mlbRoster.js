@@ -10,6 +10,7 @@ var mlbRosterSchema = new mongoose.Schema({
     parentTeamId: Number
   }], required: true},
 team: {type: {}, required: false},
+lastUpdate: {type: Date, required: false},
 teamId: {type: Number, required: true},
 rosterType: {type: String, required: false},
 link: {type: String, required: false}

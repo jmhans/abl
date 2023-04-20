@@ -644,6 +644,37 @@ class ABLRosterController extends BaseController{
    }, 30000)
  }
 
+ async _getUsers(req, res, next) {
+  try {
+    let userData = await AblTeam.aggregate([
+    {
+      $unwind:
+        {
+          path: "$owners",
+          preserveNullAndEmptyArrays: false,
+        },
+    },
+    {
+      $project:
+
+        {
+          name: "$owners.name",
+          userId: "$owners.userId",
+          email: "$owners.email",
+          _id: "$owners._id",
+          team: {
+            location: "$location",
+            nickname: "$nickname",
+            _id: "$_id",
+          },
+        },
+    },
+  ])
+  return res.send(userData);
+} catch (err) {
+  return res.status(500).send({message: err.message});
+}
+ }
 
   reroute() {
     router = this.route();
@@ -657,6 +688,7 @@ class ABLRosterController extends BaseController{
     router.get('/' + this.routeString + '/:id/drop/:plyr', (...args) => this._dropPlayerFromTeamAllFutureRosters(...args))
     router.get('/refreshDraft', (...args)=>this._updateDraft(...args));
     router.get('/playerUpdates', (...args)=>this._updatePlayers(...args));
+    router.get('/users' , (...args) => this._getUsers(...args));
 
     return router;
   }

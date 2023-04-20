@@ -23,10 +23,21 @@ export class MessageService implements OnDestroy {
       this.allPosts$ = this.api.getAPIData$('posts')
     }
 
-  add(message: string) {
+  add(author: string,  message: string) {
     //this.messages.push(message);
 
-    this.api.postAPIData$('posts', [{'title': "this is another title", "content": message}]).pipe(takeUntil(this.unsubscribe$)).subscribe(
+    this.api.postAPIData$('posts', [{'title': "this is another title", "content": message, 'timestamp': new Date()}]).pipe(takeUntil(this.unsubscribe$)).subscribe(
+      res=> {
+        this.getPosts()
+      },
+      err => {
+        console.error(err)
+      })
+  }
+
+  reply(id: string,newReply: string) {
+
+    this.api.putAPIData$('posts', id, {$push: {'replies': {'content': newReply, 'timestamp': new Date()}}}).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res=> {
         this.getPosts()
       },

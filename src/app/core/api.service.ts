@@ -263,9 +263,9 @@ export class ApiService {
         catchError((error) => this._handleError(error))
       );
   }
-  putData$(model: string, data: any[]): Observable<any[]> {
+  putAPIData$(model: string, id: string, data: any): Observable<any[]> {
     return this.http
-      .put<any[]>(`${this.data_api}${model}`,data, {
+      .put<any[]>(`${this.v2_api}${model}/${id}`,data, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
