@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MessageService } from '../core/services/message.service';
 import { AuthService } from '../auth/auth.service';
 import { UserContextService } from '../core/services/user.context.service';
-import {  Observable } from 'rxjs';
+import {  Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-messages',
@@ -11,6 +12,10 @@ import {  Observable } from 'rxjs';
 })
 export class MessagesComponent implements OnInit {
 
+unsubscribe$:Subject<any> = new Subject();
+user:any;
+currentUserSub: Subscription;
+
   constructor(
     public messageService: MessageService,
     public auth: AuthService,
@@ -18,7 +23,14 @@ export class MessagesComponent implements OnInit {
     ) { }
 
   ngOnInit() {
+    this.currentUserSub = this.userContext.owner$.pipe(takeUntil(this.unsubscribe$)).subscribe(data=> {
+      this.user = data;
+    })
 
+  }
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.unsubscribe();
   }
 
 }

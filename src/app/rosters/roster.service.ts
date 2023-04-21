@@ -29,7 +29,7 @@ export class RosterService {
       headers: new HttpHeaders().set('Authorization', this._authHeader  )
     })
       .pipe(
-        tap(_ => this.log('fetched rosters')),
+
         catchError(this.handleError('getRosters', []))
     );
   }
@@ -37,7 +37,7 @@ export class RosterService {
   // post("/api/rosters")
   createRoster(newRoster: Roster): Observable < Roster > {
     return this.http.post<Roster>(this.rostersUrl, newRoster, httpOptions).pipe(
-      tap((roster: Roster)=> this.log(`added owner w/ id=${roster._id}`)),
+
       catchError(this.handleError<Roster>('createRoster'))
     );
   }
@@ -55,17 +55,13 @@ export class RosterService {
         }
 
       // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
+
 
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
   }
 
-    /** Log a HeroService message with the MessageService */
-  private log(message: string) {
-    this.messageService.add(`RosterService: ${message}`);
-  }
 
 
 }

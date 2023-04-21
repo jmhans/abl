@@ -26,7 +26,7 @@ export class MessageService implements OnDestroy {
   add(author: string,  message: string) {
     //this.messages.push(message);
 
-    this.api.postAPIData$('posts', [{'title': "this is another title", "content": message, 'timestamp': new Date()}]).pipe(takeUntil(this.unsubscribe$)).subscribe(
+    this.api.postAPIData$('posts', [{'title': "this is another title", "author": author, "content": message, 'timestamp': new Date()}]).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res=> {
         this.getPosts()
       },
@@ -35,9 +35,9 @@ export class MessageService implements OnDestroy {
       })
   }
 
-  reply(id: string,newReply: string) {
+  reply(id: string,user: string, newReply: string) {
 
-    this.api.putAPIData$('posts', id, {$push: {'replies': {'content': newReply, 'timestamp': new Date()}}}).pipe(takeUntil(this.unsubscribe$)).subscribe(
+    this.api.putAPIData$('posts', id, {$push: {'replies': {'content': newReply, 'author': user, 'timestamp': new Date()}}}).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res=> {
         this.getPosts()
       },
