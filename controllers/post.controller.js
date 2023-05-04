@@ -6,6 +6,13 @@ class PostController extends BaseController {
     super(Post, 'posts');
   }
 
+
+  _get(req, res, next) {
+    this.model.find().populate('replies').exec(function(err, results) {
+      if (err) return next(err);
+      res.json(results);
+    });
+    }
   }
 
 module.exports = PostController

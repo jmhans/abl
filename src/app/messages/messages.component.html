@@ -15,28 +15,63 @@
 
 <button *ngIf="user as owner"
 (click)="messageService.add(owner.userId, 'some message')">add</button>
-<div *ngIf='messageService.allPosts$ | async as posts'>
-  <mat-card *ngFor='let message of posts' class="example-card">
-    <mat-card-header>
-      <mat-card-title>{{message.title}}</mat-card-title>
-      <mat-card-subtitle>{{userContext.getDisplayName(message.author)}} {{message.timestamp}}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p>{{message.content}}</p>
-      <mat-card *ngFor='let reply of message.replies' class='example-card'>
-        <mat-card-subtitle>{{userContext.getDisplayName(reply.author)}} {{reply.timestamp}}</mat-card-subtitle>
-        <mat-card-content>{{reply.content}}</mat-card-content>
+
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+  <!-- This is the tree node template for leaf nodes -->
+  <!-- There is inline padding applied to this node using styles.
+    This padding value depends on the mat-icon-button width. -->
+  <mat-tree-node *matTreeNodeDef="let message" matTreeNodeToggle>
+
+      <mat-card  class="example-card">
+        <mat-card-header>
+          <mat-card-title>{{message.title}}</mat-card-title>
+          <mat-card-subtitle>{{userContext.getDisplayName(message.author)}} {{message.timestamp}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{message.content}}</p>
+
+        </mat-card-content>
+        <mat-card-actions *ngIf="user as owner" >
+          <button mat-icon-button (click)='messageService.togglelike(message._id, owner.userId, !user_has_liked(message, owner.userId))'><mat-icon [ngClass]="{'liked material-icons': user_has_liked(message, owner.userId)}" fontSet="material-icons-outlined">thumb_up</mat-icon></button>
+          <button mat-icon-button (click)='messageService.reply(message._id, owner.userId, "my reply")'><mat-icon fontSet="material-icons-outlined">add_comment</mat-icon></button>Reply to {{message._id}}
+        </mat-card-actions>
+
 
       </mat-card>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-button>LIKE</button>
-      <button mat-button>SHARE</button>
-      <button mat-button *ngIf="user as owner" (click)='messageService.reply(message._id, owner.userId, "Some snarky reply")'>REPLY</button>
-    </mat-card-actions>
-  </mat-card>
 
 
-</div>
+  </mat-tree-node>
+  <!-- This is the tree node template for expandable nodes -->
+  <mat-nested-tree-node *matTreeNodeDef="let message; when: hasChild">
+      <div class="mat-tree-node">
+
+        <mat-card  class="example-card">
+          <mat-card-header>
+            <mat-card-title>{{message.title}}</mat-card-title>
+            <mat-card-subtitle>{{userContext.getDisplayName(message.author)}} {{message.timestamp}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{message.content}}</p>
+
+          </mat-card-content>
+          <mat-card-actions *ngIf="user as owner" >
+            <button mat-button matTreeNodeToggle
+                    [attr.aria-label]="'Toggle ' + message.title">
+               {{treeControl.isExpanded(message) ? 'HIDE' : 'VIEW'}} REPLIES
+            </button>
+            <button mat-icon-button (click)='messageService.togglelike(message._id, owner.userId, !user_has_liked(message, owner.userId))' ><mat-icon [ngClass]="{'liked material-icons': user_has_liked(message, owner.userId)}" fontSet="material-icons-outlined" >thumb_up</mat-icon></button>
+            <button mat-icon-button (click)='messageService.reply(message._id, owner.userId, "Some snarky reply")'><mat-icon  fontSet="material-icons-outlined" >add_comment</mat-icon></button>Reply to {{message._id}}
+          </mat-card-actions>
+
+        </mat-card>
 
 
+      </div>
+      <!-- There is inline padding applied to this div using styles.
+          This padding value depends on the mat-icon-button width.  -->
+      <div [class.example-tree-invisible]="!treeControl.isExpanded(message)"
+          role="group">
+        <ng-container matTreeNodeOutlet></ng-container>
+    </div>
+  </mat-nested-tree-node>
+</mat-tree>

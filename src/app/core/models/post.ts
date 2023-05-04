@@ -1,7 +1,13 @@
 interface message {
+  title:string,
   author: any,
   timestamp:Date,
   content: string,
+}
+
+interface Like {
+  timestamp: Date,
+  user: string
 }
 export class Post {
   constructor(
@@ -10,7 +16,8 @@ export class Post {
     public author: any,
     public timestamp:Date,
     public content: string,
-    public replies: message[]
+    public replies: Post[],
+    public likes: Like[]
   ) {
 
   }

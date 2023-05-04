@@ -5,10 +5,15 @@ var postSchema = new mongoose.Schema({
   author: {type: String, required: false},
   content: {type: String, required: false},
   timestamp: {type: Date, required: false},
-  replies: [{content: {type: String, required: false},
-            author: {type: String, required: false},
-          timestamp: {type: Date, required: false}}]
+//  replies: [{content: {type: String, required: false},
+//            author: {type: String, required: false},
+//          timestamp: {type: Date, required: false}}],
+  likes: [{
+    user: {type: String, required: true},
+    timestamp: {type: Date, required: false}
+}],
+  parent: {type: mongoose.Schema.objectId, ref='Post', default: false}
 
 })
 
-module.exports = mongoose.model('post', postSchema);
+module.exports = mongoose.model('Post', postSchema);
