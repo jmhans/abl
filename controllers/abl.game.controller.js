@@ -1110,9 +1110,9 @@ const toDt = dt //new Date()
 const fromDt = new Date((new Date(toDt)).setDate(toDt.getDate() -1))
 try {
 let gms = await this.model.find({
-  $and: [
-    {$or: [{results: {$exists: false}},
-              {results: {$size: 0}}]},
+  $and: [    {$or: [{results: {$exists: false}},
+              {results: {$size: 0}}, {"results": {$elemMatch: {"status": {$ne:  "final"}}}}]},
+
         {gameDate: {$gte: fromDt}},
         {gameDate: {$lte: toDt}}
       ]}).exec()
