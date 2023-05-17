@@ -6,10 +6,11 @@ import {MatPaginator as MatPaginator} from '@angular/material/paginator';
 import {MatSortModule, MatSort, SortDirection, Sort} from '@angular/material/sort';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
 
-
+import {MatTabChangeEvent} from '@angular/material/tabs'
 
 import {Subscription, merge, Observable, of as observableOf, combineLatest, BehaviorSubject} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 
 
@@ -24,38 +25,47 @@ export class StandingsComponent implements OnInit, OnDestroy {
   //standingsSub: Subscription;
   //standings: any[];
   sortedStandings: MatTableDataSource<any[]>;
-
+  standtingstype: string = 'basic';
   //loading: boolean;
   error: boolean;
   sortEvent$: BehaviorSubject<any> = new BehaviorSubject({});
 
   standingsData$: Observable<MatTableDataSource<any[]>>;
   headings = ['Team', 'G', 'W', 'L', 'WPct', 'AVG Runs', 'AB', 'H', '2B', '3B', 'HR', 'BB+HBP', 'SF+SAC', 'SB', 'CS', 'Error', 'ERA', 'HR Allowed']
-  colHeads = [{'name': 'team', 'title': 'Team', 'map': (itm)=>{return itm.tm.nickname}},
-              {'name': 'g', 'title': 'G', 'prop': 'g'},
-              {'name': 'w', 'title': 'W', 'prop': 'w'},
-              {'name': 'l', 'title': 'L', 'prop': 'l'},
-              {'name': 'wpct', 'title': 'Win Pct', 'map': (itm)=>{return itm.w / itm.g}, 'pipe': {'number':'1.3-3'}},
-              {'name': 'gb'},
-              {'name': 'l10'},
-              {'name': 'streak'},
-              {'name': 'abl', 'title': 'ABL Runs', 'prop': 'abl_runs'},
-              {'name': 'ab', 'title': 'AB', 'prop': 'ab'},
-              {'name': 'h', 'title': 'H', 'prop': 'h'},
-              {'name': '2b','title': '2B', 'prop': '2b'},
-              {'name': '3b','title': '3B', 'prop': '3b'},
-              {'name': 'hr','title': 'HR', 'prop': 'hr'},
-              {'name': 'bb','title': 'BB', 'prop': 'bb'},
-              {'name': 'sac','title': 'SAC', 'prop': 'sac'},
-              {'name': 'sb','title': 'SB', 'prop': 'sb'},
-              {'name': 'cs','title': 'CS', 'prop': 'cs'},
-              {'name': 'sb%'},
-              {'name': 'e','title': 'Error', 'prop': 'e'},
-              {'name': 'bat_avg'},
-              {'name': 'slg_pct'},
-              {'name': 'era','title': 'ERA', 'prop': 'era'},
-              {'name': 'hr_allowed','title': 'HR Allowed', 'prop': 'hr_allowed'}];
-  colNames = this.colHeads.map((itm)=> {return itm.name});
+  colHeads = [{'name': 'team', 'title': 'Team', 'map': (itm)=>{return itm.tm.nickname}, 'type': ['Standard', 'Advanced']},
+              {'name': 'g', 'title': 'G', 'prop': 'g', 'type': ['Standard', 'Advanced']},
+              {'name': 'w', 'title': 'W', 'prop': 'w', 'type': ['Standard', 'Advanced']},
+              {'name': 'l', 'title': 'L', 'prop': 'l', 'type': ['Standard', 'Advanced']},
+              {'name': 'wpct', 'title': 'Win Pct', 'map': (itm)=>{return itm.w / itm.g}, 'pipe': {'number':'1.3-3'}, 'type': ['Standard']},
+              {'name': 'gb', 'type': ['Standard']},
+              {'name': 'l10', 'type': ['Standard']},
+              {'name': 'streak', 'type': ['Standard']},
+              {'name': 'abl', 'title': 'ABL Runs', 'prop': 'abl_runs', 'type': ['Standard']},
+              {'name': 'ab', 'title': 'AB', 'prop': 'ab', 'type': ['Standard']},
+              {'name': 'h', 'title': 'H', 'prop': 'h', 'type': ['Standard']},
+              {'name': '2b','title': '2B', 'prop': '2b', 'type': ['Standard']},
+              {'name': '3b','title': '3B', 'prop': '3b', 'type': ['Standard']},
+              {'name': 'hr','title': 'HR', 'prop': 'hr', 'type': ['Standard']},
+              {'name': 'bb','title': 'BB', 'prop': 'bb', 'type': ['Standard']},
+              {'name': 'sac','title': 'SAC', 'prop': 'sac', 'type': ['Standard']},
+              {'name': 'sb','title': 'SB', 'prop': 'sb', 'type': ['Standard']},
+              {'name': 'cs','title': 'CS', 'prop': 'cs', 'type': ['Standard']},
+              {'name': 'sb%', 'type': ['Standard']},
+              {'name': 'e','title': 'Error', 'prop': 'e', 'type':['Standard']},
+              {'name': 'bat_avg', 'type': ['Standard']},
+              {'name': 'slg_pct', 'type':['Standard']},
+              {'name': 'era','title': 'ERA', 'prop': 'era', 'type': ['Standard']},
+              {'name': 'hr_allowed','title': 'HR Allowed', 'prop': 'hr_allowed', 'type':['Standard']},
+              {'name': 'dougluckw', 'title': 'DougLuck W', 'type': ['Advanced']},
+              {'name': 'dougluckl', 'title': 'DougLuck L', 'type': ['Advanced']},
+              {'name': 'dougluckExcessW', 'title': 'Lucky Wins', 'type': ['Advanced']},
+            ];
+
+  currTab: string = "Standard"
+  colNames: string[] =[]
+
+
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -67,6 +77,20 @@ export class StandingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
+    this.refreshColNames();
+
+
+  }
+
+  public onSelectedTabChange(matTabChangeEvent: MatTabChangeEvent)  {
+    console.log(matTabChangeEvent.tab.textLabel);
+    this.currTab = matTabChangeEvent.tab.textLabel
+    this.refreshColNames();
+
+  }
+
+  refreshColNames() {
+    this.colNames = this.colHeads.filter((itm)=> itm.type.indexOf(this.currTab) > -1).map((itm)=> {return itm.name});
 
   }
 
@@ -125,8 +149,4 @@ sortChange(sortEvent: Sort): void {
 
 
 }
-
-
-
-
 

@@ -12,7 +12,7 @@ var postSchema = new mongoose.Schema({
     user: {type: String, required: true},
     timestamp: {type: Date, required: false}
 }],
-  parent: {type: mongoose.Schema.objectId, ref='Post', default: false}
+  parent: {type: String, required: false}
 
 })
 
