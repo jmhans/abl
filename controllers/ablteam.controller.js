@@ -127,8 +127,6 @@ var AblTeamController = {
     });
   },
 
-
-
 }
 
 

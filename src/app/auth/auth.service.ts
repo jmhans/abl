@@ -24,8 +24,9 @@ export class AuthService {
   loggedIn: boolean = false;
   loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
   loggingIn: boolean;
-  isAdmin: boolean; 
-  
+  isAdmin: boolean;
+  user$ = new BehaviorSubject<any>({});
+
   constructor(private router: Router) {
     // If app auth token is not expired, request new token
     if (JSON.parse(localStorage.getItem('expires_at')) > Date.now()) {
@@ -36,6 +37,10 @@ export class AuthService {
   setLoggedIn(value: boolean) {
     // Update login status subject
     this.loggedIn$.next(value);
+    if (value) {
+      this.user$.next(this.userProfile);
+    }
+
     this.loggedIn = value;
   }
 
@@ -55,7 +60,7 @@ export class AuthService {
         this.router.navigate(['/']);
         console.error(`Error authenticating: ${err.error}`);
       }
-      
+
     });
   }
 
@@ -95,12 +100,12 @@ export class AuthService {
     // Remove token expiration from localStorage
     localStorage.removeItem('expires_at');
   }
-  
+
   private _redirect() {
     // Redirect with or without 'tab' query parameter
     // Note: does not support additional params besides 'tab'
     const fullRedirect = decodeURI(localStorage.getItem('authRedirect') || '');
-    
+
     let navigationExtras: NavigationExtras = {
       queryParamsHandling: 'preserve',
       preserveFragment: true
@@ -122,7 +127,7 @@ export class AuthService {
     // Remove redirect from localStorage
     localStorage.removeItem('authRedirect');
   }
-  
+
   logout() {
     // Remove data from localStorage
     this._clearExpiration();
@@ -149,7 +154,7 @@ export class AuthService {
       }
     });
   }
-  
-  
+
+
 
 }

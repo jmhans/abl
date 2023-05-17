@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {  AuthService} from './../../auth/auth.service';
 import {  ApiService} from './../api.service';
-import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import {  Subscription, BehaviorSubject,  Subject, combineLatest, throwError as ObservableThrowError, Observable } from 'rxjs';
+import { catchError , takeUntil} from 'rxjs/operators';
 
 
 @Injectable({
@@ -14,6 +14,11 @@ export class UserContextService {
   teamsSubscription: Subscription;
   teams$ = new BehaviorSubject<any[]>(this.teams);
   actingTeam$ = new BehaviorSubject<any>(undefined)
+  owners$ = new Subject<any[]>();
+  owner$ = new Subject<any>();
+  unsubscribe$: Subject<void> = new Subject<void>();
+  private owners:any[] = [];
+
 
   constructor(
     private auth: AuthService,
@@ -28,16 +33,38 @@ export class UserContextService {
         }
       }
     );
+    this.getOwners();
+    this.getCurrentOwner();
   }
 
-     
+  async getOwners() {
+    this.api.getAPIData$('users').pipe(takeUntil(this.unsubscribe$)).subscribe(
+      res=> {
+        this.owners = res
+        this.owners$.next(this.owners)
+      },
+      err => {
+        console.error(err)
+      })
+  }
+
+ async getCurrentOwner() {
+
+    combineLatest([this.owners$, this.auth.user$]).pipe(takeUntil(this.unsubscribe$)).subscribe(
+      ([ownerList, currUser]) => {
+        let currOwner =ownerList.find((owner)=> {return owner.userId == currUser.sub})
+        if (currOwner) {
+          this.owner$.next(currOwner)
+        }
+    })
+  }
 
   async getTeams() {
     this.teams$.next([]);
     const qry = {
       "$in": this.auth.userProfile['http://ff_teams.com/teams/ff_teams']
     };
-    
+
     this.teamsSubscription = this.api.getAblTeams$()
       .subscribe(
         res => {
@@ -50,7 +77,7 @@ export class UserContextService {
           if (owner_teams.length > 0) {
             this.actingTeam$.next(owner_teams[0])
           }
-          
+
         },
         err => {
           console.error(err);
@@ -58,12 +85,20 @@ export class UserContextService {
       );
 
   }
-  
+
   async setActingTm(tmID) {
     var act_team = this.teams.find((tm)=> {return tm._id == tmID})
     if (act_team) {
       this.actingTeam$.next(act_team)
     }
+  }
+
+  getDisplayName(userId: string) {
+    let owner = this.owners.find((owner)=> {return owner.userId == userId})
+    if (owner) {
+      return owner.name
+    }
+    return ''
   }
 
 }

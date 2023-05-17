@@ -182,8 +182,11 @@ class altMlbApiController extends BaseController{
 
         try {
 
-        const APIUrl = BASE_URL + `/teams/${tm}/roster?rosterType=40Man`  ;
+        const APIUrl = BASE_URL + `/teams/${tm.id}/roster?rosterType=40Man`  ;
        var retBody = await axios.get(APIUrl);
+        let rosterContent =retBody.data
+        rosterContent.team = tm
+        rosterContent.lastUpdate = new Date()
        return retBody.data
      } catch (err) {
        console.error(`Error in getRosterInfo: ${err}; URL: ${APIUrl}`)
@@ -208,9 +211,9 @@ class altMlbApiController extends BaseController{
         const teams = await this.getAllTeams();
 
         for (var t=0; t<teams.length; t++) {
-          var resp = await this.getRosterInfo(teams[t].id)
+          var resp = await this.getRosterInfo(teams[t])
 
-          const rQuery = {teamId: teams[t].id, team: teams[t]}
+          const rQuery = {teamId: teams[t].id}
 
           const upsertedRoster = await mlbRoster.findOneAndUpdate(rQuery, resp, {upsert: true});
           output.push(upsertedRoster);

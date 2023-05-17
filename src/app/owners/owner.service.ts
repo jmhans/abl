@@ -38,7 +38,7 @@ export class OwnerService {
       headers: new HttpHeaders().set('Authorization', this._authHeader  )
     })
       .pipe(
-        tap(_ => this.log('fetched owners')),
+
         catchError(this.handleError2('getOwners2', []))
       );
   }
@@ -46,14 +46,14 @@ export class OwnerService {
   /** POST: add a new Owner to the server */
   addOwner (owner: Owner): Observable<Owner> {
     return this.httpC.post<Owner>(this.ownersUrl, owner, httpOptions).pipe(
-      tap((owner: Owner) => this.log(`added owner w/ id=${owner._id}`)),
+
       catchError(this.handleError2<Owner>('addOwner'))
     );
   }
   // get("/api/owners/:id") endpoint not used by Angular app
   addTeam (team: Team): Observable<Team> {
     return this.httpC.post<Team>(this.teamsUrl, team, httpOptions).pipe(
-      tap((team: Team) => this.log(`added team w/ id=${team._id}`)),
+
       catchError(this.handleError2<Team>('addTeam'))
     );
   }
@@ -63,7 +63,7 @@ export class OwnerService {
   getOwner(id: String): Observable<Owner> {
     const url = `${this.ownersUrl}/${id}`;
     return this.httpC.get<Owner>(url).pipe(
-      tap(_ => this.log(`fetched owner id=${id}`)),
+
       catchError(this.handleError2<Owner>(`getOwner id=${id}`))
     );
   }
@@ -75,7 +75,7 @@ export class OwnerService {
     const url = `${this.ownersUrl}/${id}`;
 
     return this.httpC.delete<Owner>(url, httpOptions).pipe(
-      tap(_ => this.log(`deleted owner id=${id}`)),
+
       catchError(this.handleError2<Owner>('deleteOwner'))
     );
   }
@@ -85,7 +85,7 @@ export class OwnerService {
   updateOwner2 (owner: Owner): Observable<any> {
     var putUrl = this.ownersUrl + '/' + owner._id;
     return this.httpC.put(putUrl, owner, httpOptions).pipe(
-      tap(_ => this.log(`updated owner id=${owner._id}`)),
+
       catchError(this.handleError2<any>('updateOwner2'))
     );
   }
@@ -99,7 +99,7 @@ export class OwnerService {
 
     // Implement this method (e.g. "name" as part of the url string) on the API.
         return this.httpC.get<Owner[]>(`${this.ownersUrl}/?name=${term}`).pipe(
-      tap(_ => this.log(`found owners matching "${term}"`)),
+
       catchError(this.handleError2<Owner[]>('searchOwners', []))
     );
   }
@@ -125,7 +125,7 @@ export class OwnerService {
         }
 
       // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
+
 
       // Let the app keep running by returning an empty result.
       return of(result as T);
@@ -141,10 +141,5 @@ export class OwnerService {
     return ObservableThrowError(errorMsg);
   }
 
-
-  /** Log a HeroService message with the MessageService */
-  private log(message: string) {
-    this.messageService.add(`HeroService: ${message}`);
-  }
 
 }
