@@ -33,7 +33,7 @@
         <th mat-header-cell *matHeaderCellDef >Position</th>
         <td mat-cell *matCellDef="let rosterRec">
 
-          <mat-select panelClass="myPanel" *ngIf="editable && rosterRec.player.eligible.length > 1" [(ngModel)]="rosterRec.lineupPosition" (selectionChange)="changePos($event)" >
+          <mat-select panelClass="myPanel" *ngIf="(editable && rosterRec.player.eligible.length > 1 ) || (rosterRec.player.eligible[0] != rosterRec.lineupPosition)" [(ngModel)]="rosterRec.lineupPosition" (selectionChange)="changePos($event)" >
             <mat-option *ngFor="let pos of rosterRec.player.eligible" [value]="pos">{{pos}}</mat-option>
           </mat-select>
 
