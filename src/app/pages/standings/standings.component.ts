@@ -59,6 +59,9 @@ export class StandingsComponent implements OnInit, OnDestroy {
               {'name': 'dougluckw', 'title': 'DougLuck W', 'type': ['Advanced']},
               {'name': 'dougluckl', 'title': 'DougLuck L', 'type': ['Advanced']},
               {'name': 'dougluckExcessW', 'title': 'Lucky Wins', 'type': ['Advanced']},
+              {'name': 'homeRecord', 'title': 'Home Record', 'type': ['Advanced']},
+              {'name': 'awayRecord', 'title': 'Away Record', 'type': ['Advanced']},
+              {'name': 'xtrasRecord', 'title': 'Extras Record', 'type': ['Advanced']},
             ];
 
   currTab: string = "Standard"
