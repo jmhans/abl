@@ -60,7 +60,7 @@
                {{treeControl.isExpanded(message) ? 'HIDE' : 'VIEW'}} REPLIES
             </button>
             <button mat-icon-button (click)='messageService.togglelike(message._id, owner.userId, !user_has_liked(message, owner.userId))' ><mat-icon [ngClass]="{'liked material-icons': user_has_liked(message, owner.userId)}" fontSet="material-icons-outlined" >thumb_up</mat-icon></button>
-            <button mat-icon-button (click)='messageService.reply(message._id, owner.userId, "Some snarky reply")'><mat-icon  fontSet="material-icons-outlined" >add_comment</mat-icon></button>Reply to {{message._id}}
+            <button mat-icon-button (click)='messageService.reply(message._id, owner.userId, "Some snarky reply")'><mat-icon  fontSet="material-icons-outlined" >add_comment</mat-icon></button>
           </mat-card-actions>
 
         </mat-card>

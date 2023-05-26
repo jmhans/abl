@@ -44,7 +44,7 @@ dataSource = new MatTreeNestedDataSource<MessageNode>();
     }
 
   ngOnInit() {
-    this.messageService.allPosts$.pipe(takeUntil(this.unsubscribe$)).subscribe(data=>{
+    this.messageService.allPostsSubj$.pipe(takeUntil(this.unsubscribe$)).subscribe(data=>{
       this.dataSource.data = data
     })
     this.currentUserSub = this.userContext.owner$.pipe(takeUntil(this.unsubscribe$)).subscribe(data=> {
