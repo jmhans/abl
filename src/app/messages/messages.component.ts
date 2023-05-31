@@ -6,32 +6,7 @@ import {  Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {FlatTreeControl,NestedTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource,MatTreeNestedDataSource, MatTreeFlattener} from '@angular/material/tree';
-
-
-class MessageNode {
-  _id: string;
-  title: string;
-  replies?: MessageNode[];
-  likes?: any[];
-  content: string;
-  author: string;
-  timestamp: Date;
-  parent: string;
-
-
-}
-class MessageFlatNode {
-  _id: string;
-  title: string;
-  level: number;
-  likes?: any[];
-  expandable: boolean;
-  content: string;
-  author: string;
-  timestamp: Date;
-  parent: string;
-}
-
+import { MessageNode, MessageFlatNode } from './../core/models/message.model'
 
 @Component({
   selector: 'app-messages',
@@ -50,7 +25,6 @@ flatNodeMap = new Map<MessageFlatNode, MessageNode>();
 flattener: MatTreeFlattener<MessageNode, MessageFlatNode>;
 flatTreeControl:FlatTreeControl<MessageFlatNode>;
 flatDataSource: MatTreeFlatDataSource<MessageNode, MessageFlatNode>;
-
 
 constructor(
     public messageService: MessageService,
@@ -99,8 +73,6 @@ constructor(
     })
 
   }
-
-
 
   moveExpansionState(from: MessageFlatNode ) {
       this.flatTreeControl.collapse(from);

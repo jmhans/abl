@@ -5,18 +5,8 @@ import { Post } from '.././models/post';
 import { takeUntil, filter, map, repeatWhen} from 'rxjs/operators';
 import {CollectionViewer, SelectionChange, DataSource} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
+import { MessageNode } from './../models/message.model'
 
-
-interface MessageNode {
-  title: string;
-  content: string;
-  likes?: any[];
-  author: string;
-  timestamp: Date;
-  parent: string;
-  replies?: MessageNode[];
-  _id: string;
-}
 
 @Injectable({
   providedIn: 'root',
