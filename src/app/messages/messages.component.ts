@@ -15,7 +15,7 @@ import { MessageNode, MessageFlatNode } from './../core/models/message.model'
 })
 export class MessagesComponent implements OnInit {
 
-unsubscribe$:Subject<any> = new Subject();
+unsubscribe$:Subject<void> = new Subject();
 user:any;
 currentUserSub: Subscription;
 
