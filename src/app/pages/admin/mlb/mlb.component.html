@@ -1,0 +1,8 @@
+
+
+<table>
+  <tr *ngFor="let date of (games$ | async).dates">
+    <td *ngFor="let gm of date.games">{{gm | json}}</td>
+  </tr>
+</table>
+

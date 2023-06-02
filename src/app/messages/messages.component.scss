@@ -16,13 +16,16 @@
  * under the same parent.
  */
 .message-tree .mat-tree-node, .mat-nested-tree-node {
-  padding: 10px 10px 10px 10px;
+  padding: 2px 0px 2px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.message-tree div > .mat-tree-node, .mat-nested-tree-node {
-  padding: 20px 0px 0px 0px;
-}
+.message-tree > .mat-tree-node, .message-tree >.mat-nested-tree-node {
+  border: 1px black solid;
 
+}
 
 .liked {
  color: blue;
@@ -30,7 +33,7 @@
 }
 
 .message-tree .mat-nested-tree-node div[role=group] {
-  padding-left: 40px;
+  padding-left: 20px;
 }
 
 /*
@@ -38,6 +41,3 @@
  * Leaf nodes need to have padding so as to align with other non-leaf nodes
  * under the same parent.
  */
-.message-tree div[role=group] > .mat-tree-node {
-  padding-left: 40px;
-}
