@@ -51,7 +51,7 @@ export class SuppDraftComponent implements OnInit {
   constructor(private title: Title,
               public utils: UtilsService,
               public api: ApiService,
-              private rosterService: RosterService,
+              public rosterService: RosterService,
               private auth: AuthService,
               public userContext: UserContextService,
               public dialog: MatDialog,
@@ -66,7 +66,7 @@ export class SuppDraftComponent implements OnInit {
 //    this.formData = this.api.getAblTeams$();
 
     this._getOwner();
-
+    this.api.getAPIData$('standings')
     this.draftSseService.getDraftResults$();
     // this.draftSseService.establishConnect(); // Now doing this step in the service after the draft results are returned.
 
@@ -103,5 +103,16 @@ export class SuppDraftComponent implements OnInit {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
+  playersDrafted(roster:any[]){
+    return roster.reduce((accum, curVal)=> {
+      if (curVal.player.ablstatus.acqType == 'draft') {
+        return accum+1;
+      }
+      return accum;
+    }, 0)
+  }
+
+
 
 }

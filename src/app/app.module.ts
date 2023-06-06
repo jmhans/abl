@@ -77,6 +77,7 @@ import { SuppDraftComponent } from './pages/supp-draft/supp-draft.component';
 import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 import { PlayerListComponent } from './core/player-list/player-list.component';
 import { NewMessageFormComponent } from './message/new-message-form/new-message-form.component';
+import {NgxEditorModule } from 'ngx-editor';
 
 
 @NgModule({
@@ -145,7 +146,8 @@ import { NewMessageFormComponent } from './message/new-message-form/new-message-
         AuthModule.forRoot({
             domain: AUTH_CONFIG.CLIENT_DOMAIN,
             clientId: AUTH_CONFIG.CLIENT_ID,
-        })
+        }),
+        NgxEditorModule
     ],
     providers: [
         Title,

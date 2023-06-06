@@ -17,8 +17,8 @@ export class RosterService {
   private base_api= '/api2/'
   currentLineup$: Observable<LineupModel>;
   retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
-
-
+  activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
+  private _viewDate: Date = new Date()
 
   constructor(
     private http: HttpClient,
@@ -27,6 +27,14 @@ export class RosterService {
         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
+
+        this.getAllLineups$().subscribe(
+          data => {
+            this.activeRosters$.next(data)
+          }
+        )
+
+
 
     }
 
@@ -60,6 +68,16 @@ export class RosterService {
   getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
     return this.http
       .get<LineupModel>(`${this.base_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+
+  getAllLineups$(): Observable<LineupModel[]> {
+    return this.http
+      .get<LineupModel[]>(`${this.base_api}lineups`, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
@@ -126,10 +144,6 @@ export class RosterService {
       return ret
     }))
 
-
-
-    //this.updateRosterRecord$(ablTeamId, lineup).pipe(switchMap((x)=> {this.retrieveLineup$.next()}))
-    //this.retrieveLineup$.next({ablTeamId: ablTeamId, plyr: plyr})
   }
 
 

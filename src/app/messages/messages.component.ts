@@ -4,9 +4,9 @@ import { AuthService } from '../auth/auth.service';
 import { UserContextService } from '../core/services/user.context.service';
 import {  Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import {FlatTreeControl,NestedTreeControl} from '@angular/cdk/tree';
-import {MatTreeFlatDataSource,MatTreeNestedDataSource, MatTreeFlattener} from '@angular/material/tree';
-import { MessageNode, MessageFlatNode } from './../core/models/message.model'
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { MessageNode } from './../core/models/message.model'
 
 @Component({
   selector: 'app-messages',
@@ -19,12 +19,6 @@ unsubscribe$:Subject<void> = new Subject();
 user:any;
 currentUserSub: Subscription;
 
-//prevExpansionModel: any;
-//nestedNodeMap = new Map<MessageNode,MessageFlatNode>();
-//flatNodeMap = new Map<MessageFlatNode, MessageNode>();
-//flattener: MatTreeFlattener<MessageNode, MessageFlatNode>;
-//flatTreeControl:FlatTreeControl<MessageFlatNode>;
-//flatDataSource: MatTreeFlatDataSource<MessageNode, MessageFlatNode>;
 dataSource: MatTreeNestedDataSource<MessageNode> = new MatTreeNestedDataSource();
 nestedTreeControl:NestedTreeControl<MessageNode>= new NestedTreeControl<MessageNode>(node=> node.replies);;
 prevNestedExpansionModel: any;
@@ -35,42 +29,12 @@ constructor(
     public auth: AuthService,
     public userContext: UserContextService,
     ) {
-//      this.flattener = new MatTreeFlattener(
-//        this.transformer,
-//        this.getLevel,
-//        this.isExpandable,
-//        this.getReplies,
-//      )
-//      this.flatTreeControl = new FlatTreeControl<MessageFlatNode>(this.getLevel, this.isExpandable);
-//      this.flatDataSource = new MatTreeFlatDataSource(this.flatTreeControl, this.flattener)
+
 
     }
-
-//    getLevel = (node: MessageFlatNode) => node.level;
-
-//    isExpandable = (node: MessageFlatNode) => node.expandable;
-
-//    getReplies = (node: MessageNode): MessageNode[] => node.replies;
-//    hasNoContent = (_: number, _nodeData: MessageFlatNode) => _nodeData._id === '';
-
-//    transformer = (node: MessageNode, level: number) => {
-//      const existingNode = this.nestedNodeMap.get(node);
-//      const flatNode =
-//        existingNode && existingNode._id === node._id ? {...existingNode, ...node} : {...new MessageFlatNode(), ...node};
-
-      //flatNode._id = node._id;
-//      flatNode.level = level;
-//      flatNode.expandable = !!node.replies?.length;
-//      this.flatNodeMap.set(flatNode, node);
-//      this.nestedNodeMap.set(node, flatNode);
-//      return flatNode;
-//    };
-
   ngOnInit() {
     this.messageService.allPostsSubj$.pipe(takeUntil(this.unsubscribe$)).subscribe(data=>{
-//      this.prevExpansionModel = this.flatTreeControl.expansionModel.selected
-//      this.flatDataSource.data = data
-//      this.prevExpansionModel.forEach(element => this.moveExpansionState(element));
+
 
       this.prevNestedExpansionModel = this.nestedTreeControl.expansionModel.selected
       this.dataSource.data = data
@@ -145,6 +109,11 @@ findTreeNode(collection: MessageNode[], nodeId: string) : MessageNode[] | null
     this.unsubscribe$.unsubscribe();
   }
 
+  addReply(node) {
+    node.replies.push(new MessageNode);
+  }
+
   hasChild = (_: number, node: MessageNode) => !!node.replies && node.replies.length > 0;
+  isEditing = (_: number, node: MessageNode) => !node._id
 
 }

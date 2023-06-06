@@ -1,4 +1,5 @@
 import { MlbPlayerModel } from './mlb.player.model'
+import { AblTeamModel } from './abl.team.model'
 
 // interface Roster {
 //   player: MlbPlayerModel
@@ -35,7 +36,7 @@ class Roster {
 class LineupModel {
   constructor(
     public _id: string,
-    public ablTeam: object,
+    public ablTeam: AblTeamModel,
     public roster: Roster[],
     public effectiveDate: Date,
     public latest40Man?: Date
@@ -45,7 +46,7 @@ class LineupModel {
 class LineupCollectionModel {
     constructor(
     public _id: string,
-    public ablTeam: object,
+    public ablTeam: AblTeamModel,
     public roster: Roster[],
     public effectiveDate: Date,
     public priorRosters?: LineupModel[],

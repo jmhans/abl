@@ -13,6 +13,7 @@ const AblTeam = require('./../models/owner').AblTeam;
 const MlbPlayer = require('./../models/player').Player;
 const PlayerStream =require('./../models/player').PlayerStream;
 const Lineup = require('./../models/lineup').Lineup;
+const CurrentLineupModel=require('./../models/lineup').CurrentLineups;
 const DraftPick = require('./../models/draft').DraftPick;
 var some_league_variable = require('./../data/league.json');
 
@@ -638,6 +639,14 @@ class ABLRosterController extends BaseController{
 
   }
 
+  _get(req, res, next) {
+    CurrentLineupModel.find(function(err, results) {
+      if (err) return next(err);
+      res.json(results);
+    });
+    }
+
+
  establishHeartbeat(strm){
    setInterval(function() {
     strm.emit('push', 'ping', {msg: "testing server ping"})
@@ -693,7 +702,5 @@ class ABLRosterController extends BaseController{
     return router;
   }
 }
-
-
 
 module.exports = ABLRosterController

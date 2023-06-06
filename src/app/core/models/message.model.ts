@@ -8,8 +8,7 @@ export class MessageNode {
   author: string;
   timestamp: Date;
   parent: string;
-
-
+  editing?: boolean;
 }
 export class MessageFlatNode {
   _id: string;
