@@ -2,37 +2,57 @@
 
 
 <div *ngFor="let tm of draftSseService.draftOrder$ | async">
-  {{tm.tm.nickname}} |  {{tm.roster.roster.length}} total players | {{playersDrafted(tm.roster.roster)}} Players drafted
 
+  {{tm.tm.nickname}} |  {{tm.roster?.roster.length}} total players | {{playersDrafted(tm.roster?.roster)}} Players drafted
+
+
+</div>
+
+<div *ngIf=" draftSseService.draftOrder$ | async as teams">
+  <mat-form-field appearance="fill">
+    <mat-label>Teams</mat-label>
+    <mat-select [(ngModel)]="selectedTeam">
+      <mat-option *ngFor="let tm of teams" [value]="tm">
+        {{tm.tm.nickname}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+{{selectedTeam?.tm.nickname}}
+
+
+<div *ngFor="let plyr of selectedTeam?.roster.roster">
+  <strong>{{plyr.lineupPosition}} </strong>| {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
 </div>
 
 
 
 
-
-<div *ngFor="let tm of teamData">{{tm._id}} | {{tm.count}}</div>
-<div *ngIf="(draftSseService.draftData$ | async) as draftdata">
 <div class="row">
-  <div *ngFor='let draftTm of draftdata.order; let c=index' class="col">
+  <div *ngFor='let draftTm of teams; let c=index' class="col">
     <div class="header-cell">
-      <div>{{draftTm.nickname}}</div>
+      <div>{{draftTm.tm.nickname}}</div>
     </div>
   </div>
 </div>
-<div *ngFor='let rd of draftdata.picks ;let r= index' class="row">
-  <div *ngFor='let draftTm of rd; let c=index' class="col">
-    <div [ngClass]="{'next-pick': r == draftdata.currentPick.row && c == draftdata.currentPick.column, 'draft-cell': r != draftdata.currentPick.row || c != draftdata.currentPick.column}">
-    <div *ngIf="draftTm as pick">{{pick?.player?.name}} ({{pick?.player?.team}} - {{pick?.player?.position}})</div>
-    </div>
+<div *ngFor='let rd of rounds ;let r= index' class="row">
+  <div *ngFor='let draftTm of teams; let c=index' class="col">
+    <!-- <div [ngClass]="{'next-pick': r == draftdata.currentPick.row && c == draftdata.currentPick.column, 'draft-cell': r != draftdata.currentPick.row || c != draftdata.currentPick.column}"> -->
+    <div *ngIf="draftTm.supp_draft_picks">{{draftTm.supp_draft_picks[rd]?.player?.name}} ({{draftTm.supp_draft_picks[rd]?.player?.team}} - {{draftTm.supp_draft_picks[rd]?.player?.position}})</div>
+    <!-- </div> -->
   </div>
 </div>
+
+
 </div>
+
+
 
 
 <app-player-list
 [players$]="players.allPlayers$"
 [colNames]="colNames"
 [ownerPrimaryTeam]="ownerPrimaryTeam"
-defaultAddType="draft"
+defaultAddType="supp_draft"
 >
 </app-player-list>

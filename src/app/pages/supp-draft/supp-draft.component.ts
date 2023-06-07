@@ -7,7 +7,7 @@ import { ApiService } from './../../core/api.service';
 import { UserContextService } from './../../core/services/user.context.service';
 import { UtilsService } from './../../core/utils.service';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
-import { AblTeamModel } from './../../core/models/abl.team.model';
+import { AblTeamModel, DraftOrderTeamModel } from './../../core/models/abl.team.model';
 import { RosterService } from './../../core/services/roster.service';
 
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
@@ -40,6 +40,8 @@ export class SuppDraftComponent implements OnInit {
   draftData: any[];
   selectedRow;
   counter = Array;
+  selectedTeam:DraftOrderTeamModel = null;
+  rounds:Number[] = [...Array(6).keys()]
 
   colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
@@ -67,7 +69,7 @@ export class SuppDraftComponent implements OnInit {
 
     this._getOwner();
     this.api.getAPIData$('standings')
-    this.draftSseService.getDraftResults$();
+   // this.draftSseService.getDraftResults$();
     // this.draftSseService.establishConnect(); // Now doing this step in the service after the draft results are returned.
 
   }
@@ -81,7 +83,6 @@ export class SuppDraftComponent implements OnInit {
       err => console.log(err)
     )
   }
-
 
 
 
@@ -105,6 +106,8 @@ export class SuppDraftComponent implements OnInit {
   }
 
   playersDrafted(roster:any[]){
+    if (!roster) return null;
+
     return roster.reduce((accum, curVal)=> {
       if (curVal.player.ablstatus.acqType == 'draft') {
         return accum+1;

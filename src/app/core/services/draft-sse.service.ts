@@ -40,17 +40,30 @@ export class DraftSseService {
     private rosterService: RosterService,
 
     ) {
-      this.notify();
+      //this.notify();
       this.api.getAPIData$('standings').pipe(
           takeUntil(this.unsubscribe$),
           map(data => {
-            return data.sort((a,b)=> {return (a.w / a.g) - (b.w / b.g)})
+            return data.sort((a,b)=> {
+              let wpct = (o)=> {return o.w/o.g}
+              if (wpct(a) == wpct(b)) {
+                return a.avg_runs - b.avg_runs
+              }
+
+              return (a.w / a.g) - (b.w / b.g)})
           }),
           combineLatestWith(rosterService.activeRosters$),
           map(([standings, rosters])=> { return standings.map(s=> {
             s.roster =rosters.find((r)=> r.ablTeam == s.tm._id)
             return s
-          })})
+          })}),
+          map((data) => {
+            return data.map((team)=> {
+              let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
+              return {...team, supp_draft_picks: supp_draft_picks}
+
+            })
+          })
         ).subscribe(data => {
         this.draftOrder$.next(data)
       })
@@ -59,16 +72,16 @@ export class DraftSseService {
     }
 
 
-    getDraftResults$() {
-      this.http.get<any[]>(`${this.base_api}draftpicks`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      }).pipe(takeUntil(this.unsubscribe$)).subscribe(
-        data => {
-          this.draftData = data;
-          this.establishConnect()
-          this.notify()
-          })
-        }
+    // getDraftResults$() {
+    //   this.http.get<any[]>(`${this.base_api}draftpicks`, {
+    //     headers: new HttpHeaders().set('Authorization', this._authHeader)
+    //   }).pipe(takeUntil(this.unsubscribe$)).subscribe(
+    //     data => {
+    //       this.draftData = data;
+    //       this.establishConnect()
+    //       this.notify()
+    //       })
+    //     }
 
 
     private notify() {
@@ -107,21 +120,21 @@ export class DraftSseService {
 
 
 
-    establishConnect() {
-      this.getServerSentEvent(`${this.base_api}refreshDraft`).pipe(
-          takeUntil(this.unsubscribe$),
-          filter((data)=> {
-              const eventType = data.type
-              return eventType != 'ping'
-            })
-            ).subscribe(
-          data => {
-              this.draftData = [...this.draftData, JSON.parse(data.data).pick];
-              this.notify()
-            console.log(this.draftData)
-          }
-        )
-    }
+    // establishConnect() {
+    //   this.getServerSentEvent(`${this.base_api}refreshDraft`).pipe(
+    //       takeUntil(this.unsubscribe$),
+    //       filter((data)=> {
+    //           const eventType = data.type
+    //           return eventType != 'ping'
+    //         })
+    //         ).subscribe(
+    //       data => {
+    //           this.draftData = [...this.draftData, JSON.parse(data.data).pick];
+    //           this.notify()
+    //         console.log(this.draftData)
+    //       }
+    //     )
+    // }
 
 
 
