@@ -63,6 +63,9 @@ export class DraftSseService {
               return {...team, supp_draft_picks: supp_draft_picks}
 
             })
+          }),
+          map((data)=> {
+            return {currentPick: {row: 1, column: 4}, rosters: data}
           })
         ).subscribe(data => {
         this.draftOrder$.next(data)
