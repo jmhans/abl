@@ -3,7 +3,7 @@ let AblTeam = require('./owner').AblTeam;
 
 const EventEmitter = require('events');
 const PlayerStream = new EventEmitter();
-
+const SSE =require('./../controllers/sse.controller');
 
 var playerGameSchema = new mongoose.Schema()
 
@@ -40,7 +40,8 @@ playerSchema.pre('save', function preSave(next){
 });
 
 playerSchema.post('save', function(doc, next) {
-  PlayerStream.emit('push', 'message', {msg: 'Player updated', player: doc});
+ // PlayerStream.emit('push', 'message', {msg: 'Player updated', player: doc});
+  SSE.emit('push', 'player', {msg: 'Player updated', player: doc})
   next()
 })
 

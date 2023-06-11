@@ -9,10 +9,11 @@
     <ng-container matColumnDef="player.name" >
       <th mat-header-cell *matHeaderCellDef >Player</th>
       <td mat-cell *matCellDef="let rosterRec"> {{ rosterRec.player.name }} ({{ rosterRec.player.team }} - {{rosterRec.player.eligible?.join()}})
-        <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup'">
+        <span *ngIf="rosterRec.player.ablstatus.acqType == 'pickup' ">
           Pickup
-          <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
+
         </span>
+        <button *ngIf="dropsAllowed" mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
       </td>
     </ng-container>
     <ng-container matColumnDef="player.drop">

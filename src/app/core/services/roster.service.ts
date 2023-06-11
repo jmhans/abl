@@ -4,8 +4,34 @@ import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.r
 import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
-import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject } from 'rxjs';
-import { catchError, switchMap, map } from 'rxjs/operators';
+import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject, merge, ReplaySubject } from 'rxjs';
+import { catchError, switchMap, map, tap, scan } from 'rxjs/operators';
+import { SseService } from './sse.service';
+
+function Identity<T>(value: T): T {
+  return value;
+}
+
+function reload(selector: Function = Identity) {
+  return scan((oldValue, currentValue) => {
+    if(!oldValue && !currentValue)
+      throw new Error(`Reload can't run before initial load`);
+
+    return selector(currentValue || oldValue);
+  });
+}
+
+function combineReload<T>(
+  value$: Observable<T>,
+  reload$: Observable<void>,
+  selector: Function = Identity
+): Observable<T> {
+  return merge(value$, reload$).pipe(
+    reload(selector),
+    map((value: any) => value as T)
+  );
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,25 +40,46 @@ import { catchError, switchMap, map } from 'rxjs/operators';
 
 
 export class RosterService {
+
   private base_api= '/api2/'
   currentLineup$: Observable<LineupModel>;
   retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
-  activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
+  refresh$: Subject<void> = new Subject();
+  //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
+  activeRosters$:Observable<LineupModel[]>;
+  private cachedRosters:LineupModel[];
+
+
   private _viewDate: Date = new Date()
+
 
   constructor(
     private http: HttpClient,
-    private auth: AuthService) {
+    private auth: AuthService,
+    private SseService: SseService,
+) {
 
         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
 
-        this.getAllLineups$().subscribe(
-          data => {
-            this.activeRosters$.next(data)
-          }
-        )
+//this.SseService.getSSE$('player').subscribe((data)=> {this.refreshLineups()});
+
+
+this.activeRosters$ = this.refresh$.pipe(
+  tap(()=> console.log("Got this far!")),
+  switchMap(()=> this.getAllLineups$())
+  );
+
+        // this.refresh$.pipe(switchMap(()=> this.getAllLineups$()),
+        // tap(data=> this.activeRosters$.next(data)) );
+        this.refreshLineups();
+
+        // this.getAllLineups$().subscribe(
+        //   data => {
+        //     this.activeRosters$.next(data)
+        //   }
+        // )
 
 
 
@@ -83,6 +130,11 @@ export class RosterService {
       .pipe(
         catchError((error) => this._handleError(error))
       );
+  }
+
+
+  refreshLineups() {
+    this.refresh$.next();
   }
 
 

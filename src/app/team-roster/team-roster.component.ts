@@ -41,6 +41,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   displayRoster$: Observable<MatTableDataSource<Roster>>
   dispRoster$: Observable<MatTableDataSource<Roster>>
   refreshLineup$:Subject<void> = new Subject();
+  dropsAllowed: boolean = true;
 
   columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
 

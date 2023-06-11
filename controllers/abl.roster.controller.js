@@ -7,6 +7,8 @@ var router = express.Router();
 const EventEmitter = require('events');
 const Stream = new EventEmitter();
 
+const SSE =require('./sse.controller');
+
 
 const AblRosterRecord = require('./../models/owner').AblRosterRecord;
 const AblTeam = require('./../models/owner').AblTeam;
@@ -462,6 +464,7 @@ class ABLRosterController extends BaseController{
         var draftPick = await DraftPick.create(newPick);
         var popDP = await draftPick.populate('player');
         Stream.emit('push', 'message', {msg: 'it works!', pick: popDP});
+        SSE.emit('push', 'message', {msg: 'it works!', pick: popDP})
 
       }
       var firstDate = effDate ? new Date(effDate) : new Date()
@@ -520,6 +523,9 @@ class ABLRosterController extends BaseController{
         }
         console.log(`Added ${savedMlbPlayer.name} to roster for ${savedUpdateRec.effectiveDate}`)
       }
+
+      SSE.emit('push', 'rosters', {msg: 'rosters sse works!'})
+
       return {player: savedMlbPlayer, roster: outputRec};
 
 
@@ -577,8 +583,8 @@ class ABLRosterController extends BaseController{
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
 
-      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, new Date())
       var rosterDeadline =  this.getRosterDeadline(new Date());
+      var mostRecent = await this._getRosterForTeamAndDate(req.params.id, rosterDeadline)
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
 
       if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
@@ -586,7 +592,7 @@ class ABLRosterController extends BaseController{
 
       } else {
         // Create a new one first. Then, update many
-
+        console.log(`${yesterdayDeadline} <= ${new Date(mostRecent.effectiveDate)}`)
         console.log("Creating new lineup where player is dropped")
 
         var newLineup = await Lineup.create({

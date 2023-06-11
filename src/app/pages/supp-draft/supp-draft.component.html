@@ -30,10 +30,8 @@
 <div class="row">
   <div class="container-fluid">
     <div class="row">
-      <div *ngFor='let draftTm of rosters; let c=index' class="col">
-        <div class="header-cell">
-          <div>{{draftTm.tm.nickname}}</div>
-        </div>
+      <div *ngFor='let draftTm of rosters; let c=index' class="col no-gutters pl-1 pr-1">
+          <div class="header-cell">{{draftTm.tm.nickname}}</div>
       </div>
     </div>
     <div *ngFor='let rd of rounds; let r= index' class="row">
@@ -47,12 +45,15 @@
 </div>
 
 <div class="row">
+  {{ownerPrimaryTeam.nickname }}
 
+  {{rosters[draftData.currentPick.column].tm.nickname}}
   <app-player-list class="container-fluid"
   [players$]="players.allPlayers$"
   [colNames]="colNames"
   [ownerPrimaryTeam]="ownerPrimaryTeam"
   defaultAddType="supp_draft"
+  [actionEligible]="ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].tm.nickname"
   >
   </app-player-list>
 

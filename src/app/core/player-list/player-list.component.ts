@@ -34,6 +34,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   // filteredPlayers: MlbPlayerModel[];
   @Input() ownerPrimaryTeam:AblTeamModel;
 @Input() defaultAddType:String='pickup';
+@Input() actionEligible:Boolean=false;
 
   loading: boolean = true;
   error: boolean;
@@ -70,7 +71,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
     public utils: UtilsService,
     public api: ApiService,
     private rosterService: RosterService,
-    private auth: AuthService,
+    public auth: AuthService,
     public dialog: MatDialog,
     private cd: ChangeDetectorRef,
     ) { }
@@ -111,6 +112,7 @@ return p
 
 })
 
+
 //const filteredPlayers = adjustedPlayers //.filter(this.filterer(filterObj))
 const dataSource = new MatTableDataSource<MlbPlayerModel>();
 
@@ -136,7 +138,6 @@ return dataSource
 
 this.cd.detectChanges()
 }
-
 
 
 
