@@ -2,6 +2,7 @@ const Player = require('../models/player').Player;
 const BaseController = require('./base.controller');
 var express = require('express');
 const Statline = require('../models/statline');
+const PlayerView = require('../models/player').PlayerView;
 
 const ablConfig = require('../server/ablConfig');
 var   router = express.Router();
@@ -290,11 +291,16 @@ class PlayersController extends BaseController {
     });
   }
 
-
-
+_viewGet(req, res, next) {
+  PlayerView.find(function(err, results) {
+    if (err) return next(err);
+    res.json(results);
+  });
+}
 
   reroute() {
     router = this.route();
+    router.get('/' + this.routeString, (...args) => this._viewGet(...args));
     return router;
   }
 

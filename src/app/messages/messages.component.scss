@@ -1,21 +1,13 @@
-.example-tree-invisible {
+.message-tree-invisible {
   display: none;
 }
 
-.example-tree ul,
-.example-tree li {
+.message-tree ul,
+.message-tree li {
   margin-top: 0;
   margin-bottom: 0;
   list-style-type: none;
 }
-
-/*
- * This padding sets alignment of the nested nodes.
- */
-.example-tree .mat-nested-tree-node {
-padding: 10px 10px 10px 10px;
-}
-
 
 
 /*
@@ -23,15 +15,16 @@ padding: 10px 10px 10px 10px;
  * Leaf nodes need to have padding so as to align with other non-leaf nodes
  * under the same parent.
  */
-.example-tree .mat-tree-node {
-  padding: 10px 10px 10px 10px;
+.message-tree .mat-tree-node, .mat-nested-tree-node {
+  padding: 2px 0px 2px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.example-tree div[role=group] > .mat-tree-node {
-  padding-left: 40px;
-}
-.example-tree div[role=group] > .mat-nested-tree-node {
-  padding-left: 40px;
+.message-tree > .mat-tree-node, .message-tree >.mat-nested-tree-node {
+  border: 1px black solid;
+
 }
 
 .liked {
@@ -39,3 +32,12 @@ padding: 10px 10px 10px 10px;
  font-family: 'Material Icons' !important
 }
 
+.message-tree .mat-nested-tree-node div[role=group] {
+  padding-left: 20px;
+}
+
+/*
+ * Padding for leaf nodes.
+ * Leaf nodes need to have padding so as to align with other non-leaf nodes
+ * under the same parent.
+ */

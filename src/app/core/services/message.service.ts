@@ -2,21 +2,11 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { ApiService } from '../api.service';
 import {  BehaviorSubject, Observable, Subject, merge } from 'rxjs';
 import { Post } from '.././models/post';
-import { takeUntil, filter, map} from 'rxjs/operators';
+import { takeUntil, filter, map, repeatWhen} from 'rxjs/operators';
 import {CollectionViewer, SelectionChange, DataSource} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
+import { MessageNode } from './../models/message.model'
 
-
-interface MessageNode {
-  title: string;
-  content: string;
-  likes?: any[];
-  author: string;
-  timestamp: Date;
-  parent: string;
-  replies?: MessageNode[];
-  _id: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -26,8 +16,9 @@ export class MessageService implements OnDestroy {
 
   allPosts$: Observable<Post[]>
   unsubscribe$: Subject<void> = new Subject<void>();
-  allPostsSubj$: Subject<Post[]>
-
+  allPostsSubj$: BehaviorSubject<MessageNode[]> = new BehaviorSubject([]);
+  private messageData: MessageNode[];
+  refresh$: Subject<void> = new Subject<void>();
 
   constructor (
     public api: ApiService) {
@@ -35,10 +26,20 @@ export class MessageService implements OnDestroy {
     }
 
     getPosts() {
-      this.allPosts$ = this.api.getAPIData$('posts').pipe(map(this.mapMsgs))
+      //this.allPosts$ = this.api.getAPIData$('posts').pipe(map(this.mapMsgs)).subscribe
+      this.api.getAPIData$('posts').pipe(takeUntil(this.unsubscribe$), map(this.mapMsgs), repeatWhen( ()=> this.refresh$)).subscribe(
+        res=> {
+          this.messageData =res
+          this.updateMessages()
+        },
+        err => {
+          console.error(err)
+        })
     }
 
-
+    updateMessages() {
+      if (this.messageData) {this.allPostsSubj$.next(this.messageData)}
+    }
     mapMsgs(msgList: MessageNode[]) {
       let rootNodes = msgList.filter((msg)=> {return !msg.parent})
       let getChildren = (node:MessageNode) => {
@@ -65,7 +66,8 @@ export class MessageService implements OnDestroy {
 
     this.api.postAPIData$('posts', [{'title': "this is another title", "author": author, "content": message, 'timestamp': new Date()}]).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res=> {
-        this.getPosts()
+        //this.getPosts()
+        this.refresh$.next()
       },
       err => {
         console.error(err)
@@ -88,7 +90,8 @@ export class MessageService implements OnDestroy {
         timestamp: new Date()
       }]).pipe(takeUntil(this.unsubscribe$)).subscribe(
         res=> {
-          this.getPosts()
+          //this.getPosts()
+          this.refresh$.next();
         },
         err => {
           console.error(err)
@@ -104,7 +107,8 @@ export class MessageService implements OnDestroy {
     }
     this.api.putAPIData$('posts', id, updateString).pipe(takeUntil(this.unsubscribe$)).subscribe(
       res=> {
-        this.getPosts()
+        //this.getPosts()
+        this.refresh$.next();
       },
       err => {
         console.error(err)

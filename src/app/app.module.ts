@@ -76,6 +76,8 @@ import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.co
 import { SuppDraftComponent } from './pages/supp-draft/supp-draft.component';
 import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 import { PlayerListComponent } from './core/player-list/player-list.component';
+import { NewMessageFormComponent } from './message/new-message-form/new-message-form.component';
+import {NgxEditorModule } from 'ngx-editor';
 
 
 @NgModule({
@@ -120,7 +122,8 @@ import { PlayerListComponent } from './core/player-list/player-list.component';
         ManageGamesComponent,
         SuppDraftComponent,
         PlayoffsComponent,
-        PlayerListComponent
+        PlayerListComponent,
+        NewMessageFormComponent
     ],
     imports: [
         BrowserModule,
@@ -143,7 +146,8 @@ import { PlayerListComponent } from './core/player-list/player-list.component';
         AuthModule.forRoot({
             domain: AUTH_CONFIG.CLIENT_DOMAIN,
             clientId: AUTH_CONFIG.CLIENT_ID,
-        })
+        }),
+        NgxEditorModule
     ],
     providers: [
         Title,

@@ -51,10 +51,8 @@ export class RosterComponent implements OnInit, OnDestroy {
   formDate$: Observable<UntypedFormControl>;
   current_roster_deadline$: Observable<Date>;
   current_roster$: Observable<LineupFormModel>;
-  //lineup$: Observable<LineupCollectionModel>;
   retrieveLineup$:  BehaviorSubject<void> = new BehaviorSubject(null);
-  //current_roster_deadline_subject$: BehaviorSubject<Date> = new BehaviorSubject(new Date());
-  //refreshableLineup$: Observable<LineupCollectionModel>;
+
 
 
   roster_date: Date;
@@ -113,15 +111,6 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.current_roster_deadline$ = this.leagueConfig.league$.pipe(map((lg)=> {
       return this.actualRosterEffectiveDate(new Date(), lg.rosterLockTime, lg.rosterLockTimeZone)
     }))
-
-    // this.lineup$ = this.roster_deadline$.pipe(switchMap((deadline)=> {
-    //   return this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)
-    // }))
-
-    // this.refreshableLineup$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
-    //   switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline))
-    //   )
-
 
 
     this.current_roster$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
@@ -185,7 +174,6 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   }
 ngAfterViewInit() {
-  //this.retrieveLineup$.next();
 
 }
 
@@ -330,9 +318,7 @@ ngAfterViewInit() {
           data => {
             this.alerts.push({type: 'success', message:'Lineup saved successfully'})
             this.retrieveLineup$.next();
-            //this.lineup$.next(data)
-            //this.lineup = data;
-            //this._set_Active_Roster() //this.active_roster_index);
+
           },
           err => this._handleUpdateError(err)
         )

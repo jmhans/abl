@@ -7,7 +7,7 @@
  <button type="button" class="btn btn-link" data-mdb-color="dark" (click)="addFilterProp({'ablstatus': 'all'})">All</button>
 </div>
 
-<mat-slide-toggle
+<mat-slide-toggle *ngIf="auth.isAdmin"
 
          color="primary"
          checked="false"
@@ -117,7 +117,7 @@
            <ng-container matColumnDef="action">
              <th mat-header-cell *matHeaderCellDef>Action</th>
              <td mat-cell *matCellDef="let row">
-               <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addPlayerToTeam(row)" *ngIf="!row.ablstatus?.ablTeam && !draftMode && ownerPrimaryTeam">
+               <button mdbBtn type="button" color="primary" mdbWavesEffect (click)="_addPlayerToTeam(row)" *ngIf="!row.ablstatus?.ablTeam && (advancedMode || (!draftMode && ownerPrimaryTeam && actionEligible))">
                  <mdb-icon fas icon="user-plus"></mdb-icon>
                </button>
                <button mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlayerFromTeam(row)" *ngIf="row.ablstatus.onRoster && advancedMode && ownerPrimaryTeam">

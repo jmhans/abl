@@ -23,7 +23,7 @@ var mlbEvt = require('../controllers/mlbEventHandler').mlbEventHandler
 var AblGameController= require('../controllers/abl.game.controller');
 var DraftController = require('../controllers/draft.controller');
 var PostController = require('../controllers/post.controller');
-
+var SSEController = require('../controllers/sse.controller');
 
 router.use(new PlayersController().reroute());
 router.use(new OwnersController().route());
@@ -38,6 +38,7 @@ router.use(new mlbEvt().route())
 router.use(new AblGameController().reroute());
 router.use(new DraftController().reroute());
 router.use(new PostController().route());
+router.use(SSEController.route());
 
 
 module.exports = router;
