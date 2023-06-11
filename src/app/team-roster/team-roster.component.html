@@ -13,7 +13,7 @@
           Pickup
 
         </span>
-        <button *ngIf="dropsAllowed" mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
+        <button *ngIf="editable && dropPlayerAllowed(rosterRec)" mdbBtn type="button" color="danger" mdbWavesEffect (click)="_dropPlyr(rosterRec.player._id)">Drop</button>
       </td>
     </ng-container>
     <ng-container matColumnDef="player.drop">

@@ -42,6 +42,8 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   dispRoster$: Observable<MatTableDataSource<Roster>>
   refreshLineup$:Subject<void> = new Subject();
   dropsAllowed: boolean = true;
+  rosterLength: Number;
+
 
   columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
 
@@ -82,10 +84,10 @@ this.dispRoster$ = this.refreshLineup$.pipe(
     //  return plyr
     //})
     const ds = new MatTableDataSource(l.roster)
+    this.rosterLength =l.roster.filter((p)=> {return p.player.ablstatus.acqType == 'draft'}).length
     return ds
   })
 )
-
 
 
   }
@@ -97,6 +99,18 @@ this.dispRoster$ = this.refreshLineup$.pipe(
     });
 
   }
+
+
+
+dropPlayerAllowed(plyrRec) {
+  let now = new Date()
+  let draftedRosterLength = this.rosterLength
+
+
+  let suppDraftPrep = now >= new Date('2023-06-11T18:00:01Z') && now <=new Date('2023-06-12T00:58:00')
+  return plyrRec.player.ablstatus.acqType == 'pickup' || (suppDraftPrep &&draftedRosterLength>22)
+}
+
   dropLineupRecord(event: CdkDragDrop<any>) {
     console.log(`Item moved:`);
     console.log(event)

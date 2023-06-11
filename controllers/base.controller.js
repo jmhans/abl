@@ -10,8 +10,8 @@ class BaseController {
   constructor(model, routeString) {
     this.model = model
     this.routeString = routeString;
-    }  
-  
+    }
+
   //Simple version, without validation or sanitation
 _get(req, res, next) {
   this.model.find(function(err, results) {
@@ -50,8 +50,8 @@ _delete(req, res, next) {
     res.json(post);
   });
 }
-  
-  
+
+
   route() {
     router.get('/' + this.routeString, (...args) => this._get(...args));
     router.post('/' + this.routeString , (...args) => this._create(...args));
@@ -64,4 +64,3 @@ _delete(req, res, next) {
 }
 
 module.exports = BaseController
-

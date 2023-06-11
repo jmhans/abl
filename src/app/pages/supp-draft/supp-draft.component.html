@@ -27,7 +27,14 @@
         <div class="header-cell">{{draftTm.tm.nickname}}</div>
         <div *ngFor='let rd of rounds; let r= index'>
           <div [ngClass]="{'next-pick': rd == draftData.currentPick.row && c == draftData.currentPick.column, 'draft-cell': rd != draftData.currentPick.row || c != draftData.currentPick.column}">
-            <div *ngIf="draftTm.supp_draft_picks">{{draftTm.supp_draft_picks[rd]?.player?.name}} ({{draftTm.supp_draft_picks[rd]?.player?.team}} - {{draftTm.supp_draft_picks[rd]?.player?.eligible.toString()}})</div>
+            <div *ngIf="draftTm.supp_draft_picks">
+              <span *ngIf="true">
+                {{draftTm.supp_draft_picks[rd]?.player?.name}} ({{draftTm.supp_draft_picks[rd]?.player?.team}} - {{draftTm.supp_draft_picks[rd]?.player?.eligible.toString()}})
+              </span>
+              <span *ngIf="rd >= draftTm.picks_allowed">
+                n/a
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -51,6 +58,4 @@
 </div>
 
 </div>
-
-
 

@@ -1,6 +1,8 @@
 let mongoose = require('mongoose')
 let AblTeam = require('./owner').AblTeam;
 
+let ablTeamSchema = require('./owner').ablTeamSchema;
+
 const EventEmitter = require('events');
 const PlayerStream = new EventEmitter();
 const SSE =require('./../controllers/sse.controller');
@@ -32,6 +34,27 @@ var playerSchema = new mongoose.Schema({
   dougstatsName: {type: String, required: false}
 })
 
+var playerViewSchema = new mongoose.Schema({
+  name: {type: String, required: false},
+  mlbID: {type: String, required: true},
+  position: {type: String, required: false},
+  commish_position: {type: String, required: false},
+  team:{type: String, required: false},
+  status:{type: String, required: false},
+  stats: {type: mongoose.Schema.Types.Mixed, required: false},
+  ablstatus: {ablTeam: {type: ablTeamSchema, required: false}, //ABlTeam
+              acqType: {type: String, required: false},
+              onRoster: {type: Boolean, required: true, default: false}
+             },
+
+  lastUpdate: {type: Date, required: false, default: Date.now()},
+  statUpdate: {type: Date, required: false},
+  lastStatUpdate: {type: Date, required: false},
+  //positionLog: {type: [String], required: false}
+  dougstatsName: {type: String, required: false}
+})
+
+
 
 playerSchema.pre('save', function preSave(next){
   var plyr = this;
@@ -50,4 +73,5 @@ playerSchema.post('save', function(doc, next) {
 
 module.exports = {Player: mongoose.model('Player', playerSchema),
                   PlayerSchema: playerSchema,
-                PlayerStream: PlayerStream};
+                PlayerStream: PlayerStream,
+                PlayerView: mongoose.model('players_view', playerViewSchema, 'players_view')};

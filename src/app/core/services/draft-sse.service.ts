@@ -66,7 +66,8 @@ export class DraftSseService {
           map((data:any[]) => {
             return data.map((team)=> {
               let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
-              return {...team, supp_draft_picks: supp_draft_picks}
+              let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
+              return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster.length }
 
             })
           }),
@@ -75,10 +76,11 @@ export class DraftSseService {
 
             for (let i=0; i<6; i=i+2) {
               draftRounds[i]= data.map(tm=> {
-                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i]}
+
+                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - tm.roster.roster.length)}
               })
               draftRounds[i+1] = [...data].reverse().map(tm=> {
-                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i+1]}
+                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - tm.roster.roster.length)}
               })
             }
 
