@@ -47,6 +47,8 @@ export class RosterService {
   refresh$: Subject<void> = new Subject();
   //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
   activeRosters$:Observable<LineupModel[]>;
+  skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
+
   private cachedRosters:LineupModel[];
 
 
@@ -62,18 +64,23 @@ export class RosterService {
         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
+        this.refreshSkips();
 
 //this.SseService.getSSE$('player').subscribe((data)=> {this.refreshLineups()});
 
 
 this.activeRosters$ = this.refresh$.pipe(
-  tap(()=> console.log("Got this far!")),
+  tap(()=> {
+    console.log("Got this far!");
+    this.refreshSkips();
+  }),
   switchMap(()=> this.getAllLineups$())
   );
 
         // this.refresh$.pipe(switchMap(()=> this.getAllLineups$()),
         // tap(data=> this.activeRosters$.next(data)) );
         this.refreshLineups();
+        this.refreshSkips();
 
         // this.getAllLineups$().subscribe(
         //   data => {
@@ -137,6 +144,20 @@ this.activeRosters$ = this.refresh$.pipe(
     this.refresh$.next();
   }
 
+
+  refreshSkips() {
+
+    this.http
+      .get<LineupModel[]>(`${this.base_api}skips`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      ).subscribe((data)=>{
+        this.skipList$.next(data)
+      });
+
+  }
 
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.http

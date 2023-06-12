@@ -102,7 +102,11 @@ export class SuppDraftComponent implements OnInit {
     return (roles.indexOf("admin") > -1)
   }
 
-
+  _addSkip(tm) {
+    this.api.postAPIData$('skips', [{ablTeam: tm._id}]).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
+      console.log("Pick Skipped")
+    })
+  }
 
   onRowClicked(row) {
     console.log(row);

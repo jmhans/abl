@@ -19,8 +19,11 @@ var draftPickSchema = new mongoose.Schema({
   pickTime: {type: Date, required: false}
 })
 
-
+var skipPicks = new mongoose.Schema({
+  ablTeam: {type: mongoose.Schema.Types.ObjectId, ref: 'AblTeam', required: true}
+})
 
 module.exports = {Draft: mongoose.model('Draft', draftSchema),
                   draftSchema: draftSchema,
-                 DraftPick: mongoose.model('Draftpick', draftPickSchema)};
+                 DraftPick: mongoose.model('Draftpick', draftPickSchema),
+                Skip: mongoose.model('Skip', skipPicks)};
