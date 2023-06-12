@@ -63,11 +63,13 @@ export class DraftSseService {
             s.roster =rosters.find((r)=> r.ablTeam == s.tm._id)
             return s
           })}),
-          map((data:any[]) => {
+          combineLatestWith(rosterService.skipList$),
+          map(([data, skips]) => {
             return data.map((team)=> {
               let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
               let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
-              return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster.length }
+              supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team.tm._id).map((item)=> "Skip")]
+              return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
 
             })
           }),
@@ -140,6 +142,7 @@ export class DraftSseService {
 
 
     }
+
 
   ngOnDestroy() {
 

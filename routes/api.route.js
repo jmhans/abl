@@ -25,6 +25,8 @@ var DraftController = require('../controllers/draft.controller');
 var PostController = require('../controllers/post.controller');
 var SSEController = require('../controllers/sse.controller');
 
+var SkipController = require('../controllers/skip.js');
+
 router.use(new PlayersController().reroute());
 router.use(new OwnersController().route());
 router.use(new RostersController().route());
@@ -39,6 +41,7 @@ router.use(new AblGameController().reroute());
 router.use(new DraftController().reroute());
 router.use(new PostController().route());
 router.use(SSEController.route());
+router.use(new SkipController().route());
 
 
 module.exports = router;
