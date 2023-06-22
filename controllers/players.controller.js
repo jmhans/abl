@@ -103,7 +103,7 @@ class PlayersController extends BaseController {
 
 
   _get(req, res, next) {
-
+    return this._viewGet(req, res, next)
     let aggSteps = [{
         '$lookup': {
           'from': 'ablteams',
@@ -292,7 +292,8 @@ class PlayersController extends BaseController {
   }
 
 _viewGet(req, res, next) {
-  PlayerView.find(function(err, results) {
+
+  PlayerView.find(req.query, (err, results)=> {
     if (err) return next(err);
     res.json(results);
   });
@@ -300,7 +301,7 @@ _viewGet(req, res, next) {
 
   reroute() {
     router = this.route();
-    router.get('/' + this.routeString, (...args) => this._viewGet(...args));
+    //router.get('/players', (...args) => this._viewGet(...args));
     return router;
   }
 

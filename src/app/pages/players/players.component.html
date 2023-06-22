@@ -3,12 +3,17 @@
 <h3>
   {{pageTitle}}
 </h3>
+
+<div *ngIf="rosterService.allRosters$ | async as rosters">
+ Active Players: {{activeRoster(ownerPrimaryTeam?._id, rosters).length}}
+
 <!-- src/app/pages/games/games.component.html -->
 <app-player-list
 [players$]="players.allPlayers$"
 [colNames]="colNames"
 [ownerPrimaryTeam]="ownerPrimaryTeam"
 defaultAddType="pickup"
-actionEligible="true"
+[actionEligible]="activeRoster(ownerPrimaryTeam?._id, rosters).length < 27"
 >
 </app-player-list>
+</div>

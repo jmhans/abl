@@ -140,13 +140,6 @@ export class RosterComponent implements OnInit, OnDestroy {
                     )
                   return new Roster(p, rr.lineupPosition, rr.rosterOrder, rr.latest40Man)
                 }),
-                // this.active_roster.roster.map((rr)=> {return {
-                //   player: rr.player,
-                //   lineupPosition: rr.lineupPosition,
-                //   rosterOrder: rr.rosterOrder,
-                //   originalPosition: rr.originalPosition,
-                //   changed: rr.changed,
-                //   latest40Man: rr.latest40Man}}),
                 new Date(this.roster_deadline)
               );
               return this.current_roster

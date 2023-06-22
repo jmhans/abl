@@ -48,8 +48,10 @@ export class RosterService {
   //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
   activeRosters$:Observable<LineupModel[]>;
   skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
+  allRosters$: ReplaySubject<LineupModel[]> = new ReplaySubject(1);
 
-  private cachedRosters:LineupModel[];
+
+    private cachedRosters:LineupModel[];
 
 
   private _viewDate: Date = new Date()
@@ -65,6 +67,7 @@ export class RosterService {
           switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
         this.refreshSkips();
+        this.getRosters();
 
 //this.SseService.getSSE$('player').subscribe((data)=> {this.refreshLineups()});
 
@@ -140,6 +143,12 @@ this.activeRosters$ = this.refresh$.pipe(
   }
 
 
+  getRosters() {
+    this.getAllLineups$().subscribe((data)=>{
+        this.allRosters$.next(data)
+      });
+  }
+
   refreshLineups() {
     this.refresh$.next();
   }
@@ -165,9 +174,13 @@ this.activeRosters$ = this.refresh$.pipe(
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
-        catchError((error) => this._handleError(error))
+        catchError((error) => this._handleError(error)),
+        tap(()=> this.getRosters())
       );
   }
+
+
+
 
 
   createRosterRecord$(ablTeam: string, lineup: SubmitLineup): Observable<LineupCollectionModel> {
@@ -181,7 +194,9 @@ this.activeRosters$ = this.refresh$.pipe(
           headers: new HttpHeaders().set('Authorization', this._authHeader)
         })
         .pipe(
-          catchError((error) => this._handleError(error))
+          catchError((error) => this._handleError(error)),
+          tap(()=> this.getRosters())
+
         );
   }
   updateRosterRecord$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
@@ -191,7 +206,9 @@ this.activeRosters$ = this.refresh$.pipe(
           headers: new HttpHeaders().set('Authorization', this._authHeader)
         })
         .pipe(
-          catchError((error) => this._handleError(error))
+          catchError((error) => this._handleError(error)),
+          tap(()=> this.refreshLineups())
+
         );
   }
 
@@ -202,7 +219,9 @@ this.activeRosters$ = this.refresh$.pipe(
           headers: new HttpHeaders().set('Authorization', this._authHeader)
         })
         .pipe(
-          catchError((error) => this._handleError(error))
+          catchError((error) => this._handleError(error)),
+          tap(()=> this.refreshLineups())
+
         );
   }
 
