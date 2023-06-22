@@ -173,11 +173,27 @@
                  </mat-form-field>
                </th>
              </ng-container>
+             <ng-container matColumnDef="gFilter">
+              <th mat-header-cell *matHeaderCellDef>   <mat-select placeholder="G" (selectionChange)="addFilterProp({'g': $event.value})">
+                    <mat-option *ngFor="let g of [0, 10,20,50]" [value]="g">
+                      {{ g }}
+                    </mat-option>
+                  </mat-select>
+              </th>
+            </ng-container>
+            <ng-container matColumnDef="abFilter">
+              <th mat-header-cell *matHeaderCellDef>   <mat-select placeholder="AB" (selectionChange)="addFilterProp({'ab': $event.value})">
+                    <mat-option *ngFor="let ab of [0, 10,20,50]" [value]="ab">
+                      {{ ab }}
+                    </mat-option>
+                  </mat-select>
+              </th>
+            </ng-container>
 
 
 
 
-           <tr mat-header-row *matHeaderRowDef="['nameFilter', 'blank', 'blank', 'acqFilter', 'posFilter', 'blank', 'statusFilter']"></tr>
+           <tr mat-header-row *matHeaderRowDef="['nameFilter', 'blank', 'blank', 'acqFilter', 'posFilter', 'blank', 'statusFilter', 'blank', 'blank', 'gFilter', 'abFilter']"></tr>
            <tr mat-header-row *matHeaderRowDef="colNames"></tr>
            <tr mat-row *matRowDef="let row; columns: colNames"></tr>
 

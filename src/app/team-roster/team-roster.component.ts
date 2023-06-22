@@ -28,7 +28,6 @@ const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   styleUrls: ['./team-roster.component.scss']
 })
 export class TeamRosterComponent implements OnInit, AfterViewInit {
-  lineup$: BehaviorSubject<LineupFormModel> = new BehaviorSubject(undefined);
   @Input() lineup: LineupFormModel;
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
@@ -43,7 +42,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   refreshLineup$:Subject<void> = new Subject();
   dropsAllowed: boolean = true;
   rosterLength: Number;
-
+  activeRosterLength:Number;
 
   columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
 
@@ -54,17 +53,12 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
 
-    this.lineup$.next(this.lineup)
+
     this.displayRoster$ = this.roster$.pipe(
       map((r)=> {
-        //this.lineupChanged = false
 
 
         const plyrs = r.map((plyr, pIdx)=> {
-
-          //plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
-          //plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
-
           return plyr
         })
         const ds = new MatTableDataSource(plyrs)
@@ -73,16 +67,8 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
     )
 
 this.dispRoster$ = this.refreshLineup$.pipe(
-  switchMap(() => this.lineup$),
+  switchMap(() => of(this.lineup) ),
   map((l)=> {
-    //this.lineupChanged = false
-    //l.recalcOrder();
-    //const plyrs = l.roster.map((plyr, pIdx)=> {
-      // plyr.player.abl = this.abl(((plyr.player || {}).stats || {}).batting)
-      //plyr.player.fortyMan = new Date((plyr.player ||{}).lastUpdate) >= new Date (new Date(plyr.latest40Man).getTime() - 2 * 60 * 60000)
-
-    //  return plyr
-    //})
     const ds = new MatTableDataSource(l.roster)
     this.rosterLength =l.roster.filter((p)=> {return p.player.ablstatus.acqType == 'draft'}).length
     return ds
@@ -100,6 +86,20 @@ this.dispRoster$ = this.refreshLineup$.pipe(
 
   }
 
+getActiveRosterLength() {
+  return this.lineup.roster.filter((p)=> p.lineupPosition != 'INJ').length
+}
+
+ineligiblePositions() {
+  let inel = this.lineup.roster.filter((p)=> {
+    return (p.lineupPosition != 'INJ' && p.player.eligible.indexOf(p.lineupPosition) == -1) || (p.lineupPosition == 'INJ' && p.player.status.substring(0, 7)!='Injured')
+  })
+  return inel
+}
+
+saveable() {
+  return this.ineligiblePositions().length == 0 && this.lineup.changed && this.editable
+}
 
 
 dropPlayerAllowed(plyrRec) {
@@ -168,12 +168,14 @@ dropPlayerAllowed(plyrRec) {
   }
 
   plyrChanged<Boolean>(plyr) {
+ //   let storedPlyr = this.originalLineup.roster.find((p)=> p.player.mlbID == plyr.player.mlbID)
+    let origIdx = this.originalLineup.roster.findIndex((r)=> {return r.player.mlbID == plyr.player.mlbID})
+    return !(origIdx == this.lineup.roster.findIndex((r)=> {return r.player.mlbID == plyr.player.mlbID}) && this.originalLineup.roster[origIdx].lineupPosition == plyr.lineupPosition)
 
-    const rosterPlyrIdx = this.lineup.roster.findIndex((r)=> {return JSON.stringify(r) == JSON.stringify(plyr)})
-
-    const rosterOrderCheck =rosterPlyrIdx != plyr.rosterOrder - 1
-    const positionCheck = plyr.changed
-    return rosterOrderCheck || positionCheck
+    //const rosterPlyrIdx = this.lineup.roster.findIndex((r)=> {return JSON.stringify(r) == JSON.stringify(plyr)})
+    //const rosterOrderCheck =rosterPlyrIdx != plyr.rosterOrder - 1
+    //const positionCheck = plyr.changed
+    //return rosterOrderCheck || positionCheck
   }
 
   _dropPlyr(playerId) {

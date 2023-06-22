@@ -4,6 +4,7 @@ import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
 import { UtilsService } from './../../core/utils.service';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
+import { LineupModel } from './../../core/models/lineup.model';
 import { AblTeamModel } from './../../core/models/abl.team.model';
 import { RosterService } from './../../core/services/roster.service';
 import { MatPaginator as MatPaginator } from '@angular/material/paginator';
@@ -35,6 +36,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() ownerPrimaryTeam:AblTeamModel;
 @Input() defaultAddType:String='pickup';
 @Input() actionEligible:Boolean=false;
+@Input() ownerRoster:LineupModel;
 
   loading: boolean = true;
   error: boolean;
@@ -222,6 +224,14 @@ for (const prop in filterObj) {
           criteria.push((obj[prop] || '').toLowerCase().includes((filterObj[prop] || '').toLowerCase()))
         }
       break;
+
+    case 'g':
+          criteria.push(obj?.stats?.batting?.gamesPlayed >= filterObj.g)
+      break;
+    case 'ab':
+        criteria.push(obj?.stats?.batting?.atBats >= filterObj.ab)
+    break;
+
     default:
       criteria.push((obj[prop] || '').toLowerCase().includes((filterObj[prop] || '').toLowerCase()))
   }

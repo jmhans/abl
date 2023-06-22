@@ -25,7 +25,7 @@ export interface DialogData {
   templateUrl: './players.component.html',
   styleUrls: ['./players.component.scss']
 })
-export class PlayersComponent implements OnInit, OnDestroy {
+export class PlayersComponent implements OnInit, OnDestroy, AfterViewInit {
   pageTitle = 'Players';
   //players$: Subject<MlbPlayerModel[]> = new Subject<MlbPlayerModel[]>();
   //playerSub: Subscription;
@@ -41,13 +41,16 @@ export class PlayersComponent implements OnInit, OnDestroy {
   constructor(private title: Title,
               public utils: UtilsService,
               public api: ApiService,
-              private rosterService: RosterService,
+              public rosterService: RosterService,
               private auth: AuthService,
               public userContext: UserContextService,
               public dialog: MatDialog,
               public players: PlayersService,
 
-              ) { }
+              ) {
+
+
+               }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
@@ -56,7 +59,9 @@ export class PlayersComponent implements OnInit, OnDestroy {
     this._getOwner();
 
   }
-
+ngAfterViewInit() {
+  this.rosterService.refreshLineups();
+}
 
 
   _getOwner() {
@@ -70,7 +75,15 @@ export class PlayersComponent implements OnInit, OnDestroy {
   }
 
 
-
+activeRoster(tmId, rosters) {
+  if (rosters) {
+    let userRoster = rosters.find((r)=> r.ablTeam ==tmId);
+    if (userRoster) {
+      return userRoster.roster.filter((p)=> p.lineupPosition !='INJ')
+    }
+  }
+ return []
+}
 
 
   _isAdmin() {
