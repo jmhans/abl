@@ -87,12 +87,14 @@ this.dispRoster$ = this.refreshLineup$.pipe(
   }
 
 getActiveRosterLength() {
-  return this.lineup.roster.filter((p)=> p.lineupPosition != 'INJ').length
+  return this.lineup.roster.filter((p)=> p.lineupPosition != 'INJ' && p.lineupPosition != 'NA').length
 }
 
 ineligiblePositions() {
   let inel = this.lineup.roster.filter((p)=> {
-    return (p.lineupPosition != 'INJ' && p.player.eligible.indexOf(p.lineupPosition) == -1) || (p.lineupPosition == 'INJ' && p.player.status.substring(0, 7)!='Injured')
+    return (p.lineupPosition != 'INJ' && p.player.eligible.indexOf(p.lineupPosition) == -1)
+    || (p.lineupPosition == 'INJ' &&  p.player.status.indexOf('Injured') == -1)
+    || (p.lineupPosition == 'NA' && p.player.status.indexOf('Minors') == -1)
   })
   return inel
 }
