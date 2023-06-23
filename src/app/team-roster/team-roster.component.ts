@@ -92,7 +92,7 @@ getActiveRosterLength() {
 
 ineligiblePositions() {
   let inel = this.lineup.roster.filter((p)=> {
-    return (p.lineupPosition != 'INJ' && p.player.eligible.indexOf(p.lineupPosition) == -1)
+    return (p.lineupPosition != 'INJ' && p.lineupPosition != 'NA' && p.player.eligible.indexOf(p.lineupPosition) == -1)
     || (p.lineupPosition == 'INJ' &&  p.player.status.indexOf('Injured') == -1)
     || (p.lineupPosition == 'NA' && p.player.status.indexOf('Minors') == -1)
   })
