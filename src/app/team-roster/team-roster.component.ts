@@ -3,6 +3,7 @@ import { CdkDragDrop, CdkDragSortEvent, moveItemInArray, transferArrayItem, CdkD
 import { Subscription, Subject, Observable,  of , BehaviorSubject} from 'rxjs'
 import { map , startWith, switchMap} from 'rxjs/operators';
 import { RosterService } from './../core/services/roster.service';
+import { ApiService} from './../core/api.service';
 import { LineupModel, SubmitLineup, LineupFormModel , Roster} from './../core/models/lineup.model';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
 
@@ -43,7 +44,6 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   dropsAllowed: boolean = true;
   rosterLength: Number;
   activeRosterLength:Number;
-
   columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
 
   saveRosterRecordSub: Subscription;
@@ -52,7 +52,6 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   constructor( public rosterService: RosterService) { }
 
   ngOnInit() {
-
 
     this.displayRoster$ = this.roster$.pipe(
       map((r)=> {
@@ -90,11 +89,18 @@ getActiveRosterLength() {
   return this.lineup.roster.filter((p)=> p.lineupPosition != 'INJ' && p.lineupPosition != 'NA').length
 }
 
+
+alternate_elig(plyr) {
+  if (!plyr.status) return 'NA'
+  if (plyr.status.indexOf('Injured') != -1) return 'INJ'
+  if (plyr.status.indexOf('Minors') != -1) return 'NA'
+  return ''
+}
+
 ineligiblePositions() {
   let inel = this.lineup.roster.filter((p)=> {
-    return (p.lineupPosition != 'INJ' && p.lineupPosition != 'NA' && p.player.eligible.indexOf(p.lineupPosition) == -1)
-    || (p.lineupPosition == 'INJ' &&  p.player.status.indexOf('Injured') == -1)
-    || (p.lineupPosition == 'NA' && p.player.status.indexOf('Minors') == -1)
+    let elig = [...p.player.eligible, this.alternate_elig(p.player)]
+    return elig.indexOf(p.lineupPosition) == -1
   })
   return inel
 }

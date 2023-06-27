@@ -1,10 +1,11 @@
 import { Component, OnInit, Input, OnDestroy, AfterViewInit } from '@angular/core';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
+import { ApiService } from './../../../core/api.service';
 import { LineupModel , LineupCollectionModel, LineupFormModel, Roster} from './../../../core/models/lineup.model';
 import {MlbPlayerModel} from './../../../core/models/mlb.player.model';
 import { Subscription, Subject, combineLatest, Observable, BehaviorSubject } from 'rxjs';
-import { takeUntil, combineAll , map, switchMap, share } from 'rxjs/operators';
+import { takeUntil, combineAll , map, switchMap, share, combineLatestWith, withLatestFrom } from 'rxjs/operators';
 
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
@@ -53,6 +54,7 @@ export class RosterComponent implements OnInit, OnDestroy {
   current_roster$: Observable<LineupFormModel>;
   retrieveLineup$:  BehaviorSubject<void> = new BehaviorSubject(null);
 
+  earliestStart:Date;
 
 
   roster_date: Date;
@@ -73,6 +75,7 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   dlOptions: any;
   dlFileName: string ;
+  mlbGames$: Observable<any[]>;
 
     unsubscribe$: Subject<void> = new Subject<void>();
 
@@ -82,6 +85,7 @@ export class RosterComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 public auth: AuthService,
                 public rosterService: RosterService,
+                public api: ApiService,
                 private utils: UtilsService,
                  public dialog: MatDialog,
                  public leagueConfig: LeagueConfigService,
@@ -90,6 +94,9 @@ export class RosterComponent implements OnInit, OnDestroy {
                 ) { }
 
   ngOnInit() {
+
+    this.mlbGames$ = this.api.getMlbGames$()
+
 
     this.roster_date$ = this.route.queryParams.pipe(map((qp)=> {
       return qp['dt'] ? new Date(qp['dt']) : new Date();
@@ -103,19 +110,23 @@ export class RosterComponent implements OnInit, OnDestroy {
       this.roster_deadline = rosterEffDate
       return rosterEffDate
     }), share())
-
+/*
     this.formDate$ = this.roster_deadline$.pipe(map((deadline)=> {
       return new UntypedFormControl(deadline)
-    }))
+    })) */
 
     this.current_roster_deadline$ = this.leagueConfig.league$.pipe(map((lg)=> {
       return this.actualRosterEffectiveDate(new Date(), lg.rosterLockTime, lg.rosterLockTimeZone)
     }))
 
 
+
+
     this.current_roster$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
       switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)),
-      map((lineup)=>{
+      withLatestFrom(this.mlbGames$),
+      map(([lineup, mlbGames])=>{
+              this.earliestStart = new Date(Math.min(...mlbGames.map(g=> (new Date(g.gameDate)).getTime())));
               this.active_roster = lineup;
               this.current_roster = new LineupFormModel(
                 lineup._id,
