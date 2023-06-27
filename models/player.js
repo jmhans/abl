@@ -74,4 +74,4 @@ playerSchema.post('save', function(doc, next) {
 module.exports = {Player: mongoose.model('Player', playerSchema),
                   PlayerSchema: playerSchema,
                 PlayerStream: PlayerStream,
-                PlayerView: mongoose.model('players_view', playerViewSchema, 'players_view')};
+                PlayerView: mongoose.model('players_view', playerViewSchema, 'new_players')};

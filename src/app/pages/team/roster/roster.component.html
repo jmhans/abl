@@ -14,17 +14,16 @@
 
 </div>
 
-
+<!--{{earliestStart}}-->
 
 <div class="card">
   <div class="card-header" *ngIf="(current_roster_deadline$ | async) as deadline">
-
-    <mat-form-field color="accent" appearance="fill" *ngIf="(formDate$ | async) as formDateControl">
+ <!--    <mat-form-field color="accent" appearance="fill" *ngIf="(formDate$ | async) as formDateControl">
         <mat-label>Roster Date</mat-label>
         <input  matInput [matDatepicker]="roster_date" [max]="deadline" (dateChange)="_date_changed($event)" [formControl]="formDateControl">
         <mat-datepicker-toggle matSuffix [for]="roster_date"></mat-datepicker-toggle>
         <mat-datepicker #roster_date></mat-datepicker>
-      </mat-form-field>
+      </mat-form-field> -->
       <mat-slide-toggle
             class="example-margin"
             color="primary"

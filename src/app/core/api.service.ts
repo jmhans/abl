@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 // import { ENV } from './env.config';
 import { EventModel } from './models/event.model';
 import { RsvpModel } from './models/rsvp.model';
@@ -293,6 +293,20 @@ export class ApiService {
     })
     .pipe(
       catchError((error) => this._handleError(error))
+    )
+  }
+
+  getMlbGames$(dt: Date = new Date()): Observable<any[]> {
+
+    let lookupDate = `${dt.toLocaleDateString("en-US", {month:'2-digit'})}%2F${dt.toLocaleDateString("en-US", {day:'2-digit'})}%2F${dt.toLocaleDateString("en-US", {year:'numeric'})}`
+    return this.http
+    .get<any>(`https://statsapi.mlb.com/api/v1/schedule/?sportId=1&date=${lookupDate}`)
+    .pipe(
+      catchError((error)=> this._handleError(error)),
+      map((data)=> {
+        let dateObj = data.dates.find((d)=> d.date == dt.toISOString().substring(0,10))
+        return dateObj.games
+      })
     )
   }
 

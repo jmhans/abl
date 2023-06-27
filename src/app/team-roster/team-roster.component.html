@@ -1,12 +1,16 @@
 
 <button mdbBtn type="button" color="success" mdbWavesEffect *ngIf="saveable()" (click)="_updateRosterRecord()">Save Changes</button>
 
+
+
 <div class="alert alert-danger" role="alert" *ngIf="getActiveRosterLength()>27">
 Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) or move eligible player(s) to IL before saving.
 </div>
 <div class="alert alert-danger" role="alert" *ngFor="let inel of ineligiblePositions()">
   Player: {{inel.player.name}} is not eligible for position: {{ inel.lineupPosition}}. You must resolve this issue in order to save a new lineup.
 </div>
+
+
 
 <div class="container example-table-container example-list" cdkDropList [cdkDropListDisabled]=!editable (cdkDropListDropped)="dropLineupRecord($event)" >
 
@@ -42,8 +46,10 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
 
           <mat-select [disabled]="!editable" panelClass="myPanel" *ngIf="(editable && rosterRec.player.eligible.length > 1 ) || (rosterRec.player.eligible[0] != rosterRec.lineupPosition) || (rosterRec.player?.status?.indexOf('Injured')!= -1) || (rosterRec.player?.status?.indexOf('Minors')!= -1); else placeholder_position" [(ngModel)]="rosterRec.lineupPosition" (selectionChange)="changePos($event)" >
             <mat-option *ngFor="let pos of rosterRec.player.eligible" [value]="pos">{{pos}}</mat-option>
-            <mat-option *ngIf="rosterRec.player?.status?.indexOf('Injured')!= -1" value="INJ">INJ</mat-option>
-            <mat-option *ngIf="rosterRec.player?.status?.indexOf('Minors')!= -1" value="NA">NA</mat-option>
+            <mat-option *ngIf="alternate_elig(rosterRec.player) as altPos" [value]="altPos">{{altPos}}</mat-option>
+
+            <!-- <mat-option *ngIf="rosterRec.player?.status.indexOf('Injured')!= -1" value="INJ">INJ</mat-option>
+            <mat-option *ngIf="rosterRec.player?.status.indexOf('Minors')!= -1" value="NA">NA</mat-option> -->
           </mat-select>
           <ng-template #placeholder_position><span>{{rosterRec.lineupPosition}}</span></ng-template>
         </td>
