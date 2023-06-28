@@ -3,7 +3,7 @@
 <ng-container>
 <!-- <div class="card-body">
   <h2 class="card-title text-center mb-0">    <strong>When:</strong>{{ game.gameDate | date : "mediumDate"}}</h2>
-  
+
 </div>
 <hr /> -->
   <mat-card appearance="outlined">
@@ -13,27 +13,11 @@
       <div *ngIf="active_result">
         Winner: {{active_result?.winner?.nickname}}
       </div>
-      
+
       <div>
-<!--           <span *ngIf="live_result" class="d-block">
-            <span [ngClass]="{'active-result': ( active_result_index == -1)}">System Generated Boxscore | <button mat-button color="primary" (click)=" _setActiveResult(-1)">Go</button></span>
-          </span>
-        
 
-        <ul class="list-group list-group-horizontal">
-          <li *ngIf="live_result" class="list-group-item" [ngClass]="{'active': ( active_result_index == -1)}">
-            <span >System Generated Boxscore | <button mat-button color="primary" (click)=" _setActiveResult(-1)">Go</button></span>
-          </li>
-          <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
-            <span> {{res.status}} |  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>
-              <span *ngIf="_scoreDiff(res_idx)"> | Result has changed</span>
-            </span>
-          </li>
-
-
-        </ul> -->
          <ul class="list-group list-group-horizontal">
-          
+
           <li class="list-group-item">
             <span class="d-block">System Generated Boxscore</span>
             <ul class="list-group list-group-horizontal">
@@ -50,8 +34,8 @@
               </span>
             <ul class="list-group list-group-horizontal">
               <li *ngFor="let res of game.results; index as res_idx" class="list-group-item"  [ngClass]="{'active': (res_idx == active_result_index)}">
-                <span *ngIf="res.status"> {{res.status}} |  
-                  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>                  
+                <span *ngIf="res.status"> {{res.status}} |
+                  <button mat-button color="primary" (click)=" _setActiveResult(res_idx)">Go</button>
                   <button mat-icon-button color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="_deleteResult(res._id)"  [disabled]="_oppAttested(res_idx)">
                     <mat-icon>delete</mat-icon>
                   </button>
@@ -62,17 +46,17 @@
           </li>
 
         </ul>
-        
-        
-        
-        
+
+
+
+
       </div>
     </mat-card-subtitle>
 
   </mat-card-header>
 
-    
-    
+
+
   <mat-card-content>
         <mat-slide-toggle
           class="example-margin"
@@ -83,69 +67,69 @@
         Edit Mode
       </mat-slide-toggle>
     <div class="d-flex table-responsive" *ngIf="active_result">
-      
+
       <span class="p-1 boxscore flex-fill" *ngFor="let box of active_result.scores; index as box_idx">
         {{box.location == 'H' ? "Home" : "Away" }} Team:<strong> {{box.location == 'H' ? game.homeTeam.nickname : game.awayTeam.nickname}}</strong>
-        <app-game-team-detail  [roster]="box.players ? box.players : live_result.scores[box_idx].players" 
-                              [teamScore]="box"  
-                              [oppScore]="box_idx == 1 ? active_result.scores[0] : active_result.scores[1]" 
-                              [homeTeam]="box.location == 'H'" 
-                              [status]="box.status" 
-                              [editable]="editable" 
-                              (updateScore)="_updateScore($event, box)"></app-game-team-detail>   
+        <app-game-team-detail  [roster]="box.players ? box.players : live_result.scores[box_idx].players"
+                              [teamScore]="box"
+                              [oppScore]="box_idx == 1 ? active_result.scores[0] : active_result.scores[1]"
+                              [homeTeam]="box.location == 'H'"
+                              [status]="box.status"
+                              [editable]="editable"
+                              (updateScore)="_updateScore($event, box)"></app-game-team-detail>
       </span>
-      
-      
-      
+
+
+
     </div>
 
 
-    
-    
-    </mat-card-content>
-  
-    
-    
-  <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
-    
 
-<!--     
-    Attestation History: 
+
+    </mat-card-content>
+
+
+
+  <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
+
+
+<!--
+    Attestation History:
     <span *ngFor="let att of active_result?.attestations" class="d-block">
-     {{att.attesterType | titlecase}} team has attested. 
+     {{att.attesterType | titlecase}} team has attested.
       <button *ngIf="_teamOwner(att.attesterType)" type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)">
         Remove
       </button>
     </span> -->
-        
-    
-    
+
+
+
     <div class="alert alert-warning d-block" role="alert" *ngIf="activeDifference">
-      Warning! Current result differs from system-generated result. 
+      Warning! Current result differs from system-generated result.
     </div>
-    <span *ngIf="active_result?.scores"> 
+    <span *ngIf="active_result?.scores">
       <span class="alert alert-success d-block" role="alert" *ngIf="activeChanged">
         <span *ngIf="active_result.status == 'draft'; else elseBlockShow"> Current result has not been saved. Saving or attesting will store a new result.</span>
           <ng-template #elseBlockShow>Current result differs from stored result. Saving or attesting will overwrite stored result</ng-template>
       </span>
     </span>
-    
 
-    
-    
+
+
+
       <span class="alert alert-warning d-block" role="alert" *ngIf="active_result_index == -1">
-          You are viewing a live calculated result. <span *ngIf="game.results.length > 0">Stored result(s) also exist.</span> Saving this result will create an additional stored record.  
+          You are viewing a live calculated result. <span *ngIf="game.results.length > 0">Stored result(s) also exist.</span> Saving this result will create an additional stored record.
       </span>
-    
-    
+
+
     <button *ngIf="active_result && _canSave() && (activeChanged || active_result_index == -1)" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult(false)">
       <mdb-icon far icon="save"></mdb-icon> {{(activeChanged && active_result._id) ? "Overwrite" : "Save"}} Results
     </button>
-    
+
     <span class="d-block">
     <span>Home Attestations: </span>
     <span *ngIf="!homeAttestations"> There are no attestations for the home team.</span>
-      
+
       <span *ngFor="let att of homeAttestations">
         {{att.time | date : 'medium'}}
       <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)" *ngIf="_teamOwner('home')">
@@ -153,44 +137,44 @@
       </button>
     </span>
    <!-- home team attest-->
-    
+
     <button *ngIf="active_result && _canAttest('home')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('home')">
-      <i class="far fa-check-square"></i> 
+      <i class="far fa-check-square"></i>
       <span *ngIf="homeAttestations.length > 0">Overwrite attestation for HOME Team</span>
       <span *ngIf="homeAttestations.length == 0"><span *ngIf="!active_result._id || activeChanged">Save boxscore & </span> Attest as HOME team</span>
     </button>
-    
+
     </span>
-    
+
     <span class="d-block">
     <span >Away Attestations: </span>
-      
+
     <span *ngIf="!awayAttestations"> There are no attestations for the away team.</span>
-      
+
     <span *ngFor="let att of awayAttestations">
       {{att.time | date : 'medium'}}
     <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark" (click)="_removeAttestation(att._id)" *ngIf="_teamOwner('away')">
         Remove
       </button>
     </span>
-    
+
     <!-- away team attest-->
     <button *ngIf="active_result && _canAttest('away')" type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark" (click)="_saveResult('away')">
-      <i class="far fa-check-square"></i> 
+      <i class="far fa-check-square"></i>
       <span *ngIf="awayAttestations.length > 0">Overwrite attestation for AWAY Team</span>
       <span *ngIf="awayAttestations.length == 0"><span *ngIf="!active_result._id || activeChanged">Save boxscore & </span> Attest as AWAY team</span>
     </button>
-      
+
       </span>
 
 
-    
 
-    
+
+
   </mat-card-actions>
 </mat-card>
 
-  
+
 
 
 

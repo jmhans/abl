@@ -304,7 +304,7 @@ export class ApiService {
     .pipe(
       catchError((error)=> this._handleError(error)),
       map((data)=> {
-        let dateObj = data.dates.find((d)=> d.date == dt.toISOString().substring(0,10))
+        let dateObj = data.dates[0]//.find((d)=> d.date == dt.toISOString().substring(0,10))
         return dateObj.games
       })
     )

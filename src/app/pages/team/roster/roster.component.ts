@@ -5,7 +5,7 @@ import { ApiService } from './../../../core/api.service';
 import { LineupModel , LineupCollectionModel, LineupFormModel, Roster} from './../../../core/models/lineup.model';
 import {MlbPlayerModel} from './../../../core/models/mlb.player.model';
 import { Subscription, Subject, combineLatest, Observable, BehaviorSubject } from 'rxjs';
-import { takeUntil, combineAll , map, switchMap, share, combineLatestWith, withLatestFrom } from 'rxjs/operators';
+import { takeUntil, combineAll , map, switchMap, share, combineLatestWith, withLatestFrom, tap } from 'rxjs/operators';
 
 import { RosterRecordModel } from './../../../core/models/roster.record.model';
 import { AuthService } from './../../../auth/auth.service';
@@ -95,7 +95,12 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.mlbGames$ = this.api.getMlbGames$()
+    this.mlbGames$ = this.api.getMlbGames$().pipe(
+      tap((mlbGames)=> {
+        this.earliestStart = new Date(Math.min(...mlbGames.map(g=> (new Date(g.gameDate)).getTime())));
+
+      })
+    )
 
 
     this.roster_date$ = this.route.queryParams.pipe(map((qp)=> {
@@ -124,9 +129,8 @@ export class RosterComponent implements OnInit, OnDestroy {
 
     this.current_roster$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
       switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)),
-      withLatestFrom(this.mlbGames$),
-      map(([lineup, mlbGames])=>{
-              this.earliestStart = new Date(Math.min(...mlbGames.map(g=> (new Date(g.gameDate)).getTime())));
+
+      map((lineup)=>{
               this.active_roster = lineup;
               this.current_roster = new LineupFormModel(
                 lineup._id,
@@ -151,7 +155,8 @@ export class RosterComponent implements OnInit, OnDestroy {
                     )
                   return new Roster(p, rr.lineupPosition, rr.rosterOrder, rr.latest40Man)
                 }),
-                new Date(this.roster_deadline)
+                new Date(this.roster_deadline),
+                (new Date(this.roster_deadline)).toISOString().substring(0, 10)
               );
               return this.current_roster
       }))
@@ -311,7 +316,8 @@ ngAfterViewInit() {
     const newRec = {
       ablTeam: this.team._id,
       roster: evt.lineup.roster,
-      effectiveDate: evt.lineup.effectiveDate
+      effectiveDate: evt.lineup.effectiveDate,
+      gameDate: evt.lineup.effectiveDate.toISOString().substring(0, 10)
     }
 
 

@@ -39,6 +39,7 @@ class LineupModel {
     public ablTeam: AblTeamModel,
     public roster: Roster[],
     public effectiveDate: Date,
+    public gameDate:String,
     public latest40Man?: Date
   ) { }
 }
@@ -49,6 +50,7 @@ class LineupCollectionModel {
     public ablTeam: AblTeamModel,
     public roster: Roster[],
     public effectiveDate: Date,
+    public gameDate: String,
     public priorRosters?: LineupModel[],
     public latest40Man?: Date
   ) { }
@@ -60,6 +62,7 @@ class LineupFormModel {
     public rosterId: string,
     public roster: Roster[],
     public effectiveDate: Date,
+    public gameDate: String,
     public latest40Man?: Date
   ) { }
   get changed() {
@@ -92,6 +95,7 @@ interface PopulatedRoster {
 interface SubmitLineup {
   _id?: string;
   effectiveDate: Date;
+  gameDate: String;
   roster: [{
     "_id": string;
     "player": string;

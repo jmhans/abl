@@ -90,7 +90,7 @@ export class RosterImportComponent {
               })
 
 
-              this.outputLineup = new LineupFormModel(this.data.actualLineup.lineupId , this.data.actualLineup.rosterId, outputRoster, this.data.actualLineup.effectiveDate)
+              this.outputLineup = new LineupFormModel(this.data.actualLineup.lineupId , this.data.actualLineup.rosterId, outputRoster, this.data.actualLineup.effectiveDate, this.data.actualLineup.effectiveDate.toISOString().substring(0,10))
 
 
 
