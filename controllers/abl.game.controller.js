@@ -207,7 +207,7 @@ class ABLGameController extends BaseController{
       switch (lineupSlot) {
         case "DH":
         case "XTRA":
-          return true;
+          return (playerPosition != 'NA' && playerPosition != 'INJ');
         default:
           return (playerPosition == lineupSlot)
       }
