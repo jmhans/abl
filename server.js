@@ -1,5 +1,4 @@
 var express = require("express");
-var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 var mongoose = require('mongoose');
@@ -15,7 +14,9 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true,useUnifiedTopolog
 
 
 var app = express();
-app.use(bodyParser.json());
+
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(cors());
 
