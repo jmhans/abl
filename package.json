@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
+    "devstart" : "node --inspect-brk server.js",
     "build": "ng build --output-path dist --source-map=false",
     "test": "ng test",
     "lint": "ng lint",
@@ -99,7 +100,7 @@
     "ts-node": "^8.8.1"
   },
   "engines": {
-    "node": "16.19.1",
+    "node": "16.20.1",
     "npm": "9.6.7"
   },
   "heroku-run-build-script": true

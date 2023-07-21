@@ -4,8 +4,11 @@
   {{pageTitle}}
 </h3>
 
-<div *ngIf="rosterService.allRosters$ | async as rosters">
- Active Players: {{activeRoster(ownerPrimaryTeam?._id, rosters).length}}
+<div *ngIf="rosterService.allRostersObs$ | async as rosters">
+ <!-- Active Players1: {{activeRoster(ownerPrimaryTeam?._id, rosters).length}} -->
+ <span *ngIf="rosterService.activeRoster$ | async as currentRoster">
+  Active Players2: {{currentRoster.active_roster.length}}
+</span>
 
 <!-- src/app/pages/games/games.component.html -->
 <app-player-list

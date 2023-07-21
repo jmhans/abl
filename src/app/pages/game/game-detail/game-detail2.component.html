@@ -92,7 +92,6 @@
 
   <mat-card-actions *ngIf="active_result && active_result.status != 'scheduled'">
 
-
 <!--
     Attestation History:
     <span *ngFor="let att of active_result?.attestations" class="d-block">
@@ -126,7 +125,11 @@
       <mdb-icon far icon="save"></mdb-icon> {{(activeChanged && active_result._id) ? "Overwrite" : "Save"}} Results
     </button>
 
-    <span class="d-block">
+
+    <span>
+
+
+
     <span>Home Attestations: </span>
     <span *ngIf="!homeAttestations"> There are no attestations for the home team.</span>
 
@@ -146,7 +149,7 @@
 
     </span>
 
-    <span class="d-block">
+    <span>
     <span >Away Attestations: </span>
 
     <span *ngIf="!awayAttestations"> There are no attestations for the away team.</span>
@@ -166,7 +169,6 @@
     </button>
 
       </span>
-
 
 
 

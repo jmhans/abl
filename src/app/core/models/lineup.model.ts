@@ -36,18 +36,24 @@ class Roster {
 class LineupModel {
   constructor(
     public _id: string,
-    public ablTeam: AblTeamModel,
+    public ablTeam: AblTeamModel | string,
     public roster: Roster[],
     public effectiveDate: Date,
     public gameDate:String,
     public latest40Man?: Date
   ) { }
+
+  get active_roster() {
+    return this.roster.filter((plyr)=> {
+      return plyr.lineupPosition !='INJ' && plyr.lineupPosition != 'NA'
+    })
+  }
 }
 
 class LineupCollectionModel {
     constructor(
     public _id: string,
-    public ablTeam: AblTeamModel,
+    public ablTeam: AblTeamModel | string,
     public roster: Roster[],
     public effectiveDate: Date,
     public gameDate: String,

@@ -56,11 +56,12 @@ export class PlayersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.title.setTitle(this.pageTitle);
 //    this.formData = this.api.getAblTeams$();
 
-    this._getOwner();
 
   }
 ngAfterViewInit() {
   this.rosterService.refreshLineups();
+  this._getOwner();
+
 }
 
 
@@ -69,6 +70,10 @@ ngAfterViewInit() {
       data => {
         this.ownerTeams = data
         this.ownerPrimaryTeam = data.length ? data[0] : '';
+        if (this.ownerPrimaryTeam) {
+          this.rosterService.setActiveRoster(this.ownerPrimaryTeam._id)
+        }
+
       },
       err => console.log(err)
     )
@@ -79,7 +84,7 @@ activeRoster(tmId, rosters) {
   if (rosters) {
     let userRoster = rosters.find((r)=> r.ablTeam ==tmId);
     if (userRoster) {
-      return userRoster.roster.filter((p)=> p.lineupPosition !='INJ')
+      return userRoster.roster.filter((p)=> p.lineupPosition !='INJ' && p.lineupPosition != 'NA')
     }
   }
  return []
