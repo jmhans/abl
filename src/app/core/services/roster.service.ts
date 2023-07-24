@@ -4,8 +4,9 @@ import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.r
 import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
-import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject, merge, ReplaySubject } from 'rxjs';
-import { catchError, switchMap, map, tap, scan } from 'rxjs/operators';
+import { ApiService } from './../../core/api.service';
+import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject, merge, ReplaySubject, combineLatest, of } from 'rxjs';
+import { catchError, switchMap, map, tap, scan, combineLatestAll, shareReplay,combineLatestWith } from 'rxjs/operators';
 import { SseService } from './sse.service';
 
 function Identity<T>(value: T): T {
@@ -49,7 +50,26 @@ export class RosterService {
   activeRosters$:Observable<LineupModel[]>;
   skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
   allRosters$: ReplaySubject<LineupModel[]> = new ReplaySubject(1);
-
+  activeRosterIdReplaySubj$: ReplaySubject<string> = new ReplaySubject(1);
+  rosterReloadSubj$ = new Subject<void>();
+  allRostersObs$: Observable<LineupModel[]> = this.api.getAllLineups$()
+  .pipe(
+    shareReplay(1)
+  )
+/*   activeRoster$: Observable<LineupModel> = combineLatest([this.allRostersObs$, this.activeRosterIdReplaySubj$]).pipe(map(
+    ([rstrs, rstrID])=> {
+      return rstrs.find((roster)=> roster.ablTeam._id == rstrID)
+    }
+  )); */
+  activeRoster$: Observable<LineupModel> = this.activeRosterIdReplaySubj$
+  .pipe(
+    combineLatestWith(this.allRostersObs$),
+    map(([id, rstrs])=> {
+      var team_roster = rstrs.find((roster)=> roster.ablTeam == id)
+      let lm = new LineupModel(team_roster._id, team_roster.ablTeam, team_roster.roster, team_roster.effectiveDate, team_roster.gameDate)
+        return lm // rstrs.find((roster)=> roster.ablTeam == id)
+    })
+  )
 
     private cachedRosters:LineupModel[];
 
@@ -59,15 +79,15 @@ export class RosterService {
 
   constructor(
     private http: HttpClient,
-    private auth: AuthService,
     private SseService: SseService,
+    private api:ApiService
 ) {
 
         this.currentLineup$ = this.retrieveLineup$.pipe(
-          switchMap((obj) => this.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
+          switchMap((obj) => this.api.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         ));
         this.refreshSkips();
-        this.getRosters();
+       // this.getRosters();
 
 //this.SseService.getSSE$('player').subscribe((data)=> {this.refreshLineups()});
 
@@ -77,7 +97,7 @@ this.activeRosters$ = this.refresh$.pipe(
     console.log("Got this far!");
     this.refreshSkips();
   }),
-  switchMap(()=> this.getAllLineups$())
+  switchMap(()=> this.api.getAllLineups$())
   );
 
         // this.refresh$.pipe(switchMap(()=> this.getAllLineups$()),
@@ -96,55 +116,8 @@ this.activeRosters$ = this.refresh$.pipe(
     }
 
 
-  private get _authHeader(): string {
-    return `Bearer ${this.auth.accessToken}`;
-  }
-
-
-  // POST new roster record (authorized only)
-
-  private _handleError(err: HttpErrorResponse | any): Observable<any> {
-    const errorMsg = err.message || 'Error: Unable to complete request.';
-    if (err.message && err.message.indexOf('No JWT present') > -1) {
-      this.auth.login();
-    }
-    return ObservableThrowError(errorMsg);
-  }
-
-
-  getLineupByTeamId$(teamId: string): Observable<LineupModel> {
-    return this.http
-      .get<LineupModel>(`${this.base_api}team/${teamId}/lineup`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
-
-  getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
-    return this.http
-      .get<LineupModel>(`${this.base_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
-
-  getAllLineups$(): Observable<LineupModel[]> {
-    return this.http
-      .get<LineupModel[]>(`${this.base_api}lineups`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      );
-  }
-
-
   getRosters() {
-    this.getAllLineups$().subscribe((data)=>{
+    this.api.getAllLineups$().subscribe((data)=>{
         this.allRosters$.next(data)
       });
   }
@@ -156,25 +129,15 @@ this.activeRosters$ = this.refresh$.pipe(
 
   refreshSkips() {
 
-    this.http
-      .get<LineupModel[]>(`${this.base_api}skips`, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
-      .pipe(
-        catchError((error) => this._handleError(error))
-      ).subscribe((data)=>{
+    this.api.getSkips$().subscribe((data)=>{
         this.skipList$.next(data)
       });
 
   }
 
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
-    return this.http
-      .post<LineupModel>(`${this.base_api}team/${ablTeamId}/addPlayer`, addPlayer, {
-        headers: new HttpHeaders().set('Authorization', this._authHeader)
-      })
+    return this.api.addPlayertoTeam$(addPlayer, ablTeamId)
       .pipe(
-        catchError((error) => this._handleError(error)),
         tap(()=> this.getRosters())
       );
   }
@@ -189,24 +152,16 @@ this.activeRosters$ = this.refresh$.pipe(
       roster: lineup.roster,
       effectiveDate: new Date()
     }
-    return this.http
-        .post<LineupModel>(`${this.base_api}lineups`, submitlineup, {
-          headers: new HttpHeaders().set('Authorization', this._authHeader)
-        })
+    return this.api.postLineup$( submitlineup)
         .pipe(
-          catchError((error) => this._handleError(error)),
           tap(()=> this.getRosters())
 
         );
   }
   updateRosterRecord$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
 
-    return this.http
-        .put<LineupModel>(`${this.base_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
-          headers: new HttpHeaders().set('Authorization', this._authHeader)
-        })
+    return this.api.putLineup$(ablTeamId, lineup)
         .pipe(
-          catchError((error) => this._handleError(error)),
           tap(()=> this.refreshLineups())
 
         );
@@ -214,12 +169,8 @@ this.activeRosters$ = this.refresh$.pipe(
 
   dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
 
-    return this.http
-        .get<any>(`${this.base_api}lineups/${ablTeamId}/drop/${plyr}`, {
-          headers: new HttpHeaders().set('Authorization', this._authHeader)
-        })
+    return this.api.dropPlayerFromTeam$(ablTeamId, plyr)
         .pipe(
-          catchError((error) => this._handleError(error)),
           tap(()=> this.refreshLineups())
 
         );
@@ -238,7 +189,10 @@ this.activeRosters$ = this.refresh$.pipe(
 
   }
 
-
+  setActiveRoster(rosterId: string): void {
+    this.activeRosterIdReplaySubj$.next(rosterId)
+    console.log(`Nexted the RosterId!: ${rosterId}`)
+  }
 
 
 }

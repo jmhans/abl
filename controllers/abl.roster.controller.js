@@ -646,14 +646,21 @@ class ABLRosterController extends BaseController{
   }
 
   _get(req, res, next) {
+      console.log(`Call made to ${this.routeString}`)
     CurrentLineupModel.find(function(err, results) {
-      if (err) return next(err);
+        console.log('I am doing the lineup thing now.')
+      if (err) {
+          console.log(err);
+          return next(err)
+      };
+      console.log("I am sending back the results");
       res.json(results);
     });
     }
 
 
  establishHeartbeat(strm){
+     console.log('Heartbeat establishing.')
    setInterval(function() {
     strm.emit('push', 'ping', {msg: "testing server ping"})
    }, 30000)

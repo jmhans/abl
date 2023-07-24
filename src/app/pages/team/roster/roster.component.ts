@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnDestroy, AfterViewInit } from '@angular/cor
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { RosterService } from './../../../core/services/roster.service';
 import { ApiService } from './../../../core/api.service';
+import { MlbService } from './../../../core/services/mlb.service';
 import { LineupModel , LineupCollectionModel, LineupFormModel, Roster} from './../../../core/models/lineup.model';
 import {MlbPlayerModel} from './../../../core/models/mlb.player.model';
 import { Subscription, Subject, combineLatest, Observable, BehaviorSubject } from 'rxjs';
@@ -89,16 +90,16 @@ export class RosterComponent implements OnInit, OnDestroy {
                 private utils: UtilsService,
                  public dialog: MatDialog,
                  public leagueConfig: LeagueConfigService,
-                 private _rosterWarning: MatSnackBar
+                 private _rosterWarning: MatSnackBar,
+                 private mlb: MlbService
 
                 ) { }
 
   ngOnInit() {
 
-    this.mlbGames$ = this.api.getMlbGames$().pipe(
+    this.mlbGames$ = this.mlb.gameData$.pipe(
       tap((mlbGames)=> {
         this.earliestStart = new Date(Math.min(...mlbGames.map(g=> (new Date(g.gameDate)).getTime())));
-
       })
     )
 
@@ -128,9 +129,9 @@ export class RosterComponent implements OnInit, OnDestroy {
 
 
     this.current_roster$ = combineLatest([this.retrieveLineup$, this.roster_deadline$]).pipe(
-      switchMap(([retr, deadline])=> this.rosterService.getLineupForTeamAndDate$(this.team._id, deadline)),
+      switchMap(([retr, deadline])=> this.api.getLineupForTeamAndDate$(this.team._id, deadline)),
 
-      map((lineup)=>{
+      map((lineup: LineupModel)=>{
               this.active_roster = lineup;
               this.current_roster = new LineupFormModel(
                 lineup._id,

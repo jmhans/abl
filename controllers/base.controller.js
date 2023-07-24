@@ -14,6 +14,7 @@ class BaseController {
 
   //Simple version, without validation or sanitation
 _get(req, res, next) {
+    console.log(`call made to ${this.routeString}`)
   this.model.find(function(err, results) {
     if (err) return next(err);
     res.json(results);

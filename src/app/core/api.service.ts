@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../auth/auth.service';
 import { throwError as ObservableThrowError, Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map , tap} from 'rxjs/operators';
 // import { ENV } from './env.config';
 import { EventModel } from './models/event.model';
 import { RsvpModel } from './models/rsvp.model';
@@ -13,6 +13,8 @@ import { AblTeamModel } from './models/abl.team.model';
 import { OwnerModel } from './models/owner.model';
 import { MlbPlayerModel } from './models/mlb.player.model';
 import { MlbRoster } from './models/mlb.roster';
+import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './models/lineup.model';
+
 import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.record.model';
 
 
@@ -48,6 +50,26 @@ export class ApiService {
       .pipe(
         catchError((error) => this._handleError(error))
     );
+  }
+
+  getLineupByTeamId$(teamId: string): Observable<LineupModel> {
+    return this.http
+      .get<LineupModel>(`${this.v2_api}team/${teamId}/lineup`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+
+  getLineupForTeamAndDate$(teamId: string, gmDt: Date): Observable<LineupModel> {
+    return this.http
+      .get<LineupModel>(`${this.v2_api}lineups/${teamId}/date/${gmDt.toISOString()}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
   }
 
   getMlbPlayers$(): Observable<MlbPlayerModel[]> {
@@ -296,11 +318,15 @@ export class ApiService {
     )
   }
 
-  getMlbGames$(dt: Date = new Date()): Observable<any[]> {
+  getMlbGames$(dt: string): Observable<any[]> {
 
-    let lookupDate = `${dt.toLocaleDateString("en-US", {month:'2-digit'})}%2F${dt.toLocaleDateString("en-US", {day:'2-digit'})}%2F${dt.toLocaleDateString("en-US", {year:'numeric'})}`
+    dt = dt || (new Date()).toLocaleDateString("en-US", {month: '2-digit', day:'2-digit', timeZone: 'America/Chicago', year: 'numeric'})
+
+    // If original string was in MM/dd/YYYY or MM-dd-YYYY format, this converts it to the format expected by the MLB API.
+    dt = dt.replaceAll('/', '%2F').replaceAll('-', '%2F')
+
     return this.http
-    .get<any>(`https://statsapi.mlb.com/api/v1/schedule/?sportId=1&date=${lookupDate}`)
+    .get<any>(`https://statsapi.mlb.com/api/v1/schedule/?sportId=1&date=${dt}`)
     .pipe(
       catchError((error)=> this._handleError(error)),
       map((data)=> {
@@ -310,7 +336,84 @@ export class ApiService {
     )
   }
 
+  getAllLineups$(): Observable<LineupModel[]> {
+    return this.http
+      .get<LineupModel[]>(`${this.v2_api}lineups`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        tap((data)=> {console.log(data)}),
+        catchError((error) => this._handleError(error))
+      );
+  }
 
+  getSpecificLineup$(tmId: string): Observable<LineupModel> {
+    return this.http
+      .get<LineupModel[]>(`${this.v2_api}lineups`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        tap((data)=> {
+          console.log(data)
+        }),
+        catchError((error) => this._handleError(error)),
+        map((lineups: LineupModel[])=> {return lineups.find((roster)=> roster.ablTeam == tmId)})
+      );
+  }
+
+  getSkips$(): Observable<LineupModel[]> {
+    return this.http
+      .get<LineupModel[]>(`${this.v2_api}skips`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      )
+  }
+
+
+  addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
+    return this.http
+      .post<LineupModel>(`${this.v2_api}team/${ablTeamId}/addPlayer`, addPlayer, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      );
+  }
+
+  dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
+
+    return this.http
+        .get<any>(`${this.v2_api}lineups/${ablTeamId}/drop/${plyr}`, {
+          headers: new HttpHeaders().set('Authorization', this._authHeader)
+        })
+        .pipe(
+          catchError((error) => this._handleError(error))
+
+        );
+  }
+
+  postLineup$(submitLineup): Observable<LineupModel> {
+    return this.http
+    .post<LineupModel>(`${this.v2_api}lineups`, submitLineup, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error))
+
+    );
+  }
+  putLineup$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
+    return this.http
+    .put<LineupModel>(`${this.v2_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error)),
+
+    );
+  }
 
 
   private _handleError(err: HttpErrorResponse | any): Observable<any> {
