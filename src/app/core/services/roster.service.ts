@@ -43,24 +43,19 @@ function combineReload<T>(
 export class RosterService {
 
   private base_api= '/api2/'
-  currentLineup$: Observable<LineupModel>;
-  retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
+  //currentLineup$: Observable<LineupModel>;
+  //retrieveLineup$ = new Subject<{ablTm: string, dt: Date}>();
   refresh$: Subject<void> = new Subject();
   //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
   activeRosters$:Observable<LineupModel[]>;
   skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
-  allRosters$: ReplaySubject<LineupModel[]> = new ReplaySubject(1);
+
   activeRosterIdReplaySubj$: ReplaySubject<string> = new ReplaySubject(1);
   rosterReloadSubj$ = new Subject<void>();
   allRostersObs$: Observable<LineupModel[]> = this.api.getAllLineups$()
   .pipe(
     shareReplay(1)
   )
-/*   activeRoster$: Observable<LineupModel> = combineLatest([this.allRostersObs$, this.activeRosterIdReplaySubj$]).pipe(map(
-    ([rstrs, rstrID])=> {
-      return rstrs.find((roster)=> roster.ablTeam._id == rstrID)
-    }
-  )); */
   activeRoster$: Observable<LineupModel> = this.activeRosterIdReplaySubj$
   .pipe(
     combineLatestWith(this.allRostersObs$),
@@ -83,13 +78,12 @@ export class RosterService {
     private api:ApiService
 ) {
 
-        this.currentLineup$ = this.retrieveLineup$.pipe(
+/*         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.api.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
-        ));
+        )); */
         this.refreshSkips();
-       // this.getRosters();
 
-//this.SseService.getSSE$('player').subscribe((data)=> {this.refreshLineups()});
+
 
 
 this.activeRosters$ = this.refresh$.pipe(
@@ -100,27 +94,11 @@ this.activeRosters$ = this.refresh$.pipe(
   switchMap(()=> this.api.getAllLineups$())
   );
 
-        // this.refresh$.pipe(switchMap(()=> this.getAllLineups$()),
-        // tap(data=> this.activeRosters$.next(data)) );
         this.refreshLineups();
         this.refreshSkips();
 
-        // this.getAllLineups$().subscribe(
-        //   data => {
-        //     this.activeRosters$.next(data)
-        //   }
-        // )
-
-
-
     }
 
-
-  getRosters() {
-    this.api.getAllLineups$().subscribe((data)=>{
-        this.allRosters$.next(data)
-      });
-  }
 
   refreshLineups() {
     this.refresh$.next();
@@ -138,7 +116,7 @@ this.activeRosters$ = this.refresh$.pipe(
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.api.addPlayertoTeam$(addPlayer, ablTeamId)
       .pipe(
-        tap(()=> this.getRosters())
+        //tap(()=> this.getRosters())
       );
   }
 
@@ -154,7 +132,7 @@ this.activeRosters$ = this.refresh$.pipe(
     }
     return this.api.postLineup$( submitlineup)
         .pipe(
-          tap(()=> this.getRosters())
+          //tap(()=> this.getRosters())
 
         );
   }
@@ -183,7 +161,7 @@ this.activeRosters$ = this.refresh$.pipe(
     // When update returns, switchMap to the normal roster retrieve function.
 
     return this.updateRosterRecord$(ablTeamId, lineup).pipe(map((ret)=> {
-      this.retrieveLineup$.next({ablTm: ret.ablTeam["_id"], dt: new Date(ret.effectiveDate)});
+      //this.retrieveLineup$.next({ablTm: ret.ablTeam["_id"], dt: new Date(ret.effectiveDate)});
       return ret
     }))
 

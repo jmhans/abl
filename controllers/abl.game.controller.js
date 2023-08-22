@@ -713,41 +713,64 @@ async _getStatsForLineups(lineups, current_date) {
 
  }
 
- _post(req, res) {
+ async _post(req, res) {
 
-  AblGame.findOne({
-    awayTeam: req.body.awayTeam,
-    homeTeam: req.body.homeTeam,
-    gameDate: req.body.gameDate
-  }, (err, existingGame) => {
-    if (err) {
-      return res.status(500).send({
-        message: err.message
-      });
-    }
-    if (existingGame) {
-      return res.status(409).send({
-        message: 'You have already created a game with those details.'
-      });
-    }
-    const game = new AblGame({
-      awayTeam: (typeof req.body.awayTeam === "object") ? req.body.awayTeam._id : new ObjectId(req.body.awayTeam),
-      homeTeam: (typeof req.body.homeTeam === "object") ? req.body.homeTeam._id : new ObjectId(req.body.homeTeam),
-      gameDate: req.body.gameDate,
-      description: req.body.description
-    });
-    game.save((err) => {
-      if (err) {
-        return res.status(500).send({
-          message: err.message
-        });
-      }
-      res.send(game);
-    });
-  });
+  let gamesToCreate = []
 
+if (Array.isArray(req.body)) {
+// Need to loop through, as there are several games in here...
+
+  gamesToCreate = req.body
+} else {
+  gamesToCreate = [req.body]
+}
+
+try {
+  let createdGames = []
+  for (let g=0; g<gamesToCreate.length; g++) {
+    let newGame = await this.createNewGame(gamesToCreate[g])
+    createdGames.push(newGame)
+  }
+  res.send(createdGames[0])
+} catch(e) {
+
+  return res.status(500).send( e.message)
+}
 
 }
+
+async createNewGame(gameDetails) {
+
+try {
+  let existingGame = await AblGame.findOne({
+    awayTeam: gameDetails.awayTeam,
+    homeTeam: gameDetails.homeTeam,
+    gameDate: gameDetails.gameDate
+  })
+
+  if (existingGame) {
+    throw new Error('You have already created a game with those details')
+  }
+
+  const game = new AblGame({
+    awayTeam: (typeof gameDetails.awayTeam === "object") ? gameDetails.awayTeam._id : new ObjectId(gameDetails.awayTeam),
+    homeTeam: (typeof gameDetails.homeTeam === "object") ? gameDetails.homeTeam._id : new ObjectId(gameDetails.homeTeam),
+    gameDate: gameDetails.gameDate,
+    description: gameDetails.description,
+    gameType: gameDetails.gameType || "R"
+  });
+  let output = await game.save()
+  console.log(output)
+    return output;
+
+} catch (err) {
+  throw err
+}
+
+}
+
+
+
 
 _put(req, res) {
   AblGame.findById(req.params.id, (err, game) => {

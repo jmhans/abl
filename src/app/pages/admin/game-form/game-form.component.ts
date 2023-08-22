@@ -1,22 +1,25 @@
 // src/app/pages/admin/game-form/game-form.component.ts
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewEncapsulation } from '@angular/core';
+
 import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
 import { GameModel, FormGameModel } from './../../../core/models/game.model';
-import { AblTeamModel, FormTeamModel } from './../../../core/models/abl.team.model'; 
+import { AblTeamModel, FormTeamModel } from './../../../core/models/abl.team.model';
 import { DatePipe } from '@angular/common';
 import { dateValidator } from './../../../core/forms/date.validator';
 import { DATE_REGEX, TIME_REGEX, stringsToDate } from './../../../core/forms/formUtils.factory';
-import { GameFormService } from './game-form.service'; 
+import { GameFormService } from './game-form.service';
 import { dateRangeValidator } from './../../../core/forms/date-range.validator';
 
 @Component({
   selector: 'app-game-form',
   templateUrl: './game-form.component.html',
   styleUrls: ['./game-form.component.scss'],
-  providers: [ GameFormService ]
+  providers: [ GameFormService ],
+  encapsulation:ViewEncapsulation.None
+
 })
 export class GameFormComponent implements OnInit, OnDestroy {
   @Input() game: GameModel;
@@ -30,17 +33,19 @@ export class GameFormComponent implements OnInit, OnDestroy {
   formErrors: any;
   formChangeSub: Subscription;
   // Form submission
-  submitGameObj: GameModel;
+  submitGameObj: GameModel | GameModel[];
   submitGameSub: Subscription;
   error: boolean;
   submitting: boolean;
   submitBtnText: string;
-  
+
   formTeam: AblTeamModel;
   formTeams: AblTeamModel[];
   formTeamSub: Subscription;
-  
-  
+
+  daysSelected: any[] = [];
+event: any;
+
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -57,12 +62,15 @@ export class GameFormComponent implements OnInit, OnDestroy {
     // Set initial form data
     this.formGame = this._setFormGame();
     // Use FormBuilder to construct the form
-    
+
     this._getAblTeams();
     this._buildForm();
   }
 
-    
+
+
+
+
   private _getAblTeams() {
 
     // Get all owners
@@ -78,14 +86,15 @@ export class GameFormComponent implements OnInit, OnDestroy {
         }
       );
   }
-  
-  
-  
+
+
+
   private _setFormGame() {
     if (!this.isEdit) {
       // If creating a new game, create new
       // FormGameModel with default null data
-      return new FormGameModel(null, null, null, null);
+       return new FormGameModel(null, null, null, null);
+
     } else {
       // If editing existing game, create new
       // FormGameModel from existing data
@@ -97,14 +106,15 @@ export class GameFormComponent implements OnInit, OnDestroy {
       return new FormGameModel(
         this.datePipe.transform(this.game.gameDate, _shortDate),
         this.game.awayTeam,
-        this.game.homeTeam, 
-        this.game.description
+        this.game.homeTeam,
+        this.game.description,
+        this.game.gameType
       );
     }
   }
-  
-  
-  
+
+
+
 
   private _buildForm() {
     this.gameForm = this.fb.group({
@@ -123,8 +133,11 @@ export class GameFormComponent implements OnInit, OnDestroy {
           Validators.maxLength(this.gf.dateMax),
           dateValidator()
         ]]
-      })
+      }),
+      gameType: [this.formGame.gameType]
     });
+
+
     // Set local property to gameForm datesGroup control
     this.datesGroup = this.gameForm.get('datesGroup');
 
@@ -175,35 +188,35 @@ export class GameFormComponent implements OnInit, OnDestroy {
         } else {
           // Set errors for fields inside datesGroup
           const datesGroupErrors = this.formErrors['datesGroup'];
-          for (const dateField in datesGroupErrors) {
-            if (datesGroupErrors.hasOwnProperty(dateField)) {
-              // Clear previous error message (if any)
-              datesGroupErrors[dateField] = '';
-              _setErrMsgs(this.datesGroup.get(dateField), datesGroupErrors, dateField);
-            }
+          if (this.daysSelected.length == 0) {
+            _setErrMsgs(this.datesGroup.get('gameDate'), datesGroupErrors , 'gameDate')
           }
+
         }
       }
     }
   }
 
   private _getSubmitObj() {
-    const gameDate = this.datesGroup.get('gameDate').value;
+//    const gameDate = this.datesGroup.get('gameDate').value;
     // Convert form startDate/startTime and endDate/endTime
     // to JS dates and populate a new GameModel for submission
-    
-    // Ensure game time is noon central. 
-    
-    const insertGameDate = new Date(gameDate).toISOString().substring(0, 10) + "T17:00:00Z"
-    
-    
-    return new GameModel(
-      insertGameDate,
-      this.gameForm.get('awayTeam').value, // Need to think about these - probably need to extract _id from these differently.  
+
+    // Ensure game time is noon central.
+
+  //  const insertGameDate = new Date(gameDate).toISOString().substring(0, 10) + "T17:00:00Z"
+
+    return this.daysSelected.map(dt=> {return new GameModel(
+      new Date(dt).toISOString().substring(0, 10)+ "T17:00:00Z",
+      this.gameForm.get('awayTeam').value, // Need to think about these - probably need to extract _id from these differently.
       this.gameForm.get('homeTeam').value,
       this.gameForm.get('description').value,
-      this.game ? this.game._id : null
-    );
+      this.game ? this.game._id : null,
+      this.gameForm.get('gameType').value
+    )})
+
+
+
   }
 
   onSubmit() {
@@ -219,7 +232,7 @@ export class GameFormComponent implements OnInit, OnDestroy {
         );
     } else {
       this.submitGameSub = this.api
-        .editGame$(this.game._id, this.submitGameObj)
+        .editGame$(this.game._id, this.submitGameObj[0])
         .subscribe(
           data => this._handleSubmitSuccess(data),
           err => this._handleSubmitError(err)
@@ -238,11 +251,38 @@ export class GameFormComponent implements OnInit, OnDestroy {
     console.error(err);
     this.submitting = false;
     this.error = true;
+
   }
 
   resetForm() {
     this.gameForm.reset();
   }
+
+
+isSelected = (event: any) => {
+  const date =
+    event.getFullYear() +
+    "-" +
+    ("00" + (event.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("00" + event.getDate()).slice(-2);
+  return this.daysSelected.find(x => x == date) ? "selected" : null;
+};
+
+select(event: any, calendar: any) {
+  const date =
+    event.getFullYear() +
+    "-" +
+    ("00" + (event.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("00" + event.getDate()).slice(-2);
+  const index = this.daysSelected.findIndex(x => x == date);
+  if (index < 0) this.daysSelected.push(date);
+  else this.daysSelected.splice(index, 1);
+
+  calendar.updateTodaysDate();
+this.gameForm.controls.datesGroup.patchValue({gameDate: this.daysSelected[0]})
+}
 
   ngOnDestroy() {
     if (this.submitGameSub) {
