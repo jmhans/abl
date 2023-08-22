@@ -5,7 +5,7 @@
     <h1 class="header-page-siteTitle">
       <a routerLink="/">ABL</a>
     </h1>
-    
+
     <div class="header-page-authStatus">
       <span *ngIf="auth.loggingIn">Logging in...</span>
       <ng-template [ngIf]="!auth.loggingIn">
@@ -17,10 +17,10 @@
         </span>
       </ng-template>
     </div>
-    
+
   </div>
- 
-  
+
+
   <nav id="nav" class="nav" role="navigation">
     <ul class="nav-list">
 <!--       <li>
@@ -80,8 +80,15 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">ABL Admin</a>
       </li>
-      
-      
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/create/game"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">Add Games</a>
+      </li>
+
+
     </ul>
   </nav>
 </header>

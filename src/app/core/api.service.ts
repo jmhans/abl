@@ -213,7 +213,7 @@ export class ApiService {
   }
 
    // POST new game (admin only)
-  postGame$(game: GameModel): Observable<GameModel> {
+  postGame$(game: GameModel | GameModel[]): Observable<GameModel> {
     return this.http
       .post<GameModel>(`${this.v2_api}game/new`,game, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
@@ -222,6 +222,8 @@ export class ApiService {
         catchError((error) => this._handleError(error))
       );
   }
+
+
 
   // PUT existing event (admin only)
   editGame$(id: string,game: GameModel): Observable<GameModel> {

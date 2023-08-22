@@ -9,6 +9,7 @@ class GameModel {
     public homeTeam: AblTeamModel,
     public description?: string,
     public _id?: string,
+    public gameType?: string,
     public awayTeamRoster?: Roster[],
     public homeTeamRoster?: Roster[],
     public results?: GameResultsModel[]
@@ -20,9 +21,12 @@ class FormGameModel {
     public gameDate: string,
     public awayTeam: AblTeamModel,
     public homeTeam: AblTeamModel,
-    public description?: string
+    public description?: string,
+    public gameType?: string
   ) { }
 }
+
+
 
 interface PopulatedGameModel {
     gameDate: string

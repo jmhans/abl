@@ -7,7 +7,7 @@ import { Title } from '@angular/platform-browser';
   styleUrls: ['./create-game.component.scss']
 })
 export class CreateGameComponent implements OnInit {
-  pageTitle = 'Create Game';
+  pageTitle = 'Create Game(s)';
 
   constructor(private title: Title) { }
 

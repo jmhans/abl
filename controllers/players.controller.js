@@ -3,6 +3,7 @@ const BaseController = require('./base.controller');
 var express = require('express');
 const Statline = require('../models/statline');
 const PlayerView = require('../models/player').PlayerView;
+const PlayerCache = require('../models/player').PlayerCache;
 
 const ablConfig = require('../server/ablConfig');
 var   router = express.Router();
@@ -293,7 +294,8 @@ class PlayersController extends BaseController {
 
 _viewGet(req, res, next) {
 
-  PlayerView.find(req.query, (err, results)=> {
+  console.log("am caching now");
+  PlayerCache.find(req.query, (err, results)=> {
     if (err) return next(err);
     res.json(results);
   });

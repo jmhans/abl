@@ -18,6 +18,7 @@ const gameSchema = new Schema({
   gameDate: { type: Date, required: true },
   awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true},
   homeTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true},
+  gameType: {type: String, required: false},
   description: String,
   awayTeamRoster: [{type: gamePlayerSchema}],
   homeTeamRoster: [{type: gamePlayerSchema}],
