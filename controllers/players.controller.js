@@ -295,7 +295,7 @@ class PlayersController extends BaseController {
 _viewGet(req, res, next) {
 
   console.log("am caching now");
-  PlayerCache.find(req.query, (err, results)=> {
+  PlayerView.find(req.query, (err, results)=> {
     if (err) return next(err);
     res.json(results);
   });
