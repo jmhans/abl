@@ -4,6 +4,25 @@ var express = require('express');
 var router = express.Router();
 const ablConfig = require('../server/ablConfig');
 
+function minifyJSON(obj) {
+return Object.keys(obj)
+.filter(function(key) {
+  return obj[key] !== 0
+})
+.reduce(function(out, key) {
+  out[key] = obj[key]
+  return out
+}, {})
+}
+
+
+function shortenStats(statline) {
+  let outputObj = {batting: minifyJSON(statline.batting), fielding: {e: statline.fielding.errors}}
+
+return outputObj
+
+}
+
 
 
 
@@ -60,10 +79,13 @@ class StatlineController extends BaseController {
                 mlbId: plyr.person.id,
                 gameDate: gm.gameDate,
                 gamePk: gm.gamePk,
-                stats: plyr.stats,
+                stats: shortenStats(plyr.stats),
                 positions: shortPositions,
                 statlineType: gm.status.detailedState
               };
+
+        console.log(plyr.stats);
+        console.log(shortenStats(plyr.stats));
       try {
         const doc = await this.model.findOne(query);
         if (doc) {
@@ -73,7 +95,7 @@ class StatlineController extends BaseController {
             // They have stats from the original date. Find the diff for the new date.
             console.log(`Doc: ${doc.gameDate} vs. stats: ${new Date(gm.gameDate)}`)
             console.log(`Doc: ${typeof(new Date(doc.gameDate))} vs. stats: ${typeof(new Date(gm.gameDate))}`)
-            _statline.stats = await this._getStatlineDiff(plyr.stats, doc.stats)
+            _statline.stats = await this._getStatlineDiff(shortenStats(plyr.stats), doc.stats)
             // _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
             query = {
               'mlbId': plyr.person.id,
@@ -83,6 +105,8 @@ class StatlineController extends BaseController {
           }
         }
         const doc2 = await this.model.updateMany(query, _statline, { upsert: true });
+        console.log(`Successfully updated ${plyr.person.fullName} for date ${gm.gameDate}`)
+        console.log(doc2)
           return doc2;
 
 
