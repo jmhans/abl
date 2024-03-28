@@ -88,7 +88,6 @@ export class RosterService {
 
 this.activeRosters$ = this.refresh$.pipe(
   tap(()=> {
-    console.log("Got this far!");
     this.refreshSkips();
   }),
   switchMap(()=> this.api.getAllLineups$())

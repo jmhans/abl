@@ -78,6 +78,7 @@ import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 import { PlayerListComponent } from './core/player-list/player-list.component';
 import { NewMessageFormComponent } from './message/new-message-form/new-message-form.component';
 import {NgxEditorModule } from 'ngx-editor';
+import { DraftComponent } from './pages/draft/draft.component';
 
 
 @NgModule({
@@ -123,7 +124,8 @@ import {NgxEditorModule } from 'ngx-editor';
         SuppDraftComponent,
         PlayoffsComponent,
         PlayerListComponent,
-        NewMessageFormComponent
+        NewMessageFormComponent,
+        DraftComponent
     ],
     imports: [
         BrowserModule,

@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "node server.js",
     "devstart" : "node --inspect-brk server.js",
+    "devbuild" : "ng build --output-path dist --source-map=true",
     "build": "ng build --output-path dist --source-map=false",
     "test": "ng test",
     "lint": "ng lint",

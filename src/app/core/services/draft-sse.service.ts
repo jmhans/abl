@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from "@angular/core";
-import { BehaviorSubject, Observable, ReplaySubject,throwError as ObservableThrowError , Subject, Subscription, combineLatestWith} from "rxjs";
+import { BehaviorSubject, Observable, ReplaySubject,throwError as ObservableThrowError, of , Subject, Subscription, combineLatestWith} from "rxjs";
 import { catchError, switchMap, map, tap, startWith, takeUntil, filter, combineLatest} from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../../auth/auth.service';
@@ -25,7 +25,18 @@ export class DraftSseService {
   draftResults$: Observable<any[]>;
   draftData$: BehaviorSubject<any> = new BehaviorSubject([]);
   playerData$: BehaviorSubject<any> = new BehaviorSubject([]);
-  draftOrder=[{"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"1"},{"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"2"},{"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"3"},{"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"4"},{"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"5"},{"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"6"},{"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"7"},{"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"8"},{"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"9"},{"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"10"}]
+  draftOrder=[
+    {"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"1"},
+    {"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"2"},
+    {"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"3"},
+    {"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"4"},
+    {"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"5"},
+    {"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"6"},
+    {"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"7"},
+    {"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"8"},
+    {"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"9"},
+    {"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"10"}
+  ]
   draftOrder$: BehaviorSubject<any> = new BehaviorSubject([]);
   //private eventSource: EventSource =new EventSource(`${this.base_api}sse`)
   private draftData: any[];
@@ -45,64 +56,13 @@ export class DraftSseService {
 
     ) {
       //this.notify();
+      if (false) {
+        this.suppDraftDraftOrder()
+      } else {
+        this.regularDraftOrder()
+       // this.draftOrder$.next(this.draftOrder)
+      }
 
-
-      this.api.getAPIData$('standings').pipe(
-          takeUntil(this.unsubscribe$),
-          map((data:any[]) => {
-            return data.sort((a,b)=> {
-              let wpct = (o)=> {return o.w/o.g}
-              if (wpct(a) == wpct(b)) {
-                return a.avg_runs - b.avg_runs
-              }
-
-              return (a.w / a.g) - (b.w / b.g)})
-          }),
-          combineLatestWith(rosterService.activeRosters$),
-          map(([standings, rosters])=> { return standings.map(s=> {
-            s.roster =rosters.find((r)=> r.ablTeam == s.tm._id)
-            return s
-          })}),
-          combineLatestWith(rosterService.skipList$),
-          map(([data, skips]) => {
-            return data.map((team)=> {
-              let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
-              let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
-              supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team.tm._id).map((item)=> "Skip")]
-              return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
-
-            })
-          }),
-          map((data:any[])=> {
-            let draftRounds = []
-
-            for (let i=0; i<6; i=i+2) {
-              draftRounds[i]= data.map(tm=> {
-
-                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - tm.roster.roster.length)}
-              })
-              draftRounds[i+1] = [...data].reverse().map(tm=> {
-                return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - tm.roster.roster.length)}
-              })
-            }
-
-            let pick, currentPick;
-            let pickRd = 0;
-            let tm = 0
-            do {
-              pick = draftRounds[pickRd][tm].pick
-              currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.tm.nickname == draftRounds[pickRd][tm].team})}
-              tm = (tm+1) % 10
-              if (tm == 0) {
-                pickRd++
-              }
-            } while (pick)
-
-            return {currentPick: currentPick, rosters: data}
-          })
-        ).subscribe(data => {
-        this.draftOrder$.next(data)
-      })
 
       this.rosterService.refreshLineups();
       this.SseService.getSSE$('rosters').subscribe((data)=> {this.rosterService.refreshLineups()});
@@ -142,6 +102,118 @@ export class DraftSseService {
 
 
     }
+
+    regularDraftOrder() {
+
+      of(this.draftOrder).pipe(
+        takeUntil(this.unsubscribe$),
+      combineLatestWith(this.rosterService.activeRosters$),
+      map(([standings, rosters])=> { return standings.map(s=> {
+        let rstr =rosters.find((r)=> r.ablTeam == s._id) //|| []
+        return {...s, roster: rstr }
+      })}),
+      combineLatestWith(this.rosterService.skipList$),
+      map(([data, skips]) => {
+        return data.map((team)=> {
+          let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft') || [];
+          let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft') || [];
+          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team._id).map((item)=> "Skip")]
+          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
+
+        })
+      }),
+      map((data:any[])=> {
+        let draftRounds = []
+
+        for (let i=0; i<6; i=i+2) {
+          draftRounds[i]= data.map(tm=> {
+
+            return {team: tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - (tm.roster?.roster.length || 0))}
+          })
+          draftRounds[i+1] = [...data].reverse().map(tm=> {
+            return {team: tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - (tm.roster?.roster.length || 0))}
+          })
+        }
+
+        let pick, currentPick;
+        let pickRd = 0;
+        let tm = 0
+        do {
+          pick = draftRounds[pickRd][tm].pick
+          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.nickname == draftRounds[pickRd][tm].team})}
+          tm = (tm+1) % 10
+          if (tm == 0) {
+            pickRd++
+          }
+        } while (pick)
+
+        return {currentPick: currentPick, rosters: data}
+      })
+
+      ).subscribe(data => {
+        this.draftOrder$.next(data)
+      })
+
+    }
+
+  suppDraftDraftOrder() {
+    this.api.getAPIData$('standings').pipe(
+      takeUntil(this.unsubscribe$),
+      map((data:any[]) => {
+        return data.sort((a,b)=> {
+          let wpct = (o)=> {return o.w/o.g}
+          if (wpct(a) == wpct(b)) {
+            return a.avg_runs - b.avg_runs
+          }
+
+          return (a.w / a.g) - (b.w / b.g)})
+      }),
+      combineLatestWith(this.rosterService.activeRosters$),
+      map(([standings, rosters])=> { return standings.map(s=> {
+        s.roster =rosters.find((r)=> r.ablTeam == s.tm._id)
+        return s
+      })}),
+      combineLatestWith(this.rosterService.skipList$),
+      map(([data, skips]) => {
+        return data.map((team)=> {
+          let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
+          let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
+          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team.tm._id).map((item)=> "Skip")]
+          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
+
+        })
+      }),
+      map((data:any[])=> {
+        let draftRounds = []
+
+        for (let i=0; i<6; i=i+2) {
+          draftRounds[i]= data.map(tm=> {
+
+            return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - tm.roster.roster.length)}
+          })
+          draftRounds[i+1] = [...data].reverse().map(tm=> {
+            return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - tm.roster.roster.length)}
+          })
+        }
+
+        let pick, currentPick;
+        let pickRd = 0;
+        let tm = 0
+        do {
+          pick = draftRounds[pickRd][tm].pick
+          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.tm.nickname == draftRounds[pickRd][tm].team})}
+          tm = (tm+1) % 10
+          if (tm == 0) {
+            pickRd++
+          }
+        } while (pick)
+
+        return {currentPick: currentPick, rosters: data}
+      })
+    ).subscribe(data => {
+    this.draftOrder$.next(data)
+  })
+  }
 
 
   ngOnDestroy() {

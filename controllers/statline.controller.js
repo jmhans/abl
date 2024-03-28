@@ -143,8 +143,8 @@ class StatlineController extends BaseController {
     try {
       const slDoc = await this.model.findById(req.params.id).exec();
       const mlbId = slDoc.mlbId
-      const currentSeason = new Date(slDoc.gameDate).getFullYear() || 2023;
-      const regSeasonStart = new Date('2023-03-30T00:00:00Z')
+      const currentSeason = new Date(slDoc.gameDate).getFullYear() || 2024;
+      const regSeasonStart = new Date('2024-03-28T00:00:00Z')
 
     var position_log_records = await this.model.aggregate([
 {
@@ -405,8 +405,8 @@ class StatlineController extends BaseController {
 async _genPositionLog() {
   try {
 
-    var currentSeason = 2023;
-    var regSeasonStart = new Date('2023-03-30T00:00:00Z')
+    var currentSeason = 2024;
+    var regSeasonStart = new Date('2024-03-28T00:00:00Z')
 
     var position_log_records = await this.model.aggregate([
       {
