@@ -26,17 +26,18 @@ export class DraftSseService {
   draftData$: BehaviorSubject<any> = new BehaviorSubject([]);
   playerData$: BehaviorSubject<any> = new BehaviorSubject([]);
   draftOrder=[
-    {"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"1"},
-    {"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"2"},
-    {"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"3"},
-    {"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"4"},
-    {"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"5"},
-    {"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"6"},
-    {"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"7"},
-    {"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"8"},
-    {"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"9"},
-    {"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"10"}
+    {"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"1"},
+    {"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"2"},
+    {"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"3"},
+    {"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"4"},
+    {"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"5"},
+    {"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"6"},
+    {"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"7"},
+    {"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"8"},
+    {"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"9"},
+    {"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"10"}
   ]
+
   draftOrder$: BehaviorSubject<any> = new BehaviorSubject([]);
   //private eventSource: EventSource =new EventSource(`${this.base_api}sse`)
   private draftData: any[];
@@ -70,40 +71,14 @@ export class DraftSseService {
 
     }
 
-    private notify() {
-      let outData = []
-      let nextRow =0
-      let nextCol = 0
-      for (let r=1; r<=24; r++) {
-        outData[r-1] = []
-        for (let c=1; c<=10; c++) {
-          let effRound = r<=18 ? r : 18+Math.max(0, Math.floor((r-19)/3)+1)
-          let fullRoundPicks = Math.min(18, effRound -1) * 10+ Math.max(0, effRound-19)*30
-
-          let priorPlayers = isEven(effRound) ? 10 - c: c -1
-          let picksPerPlayer = (effRound <=18) ?1 :3
-          let priorPlayerPicks = priorPlayers * picksPerPlayer + (r-19)% picksPerPlayer
-
-          let pickNum = fullRoundPicks + priorPlayerPicks + 1
-          if (this.draftData && pickNum <= this.draftData.length) {
-            outData[r-1][c-1] = this.draftData[pickNum-1]
-          } else {
-            outData[r-1][c-1] = {}
-            if (pickNum == this.draftData?.length + 1) {
-              nextRow = r -1
-              nextCol = c-1
-            }
-          }
-
-        }
-      }
-
-      this.draftData$.next({order: this.draftOrder, currentPick: {number: this.draftData?.length + 1, row: nextRow , column: nextCol}, picks: outData});
-
-
-    }
-
     regularDraftOrder() {
+
+      let onePickDraftRounds = 18 // This must be an even number the way things are currently set up.
+      let multiPickDraftRounds = 2 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
+      let picksPerMultiRound = 3
+      let totalPicks = onePickDraftRounds + multiPickDraftRounds * picksPerMultiRound
+
+
 
       of(this.draftOrder).pipe(
         takeUntil(this.unsubscribe$),
@@ -118,22 +93,34 @@ export class DraftSseService {
           let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft') || [];
           let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft') || [];
           supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team._id).map((item)=> "Skip")]
-          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
+          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: totalPicks-origRoster?.length, origRoster: origRoster }
 
         })
       }),
       map((data:any[])=> {
         let draftRounds = []
 
-        for (let i=0; i<6; i=i+2) {
+        for (let i=0; i<onePickDraftRounds; i=i+2) {
           draftRounds[i]= data.map(tm=> {
 
-            return {team: tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - (tm.roster?.roster.length || 0))}
+            return {team: tm.nickname, pick: tm.origRoster[i], allowed: i+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
           })
           draftRounds[i+1] = [...data].reverse().map(tm=> {
-            return {team: tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - (tm.roster?.roster.length || 0))}
+            return {team: tm.nickname, pick: tm.origRoster[i+1], allowed: i+1+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
           })
         }
+          let newi = onePickDraftRounds
+          for (let sub_i=0; sub_i<picksPerMultiRound; sub_i++) {
+            draftRounds[newi+sub_i]= data.map(tm=> {
+              return {team: tm.nickname, pick: tm.origRoster[newi+sub_i], allowed: newi+sub_i+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
+            })
+            draftRounds[newi+sub_i+picksPerMultiRound] = [...data].reverse().map(tm=> {
+              return {team: tm.nickname, pick: tm.origRoster[newi+1], allowed: newi+sub_i+picksPerMultiRound <= (totalPicks - (tm.roster?.roster.length || 0))}
+            })
+
+        }
+
+
 
         let pick, currentPick;
         let pickRd = 0;
@@ -141,9 +128,17 @@ export class DraftSseService {
         do {
           pick = draftRounds[pickRd][tm].pick
           currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.nickname == draftRounds[pickRd][tm].team})}
-          tm = (tm+1) % 10
-          if (tm == 0) {
-            pickRd++
+          if (pickRd < onePickDraftRounds) {
+
+            tm = (tm+1) % data.length
+            if (tm == 0) {
+              pickRd++
+            }
+          } else {
+            pickRd = (pickRd+ 1 - onePickDraftRounds) % picksPerMultiRound + onePickDraftRounds
+            if (pickRd == onePickDraftRounds) {
+              tm = (tm+1) % data.length
+            }
           }
         } while (pick)
 

@@ -42,7 +42,7 @@ export class DraftComponent implements OnInit {
   selectedRow;
   counter = Array;
   selectedTeam:DraftOrderTeamModel = null;
-  rounds:Number[] = [...Array(5).keys()]
+  rounds:Number[] = [...Array(23).keys()]
 
   colNames= ['name',  'position', 'team', 'status',  'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']

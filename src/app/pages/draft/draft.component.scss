@@ -2,8 +2,8 @@
   background-color: yellow;
   }
   .draft-cell {
-  background-color: white;
   border: 1px solid darkslategrey;
+  min-height: 20px;
   }
   .header-cell {
   background-color:darkblue;
@@ -15,6 +15,13 @@
   .next-pick {
   background-color: lightblue;
   border: 3px solid darkblue;
+
+  }
+  .active-round {
+    min-height: 20px
+  }
+  .inactive-round {
+    display: none
   }
 
 

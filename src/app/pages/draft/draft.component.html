@@ -6,6 +6,9 @@
 
 
  <div class="selected-team">
+  <div>
+    {{draftData.currentPick | json}}
+  </div>
   <mat-form-field appearance="fill" style="width:100%">
     <mat-label>Teams</mat-label>
     <mat-select [(ngModel)]="selectedTeam">
@@ -26,13 +29,16 @@
       <div *ngFor='let draftTm of rosters; let c=index' class="draft-history">
         <div class="header-cell">{{draftTm.nickname}}</div>
         <div *ngFor='let rd of rounds; let r= index'>
-          <div [ngClass]="{'next-pick': rd == draftData.currentPick.row && c == draftData.currentPick.column, 'draft-cell': rd != draftData.currentPick.row || c != draftData.currentPick.column, 'no-pick': rd >= draftTm.picks_allowed}">
-            <div *ngIf="draftTm?.supp_draft_picks">
-              <span *ngIf="rd < draftTm.picks_allowed && draftTm.supp_draft_picks[rd]?.player">
-                {{draftTm.supp_draft_picks[rd]?.player?.name}} ({{draftTm.supp_draft_picks[rd]?.player?.team}} - {{draftTm.supp_draft_picks[rd]?.player?.eligible.toString()}})
+          <div class="draft-cell" [ngClass]="{'next-pick': rd == draftData.currentPick.row && c == draftData.currentPick.column,
+          'no-pick': rd >= draftTm.picks_allowed,
+          'inactive-round': rd >draftData.currentPick.row
+        }">
+            <div *ngIf="draftTm?.origRoster">
+              <span *ngIf="rd < draftTm.picks_allowed && draftTm.origRoster[rd]?.player">
+                {{draftTm.origRoster[rd]?.player?.name}} ({{draftTm.origRoster[rd]?.player?.team}} - {{draftTm.origRoster[rd]?.player?.eligible.toString()}})
               </span>
-              <span *ngIf="draftTm?.supp_draft_picks[rd] == 'Skip'"> Pick Skipped </span>
-              <span *ngIf="!draftTm?.supp_draft_picks[rd]?.player && rd < draftTm?.picks_allowed"> <button (click)="_addSkip(draftTm)">Skip Pick</button> </span>
+              <span *ngIf="draftTm?.origRoster[rd] == 'Skip'"> Pick Skipped </span>
+              <!-- <span *ngIf="!draftTm?.origRoster[rd]?.player && rd < draftTm?.picks_allowed"> <button (click)="_addSkip(draftTm)">Skip Pick</button> </span> -->
               <span *ngIf="rd >= draftTm?.picks_allowed">
                 n/a
               </span>
@@ -48,7 +54,7 @@
     [colNames]="colNames"
     [ownerPrimaryTeam]="ownerPrimaryTeam"
     defaultAddType="draft"
-    [actionEligible]="true"
+    [actionEligible]="ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].nickname"
     >
     </app-player-list>
   </div>
