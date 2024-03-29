@@ -3,7 +3,6 @@
   }
   .draft-cell {
   border: 1px solid darkslategrey;
-  min-height: 20px;
   }
   .header-cell {
   background-color:darkblue;
@@ -14,11 +13,8 @@
   }
   .next-pick {
   background-color: lightblue;
-  border: 3px solid darkblue;
+  border: 1px solid darkblue;
 
-  }
-  .active-round {
-    min-height: 20px
   }
   .inactive-round {
     display: none
@@ -34,6 +30,27 @@
     overflow: auto;
   }
 
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    min-width: 100%;
+    justify-content: space-around;
+    align-items: stretch;
+
+  }
+  .flex-row-rev {
+
+    display: flex;
+    flex-direction: row-reverse;
+    min-width: 100%;
+    justify-content: space-around;
+    align-items: stretch;
+  }
+
+
+  .flex-col {
+    flex: 1
+  }
 
   .selected-team {
 

@@ -24,29 +24,18 @@
 
 </div>
 <div class="right-draft-board">
+
   <div class="flex-container">
-
-      <div *ngFor='let draftTm of rosters; let c=index' class="draft-history">
-        <div class="header-cell">{{draftTm.nickname}}</div>
-        <div *ngFor='let rd of rounds; let r= index'>
-          <div class="draft-cell" [ngClass]="{'next-pick': rd == draftData.currentPick.row && c == draftData.currentPick.column,
-          'no-pick': rd >= draftTm.picks_allowed,
-          'inactive-round': rd >draftData.currentPick.row
-        }">
-            <div *ngIf="draftTm?.origRoster">
-              <span *ngIf="rd < draftTm.picks_allowed && draftTm.origRoster[rd]?.player">
-                {{draftTm.origRoster[rd]?.player?.name}} ({{draftTm.origRoster[rd]?.player?.team}} - {{draftTm.origRoster[rd]?.player?.eligible.toString()}})
-              </span>
-              <span *ngIf="draftTm?.origRoster[rd] == 'Skip'"> Pick Skipped </span>
-              <!-- <span *ngIf="!draftTm?.origRoster[rd]?.player && rd < draftTm?.picks_allowed"> <button (click)="_addSkip(draftTm)">Skip Pick</button> </span> -->
-              <span *ngIf="rd >= draftTm?.picks_allowed">
-                n/a
-              </span>
-            </div>
-          </div>
-        </div>
+    <div class="flex-row" *ngFor='let draftTm of rosters; let c=index' class="draft-history">
+      <div class="header-cell">{{draftTm.nickname}}</div>
+    </div>
+    <div  *ngFor='let rd of draftData.rounds; let r=index' [ngClass]="rd.rowrev ? 'flex-row-rev' : 'flex-row'">
+      <div class="flex-col draft-cell" *ngFor='let pick of rd.data;  let p=index' [ngClass]="{'next-pick': r == draftData.currentPick.row && p == draftData.currentPick.column,
+       'inactive-round': r >draftData.currentPick.row && r >=draftData.activeRounds
+    }">
+        {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
       </div>
-
+    </div>
   </div>
   <div class="players-list">
     <app-player-list class="container-fluid"

@@ -73,7 +73,7 @@ export class DraftSseService {
 
     regularDraftOrder() {
 
-      let onePickDraftRounds = 18 // This must be an even number the way things are currently set up.
+      let onePickDraftRounds = 2 // This must be an even number the way things are currently set up.
       let multiPickDraftRounds = 2 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
       let picksPerMultiRound = 3
       let totalPicks = onePickDraftRounds + multiPickDraftRounds * picksPerMultiRound
@@ -87,13 +87,10 @@ export class DraftSseService {
         let rstr =rosters.find((r)=> r.ablTeam == s._id) //|| []
         return {...s, roster: rstr }
       })}),
-      combineLatestWith(this.rosterService.skipList$),
-      map(([data, skips]) => {
+      map((data) => {
         return data.map((team)=> {
-          let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft') || [];
           let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft') || [];
-          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team._id).map((item)=> "Skip")]
-          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: totalPicks-origRoster?.length, origRoster: origRoster }
+          return {...team, picks_allowed: totalPicks-origRoster?.length, origRoster: origRoster }
 
         })
       }),
@@ -101,22 +98,22 @@ export class DraftSseService {
         let draftRounds = []
 
         for (let i=0; i<onePickDraftRounds; i=i+2) {
-          draftRounds[i]= data.map(tm=> {
+          draftRounds[i]= {rowrev: false, data: data.map(tm=> {
 
             return {team: tm.nickname, pick: tm.origRoster[i], allowed: i+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
-          })
-          draftRounds[i+1] = [...data].reverse().map(tm=> {
+          })}
+          draftRounds[i+1] = {rowrev: true, data: [...data].reverse().map(tm=> {
             return {team: tm.nickname, pick: tm.origRoster[i+1], allowed: i+1+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
-          })
+          })}
         }
           let newi = onePickDraftRounds
           for (let sub_i=0; sub_i<picksPerMultiRound; sub_i++) {
-            draftRounds[newi+sub_i]= data.map(tm=> {
+            draftRounds[newi+sub_i]= {rowrev: false, data: data.map(tm=> {
               return {team: tm.nickname, pick: tm.origRoster[newi+sub_i], allowed: newi+sub_i+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
-            })
-            draftRounds[newi+sub_i+picksPerMultiRound] = [...data].reverse().map(tm=> {
+            })}
+            draftRounds[newi+sub_i+picksPerMultiRound] = {rowrev: true, data: [...data].reverse().map(tm=> {
               return {team: tm.nickname, pick: tm.origRoster[newi+1], allowed: newi+sub_i+picksPerMultiRound <= (totalPicks - (tm.roster?.roster.length || 0))}
-            })
+            })}
 
         }
 
@@ -126,8 +123,8 @@ export class DraftSseService {
         let pickRd = 0;
         let tm = 0
         do {
-          pick = draftRounds[pickRd][tm].pick
-          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.nickname == draftRounds[pickRd][tm].team})}
+          pick = draftRounds[pickRd].data[tm].pick
+          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
           if (pickRd < onePickDraftRounds) {
 
             tm = (tm+1) % data.length
@@ -141,8 +138,11 @@ export class DraftSseService {
             }
           }
         } while (pick)
-
-        return {currentPick: currentPick, rosters: data}
+        let maxRosterLength = data.reduce((acc, cur)=> {
+          return Math.max(acc, cur.origRoster.length)
+        }, 0
+        )
+        return {currentPick: currentPick, rosters: data, rounds: draftRounds, activeRounds : maxRosterLength}
       })
 
       ).subscribe(data => {
