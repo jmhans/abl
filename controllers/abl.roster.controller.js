@@ -165,7 +165,7 @@ class ABLRosterController extends BaseController{
                         {
                           'case': {
                             '$eq': [
-                              '$$this.season', 2023
+                              '$$this.season', 2024
                             ]
                           },
                           'then': {
@@ -460,7 +460,7 @@ class ABLRosterController extends BaseController{
       var savedMlbPlayer = await this._updatePlayerRecBackend(plyr, teamId, acqType, effDate )
       var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       if (acqType == 'draft') {
-        var newPick = {season: "2023", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date()}
+        var newPick = {season: "2024", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date()}
         var draftPick = await DraftPick.create(newPick);
         var popDP = await draftPick.populate('player');
         Stream.emit('push', 'message', {msg: 'it works!', pick: popDP});

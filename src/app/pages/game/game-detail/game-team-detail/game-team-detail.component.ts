@@ -20,7 +20,7 @@ interface abltotals {
   hr:number
   bb: number
   hbp:number
-  sac:number 
+  sac:number
   sf:number
   sb:number
   cs:number
@@ -28,7 +28,7 @@ interface abltotals {
 
 
 interface gameTeam {
-  away_score: ablgameScore 
+  away_score: ablgameScore
   home_score: ablgameScore
   awayTeam: {}
   homeTeam: {}
@@ -52,10 +52,10 @@ export class GameTeamDetailComponent implements OnInit {
   @Input() homeTeam: boolean;
   @Input() status: string;
   @Input() editable: boolean;
-  @Output() updateScore = new EventEmitter<ablgameScore>(); 
+  @Output() updateScore = new EventEmitter<ablgameScore>();
 
-  
-  
+
+
   showBench: boolean = false;
   active: any[];
   bench: any[];
@@ -64,27 +64,27 @@ export class GameTeamDetailComponent implements OnInit {
   dragSource: string;
   editField: string;
   regulation_score = ()=> { if (this.active) {
-    return this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e 
+    return this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e
                       )}}
   final_score = ()=>this.score(this.active,  this.oppScore.final.e )
-      
+
     ngOnChanges(changes: SimpleChanges) {
-      
+
       if (changes.roster) {
         this.active = this.roster ? this.roster.filter((p)=> {return p.ablstatus == 'active'}) : [];
         this.bench = this.roster ? this.roster.filter((p)=> {return p.ablstatus != 'active'}) : [];
       }
-      
+
       if (changes.oppScore) {
         this.updateTeamScore(true);
       }
 //        this.doSomething(changes.categoryId.currentValue);
-        // You can also use categoryId.previousValue and 
+        // You can also use categoryId.previousValue and
         // categoryId.firstChange for comparing old and new values
-        
+
     }
-  
-  
+
+
 
     displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
 
@@ -92,13 +92,13 @@ export class GameTeamDetailComponent implements OnInit {
 
   ngOnInit(): void {
 
-    
-    
+
+
   }
-  
+
   drop(event: CdkDragDrop<playerModel[]>) {
-    
-    
+
+
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -106,9 +106,9 @@ export class GameTeamDetailComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
-      
+
       var droppedPlyr: playerModel = event.container.data[event.currentIndex]
-      
+
       if (droppedPlyr.ablstatus == 'active') {
         droppedPlyr.ablstatus = null
         droppedPlyr.ablRosterPosition = null
@@ -123,30 +123,30 @@ export class GameTeamDetailComponent implements OnInit {
       }
       this.updateTeamScore();
     }
-    
+
   }
   enter(event: CdkDragEnter<string[]>) {
-    
-    
+
+
   }
   toggleDrag(dragSource: string ) {
-    
+
     this.dragging = !this.dragging
     this.dragSource = dragSource
   }
-  
-  
+
+
     updateStatList(id: number, property: string, event: any) {
       const editField = event.target.textContent;
       this.active[id].dailyStats[property] = editField;
-      
+
     }
 
     updateList(id: number, obj: any, property: string, event: any, stat: boolean = false) {
       const editField = event.target.textContent;
-      
+
       // Need to update score if appropriate...
-      
+
       if (stat) {
         obj[property] = parseInt(editField);
         obj.modified = true;
@@ -157,7 +157,7 @@ export class GameTeamDetailComponent implements OnInit {
           }
 
     }
-  
+
 //     remove(id: any) {
 //       this.awaitingPersonList.push(this.personList[id]);
 //       this.personList.splice(id, 1);
@@ -175,53 +175,53 @@ export class GameTeamDetailComponent implements OnInit {
       this.editField = event.target.textContent;
     }
   updateTeamScore(external:boolean = false) {
-    //this.teamScore = 
+    //this.teamScore =
     if (!external) {
       this.updateScore.emit({regulation : this.regulation_score(), final: this.final_score()}); //this.teamScore);
     }
-    
+
   }
-  
+
   updateScoreForPlyr (stats) {
     var retObj = stats;
-    var ablPts = 
-        25 * (retObj.h || 0) + 
-        10 * (retObj["2b"] || 0)+ 
-        20 * (retObj["3b"] || 0) + 
-        30 * (retObj.hr || 0) + 
-        10 * (retObj.bb || 0) + 
-        10 * (retObj.ibb || 0)+ 
-        10 * (retObj.hbp || 0) + 
-        7 * (retObj.sb - retObj.cs || 0) + 
-        5 * (retObj.sac + retObj.sf || 0);
-    
+    var ablPts =
+        25 * (retObj.h || 0) +
+        10 * (retObj["2b"] || 0)+
+        20 * (retObj["3b"] || 0) +
+        30 * (retObj.hr || 0) +
+        10 * (retObj.bb || 0) +
+        10 * (retObj.ibb || 0)+
+        10 * (retObj.hbp || 0) +
+        7 * (retObj.sb || 0 - retObj.cs || 0) +
+        5 * (retObj.sac || 0 + retObj.sf || 0);
+
      var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
     retObj.abl_points = ablPts;
     retObj.abl_score = {abl_runs: ablruns, abl_points: ablPts, e: retObj.e, ab: retObj.ab};
   }
-  
-  
+
+
   score(playerList, oppErrors = 0) {
     if (playerList) {
     return playerList.reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
         if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
-          // Player played in DH or XTRA spot, so errors are not counted toward team total. 
+          // Player played in DH or XTRA spot, so errors are not counted toward team total.
           total.e += (curPlyr.dailyStats.e || 0);
         }
-        
+
         ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs"].forEach((prop) => {
           total[prop] += parseInt(curPlyr.dailyStats[prop]) || 0
         })
-      
+
         // total.ab += (curPlyr.dailyStats.ab || 0);
-        
+
         total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + (this.homeTeam ?  0.5 : 0 );
-      
+
       return total;
-      
+
       }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0 , opp_e: oppErrors})
   }
     }
-    
+
 }

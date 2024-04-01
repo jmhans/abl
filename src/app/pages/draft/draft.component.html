@@ -1,0 +1,58 @@
+<p>{{pageTitle}}</p>
+
+<div *ngIf="draftSseService.draftOrder$ | async as draftData" class="flex-container">
+
+<div *ngIf=" draftData.rosters as rosters" class="flex-container">
+
+
+ <div class="selected-team">
+  <div>
+    {{draftData.currentPick | json}}
+  </div>
+  <mat-form-field appearance="fill" style="width:100%">
+    <mat-label>Teams</mat-label>
+    <mat-select [(ngModel)]="selectedTeam">
+      <mat-option *ngFor="let tm of rosters" [value]="tm">
+        {{tm.nickname}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngFor="let plyr of selectedTeam?.roster?.roster">
+    <strong>{{plyr.lineupPosition}} </strong>| {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
+  </div>
+
+</div>
+<div class="right-draft-board">
+
+  <div class="flex-container">
+    <div class="flex-row" *ngFor='let draftTm of rosters; let c=index' class="draft-history">
+      <div class="header-cell">{{draftTm.nickname}}</div>
+    </div>
+    <div  *ngFor='let rd of draftData.rounds; let r=index' [ngClass]="rd.rowrev ? 'flex-row-rev' : 'flex-row'">
+      <div class="flex-col draft-cell" *ngFor='let pick of rd.data;  let p=index' [ngClass]="{'next-pick': r == draftData.currentPick.row && p == draftData.currentPick.column,
+       'inactive-round': r >draftData.currentPick.row && r >=draftData.activeRounds
+    }">
+        {{pick.team}} {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
+      </div>
+    </div>
+  </div>
+  <div class="players-list">
+    <app-player-list class="container-fluid"
+    [players$]="players.allPlayers$"
+    [colNames]="colNames"
+    [ownerPrimaryTeam]="ownerPrimaryTeam"
+    defaultAddType="draft"
+    [actionEligible]="ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].nickname"
+    >
+    </app-player-list>
+  </div>
+</div>
+
+<!-- ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].nickname -->
+
+
+</div>
+
+</div>
+

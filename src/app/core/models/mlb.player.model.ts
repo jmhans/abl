@@ -42,7 +42,7 @@ class MlbPlayerModel {
               plyrStats.hitByPitch * 10 +
               plyrStats.stolenBases * 7 +
               plyrStats.caughtStealing * (-7)  +
-              (plyrStats.sacBunts + plyrStats.sacFlies) * 5) / plyrStats.atBats - 4.5
+              (plyrStats.sacBunts || 0 + plyrStats.sacFlies || 0) * 5) / plyrStats.atBats - 4.5
     } else {
       return -Infinity
     }

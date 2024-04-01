@@ -129,11 +129,11 @@ export class StandingsComponent implements OnInit, OnDestroy {
             case 'team': return item.tm.nickname;
             case 'wpct': return (item.g > 0) ? item.w / item.g : 0;
             case 'abl': return item.avg_runs;
-            case 'bb': return item.bb + item.hbp;
-            case 'sac': return item.sac + item.sf;
-            case 'sb%': return (item.sb + item.cs > 0 ) ? item.sb / (item.sb + item.cs) : 0;
+            case 'bb': return item.bb || 0 + item.hbp || 0;
+            case 'sac': return item.sac || 0 + item.sf || 0;
+            case 'sb%': return (item.sb || 0 + item.cs || 0 > 0 ) ? item.sb / (item.sb + item.cs) : 0;
             case 'bat_avg': return (item.ab > 0 ) ? item.h / item.ab : 0;
-            case 'slg_pct': return (item.ab > 0 ) ? ((item.h + item['2b'] + item['3b'] * 2 + item['hr'] * 3) / item.ab) : 0 ;
+            case 'slg_pct': return (item.ab > 0 ) ? ((item.h || 0 + item['2b'] || 0  + (item['3b'] || 0) * 2 + (item['hr'] || 0) * 3) / item.ab) : 0 ;
             default: return item[header];
           }
         }
