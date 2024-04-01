@@ -33,7 +33,7 @@
       <div class="flex-col draft-cell" *ngFor='let pick of rd.data;  let p=index' [ngClass]="{'next-pick': r == draftData.currentPick.row && p == draftData.currentPick.column,
        'inactive-round': r >draftData.currentPick.row && r >=draftData.activeRounds
     }">
-        {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
+        {{pick.team}} {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
       </div>
     </div>
   </div>

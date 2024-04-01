@@ -112,7 +112,7 @@ export class DraftSseService {
               return {team: tm.nickname, pick: tm.origRoster[newi+sub_i], allowed: newi+sub_i+1 <= (totalPicks - (tm.roster?.roster.length || 0))}
             })}
             draftRounds[newi+sub_i+picksPerMultiRound] = {rowrev: true, data: [...data].reverse().map(tm=> {
-              return {team: tm.nickname, pick: tm.origRoster[newi+1], allowed: newi+sub_i+picksPerMultiRound <= (totalPicks - (tm.roster?.roster.length || 0))}
+              return {team: tm.nickname, pick: tm.origRoster[newi+sub_i+picksPerMultiRound], allowed: newi+sub_i+picksPerMultiRound <= (totalPicks - (tm.roster?.roster.length || 0))}
             })}
 
         }
@@ -121,10 +121,11 @@ export class DraftSseService {
 
         let pick, currentPick;
         let pickRd = 0;
+        let pickRow = 0; 
         let tm = 0
         do {
           pick = draftRounds[pickRd].data[tm].pick
-          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
+          currentPick = {row: pickRd, column: tm }// data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
           if (pickRd < onePickDraftRounds) {
 
             tm = (tm+1) % data.length
@@ -132,9 +133,13 @@ export class DraftSseService {
               pickRd++
             }
           } else {
-            pickRd = (pickRd+ 1 - onePickDraftRounds) % picksPerMultiRound + onePickDraftRounds
-            if (pickRd == onePickDraftRounds) {
+            pickRd++
+            if (((pickRd - onePickDraftRounds) % picksPerMultiRound) == 0) {
               tm = (tm+1) % data.length
+              if (tm != 0) {
+                pickRd = pickRd - picksPerMultiRound
+              
+              }
             }
           }
         } while (pick)
