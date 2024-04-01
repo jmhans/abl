@@ -50,7 +50,9 @@ export class PlayersService {
         })
       ).subscribe(
         res=> {
-          this.tempPlayerData = res
+          this.playerData = res
+          this.establishPlayerConnect()
+
           this.playerNotify();
         },
         err => {
@@ -58,17 +60,18 @@ export class PlayersService {
         })
 
 
-      this.playerSub = api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
+/*       this.playerSub = api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
         res=> {
-          this.playerData =res
-          this.establishPlayerConnect()
-          this.playerNotify()
+          //this.playerData =res
+          //this.establishPlayerConnect()
+
+          //this.playerNotify()
 
 
         },
         err => {
           console.error(err)
-        })
+        }) */
 
       api.getMlbRosters$().pipe(takeUntil(this.unsubscribe$)).subscribe(
         res=> {
@@ -123,9 +126,9 @@ export class PlayersService {
 
 
   private playerNotify() {
-    if (this.playerData) {this.allPlayers$.next(this.playerData)}
+    //if (this.playerData) {this.allPlayers$.next(this.playerData)}
     if (this.rosterData) {this.mlbRosters$.next(this.rosterData)}
-    if (this.tempPlayerData) {this.allEnrichedPlayers$.next(this.tempPlayerData)}
+    if (this.playerData) {this.allEnrichedPlayers$.next(this.playerData)}
 
   }
 
