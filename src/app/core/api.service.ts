@@ -79,6 +79,24 @@ export class ApiService {
         catchError((error) => this._handleError(error))
     );
   }
+
+  getMlbPlayerNames$():Observable<MlbPlayerModel[]> {
+    return this.http
+      .get<MlbPlayerModel[]>(`${this.v2_api}playernames`)
+      .pipe(
+        catchError((error) => this._handleError(error))
+    );
+  }
+
+  getAblPlayerPositions$():Observable<MlbPlayerModel[]> {
+    return this.http
+      .get<MlbPlayerModel[]>(`${this.v2_api}playerpositions`)
+      .pipe(
+        catchError((error) => this._handleError(error))
+    );
+  }
+
+
   getMlbRosters$(): Observable<MlbRoster[]> {
     return this.http
       .get<MlbRoster[]>(`${this.v2_api}mlbRosters`)

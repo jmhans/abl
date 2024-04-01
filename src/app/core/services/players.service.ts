@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy , NgZone} from '@angular/core';
-import {BehaviorSubject, Subject, ReplaySubject, Subscription, Observable } from 'rxjs';
+import {BehaviorSubject, Subject, ReplaySubject, Subscription, Observable, combineLatest } from 'rxjs';
 import {MlbPlayerModel} from '../models/mlb.player.model';
 import {MlbRoster} from '../models/mlb.roster';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from '../api.service'
-import { takeUntil, filter,  } from 'rxjs/operators';
+import { takeUntil, filter,  startWith, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,27 +13,58 @@ export class PlayersService {
   private base_api= '/api2/'
   unsubscribe$: Subject<void> = new Subject<void>();
   playerSub : Subscription;
+  playerSub2 : Subscription;
+
+  positionsSub : Subscription;
+
   playerUpdates: Subscription;
   private playerData: MlbPlayerModel[];
+  private tempPlayerData: MlbPlayerModel[];
   private rosterData: MlbRoster[];
   loadType: string = 'active';
+  positionsData$ = new BehaviorSubject<MlbPlayerModel[]>([]);
+  allEnrichedPlayers$ = new ReplaySubject<MlbPlayerModel[]>(1); // = new Subject();
 
   allPlayers$ = new ReplaySubject<MlbPlayerModel[]>(1); // = new Subject();
   //activePlayers$: BehaviorSubject<MlbPlayerModel[]> = new BehaviorSubject([]);
 
   mlbRosters$: BehaviorSubject<MlbRoster[]> = new BehaviorSubject([]); // Roster data is source of truth for player status/team/etc.
 
-
-
   constructor(
     private _zone: NgZone,
     http: HttpClient,
     api: ApiService) {
+
+      this.positionsSub = api.getAblPlayerPositions$().pipe(takeUntil(this.unsubscribe$)).subscribe(res => {
+        this.positionsData$.next(res)
+      });
+
+      this.playerSub2 = combineLatest([api.getMlbPlayerNames$(), this.positionsData$]).pipe(
+        takeUntil(this.unsubscribe$),
+        map(([plyrNames, plyrPositions]) => {
+          let enrichedPlayers = plyrNames.map((p)=> {
+            p.eligible =plyrPositions.find((posRec)=> posRec.mlbID == p.mlbID)?.eligible
+            return p
+          })
+          return enrichedPlayers
+        })
+      ).subscribe(
+        res=> {
+          this.tempPlayerData = res
+          this.playerNotify();
+        },
+        err => {
+          console.error(err)
+        })
+
+
       this.playerSub = api.getMlbPlayers$().pipe(takeUntil(this.unsubscribe$)).subscribe(
         res=> {
           this.playerData =res
           this.establishPlayerConnect()
           this.playerNotify()
+
+
         },
         err => {
           console.error(err)
@@ -41,7 +72,7 @@ export class PlayersService {
 
       api.getMlbRosters$().pipe(takeUntil(this.unsubscribe$)).subscribe(
         res=> {
-          this.rosterData =res
+          this.rosterData = res
           this.playerNotify()
         },
         err => {
@@ -94,6 +125,7 @@ export class PlayersService {
   private playerNotify() {
     if (this.playerData) {this.allPlayers$.next(this.playerData)}
     if (this.rosterData) {this.mlbRosters$.next(this.rosterData)}
+    if (this.tempPlayerData) {this.allEnrichedPlayers$.next(this.tempPlayerData)}
 
   }
 

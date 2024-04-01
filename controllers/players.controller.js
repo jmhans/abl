@@ -4,7 +4,8 @@ var express = require('express');
 const Statline = require('../models/statline');
 const PlayerView = require('../models/player').PlayerView;
 const PlayerCache = require('../models/player').PlayerCache;
-
+const PlayerNameView = require('../models/player').PlayerNamesView;
+const PlayerPositionsView =require('../models/player').PlayerPositionsView;
 const ablConfig = require('../server/ablConfig');
 var   router = express.Router();
 
@@ -294,8 +295,23 @@ class PlayersController extends BaseController {
 
 _viewGet(req, res, next) {
 
-  console.log("am caching now");
   PlayerView.find(req.query, (err, results)=> {
+    if (err) return next(err);
+    res.json(results);
+  });
+}
+_getPlayerNames(req, res, next) {
+
+  PlayerNameView.find(req.query, (err, results)=> {
+    if (err) return next(err);
+    res.json(results);
+  });
+}
+
+
+_getPositions(req, res, next) {
+
+  PlayerPositionsView.find(req.query, (err, results)=> {
     if (err) return next(err);
     res.json(results);
   });
@@ -304,6 +320,8 @@ _viewGet(req, res, next) {
   reroute() {
     router = this.route();
     //router.get('/players', (...args) => this._viewGet(...args));
+    router.get('/playernames', (...args) => this._getPlayerNames(...args));
+    router.get('/playerpositions', (...args) => this._getPositions(...args));
     return router;
   }
 
