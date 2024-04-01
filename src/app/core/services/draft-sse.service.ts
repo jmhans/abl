@@ -73,7 +73,7 @@ export class DraftSseService {
 
     regularDraftOrder() {
 
-      let onePickDraftRounds = 2 // This must be an even number the way things are currently set up.
+      let onePickDraftRounds = 18 // This must be an even number the way things are currently set up.
       let multiPickDraftRounds = 2 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
       let picksPerMultiRound = 3
       let totalPicks = onePickDraftRounds + multiPickDraftRounds * picksPerMultiRound
