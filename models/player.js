@@ -54,6 +54,29 @@ var playerViewSchema = new mongoose.Schema({
   dougstatsName: {type: String, required: false}
 })
 
+var playerNamesViewSchema = new mongoose.Schema({
+  name: {type: String, required: false},
+  mlbID: {type: String, required: true},
+  team:{type: String, required: false},
+  status:{type: String, required: false},
+  stats: {type: mongoose.Schema.Types.Mixed, required: false},
+  ablstatus: {ablTeam: {type: ablTeamSchema, required: false}, //ABlTeam
+              acqType: {type: String, required: false},
+              onRoster: {type: Boolean, required: true, default: false}
+             },
+
+  lastUpdate: {type: Date, required: false, default: Date.now()},
+  lastStatUpdate: {type: Date, required: false},
+  //positionLog: {type: [String], required: false}
+})
+
+var playerPositionsViewSchema = new mongoose.Schema({
+  name: {type: String, required: false},
+  mlbID: {type: String, required: true},
+   lastStatUpdate: {type: Date, required: false},
+  eligible: {type: [String], required: false}
+})
+
 
 
 playerSchema.pre('save', function preSave(next){
@@ -75,4 +98,7 @@ module.exports = {Player: mongoose.model('Player', playerSchema),
                   PlayerSchema: playerSchema,
                 PlayerStream: PlayerStream,
                 PlayerView: mongoose.model('players_view', playerViewSchema, 'players_view'),
-                PlayerCache: mongoose.model('players_cache', playerViewSchema, 'players_cache')};
+                PlayerCache: mongoose.model('players_cache', playerViewSchema, 'players_cache'),
+                PlayerNamesView: mongoose.model('player_names_view', playerNamesViewSchema, 'player_names_view'),
+                PlayerPositionsView: mongoose.model('positions_view', playerPositionsViewSchema, 'positions_view')
+              };
