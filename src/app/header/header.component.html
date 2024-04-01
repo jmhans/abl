@@ -87,6 +87,13 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Add Games</a>
       </li>
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/draft"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">Add Games</a>
+      </li>
 
 
     </ul>

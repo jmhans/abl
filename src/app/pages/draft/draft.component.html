@@ -5,7 +5,7 @@
 <div *ngIf=" draftData.rosters as rosters" class="flex-container">
 
 
- <div class="selected-team">
+<!--  <div class="selected-team">
   <div>
     {{draftData.currentPick | json}}
   </div>
@@ -22,7 +22,7 @@
     <strong>{{plyr.lineupPosition}} </strong>| {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
   </div>
 
-</div>
+</div> -->
 <div class="right-draft-board">
 
   <div class="flex-container">
@@ -33,7 +33,7 @@
       <div class="flex-col draft-cell" *ngFor='let pick of rd.data;  let p=index' [ngClass]="{'next-pick': r == draftData.currentPick.row && p == draftData.currentPick.column,
        'inactive-round': r >draftData.currentPick.row && r >=draftData.activeRounds
     }">
-        {{pick.team}} {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
+        {{pick.pick?.player.name}} ({{pick.pick?.player?.team}} - {{pick.pick?.player?.eligible.toString()}})
       </div>
     </div>
   </div>
