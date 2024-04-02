@@ -121,7 +121,7 @@ export class DraftSseService {
 
         let pick, currentPick;
         let pickRd = 0;
-        let pickRow = 0; 
+        let pickRow = 0;
         let tm = 0
         do {
           pick = draftRounds[pickRd].data[tm].pick
@@ -138,11 +138,11 @@ export class DraftSseService {
               tm = (tm+1) % data.length
               if (tm != 0) {
                 pickRd = pickRd - picksPerMultiRound
-              
+
               }
             }
           }
-        } while (pick)
+        } while (pick && (pickRd < onePickDraftRounds + picksPerMultiRound * multiPickDraftRounds))
         let maxRosterLength = data.reduce((acc, cur)=> {
           return Math.max(acc, cur.origRoster.length)
         }, 0
