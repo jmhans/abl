@@ -4,9 +4,11 @@ const axios = require('axios');
 var   express = require('express');
 var   router = express.Router();
 const BASE_URL = "https://statsapi.mlb.com/api/v1";//"http://statsapi-default-elb-prod-876255662.us-east-1.elb.amazonaws.com/api/v1";
-const mlbGame = require('./../models/mlbGame');
+const mlbGame = require('./../models/mlbGame').mlbGame;
 const player = require('./../models/player').Player;
 const mlbRoster = require('./../models/mlbRoster');
+const GameLoadView = require('./../models/mlbGame').mlbGameLoad;
+
 
 const BaseController = require('./base.controller');
 
@@ -234,11 +236,20 @@ class altMlbApiController extends BaseController{
     return res.status(500).send({message: err.message});
   }
 }
+async _getLoadData(req, res, next) {
+  try {
+    const rosters = await GameLoadView.find({});
+    return res.send(rosters);
+  } catch (err) {
+    return res.status(500).send({message: err.message});
+  }
+}
 
   route() {
     router.get('/' + this.routeString + '/:gm_dt' , (...args) => this._getGames(...args));
     router.get('/mlb/rosters', (...args)=> this._refreshRosters(...args));
     router.get('/mlbRosters', (...args)=> this._getRosters(...args));
+    router.get('/mlbLoads', (...args)=> this._getLoadData(...args))
     return router;
   }
 

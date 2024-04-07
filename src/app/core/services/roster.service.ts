@@ -74,27 +74,27 @@ export class RosterService {
 
   constructor(
     private http: HttpClient,
-    private SseService: SseService,
+    //private SseService: SseService,
     private api:ApiService
 ) {
 
 /*         this.currentLineup$ = this.retrieveLineup$.pipe(
           switchMap((obj) => this.api.getLineupForTeamAndDate$(obj.ablTm, obj.dt)
         )); */
-        this.refreshSkips();
+//        this.refreshSkips();
 
 
 
 
 this.activeRosters$ = this.refresh$.pipe(
   tap(()=> {
-    this.refreshSkips();
+ //   this.refreshSkips();
   }),
   switchMap(()=> this.api.getAllLineups$())
   );
 
         this.refreshLineups();
-        this.refreshSkips();
+       // this.refreshSkips();
 
     }
 

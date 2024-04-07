@@ -6,6 +6,7 @@ import { ApiService } from './../api.service';
 
 interface leagueConfig {
   rosterLockTime?: string;
+  rosterLockHour?: number;
   rosterLockTimeZone?: string;
 }
 
@@ -16,13 +17,13 @@ interface leagueConfig {
 
 
 export class LeagueConfigService {
-  
+
   leagueSub: Subscription;
   league$ = new AsyncSubject<leagueConfig>();
-  
 
-  constructor(private api: ApiService) { 
-    
+
+  constructor(private api: ApiService) {
+
     this.leagueSub = this.api.getleagueConfig$().subscribe(
       res => {
         if (res) {
@@ -31,7 +32,7 @@ export class LeagueConfigService {
         }
       }
     )
-    
-    
+
+
   }
 }
