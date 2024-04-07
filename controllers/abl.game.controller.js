@@ -8,7 +8,7 @@ const AblGame = require('../models/Game');
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
-const Statline = require('../models/statline');
+const Statline = require('../models/statline').Statline;
 
 const ObjectId = require('mongoose').Types.ObjectId;
 

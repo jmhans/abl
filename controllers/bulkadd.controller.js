@@ -1,7 +1,7 @@
 const https = require('https');
 
 const Player = require('./../models/player').Player;
-const Statline = require('./../models/statline');
+const Statline = require('./../models/statline').Statline;
 const AblGame = require('./../models/Game');
 
 const gamesList = require("./../data/gamesList.json");
@@ -9,26 +9,26 @@ const gamesList = require("./../data/gamesList.json");
 class BaseHandler {
   constructor() {
     this.model = ''
-    } 
+    }
 
   _postData(req, res, next) {
   // req.params.model is the model to use.
-    
+
     switch(req.params.model) {
       case 'games':
         this.model = require('./../models/Game');
         break;
-      case 'lineups': 
+      case 'lineups':
         this.model = require('./../models/lineup').Lineup;
         break;
       default:
-        
+
     }
-    
-    
-    
+
+
+
     var promArr = [];
-    
+
     if (Array.isArray(req.body)) {
       req.body.forEach((itm) => {
         var prom = new Promise((resolve, reject) => {
@@ -48,12 +48,12 @@ class BaseHandler {
       })
       promArr.push(prom)
     }
-    
+
     Promise.all(promArr).then((values) => {
       res.json(values)
     })
-    
-    
+
+
   }
 
 }
@@ -65,7 +65,7 @@ var BulkAddController = {
   _addGames : function() {
     console.log(gamesList);
     console.log(Array.isArray(gamesList));
-    
+
     if (Array.isArray(gamesList)) {
       gamesList.forEach((gm) => {
         AblGame.findOne({
@@ -83,8 +83,8 @@ var BulkAddController = {
           }
           const game = new AblGame({
             awayTeam: gm.awayTeam,
-            homeTeam: gm.homeTeam, 
-            gameDate: gm.gameDate, 
+            homeTeam: gm.homeTeam,
+            gameDate: gm.gameDate,
             description: gm.description || ''
           });
           game.save((err) => {
@@ -96,8 +96,8 @@ var BulkAddController = {
         });
       })
     }
-    
-  }, 
+
+  },
   _getFile: function(req, res) {
     const fl = req.params.flname;
     const data = require('./../data/' + fl + ".json");
@@ -106,7 +106,7 @@ var BulkAddController = {
     }
   }
 
-  
-  
+
+
 }
 module.exports = {BulkAdd: BulkAddController, BulkLoad: BaseHandler}

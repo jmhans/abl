@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const statline = require('./statline.js').StatlineSchema
+
+
+
 const mlbGameSchema = new Schema({
-  gamePk: {type: Number, required: true}, 
-  gameType: { type: String, required: true}, 
-  season: {type: String}, 
-  gameDate: { type: String, required: true}, 
-  officialDate: { type: String, required: false}, 
-  rescheduleDate: { type: String, required: false}, 
+  gamePk: {type: Number, required: true},
+  gameType: { type: String, required: true},
+  season: {type: String},
+  gameDate: { type: String, required: true},
+  officialDate: { type: String, required: false},
+  rescheduleDate: { type: String, required: false},
   teams: {type: Schema.Types.Mixed, required: true},
   //gameNumber: {type:Number},
   //doubleHeader: {type:String},
@@ -29,6 +33,27 @@ const mlbGameSchema = new Schema({
 
 });
 
-module.exports = mongoose.model('mlbGameSchema', mlbGameSchema);
+
+const mlbGameLoadSchema = new Schema({
+  gamePk: {type: Number, required: true},
+  gameType: { type: String, required: true},
+  season: {type: String},
+  gameDate: { type: String, required: true},
+  officialDate: { type: String, required: false},
+  rescheduleDate: { type: String, required: false},
+  teams: {type: Schema.Types.Mixed, required: true},
+  description: {type:String},
+  seriesDescription: {type:String},
+  ifNecessary: {type:String},
+  status: {type:Schema.Types.Mixed, required: true},
+  rescheduledDate: {type: String, required: false},
+  stats: {type: [statline], required: false}
+
+});
+
+
+module.exports = {mlbGame: mongoose.model('mlbGameSchema', mlbGameSchema)
+,mlbGameLoad: mongoose.model('mlbGameLoads', mlbGameLoadSchema, 'mlbGameLoads')
+}
 
 

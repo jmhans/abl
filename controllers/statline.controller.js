@@ -1,4 +1,4 @@
-const Statline = require('../models/statline');
+const Statline = require('../models/statline').Statline;
 const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();

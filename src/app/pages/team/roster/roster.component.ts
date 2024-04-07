@@ -111,7 +111,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     this.roster_deadline$ = combineLatest([this.leagueConfig.league$, this.roster_date$]).pipe(map(([lg, rd])=> {
       // this.editTimeLimit = lg.rosterLockTime
       // this.editTimeLimitInantz = lg.rosterLockTimeZone
-      var rosterEffDate = this.actualRosterEffectiveDate(rd, lg.rosterLockTime, lg.rosterLockTimeZone)
+      var rosterEffDate = this.actualRosterEffectiveDate(rd, lg.rosterLockHour, lg.rosterLockTimeZone)
       this.dlFileName = this.team.nickname + '_Lineup_' + rosterEffDate.toISOString().substring(0, 10)
       this.roster_deadline = rosterEffDate
       return rosterEffDate
@@ -122,7 +122,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     })) */
 
     this.current_roster_deadline$ = this.leagueConfig.league$.pipe(map((lg)=> {
-      return this.actualRosterEffectiveDate(new Date(), lg.rosterLockTime, lg.rosterLockTimeZone)
+      return this.actualRosterEffectiveDate(new Date(), lg.rosterLockHour, lg.rosterLockTimeZone)
     }))
 
 
@@ -187,7 +187,7 @@ ngAfterViewInit() {
 
 }
 
-  submitCSV() {
+  /* submitCSV() {
 
     const dialogRef = this.dialog.open(RosterImportComponent, {
         width: '60%',
@@ -207,17 +207,17 @@ ngAfterViewInit() {
 
 
 
-  }
+  } */
 
 
 
 
-  actualRosterEffectiveDate(curDt, deadlineTime, deadlineTimeZone) {
+  actualRosterEffectiveDate(curDt, deadlineHour, deadlineTimeZone) {
     //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call.
 
-    var globalrosterDeadline = new Date(curDt.getFullYear() + "-" + (curDt.getMonth()+1).toString() + "-" + curDt.getDate() + " " + deadlineTime)
-    if (globalrosterDeadline < curDt) {
+    var globalrosterDeadline = new Date(curDt.getFullYear() , curDt.getMonth()+1, curDt.getDate(), deadlineHour)
+     if (globalrosterDeadline < curDt) {
       globalrosterDeadline.setDate(globalrosterDeadline.getDate() +1)
     }
     return this.utils.changeTimezone(globalrosterDeadline, deadlineTimeZone)
@@ -289,7 +289,7 @@ ngAfterViewInit() {
     }})
   }
 
-  downloadFile(data: any) {
+/*   downloadFile(data: any) {
     const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
     const header = Object.keys(data[0]);
     const csv = data.map((row) =>
@@ -309,7 +309,7 @@ ngAfterViewInit() {
     a.click();
     window.URL.revokeObjectURL(url);
     a.remove();
-  }
+  } */
 
 
   private _createNewRoster(evt) {
@@ -390,9 +390,9 @@ ngAfterViewInit() {
 
 
 
-    download(){
+/*     download(){
     this.downloadFile2(this._getDLFile(), this.dlFileName);
-  }
+  } */
 
   ConvertToCSV(objArray, headerList) {
      let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
@@ -415,7 +415,7 @@ ngAfterViewInit() {
      }
      return str;
  }
-     downloadFile2(data, filename='data') {
+/*      downloadFile2(data, filename='data') {
         let csvData = this.ConvertToCSV(data, ['rosterOrder', 'lineupPosition','playerName','playerTeam', 'mlbID', 'dougstatsName']);
 
         let blob = new Blob(['\ufeff' + csvData], { type: 'text/csv;charset=utf-8;' });
@@ -431,7 +431,7 @@ ngAfterViewInit() {
         document.body.appendChild(dwldLink);
         dwldLink.click();
         document.body.removeChild(dwldLink);
-    }
+    } */
 
 
 

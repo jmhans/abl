@@ -34,16 +34,17 @@
         </mat-slide-toggle>
 
   </div>
+    <div>I'm in this part of the world...</div>
     <span *ngIf="(current_roster$ | async) as myLineup">
 
       <div >Last Updated: {{active_roster.effectiveDate | date : 'fullDate'}}</div>
-
-      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()">
+      <div> There is some content here...</div>
+      <!-- <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()">
          <mdb-icon fas icon="file-download"></mdb-icon>
         Download Lineup
-      </button>
-      <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button>
-       <app-team-roster [lineup]="current_roster"
+      </button> -->
+      <!-- <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="submitCSV()"> Import lineup from text </button> -->
+       <app-team-roster [lineup]="myLineup"
                      [originalLineup] = "active_roster"
                      [editable]="editable()"
                      (update)="_createNewRoster($event)"

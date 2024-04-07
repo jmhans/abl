@@ -50,4 +50,4 @@ var statLineSchema = new Schema({
 
 const Statline = mongoose.model('Statline', statLineSchema);
 
-module.exports =  Statline ;
+module.exports =  {Statline: Statline, StatlineSchema: statLineSchema} ;

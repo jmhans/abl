@@ -9,7 +9,7 @@ const { expressjwt: jwt} = require('express-jwt');
 const jwks = require('jwks-rsa');
 
 const https = require('https');
-const mlbGame = require('./../models/mlbGame');
+const mlbGame = require('./../models/mlbGame').mlbGame;
 const Player = require('./../models/player').Player;
 const Statline = require('./../models/statline');
 
