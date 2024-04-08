@@ -34,11 +34,9 @@
         </mat-slide-toggle>
 
   </div>
-    <div>I'm in this part of the world...</div>
     <span *ngIf="(current_roster$ | async) as myLineup">
 
       <div >Last Updated: {{active_roster.effectiveDate | date : 'fullDate'}}</div>
-      <div> There is some content here...</div>
       <!-- <button mdbBtn type="button" outline="true" color="primary" mdbWavesEffect (click)="download()">
          <mdb-icon fas icon="file-download"></mdb-icon>
         Download Lineup
