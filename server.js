@@ -34,6 +34,7 @@ require('./server/api')(app, config2);
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
   console.log("Database connection ready");
+  console.log(`DB: ${process.env.MONGO_URI}`)
   // Initialize the app.
   var server = app.listen(process.env.PORT || 3000, '0.0.0.0', function () {
     var port = server.address().port;
