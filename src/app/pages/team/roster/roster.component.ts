@@ -216,7 +216,7 @@ ngAfterViewInit() {
     //var curDt = this.current_roster.effectiveDate
     if (typeof(curDt) == 'string') { curDt = new Date(curDt)} //Assume it's an ISODate string, and convert it for rest of function call.
 
-    var globalrosterDeadline = new Date(curDt.getFullYear() , curDt.getMonth()+1, curDt.getDate(), deadlineHour)
+    var globalrosterDeadline = new Date(curDt.getFullYear() , curDt.getMonth(), curDt.getDate(), deadlineHour)
      if (globalrosterDeadline < curDt) {
       globalrosterDeadline.setDate(globalrosterDeadline.getDate() +1)
     }
