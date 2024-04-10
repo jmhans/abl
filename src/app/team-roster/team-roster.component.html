@@ -3,7 +3,7 @@
 
 
 
-<div class="alert alert-danger" role="alert" *ngIf="getActiveRosterLength()>27">
+<div class="alert alert-danger" role="alert" *ngIf="getActiveRosterLength()>24">
 Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) or move eligible player(s) to IL before saving.
 </div>
 <div class="alert alert-danger" role="alert" *ngFor="let inel of ineligiblePositions()">
