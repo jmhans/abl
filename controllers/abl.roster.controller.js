@@ -442,7 +442,7 @@ class ABLRosterController extends BaseController{
 
         var updatedLineup = await this._getRosterForTeamAndDate(req.params.id, rosterDeadline)
 
-
+        // change to bump code.
 
         // var populated = await updatedRec.populate('roster.player priorRosters.roster.player').execPopulate()
         res.json(updatedLineup)
