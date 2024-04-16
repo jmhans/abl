@@ -258,7 +258,7 @@ class ABLGameController extends BaseController{
           'cs':  statlineObj.stats.batting.caughtStealing,
           'sac':  statlineObj.stats.batting.sacBunts,
           'sf':  statlineObj.stats.batting.sacFlies,
-          'e':  statlineObj.stats.fielding.errors,
+          'e':  statlineObj.stats.fielding.e,
           'position(s)': statlineObj.positions
 
         }
