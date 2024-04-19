@@ -13,7 +13,7 @@ const mlbGame = require('./../models/mlbGame').mlbGame;
 const Player = require('./../models/player').Player;
 const Statline = require('./../models/statline');
 
-const Game = require('./../models/Game');
+const Game = require('./../models/Game').Game;
 const AblTeamController = require('./../controllers/ablteam.controller');
 //const AblGameController = require('./../controllers/abl.game.controller');
 const AblRosterController = require('./../controllers/abl.roster.controller').AblRosterController;

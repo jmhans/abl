@@ -2,7 +2,7 @@ const https = require('https');
 
 const Player = require('./../models/player').Player;
 const Statline = require('./../models/statline').Statline;
-const AblGame = require('./../models/Game');
+const AblGame = require('./../models/Game').Game;
 
 const gamesList = require("./../data/gamesList.json");
 
@@ -16,7 +16,7 @@ class BaseHandler {
 
     switch(req.params.model) {
       case 'games':
-        this.model = require('./../models/Game');
+        this.model = require('./../models/Game').Game;
         break;
       case 'lineups':
         this.model = require('./../models/lineup').Lineup;

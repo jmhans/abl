@@ -192,8 +192,8 @@ export class GameTeamDetailComponent implements OnInit {
         10 * (retObj.bb || 0) +
         10 * (retObj.ibb || 0)+
         10 * (retObj.hbp || 0) +
-        7 * (retObj.sb || 0 - retObj.cs || 0) +
-        5 * (retObj.sac || 0 + retObj.sf || 0);
+        7 * ((retObj.sb || 0) - (retObj.cs || 0)) +
+        5 * ((retObj.sac || 0) + (retObj.sf || 0));
 
      var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
     retObj.abl_points = ablPts;

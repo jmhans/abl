@@ -8,7 +8,7 @@ var parseArgs = require('minimist')
 
 let args = parseArgs(process.argv.slice(2));
 var GameController = require('./controllers/abl.game.controller');
-let someGame = require('./models/Game')
+let someGame = require('./models/Game').Game
 
 var gc = new GameController();
 var result = dotenv.config();

@@ -4,11 +4,13 @@ const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();
 
-const AblGame = require('../models/Game');
+const AblGame = require('../models/Game').Game;
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
 const Statline = require('../models/statline').Statline;
+
+const GameResultsView = require('../models/Game').GameResultsView;
 
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -298,8 +300,8 @@ class ABLGameController extends BaseController{
           10 * (retObj.bb || 0) +
           //10 * (retObj.ibb || 0)+
           10 * (retObj.hbp || 0) +
-          7 * (retObj.sb || 0- retObj.cs || 0) +
-          5 * (retObj.sac || 0 + retObj.sf || 0);
+          7 * ((retObj.sb || 0) - (retObj.cs || 0)) +
+          5 * ((retObj.sac || 0) + (retObj.sf || 0));
 
        var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
       retObj.abl_points = ablPts;
@@ -1126,6 +1128,8 @@ async _removeAttestation2(req, res) {
 
 }
 
+
+
 async getAllUnprocessedGames(dt) {
 
 const toDt = dt //new Date()
@@ -1206,6 +1210,20 @@ try {
 }
 }
 
+async _viewGet(req, res, next) {
+
+  try {
+    let gameRes = await GameResultsView.find().populate('homeTeam').exec()
+    if (gameRes) {
+      res.json(gameRes)
+    }
+
+  }
+  catch(err) {
+    return next(err)
+  }
+}
+
 
 
 reroute() {
@@ -1224,6 +1242,7 @@ reroute() {
   router.get('/games/oldResults', (...args)=>this._getOldResultGames(...args));
   router.post('/games/oldResults/:gameId', (...args)=>this._addIdToResult(...args));
   router.get('/games/process/:gameDate', (...args)=>this.processGames(...args));
+  router.get('/gameresults', (...args)=>this._viewGet(...args));
   return router;
 }
 

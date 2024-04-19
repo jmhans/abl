@@ -4,7 +4,7 @@ const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();
 
-const AblGame = require('../models/Game');
+const AblGame = require('../models/Game').Game;
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');

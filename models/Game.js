@@ -38,5 +38,26 @@ const gameSchema = new Schema({
 
 });
 
-module.exports = mongoose.model('Game', gameSchema);
+const gameResultsViewSchema = new Schema({
+  gameDate: { type: Date, required: true },
+  awayTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true},
+  homeTeam: { type: Schema.Types.ObjectId, ref:'AblTeam', required: true},
+  gameType: {type: String, required: false},
+  description: String,
+
+  status: String,
+  results: [{
+        status: String,
+        scores: [{team: String, location: String, final: {} }] ,
+        winner: {type: Schema.Types.ObjectId, ref: 'AblTeam', required: false},
+        loser: {type: Schema.Types.ObjectId, ref: 'AblTeam', required: false},
+        attestations: [{attester: String, attesterType: String, time: Date}]
+      }]
+
+});
+
+module.exports = {Game:mongoose.model('Game', gameSchema),
+GameResultsView: mongoose.model('gameResultsView', gameResultsViewSchema, 'gameResultsView')
+
+}
 

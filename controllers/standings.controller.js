@@ -1,6 +1,6 @@
 const BaseController = require('./base.controller');
 const Team = require('../models/owner').AblTeam;
-const Game = require('../models/Game');
+const Game = require('../models/Game').Game;
 const StandingView = require('../models/standings');
 
 class StandingsController extends BaseController {
