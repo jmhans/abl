@@ -69,218 +69,260 @@ class ABLRosterController extends BaseController{
       var atomicLineup = await Lineup.aggregate(
         [
           {
-            '$match': {
-              'ablTeam': new ObjectId(teamId),
-              'effectiveDate': {
-                '$lte': new Date(gmDate)
-              }
-            }
-          }, {
-            '$sort': {
-              'effectiveDate': -1
-            }
-          }, {
-            '$limit': 1
-          }, {
-            '$unwind': {
-              'path': '$roster',
-              'preserveNullAndEmptyArrays': false
-            }
-          }, {
-            '$lookup': {
-              'from': 'players',
-              'localField': 'roster.player',
-              'foreignField': '_id',
-              'as': 'player'
-            }
-          }, {
-            '$unwind': {
-              'path': '$player',
-              'preserveNullAndEmptyArrays': false
-            }
-          }, {
-            '$lookup': {
-              'from': 'mlbrosters',
-              'let': {
-                'plyrId': '$player.mlbID'
+            $match: {
+              ablTeam: new ObjectId(teamId),
+              effectiveDate: {
+                $lte: new Date(gmDate),
               },
-              'pipeline': [
-                {
-                  '$unwind': {
-                    'path': '$roster',
-                    'preserveNullAndEmptyArrays': true
-                  }
-                }, {
-                  '$project': {
-                    'teamId': 1,
-                    'player': '$roster.person',
-                    'status': '$roster.status'
-                  }
-                }, {
-                  '$match': {
-                    '$expr': {
-                      '$eq': [
-                        '$$plyrId', {
-                          '$toString': '$player.id'
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              'as': 'rosterStatus'
-            }
-          }, {
-            '$lookup': {
-              'from': 'position_log',
-              'let': {
-                'plyrId': '$player.mlbID'
+            },
+          },
+          {
+            $sort: {
+              effectiveDate: -1,
+            },
+          },
+          {
+            $limit: 1,
+          },
+          {
+            $unwind: {
+              path: "$roster",
+              preserveNullAndEmptyArrays: false,
+            },
+          },
+          {
+            $lookup:
+              /**
+               * from: The target collection.
+               * localField: The local join field.
+               * foreignField: The target join field.
+               * as: The name for the results.
+               * pipeline: Optional pipeline to run on the foreign collection.
+               * let: Optional variables to use in the pipeline field stages.
+               */
+              {
+                from: "players",
+                let: {
+                  plyrId: "$roster.player",
+                },
+                pipeline: [
+                  {
+                    $project: {
+                      ablstatus: 1,
+                      mlbID: 1,
+                      name: 1,
+                      stats: 1,
+                    },
+                  },
+                  {
+                    $match: {
+                      $expr: {
+                        $eq: ["$$plyrId", "$_id"],
+                      },
+                    },
+                  },
+                ],
+                as: "player",
               },
-              'pipeline': [
+          },
+          {
+            $unwind: {
+              path: "$player",
+              preserveNullAndEmptyArrays: false,
+            },
+          },
+          {
+            $lookup: {
+              from: "mlbrosters",
+              let: {
+                plyrId: "$player.mlbID",
+              },
+              pipeline: [
                 {
-                  '$match': {
-                    '$expr': {
-                      '$and': [
+                  $unwind: {
+                    path: "$roster",
+                    preserveNullAndEmptyArrays: true,
+                  },
+                },
+                {
+                  $project: {
+                    teamId: 1,
+                    player: "$roster.person",
+                    status: "$roster.status",
+                    team: 1,
+                  },
+                },
+                {
+                  $match: {
+                    $expr: {
+                      $eq: [
+                        "$$plyrId",
                         {
-                          '$eq': [
-                            '$mlbId', '$$plyrId'
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              'as': 'posLog'
-            }
-          }, {
-            '$addFields': {
-              'newPosLog': {
-                '$reduce': {
-                  'input': '$posLog',
-                  'initialValue': {},
-                  'in': {
-                    '$switch': {
-                      'branches': [
-                        {
-                          'case': {
-                            '$eq': [
-                              '$$this.season', 2024
-                            ]
-                          },
-                          'then': {
-                            'curr': '$$this.eligiblePositions',
-                            'prior': '$$value.prior'
-                          }
-                        }, {
-                          'case': {
-                            '$eq': [
-                              '$$this.season', 2023
-                            ]
-                          },
-                          'then': {
-                            'curr': '$$value.curr',
-                            'prior': '$$this.maxPosition'
-                          }
-                        }
+                          $toString: "$player.id",
+                        },
                       ],
-                      'default': '$$value'
-                    }
-                  }
-                }
-              }
-            }
-          }, {
-            '$lookup': {
-              'from': 'positions',
-              'localField': 'player.mlbID',
-              'foreignField': 'mlbId',
-              'as': 'tempCommish'
-            }
-          }, {
-            '$addFields': {
-              'player.status': {
-                '$first': '$rosterStatus.status.description'
+                    },
+                  },
+                },
+              ],
+              as: "rosterStatus",
+            },
+          },
+          {
+            $lookup: {
+              from: "position_log",
+              let: {
+                plyrId: "$player.mlbID",
               },
-              'allPos': {
-                '$concatArrays': [
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        {
+                          $eq: ["$mlbId", "$$plyrId"],
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: "posLog",
+            },
+          },
+          {
+            $addFields: {
+              newPosLog: {
+                $reduce: {
+                  input: "$posLog",
+                  initialValue: {},
+                  in: {
+                    $switch: {
+                      branches: [
+                        {
+                          case: {
+                            $eq: ["$$this.season", 2024],
+                          },
+                          then: {
+                            curr: "$$this.eligiblePositions",
+                            prior: "$$value.prior",
+                          },
+                        },
+                        {
+                          case: {
+                            $eq: ["$$this.season", 2023],
+                          },
+                          then: {
+                            curr: "$$value.curr",
+                            prior: "$$this.maxPosition",
+                          },
+                        },
+                      ],
+                      default: "$$value",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "positions",
+              localField: "player.mlbID",
+              foreignField: "mlbId",
+              as: "tempCommish",
+            },
+          },
+          {
+            $addFields: {
+              "player.status": {
+                $first:
+                  "$rosterStatus.status.description",
+              },
+              allPos: {
+                $concatArrays: [
                   [
                     {
-                      '$ifNull': [
+                      $ifNull: [
                         {
-                          '$first': '$tempCommish.CommishPos'
-                        }, '$newPosLog.prior'
-                      ]
-                    }
-                  ], {
-                    '$ifNull': [
-                      '$newPosLog.curr', []
-                    ]
-                  }
-                ]
-              }
-            }
-          }, {
-            '$addFields': {
-              'player.eligible': {
-                '$filter': {
-                  'input': {
-                    '$reduce': {
-                      'input': '$allPos',
-                      'initialValue': [],
-                      'in': {
-                        '$cond': [
-                          {
-                            '$in': [
-                              '$$this', '$$value'
-                            ]
-                          }, '$$value', {
-                            '$concatArrays': [
-                              '$$value', [
-                                '$$this'
-                              ]
-                            ]
-                          }
-                        ]
-                      }
-                    }
+                          $first:
+                            "$tempCommish.CommishPos",
+                        },
+                        "$newPosLog.prior",
+                      ],
+                    },
+                  ],
+                  {
+                    $ifNull: ["$newPosLog.curr", []],
                   },
-                  'as': 'pos',
-                  'cond': {
-                    '$ne': [
-                      '$$pos', null
-                    ]
-                  }
-                }
-              }
-            }
-          }, {
-            '$project': {
-              'player.position': 0,
-              'allPos': 0,
-              'tempCommish': 0,
-              'posLog': 0,
-              'newPosLog': 0,
-              'rosterStatus': 0
-            }
-          }, {
-            '$group': {
-              '_id': '$_id',
-              'roster': {
-                '$push': {
-                  'player': '$player',
-                  'lineupPosition': '$roster.lineupPosition',
-                  'rosterOrder': '$roster.rosterOrder'
-                }
+                ],
               },
-              'effectiveDate': {
-                '$first': '$effectiveDate'
+              "player.team": {
+                $first: "$rosterStatus.team.abbreviation",
               },
-              'ablTeam': {
-                '$first': '$ablTeam'
-              }
-            }
-          }
+            },
+          },
+          {
+            $addFields: {
+              "player.eligible": {
+                $filter: {
+                  input: {
+                    $reduce: {
+                      input: "$allPos",
+                      initialValue: [],
+                      in: {
+                        $cond: [
+                          {
+                            $in: ["$$this", "$$value"],
+                          },
+                          "$$value",
+                          {
+                            $concatArrays: [
+                              "$$value",
+                              ["$$this"],
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                  as: "pos",
+                  cond: {
+                    $ne: ["$$pos", null],
+                  },
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              allPos: 0,
+              tempCommish: 0,
+              posLog: 0,
+              newPosLog: 0,
+              rosterStatus: 0,
+              priorRosters: 0,
+            },
+          },
+          {
+            $group: {
+              _id: "$_id",
+              roster: {
+                $push: {
+                  player: "$player",
+                  lineupPosition:
+                    "$roster.lineupPosition",
+                  rosterOrder: "$roster.rosterOrder",
+                },
+              },
+              effectiveDate: {
+                $first: "$effectiveDate",
+              },
+              ablTeam: {
+                $first: "$ablTeam",
+              },
+            },
+          },
         ]
 
 

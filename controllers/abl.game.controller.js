@@ -4,11 +4,13 @@ const BaseController = require('./base.controller');
 var express = require('express');
 var router = express.Router();
 
-const AblGame = require('../models/Game');
+const AblGame = require('../models/Game').Game;
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
 const Statline = require('../models/statline').Statline;
+
+const GameResultsView = require('../models/Game').GameResultsView;
 
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -298,8 +300,8 @@ class ABLGameController extends BaseController{
           10 * (retObj.bb || 0) +
           //10 * (retObj.ibb || 0)+
           10 * (retObj.hbp || 0) +
-          7 * (retObj.sb || 0- retObj.cs || 0) +
-          5 * (retObj.sac || 0 + retObj.sf || 0);
+          7 * ((retObj.sb || 0) - (retObj.cs || 0)) +
+          5 * ((retObj.sac || 0) + (retObj.sf || 0));
 
        var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
       retObj.abl_points = ablPts;
@@ -673,7 +675,7 @@ async _getStatsForLineups(lineups, current_date) {
                    total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
                    break;
                  default:
-                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName] || 0)
                }
 
              }
@@ -683,7 +685,7 @@ async _getStatsForLineups(lineups, current_date) {
              'gamePk': [],
              'gameDate': [],
              'position(s)': [],
-             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
+             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0, h: 0, "2b": 0, "3b": 0, "hr": 0, "bb": 0, "ibb": 0, "hbp": 0, "sb": 0, "cs": 0, "sac": 0, "sf": 0, "e": 0}
            });
          //console.log(`Stats for ${plyr.player.name} updating.`);
 
@@ -1126,6 +1128,8 @@ async _removeAttestation2(req, res) {
 
 }
 
+
+
 async getAllUnprocessedGames(dt) {
 
 const toDt = dt //new Date()
@@ -1206,6 +1210,20 @@ try {
 }
 }
 
+async _viewGet(req, res, next) {
+
+  try {
+    let gameRes = await GameResultsView.find().populate('homeTeam').exec()
+    if (gameRes) {
+      res.json(gameRes)
+    }
+
+  }
+  catch(err) {
+    return next(err)
+  }
+}
+
 
 
 reroute() {
@@ -1224,6 +1242,7 @@ reroute() {
   router.get('/games/oldResults', (...args)=>this._getOldResultGames(...args));
   router.post('/games/oldResults/:gameId', (...args)=>this._addIdToResult(...args));
   router.get('/games/process/:gameDate', (...args)=>this.processGames(...args));
+  router.get('/gameresults', (...args)=>this._viewGet(...args));
   return router;
 }
 
