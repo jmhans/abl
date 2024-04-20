@@ -675,7 +675,7 @@ async _getStatsForLineups(lineups, current_date) {
                    total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
                    break;
                  default:
-                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName])
+                   total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName] || 0)
                }
 
              }
@@ -685,7 +685,7 @@ async _getStatsForLineups(lineups, current_date) {
              'gamePk': [],
              'gameDate': [],
              'position(s)': [],
-             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0}
+             'abl_score': {abl_runs: 0, abl_points: 0, e: 0, ab: 0, h: 0, "2b": 0, "3b": 0, "hr": 0, "bb": 0, "ibb": 0, "hbp": 0, "sb": 0, "cs": 0, "sac": 0, "sf": 0, "e": 0}
            });
          //console.log(`Stats for ${plyr.player.name} updating.`);
 
