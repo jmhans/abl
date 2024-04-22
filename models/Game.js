@@ -57,7 +57,7 @@ const gameResultsViewSchema = new Schema({
 });
 
 module.exports = {Game:mongoose.model('Game', gameSchema),
-GameResultsView: mongoose.model('gameResultsView', gameResultsViewSchema, 'gameResultsView')
+GameResultsView: mongoose.model('gameResults', gameResultsViewSchema, 'gameResults')
 
 }
 
