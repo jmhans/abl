@@ -1149,6 +1149,22 @@ return gms
 console.error(err)
 }
 }
+async getAllGamesForDate(dt) {
+
+  const toDt = dt //new Date()
+
+  const fromDt = new Date((new Date(toDt)).setDate(toDt.getDate() -1))
+  try {
+  let gms = await this.model.find({
+    $and: [{gameDate: {$gte: fromDt}},
+          {gameDate: {$lte: toDt}}
+        ]}).exec()
+
+  return gms
+  } catch (err) {
+  console.error(err)
+  }
+  }
 
 async processGames(req, res){
   try {
@@ -1158,7 +1174,12 @@ async processGames(req, res){
       myDt = new Date((new Date(myDt)).setDate(myDt.getDate() +1))
     }
 
-    let gms = await this.getAllUnprocessedGames(myDt);
+    if (req.query.force) {
+      let gms = await this.getAllUnprocessedGames(myDt);
+    } else {
+      let gms = await this.getAllUnprocessedGames(myDt);
+    }
+
     for (let g=0; g<gms.length; g++) {
       this.createAndSaveResult(gms[g]._id)
 
@@ -1213,7 +1234,7 @@ try {
 async _viewGet(req, res, next) {
 
   try {
-    let gameRes = await GameResultsView.find().populate('homeTeam').exec()
+    let gameRes = await GameResultsView.find().populate('homeTeam awayTeam').exec()
     if (gameRes) {
       res.json(gameRes)
     }
