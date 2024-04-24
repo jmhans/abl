@@ -58,6 +58,7 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
         <th mat-header-cell *matHeaderCellDef>Move</th>
         <td mat-cell *matCellDef="let rosterRec">
           <span *ngIf="editable" class=" example-handle " cdkDragHandle><mat-icon> drag_handle</mat-icon></span>
+          <span>{{isStarter(rosterRec)}}</span>
         </td>
       </ng-container>
       <ng-container matColumnDef="abl_runs" >

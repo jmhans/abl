@@ -35,7 +35,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   @Output() dropPlyr = new EventEmitter<{playerId: string}>();
   @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
   @Output() raiseAlert = new EventEmitter<any>();
-  lineupChanged: Boolean = false;
+    lineupChanged: Boolean = false;
   formLineup: LineupFormModel;
   roster$: Subject<Roster[]>= new Subject();
   displayRoster$: Observable<MatTableDataSource<Roster>>
@@ -48,6 +48,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
 
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
+
 
   constructor( public rosterService: RosterService) { }
 
@@ -156,6 +157,29 @@ dropPlayerAllowed(plyrRec) {
 
   sorted(event: CdkDragSortEvent<any>) {
     console.log(`Sorted: ${event}`);
+  }
+
+  isStarter(itm) {
+ //   console.log(this.lineup.roster.indexOf(itm))
+
+    //let posIdx = this.lineup.roster.filter((rr)=> {return rr.lineupPosition == itm.lineupPosition}).indexOf(itm)
+    let startingPositions= {
+      '1B': 1, '2B': 1, '3B': 1, 'OF': 3, 'SS': 1, 'C': 1, 'any': 1
+    }
+    let benchIdx = 0
+    let newThing = this.lineup.roster.map((rr, idx)=> {
+      let posIdx = this.lineup.roster.filter((rosterRec)=> {return rosterRec.lineupPosition == rr.lineupPosition}).indexOf(rr)
+      let starter = (posIdx < startingPositions[rr.lineupPosition])
+      if (!starter) {
+        benchIdx++
+      }
+      return {...rr
+        , starter : starter
+        , benchIdx: benchIdx
+    }
+    })
+
+    return false
   }
 
   lineupDirty(): boolean {
