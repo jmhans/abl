@@ -1173,13 +1173,13 @@ async processGames(req, res){
     if (req.params.gameDate) {
       myDt = new Date((new Date(myDt)).setDate(myDt.getDate() +1))
     }
-
+    let gms = await this.getAllUnprocessedGames(myDt);
+    console.log(req.query?.force);
     if (req.query.force) {
-      let gms = await this.getAllUnprocessedGames(myDt);
-    } else {
-      let gms = await this.getAllUnprocessedGames(myDt);
+      console.log("I'm in here")
+      gms = await this.getAllGamesForDate(myDt);
     }
-
+    console.log(gms)
     for (let g=0; g<gms.length; g++) {
       this.createAndSaveResult(gms[g]._id)
 
