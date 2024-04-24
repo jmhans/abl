@@ -166,20 +166,20 @@ dropPlayerAllowed(plyrRec) {
     let startingPositions= {
       '1B': 1, '2B': 1, '3B': 1, 'OF': 3, 'SS': 1, 'C': 1, 'any': 1
     }
-    let benchIdx = 0
-    let newThing = this.lineup.roster.map((rr, idx)=> {
-      let posIdx = this.lineup.roster.filter((rosterRec)=> {return rosterRec.lineupPosition == rr.lineupPosition}).indexOf(rr)
-      let starter = (posIdx < startingPositions[rr.lineupPosition])
-      if (!starter) {
-        benchIdx++
-      }
-      return {...rr
-        , starter : starter
-        , benchIdx: benchIdx
-    }
+
+    let starters = this.lineup.roster.filter((myGuy)=> {
+      let posIdx = this.lineup.roster.filter((rosterRec)=> {return rosterRec.lineupPosition == myGuy.lineupPosition}).indexOf(myGuy)
+      if (posIdx < startingPositions[myGuy.lineupPosition]) {
+        return true
+      }})
+
+    let bench = this.lineup.roster.filter((myGuy)=> {
+      return starters.indexOf(myGuy) == -1
     })
 
-    return false
+    starters.push(bench.shift())
+
+    return starters.indexOf(itm) != -1
   }
 
   lineupDirty(): boolean {
