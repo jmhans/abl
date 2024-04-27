@@ -1,11 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter , AfterViewInit} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter , AfterViewInit, OnDestroy} from '@angular/core';
 import { CdkDragDrop, CdkDragSortEvent, moveItemInArray, transferArrayItem, CdkDrag } from '@angular/cdk/drag-drop';
-import { Subscription, Subject, Observable,  of , BehaviorSubject} from 'rxjs'
+import { Subscription, Subject, Observable,  of , BehaviorSubject, takeUntil} from 'rxjs'
 import { map , startWith, switchMap} from 'rxjs/operators';
 import { RosterService } from './../core/services/roster.service';
 import { ApiService} from './../core/api.service';
 import { LineupModel, SubmitLineup, LineupFormModel , Roster} from './../core/models/lineup.model';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+
 
 const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   var output = {_id: rosterId, effectiveDate: effectiveDate, roster: []}
@@ -28,7 +30,9 @@ const submitObj = ({lineupId, rosterId, effectiveDate, roster })=>{
   templateUrl: './team-roster.component.html',
   styleUrls: ['./team-roster.component.scss']
 })
-export class TeamRosterComponent implements OnInit, AfterViewInit {
+export class TeamRosterComponent implements OnInit, AfterViewInit, OnDestroy {
+  destroyed = new Subject<void>();
+
   @Input() lineup: LineupFormModel;
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
@@ -44,13 +48,32 @@ export class TeamRosterComponent implements OnInit, AfterViewInit {
   dropsAllowed: boolean = true;
   rosterLength: Number;
   activeRosterLength:Number;
-  columnNames: ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
-
+  displayedColumns: string[] =[]
+  allColumns =  ['drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed','player.stats.batting.atBats', 'player.stats.batting.hits', 'player.stats.batting.doubles', 'player.stats.batting.triples', 'player.stats.batting.homeRuns', 'player.stats.batting.baseOnBalls', 'player.stats.batting.hitByPitch', 'player.stats.batting.stolenBases', 'player.stats.batting.caughtStealing']
+  smallColumns = [ 'drag_handle', 'lineupPosition', 'player.name', 'player.status', 'abl_runs', 'player.stats.batting.gamesPlayed']
   saveRosterRecordSub: Subscription;
   availablePositions: string[] = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH']
+  dragDisabled=true;
 
 
-  constructor( public rosterService: RosterService) { }
+  constructor( public rosterService: RosterService, breakpointObserver: BreakpointObserver) {
+    breakpointObserver
+      .observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small
+      ])
+      .pipe(takeUntil(this.destroyed))
+      .subscribe(result => {
+        if (result.matches) {
+          this.displayedColumns = this.allColumns // this.smallColumns
+        } else {
+          this.displayedColumns = this.allColumns
+        }
+
+        console.log(result)
+      });
+
+  }
 
   ngOnInit() {
 
@@ -261,6 +284,11 @@ dropPlayerAllowed(plyrRec) {
           return -99.99
 
         }
+      }
+
+      ngOnDestroy() {
+        this.destroyed.next();
+        this.destroyed.complete();
       }
 
 }

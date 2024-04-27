@@ -9,9 +9,19 @@
   border: solid 1px #ccc;
   background: white;
   border-radius: 4px;
-  overflow: hidden;
+  overflow-x: scroll;
   display: -webkit-box;
   display: block;
+}
+
+.example-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.example-list {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .example-box {
@@ -97,19 +107,33 @@ body {
   width: 100%;
 
 }
-.mat-mdc-cell{
+
+
+.mat-mdc-table {
+  overflow-x: scroll;
+}
+
+.mat-mdc-cell,
+.mat-mdc-header-cell {
   justify-content: flex-start;
+  padding: 0px 10px 0px 10px;
+  word-wrap: initial;
+  display: table-cell;
+  line-break: unset;
+  //width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
 }
-.mat-mdc-row{
-  height:auto !important;
-  width: 100%;
+
+.mat-mdc-row,
+.mat-mdc-header-row {
+  display: table-row;
+ // height:auto !important;
+ // width: 100%;
   justify-content: space-between;
-
 }
-.mat-mdc-header-row{
-  width: 100%;
 
-}
 
 
 ::ng-deep .myPanel.mat-mdc-select-panel {
