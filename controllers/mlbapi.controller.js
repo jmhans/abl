@@ -86,6 +86,7 @@ class altMlbApiController extends BaseController{
       var returnArr = []
 
       for (var g=0; g<gamesList.length; g++ ){
+      //for (var g=0; g<1; g++ ){
         var gm = gamesList[g]
         var query = {
           'gamePk': gm.gamePk

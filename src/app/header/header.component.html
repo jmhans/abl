@@ -94,7 +94,13 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Draft</a>
       </li>
-
+      <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/history"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">History</a>
+      </li>
 
     </ul>
   </nav>

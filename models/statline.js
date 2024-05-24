@@ -19,7 +19,8 @@ var statLineSchema = new Schema({
   positions: [{type: String, required: false}],
   ablGame: {type: Schema.Types.ObjectId, ref: 'Game', required: false},
   statlineType: {type: String, required: false},
-  updatedStats: {type: Schema.Types.Mixed, required: false}
+  updatedStats: {type: Schema.Types.Mixed, required: false},
+  ablDate: {type: String, required: true}
 })
 
 
