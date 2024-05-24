@@ -27,6 +27,7 @@ import { DeleteGameComponent } from './pages/admin/game/delete-game/delete-game.
 import { ManageGamesComponent } from './pages/admin/manage-games/manage-games.component';
 import { PlayoffsComponent } from './pages/playoffs/playoffs.component';
 import { DraftComponent } from './pages/draft/draft.component';
+import { HistoryComponent } from './pages/history/history.component';
 
 
 const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch: 'full'},
@@ -54,7 +55,8 @@ const routes: Routes = [{path:'owners', component: OwnerListComponent, pathMatch
                         {path: 'suppdraft', component: SuppDraftComponent, canActivate: [ AuthGuard ]},
                         {path: 'draft', component: DraftComponent, canActivate: [ AuthGuard ]},
                         {path: 'playoffs', component: PlayoffsComponent, canActivate: [ AuthGuard ]},
-                        {path: 'messages', component: MessagesComponent, canActivate: [ AuthGuard ]}
+                        {path: 'messages', component: MessagesComponent, canActivate: [ AuthGuard ]},
+                        {path: 'history', component: HistoryComponent, canActivate: [ AuthGuard ]}
 
                        ];
 

@@ -63,17 +63,15 @@ class StatlineController extends BaseController {
     if (plyr.allPositions) {
 
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
-
+    const resumedGame = !!gm.resumedFrom
     const originalDate = gm.resumedFrom ? gm.resumedFrom : gm.gameDate
-      var query = {
-        'mlbId': plyr.person.id,
-        'gamePk': gm.gamePk,
-        'gameDate': originalDate
-      }
+    let playedDate = (new Date(new Date(gm.gameDate) - (new Date(gm.gameDate)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10)
+    // this is the yyyy-MM-dd formatted string of the game time in local time zone.
 
-      if (gm.officialDate) {
-        // console.log(`${gm.gamePk}: - ` )
-      }
+    
+//    let a = (new Date(new Date(originalDate) - (new Date(originalDate)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10)
+    
+
 
        var _statline = {
                 mlbId: plyr.person.id,
@@ -81,32 +79,33 @@ class StatlineController extends BaseController {
                 gamePk: gm.gamePk,
                 stats: shortenStats(plyr.stats),
                 positions: shortPositions,
-                statlineType: gm.status.detailedState
+                statlineType: gm.status.detailedState,
+                ablDate: playedDate
               };
 
-        console.log(plyr.stats);
-        console.log(shortenStats(plyr.stats));
       try {
-        const doc = await this.model.findOne(query);
-        if (doc) {
-          // One already exists. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc.
-
-          if (new Date(doc.gameDate).toString != new Date(gm.gameDate).toString) {
-            // They have stats from the original date. Find the diff for the new date.
-            console.log(`Doc: ${doc.gameDate} vs. stats: ${new Date(gm.gameDate)}`)
-            console.log(`Doc: ${typeof(new Date(doc.gameDate))} vs. stats: ${typeof(new Date(gm.gameDate))}`)
-            _statline.stats = await this._getStatlineDiff(shortenStats(plyr.stats), doc.stats)
-            // _statline.gameDate = gm.gameDate  // Use the new game date specifically in the statline.
-            query = {
-              'mlbId': plyr.person.id,
-              'gamePk' : gm.gamePk,
-              'gameDate': gm.gameDate // Modify the query so it won't replace the existing doc.
-            }
+        if (resumedGame) {
+          var query = {
+            'mlbId': plyr.person.id.toString(),
+            'gamePk': gm.gamePk.toString(),
+            'ablDate': {$lt: playedDate}
           }
+        }
+        const docs = await this.model.find(query);
+        if (docs.length > 0) {
+          // Doc already exist for this game for a prior ablDate. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc.
+           _statline.stats = await this._getStatlineDiff(shortenStats(plyr.stats), docs)
+          
+        }
+        var query = {
+            'mlbId': plyr.person.id.toString(),
+            'gamePk': gm.gamePk.toString(),
+            //'gameDate': new Date(originalDate),
+            'ablDate':playedDate
         }
         const doc2 = await this.model.updateMany(query, _statline, { upsert: true });
         console.log(`Successfully updated ${plyr.person.fullName} for date ${gm.gameDate}`)
-        console.log(doc2)
+        //console.log(doc2)
           return doc2;
 
 
@@ -118,23 +117,40 @@ class StatlineController extends BaseController {
   }
 
   async _getStatlineDiff(fullStat, partialStat) {
+    //console.log(partialStat)
+    var partials = partialStat.reduce((all, cur) => {
+      Object.keys(cur.stats).forEach((cat)=> {
+        if (!all[cat]) {
+          all[cat] = {}
+        }
+        Object.keys(cur.stats[cat]).forEach((prop)=> {
+          if (typeof(cur.stats[cat][prop] == "number")) {
+            if (prop == 'gamesPlayed') {
+              all[cat][prop] = cur.stats[cat][prop]
+            } else  {
+              all[cat][prop] = cur.stats[cat][prop] + (all[cat][prop] || 0)
+            }
+          }
+        })
+      })
+        return all
+      }, {})
+
     var ret = {batting: {}, fielding: {}, pitching: {}}
     if (fullStat) {
-      Object.keys(fullStat.batting).forEach((prop)=> {
-        if (typeof(fullStat.batting[prop]) == "number") {
-                ret.batting[prop] = fullStat.batting[prop] - (partialStat.batting[prop] || 0)
-          }
+      Object.keys(fullStat).forEach((cat)=> {
+        Object.keys(fullStat[cat]).forEach((prop)=> {
+          if (typeof(fullStat[cat][prop]) == "number") {
+              if (prop == 'gamesPlayed') {
+                ret[cat][prop] = fullStat[cat][prop]
+              } else {
+                ret[cat][prop] = fullStat[cat][prop] - (partials[cat][prop] || 0)
+              }
+
+            }
+        })
       })
-      Object.keys(fullStat.fielding).forEach((prop)=> {
-        if (typeof(fullStat.fielding[prop]) == "number") {
-          ret.fielding[prop] = fullStat.fielding[prop] - (partialStat.fielding[prop] || 0)
-        }
-      })
-      Object.keys(fullStat.pitching).forEach((prop)=> {
-        if (typeof(fullStat.pitching[prop]) == "number") {
-          ret.pitching[prop] = fullStat.pitching[prop] - (partialStat.pitching[prop] || 0)
-        }
-      })
+
       return ret
     }
   }
