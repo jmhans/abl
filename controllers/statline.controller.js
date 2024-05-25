@@ -60,6 +60,9 @@ class StatlineController extends BaseController {
    }
 
   async _updateStatline(plyr, gm) {
+
+    console.log(`Updating stats for ${plyr.person.fullName}`)
+
     if (plyr.allPositions) {
 
     var shortPositions = plyr.allPositions.map((pos) => {return pos.abbreviation;})
@@ -68,9 +71,9 @@ class StatlineController extends BaseController {
     let playedDate = (new Date(new Date(gm.gameDate) - (new Date(gm.gameDate)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10)
     // this is the yyyy-MM-dd formatted string of the game time in local time zone.
 
-    
+
 //    let a = (new Date(new Date(originalDate) - (new Date(originalDate)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10)
-    
+
 
 
        var _statline = {
@@ -90,19 +93,23 @@ class StatlineController extends BaseController {
             'gamePk': gm.gamePk.toString(),
             'ablDate': {$lt: playedDate}
           }
+
+          const docs = await this.model.find(query);
+          if (docs.length > 0) {
+            console.log(`Reducing stats for ${docs.length} prior records`)
+            // Doc already exist for this game for a prior ablDate. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc.
+             _statline.stats = await this._getStatlineDiff(shortenStats(plyr.stats), docs)
+
+          }
         }
-        const docs = await this.model.find(query);
-        if (docs.length > 0) {
-          // Doc already exist for this game for a prior ablDate. This could be a suspended game situation. Modify the 'new' stats to reflect only those that happened after the prior document, then create new doc.
-           _statline.stats = await this._getStatlineDiff(shortenStats(plyr.stats), docs)
-          
-        }
+
         var query = {
             'mlbId': plyr.person.id.toString(),
             'gamePk': gm.gamePk.toString(),
             //'gameDate': new Date(originalDate),
             'ablDate':playedDate
         }
+        console.log(`Sending to DB now`)
         const doc2 = await this.model.updateMany(query, _statline, { upsert: true });
         console.log(`Successfully updated ${plyr.person.fullName} for date ${gm.gameDate}`)
         //console.log(doc2)
