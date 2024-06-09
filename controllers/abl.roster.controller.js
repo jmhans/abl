@@ -655,10 +655,14 @@ async _makeDraftPick(plyr, teamId, acqType) {
       var savedMlbPlayer = await mlbPlayer.save()
       var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
       var rosterDeadline =  this.getRosterDeadline(new Date());
-      var mostRecent = await this._getRosterForTeamAndDate(tmid, rosterDeadline)
+      console.log(`${tmId}`)
+      var mostRecent = await this._getRosterForTeamAndDate(tmId, rosterDeadline)
+      console.log(`Found Most Recent ${mostRecent._id}`)
+
       var yesterdayDeadline = new Date((new Date(rosterDeadline.toISOString())).setDate(rosterDeadline.getDate()-1))
       if (new Date(mostRecent.effectiveDate) > yesterdayDeadline) {
         // Cool. Move on to update many
+        console.log(`I'm in the true condition: ${mostRecent.effectiveDate}`)
 
       } else {
         // Create a new one first. Then, update many
@@ -670,6 +674,7 @@ async _makeDraftPick(plyr, teamId, acqType) {
           roster: mostRecent.roster,
           effectiveDate: rosterDeadline
         })
+        console.log(newLineup)
 
       }
 
@@ -678,14 +683,14 @@ async _makeDraftPick(plyr, teamId, acqType) {
       return popMlbPlayer
 
     } catch (err) {
-
+      console.log(err)
     }
   }
 
   async _dropPlayerFromTeamAllFutureRosters(req, res, next) {
 
     try {
-      let popoMlbPlayer = await this._dropPlayerBackend(req.params.plyr, req.params.tm)
+      let popMlbPlayer = await this._dropPlayerBackend(req.params.plyr, req.params.id)
       return res.send({success: true, player: popMlbPlayer});
 
     } catch(err) {
