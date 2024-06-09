@@ -1,4 +1,3 @@
-
 import {PlayersService } from '../../core/services/players.service';
 import { Component, OnInit, NgZone ,OnDestroy, ViewChild , Inject, AfterViewInit, ChangeDetectionStrategy,ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
@@ -20,13 +19,14 @@ import { SseService } from 'src/app/core/services/sse.service';
 
 @Component({
   selector: 'app-supp-draft',
-  templateUrl: './supp-draft.component.html',
-  styleUrls: ['./supp-draft.component.scss'],
+  templateUrl: './draft.component.html',
+  styleUrls: ['../draft/draft.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class SuppDraftComponent implements OnInit {
 
-  pageTitle = 'Draft';
+  pageTitle = 'Supplemental Draft';
 
   // filteredPlayers: MlbPlayerModel[];
   loading: boolean;
@@ -67,19 +67,15 @@ export class SuppDraftComponent implements OnInit {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-//    this.formData = this.api.getAblTeams$();
 
     this._getOwner();
-    this.api.getAPIData$('standings')
-    this.SseService.getSSE$('draft').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      console.log(data);
-    })
-    this.SseService.getSSE$('ping').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      console.log(data);
-    })
-
-   // this.draftSseService.getDraftResults$();
-    // this.draftSseService.establishConnect(); // Now doing this step in the service after the draft results are returned.
+    //this.api.getAPIData$('standings')
+    // this.SseService.getSSE$('draft').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+    //   console.log(data);
+    // })
+    // this.SseService.getSSE$('ping').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+    //   console.log(data);
+    // })
 
   }
 
@@ -103,8 +99,22 @@ export class SuppDraftComponent implements OnInit {
   }
 
   _addSkip(tm) {
-    this.api.postAPIData$('skips', [{ablTeam: tm._id}]).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
+    this.api.postAPIData$('skips', {ablTeam: tm._id}).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
       console.log("Pick Skipped")
+      this.rosterService.refreshSkips()
+    })
+  }
+  _removeSkip(tm) {
+     this.api.deleteSkip$(tm).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
+       console.log("Pick Skipped")
+       this.rosterService.refreshSkips()
+     })
+  }
+
+  _addDraftPick(tm) {
+    this.api.postAPIData$('skips', {ablTeam: tm._id}).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
+      console.log("DraftPickMade")
+      this.rosterService.refreshSkips()
     })
   }
 

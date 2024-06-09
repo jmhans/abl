@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.record.model';
 import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
+import { DraftPickModel } from './../models/draft.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
@@ -48,7 +49,10 @@ export class RosterService {
   refresh$: Subject<void> = new Subject();
   //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
   activeRosters$:Observable<LineupModel[]>;
+  draftList$:Observable<DraftPickModel[]>;
   skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
+
+
 
   activeRosterIdReplaySubj$: ReplaySubject<string> = new ReplaySubject(1);
   rosterReloadSubj$ = new Subject<void>();
@@ -88,13 +92,15 @@ export class RosterService {
 
 this.activeRosters$ = this.refresh$.pipe(
   tap(()=> {
- //   this.refreshSkips();
+    //this.refreshSkips();
   }),
   switchMap(()=> this.api.getAllLineups$())
   );
 
-        this.refreshLineups();
-       // this.refreshSkips();
+this.draftList$ = this.refresh$.pipe(switchMap(()=> this.api.getDraftPicks$('supp_draft')))
+
+this.refreshLineups();
+this.refreshSkips();
 
     }
 
@@ -111,6 +117,7 @@ this.activeRosters$ = this.refresh$.pipe(
       });
 
   }
+
 
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
     return this.api.addPlayertoTeam$(addPlayer, ablTeamId)

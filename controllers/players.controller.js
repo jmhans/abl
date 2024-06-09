@@ -317,6 +317,7 @@ _getPositions(req, res, next) {
   });
 }
 
+
   reroute() {
     router = this.route();
     //router.get('/players', (...args) => this._viewGet(...args));

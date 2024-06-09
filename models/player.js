@@ -51,7 +51,8 @@ var playerViewSchema = new mongoose.Schema({
   statUpdate: {type: Date, required: false},
   lastStatUpdate: {type: Date, required: false},
   //positionLog: {type: [String], required: false}
-  dougstatsName: {type: String, required: false}
+  dougstatsName: {type: String, required: false},
+  eligible:{type: [String], required: false}
 })
 
 var playerNamesViewSchema = new mongoose.Schema({

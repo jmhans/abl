@@ -2,7 +2,10 @@
   background-color: yellow;
   }
   .draft-cell {
-  border: 1px solid darkslategrey;
+    border: 1px solid darkslategrey;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
   }
   .header-cell {
   background-color:darkblue;
@@ -20,6 +23,14 @@
     display: none
   }
 
+  .inactive-pick {
+    background-color: darkslategrey;
+  }
+
+  .inactive-pick:before {
+    content: "Not Allowed";
+
+  }
 
 
   .flex-container {
@@ -54,10 +65,10 @@
 
   .selected-team {
 
-    flex: 20%;
+    flex: 15%;
   }
   .right-draft-board {
-  flex: 80%;
+  flex: 85%;
   }
   .draft-history {
     flex:10%;
@@ -80,3 +91,29 @@
    background-color: darkgray;
    width: 100%;
   }
+
+
+.mat-mdc-icon-button {
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  & > *[role=img] {
+     width: 12px;
+     height: 12px;
+     font-size: 12px;
+
+     svg {
+        width: 16px;
+        height: 16px;
+     }
+  }
+
+  .mat-mdc-button-touch-target {
+     width: 16px !important;
+     height: 16px !important;
+  }
+}
