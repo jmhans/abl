@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from "@angular/core";
-import { BehaviorSubject, Observable, ReplaySubject,throwError as ObservableThrowError, of , Subject, Subscription, combineLatestWith} from "rxjs";
+import { BehaviorSubject, Observable, ReplaySubject,throwError as ObservableThrowError, of , Subject, Subscription, combineLatestWith, combineLatestAll} from "rxjs";
 import { catchError, switchMap, map, tap, startWith, takeUntil, filter, combineLatest} from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from './../../auth/auth.service';
@@ -57,16 +57,17 @@ export class DraftSseService {
 
     ) {
       //this.notify();
-      if (false) {
+      if (true) {
         this.suppDraftDraftOrder()
       } else {
         this.regularDraftOrder()
-       // this.draftOrder$.next(this.draftOrder)
       }
 
 
       this.rosterService.refreshLineups();
       this.SseService.getSSE$('rosters').subscribe((data)=> {this.rosterService.refreshLineups()});
+      this.SseService.getSSE$('skips').subscribe((data)=> {this.rosterService.refreshSkips()});
+      this.SseService.getSSE$('draft').subscribe((data)=> {this.rosterService.refreshLineups()});
 
 
     }
@@ -157,6 +158,14 @@ export class DraftSseService {
     }
 
   suppDraftDraftOrder() {
+
+
+    let onePickDraftRounds = 5 // This must be an even number the way things are currently set up.
+    let multiPickDraftRounds = 0 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
+    let picksPerMultiRound = 1
+    let totalPicks = 27
+
+
     this.api.getAPIData$('standings').pipe(
       takeUntil(this.unsubscribe$),
       map((data:any[]) => {
@@ -174,41 +183,33 @@ export class DraftSseService {
         return s
       })}),
       combineLatestWith(this.rosterService.skipList$),
-      map(([data, skips]) => {
+      combineLatestWith(this.rosterService.draftList$),
+      map(([[data, skips], draftList]) => {
         return data.map((team)=> {
-          let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'supp_draft');
+          //let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType != 'draft');
+          let supp_draft_picks= draftList.filter((p)=> (typeof p.ablTeam == 'string' ? (p.ablTeam == team._id) : (p.ablTeam._id == team._id)) );
           let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
-          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam._id == team.tm._id).map((item)=> "Skip")]
-          return {...team, supp_draft_picks: supp_draft_picks, picks_allowed: 27-origRoster?.length }
+          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam == team.tm._id).map((item)=> {return  {type: "Skip", _id: item._id}})]
+          return {...team, supp_draft_picks: supp_draft_picks, orig_roster: origRoster, picks_allowed: totalPicks-origRoster?.length }
 
         })
       }),
       map((data:any[])=> {
         let draftRounds = []
-
-        for (let i=0; i<6; i=i+2) {
-          draftRounds[i]= data.map(tm=> {
-
-            return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i], allowed: i+1 <= (27 - tm.roster.roster.length)}
-          })
-          draftRounds[i+1] = [...data].reverse().map(tm=> {
-            return {team: tm.tm.nickname, pick: tm.supp_draft_picks[i+1], allowed: i+1+1 <= (27 - tm.roster.roster.length)}
-          })
+        let currentPick
+        for (let i=0; i<onePickDraftRounds; i=i+1) {
+          draftRounds[i]= {rowrev: false, data: data.map((tm, tmIdx) => {
+            let pick ={team: tm.tm, pick: tm.supp_draft_picks[i], allowed: i+1 <= (totalPicks - (tm.orig_roster?.length || 0))}
+            if (!pick.pick && pick.allowed && !currentPick) {
+              currentPick = {row: i, column: tmIdx }
+            }
+            return pick
+          })}
         }
-
-        let pick, currentPick;
-        let pickRd = 0;
-        let tm = 0
-        do {
-          pick = draftRounds[pickRd][tm].pick
-          currentPick = {row: pickRd, column: data.findIndex((item)=> {return item.tm.nickname == draftRounds[pickRd][tm].team})}
-          tm = (tm+1) % 10
-          if (tm == 0) {
-            pickRd++
-          }
-        } while (pick)
-
-        return {currentPick: currentPick, rosters: data}
+        if (!currentPick) {
+          currentPick = {row: 0, column: 0}
+        }
+        return {currentPick: currentPick, rosters: data, rounds: draftRounds, activeRounds : totalPicks}
       })
     ).subscribe(data => {
     this.draftOrder$.next(data)

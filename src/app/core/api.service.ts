@@ -14,7 +14,7 @@ import { OwnerModel } from './models/owner.model';
 import { MlbPlayerModel } from './models/mlb.player.model';
 import { MlbRoster } from './models/mlb.roster';
 import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './models/lineup.model';
-
+import { DraftPickModel } from './models/draft.model';
 import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.record.model';
 
 
@@ -285,14 +285,20 @@ export class ApiService {
     )
   }
      // POST new game (admin only)
-     postAPIData$(model: string, data: any[]): Observable<any[]> {
+     postAPIData$(model: string, data: any): Observable<any[]> {
       return this.http
-        .post<any[]>(`${this.v2_api}${model}`,data, {
+        .post<any>(`${this.v2_api}${model}`,data, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)
         })
         .pipe(
           catchError((error) => this._handleError(error))
         );
+    }
+    deleteSkip$(data): Observable<any[]> {
+      return this.http
+      .delete<any>(`${this.v2_api}skips/${data}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
     }
 
      // POST new game (admin only)
@@ -384,6 +390,15 @@ export class ApiService {
   getSkips$(): Observable<LineupModel[]> {
     return this.http
       .get<LineupModel[]>(`${this.v2_api}skips`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      )
+  }
+  getDraftPicks$(draftType:string= 'draft'): Observable<DraftPickModel[]> {
+    return this.http
+      .get<DraftPickModel[]>(`${this.v2_api}draftpicks?draftType=${draftType}`, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(

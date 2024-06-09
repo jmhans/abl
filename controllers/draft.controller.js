@@ -30,10 +30,14 @@ class DraftController extends BaseController {
   }
 
   _get(req, res, next) {
-    this.model.find().populate('player').exec(function(err, results) {
+    this.model.find(req.query).populate('player').exec(function(err, results) {
       if (err) return next(err);
       res.json(results);
     });
+  }
+
+  _setupSuppDraft(req, res, next) {
+
   }
 
   async _processDraftResults(req, res, next) {

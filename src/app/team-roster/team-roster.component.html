@@ -23,7 +23,6 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
           Pickup
 
         </span>
-        <button mat-icon-button color="warn" *ngIf="editable && dropPlayerAllowed(rosterRec)" (click)="_dropPlyr(rosterRec.player._id)"><mat-icon>person_remove</mat-icon></button>
       </td>
     </ng-container>
     <ng-container matColumnDef="player.drop">
@@ -58,6 +57,8 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
         <th mat-header-cell *matHeaderCellDef>Move</th>
         <td mat-cell *matCellDef="let rosterRec">
           <span *ngIf="editable" class=" example-handle " ><mat-icon cdkDragHandle (touchstart)="dragDisabled = false" (touchend)="dragDisabled = true" (mousedown)="dragDisabled= false" (mouseup)="dragDisabled=true"> drag_handle</mat-icon></span>
+          <button mat-icon-button color="warn" *ngIf="editable && dropPlayerAllowed(rosterRec)" (click)="_dropPlyr(rosterRec.player._id)"><mat-icon>person_remove</mat-icon></button>
+
         </td>
       </ng-container>
       <ng-container matColumnDef="abl_runs" >
@@ -146,4 +147,15 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr cdkDrag mat-row *matRowDef="let row; columns: displayedColumns;" [cdkDragDisabled]="dragDisabled" (cdkDragReleased)="dragDisabled = true" [ngClass]="{ 'dirty-box': plyrChanged(row), 'nonstarter': !isStarter(row)  }"></tr>
   </table>
+
+  <span style="display: flex; flex-direction: column;">
+    <span><strong>Action Guide</strong></span>
+    <span  style="display: flex; flex-direction: row; align-items: center;">
+      <mat-icon > drag_handle</mat-icon>
+      <span>Drag to move player within lineup</span>
+    </span>
+    <span  style="display: flex; flex-direction: row; align-items: center;">
+      <button mat-icon-button color="warn"><mat-icon>person_remove</mat-icon></button><span>Drop player</span>
+    </span>
+  </span>
 </div>

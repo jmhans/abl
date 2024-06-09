@@ -52,34 +52,30 @@ export class DraftComponent implements OnInit {
   resultLength: number;
 
   constructor(private title: Title,
-    public utils: UtilsService,
-    public api: ApiService,
-    public rosterService: RosterService,
-    private auth: AuthService,
-    public userContext: UserContextService,
-    public dialog: MatDialog,
-    public players: PlayersService,
-    public cdRef:ChangeDetectorRef,
-    public draftSseService:DraftSseService,
-    public SseService:SseService,
-    private ngZone: NgZone
-    ) { }
+              public utils: UtilsService,
+              public api: ApiService,
+              public rosterService: RosterService,
+              private auth: AuthService,
+              public userContext: UserContextService,
+              public dialog: MatDialog,
+              public players: PlayersService,
+              public cdRef:ChangeDetectorRef,
+              public draftSseService:DraftSseService,
+              public SseService:SseService,
+              private ngZone: NgZone
+              ) { }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    //    this.formData = this.api.getAblTeams$();
 
     this._getOwner();
     this.api.getAPIData$('standings')
     this.SseService.getSSE$('draft').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-    console.log(data);
+      console.log(data);
     })
     this.SseService.getSSE$('ping').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-    console.log(data);
+      console.log(data);
     })
-
-    // this.draftSseService.getDraftResults$();
-    // this.draftSseService.establishConnect(); // Now doing this step in the service after the draft results are returned.
 
   }
 

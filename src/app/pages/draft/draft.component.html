@@ -4,25 +4,6 @@
 
 <div *ngIf=" draftData.rosters as rosters" class="flex-container">
 
-
-<!--  <div class="selected-team">
-  <div>
-    {{draftData.currentPick | json}}
-  </div>
-  <mat-form-field appearance="fill" style="width:100%">
-    <mat-label>Teams</mat-label>
-    <mat-select [(ngModel)]="selectedTeam">
-      <mat-option *ngFor="let tm of rosters" [value]="tm">
-        {{tm.nickname}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <div *ngFor="let plyr of selectedTeam?.roster?.roster">
-    <strong>{{plyr.lineupPosition}} </strong>| {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
-  </div>
-
-</div> -->
 <div class="right-draft-board">
 
   <div class="flex-container">
@@ -48,9 +29,6 @@
     </app-player-list>
   </div>
 </div>
-
-<!-- ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].nickname -->
-
 
 </div>
 

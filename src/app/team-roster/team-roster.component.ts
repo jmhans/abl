@@ -135,12 +135,12 @@ saveable() {
 
 
 dropPlayerAllowed(plyrRec) {
-  let now = new Date()
   let draftedRosterLength = this.rosterLength
+  let now = new Date()
 
+  let suppDraftPrep = now >= new Date('2024-06-07T00:00:00Z') && now <=new Date('2024-06-10T00:00:00Z')
+  return plyrRec.player.ablstatus.acqType == 'pickup' ||  (suppDraftPrep && draftedRosterLength>22)
 
-  let suppDraftPrep = now >= new Date('2023-06-11T18:00:01Z') && now <=new Date('2023-06-12T00:58:00')
-  return plyrRec.player.ablstatus.acqType == 'pickup' || (suppDraftPrep &&draftedRosterLength>22)
 }
 
   dropLineupRecord(event: CdkDragDrop<any>) {
