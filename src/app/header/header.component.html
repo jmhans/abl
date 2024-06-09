@@ -80,27 +80,34 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">ABL Admin</a>
       </li>
-      <li>
+      <!-- <li>
         <a
           *ngIf="auth.loggedIn"
           routerLink="/create/game"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Add Games</a>
-      </li>
-      <li>
+      </li> -->
+      <!-- <li>
         <a
           *ngIf="auth.loggedIn"
           routerLink="/draft"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Draft</a>
-      </li>
+      </li> -->
       <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/suppdraft"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">Supp Draft</a>
+      </li>
+      <!-- <li>
         <a
           *ngIf="auth.loggedIn"
           routerLink="/history"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">History</a>
-      </li>
+      </li> -->
 
     </ul>
   </nav>
