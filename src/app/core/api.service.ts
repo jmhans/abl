@@ -405,6 +405,15 @@ export class ApiService {
         catchError((error) => this._handleError(error))
       )
   }
+  getStandings$(asOfDate:string = (new Date).toISOString().substring(0, 10)): Observable<DraftPickModel[]> {
+    return this.http
+      .get<any[]>(`${this.v2_api}standings?asOfDate=${asOfDate}`, {
+        headers: new HttpHeaders().set('Authorization', this._authHeader)
+      })
+      .pipe(
+        catchError((error) => this._handleError(error))
+      )
+  }
 
 
   addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {

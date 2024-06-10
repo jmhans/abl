@@ -45,5 +45,9 @@ const standingSchema = new Schema({
 })
 
 
+
+
+
+
 module.exports = mongoose.model('standings_view', standingSchema, 'standings_view');
 

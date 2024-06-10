@@ -38,7 +38,7 @@
           <span *ngIf="pick?.pick?.player">  {{pick.pick.player.name }} ({{pick.pick.player.team}} - {{pick.pick.player.eligible.toString()}}) </span>
         </span>
         <ng-template #makePick>
-          <span *ngIf="pick.allowed"> <button (click)="_addSkip(pick.team)">Skip {{pick.team.nickname}} Pick</button> </span>
+          <span *ngIf="pick.allowed && (pick.team.nickname == ownerPrimaryTeam.nickname || auth.isAdmin)"> <button (click)="_addSkip(pick.team)">Skip {{pick.team.nickname}} Pick</button> </span>
         </ng-template>
 
 

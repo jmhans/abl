@@ -166,7 +166,7 @@ export class DraftSseService {
     let totalPicks = 27
 
 
-    this.api.getAPIData$('standings').pipe(
+    this.api.getStandings$('2024-06-08').pipe(
       takeUntil(this.unsubscribe$),
       map((data:any[]) => {
         return data.sort((a,b)=> {
