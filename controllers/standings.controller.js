@@ -13,13 +13,16 @@ class StandingsController extends BaseController {
   async _get(req, res, next) {
 
     try {
+      let modPipeline
       if (req.query.asOfDate) {
           // asOfDate should be in format YYYY-MM-DD
-       StandingsPipeline.unshift({"$match": {"gameDate": {"$lte": new Date(req.query.asOfDate + "T17:00:00Z")}}})
+        modPipeline =[{"$match": {"gameDate": {"$lte": new Date(req.query.asOfDate + "T17:00:00Z")}}}, ...StandingsPipeline]
+      } else {
+        modPipeline = [...StandingsPipeline]
       }
 
 
-      let standings = await Game.aggregate(StandingsPipeline).exec()
+      let standings = await Game.aggregate(modPipeline).exec()
       let scoreDateSorter = (a, b) => { return new Date(b.gameDate) - new Date(a.gameDate); };
 
       for (let tm = 0; tm < standings.length; tm++) {
