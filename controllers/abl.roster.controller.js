@@ -516,9 +516,9 @@ async _makeDraftPick(plyr, teamId, acqType) {
 }
 
 
-  async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate ) {
+  async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate, forceDraft = false ) {
     try {
-      if (acqType == 'draft' || acqType == 'supp_draft') {
+      if (acqType == 'draft' || acqType == 'supp_draft' && !forceDraft) {
         let draftedPlyr = await this._makeDraftPick(plyr, teamId, acqType)
         return {player: draftedPlyr, roster: []};
 
@@ -647,6 +647,8 @@ async _makeDraftPick(plyr, teamId, acqType) {
      return res.status(500).send({message: err.message})
    }
   }
+
+
 
   async _dropPlayerBackend(plyr, tmId) {
     try {
