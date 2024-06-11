@@ -40,6 +40,24 @@ class DraftController extends BaseController {
 
   }
 
+
+
+  async _processDraftPicks(req, res, next) {
+    try {
+      let allDraftPicks = await this.model.find({"season": "2024", "draftType": "supp_draft"}).exec()
+      console.log(allDraftPicks)
+      for (let p=0; p<allDraftPicks.length; p++) {
+       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2024-06-11T17:00:00Z"), true)
+       console.log(addDude.name)
+      }
+      return res.send({success: true, addCount: allDraftPicks.length});
+
+
+    } catch(err) {
+      return res.status(500).send({message: err.message})
+    }
+   }
+
   async _processDraftResults(req, res, next) {
 
     try {
@@ -91,7 +109,9 @@ class DraftController extends BaseController {
   }
   reroute() {
     router = this.route();
-    router.get('/processDraftResults', (...args)=>this._processDraftResults(...args));
+//    router.get('/processDraftResults', (...args)=>this._processDraftResults(...args));
+    router.get('/processAllDraftPicks', (...args)=>this._processDraftPicks(...args));
+
     return router;
   }
 
