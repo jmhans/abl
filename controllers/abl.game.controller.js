@@ -10,6 +10,8 @@ var myAblRoster = new AblRosterController()
 var StatlineController = require('./statline.controller');
 const Statline = require('../models/statline').Statline;
 
+const validPositions = ['1B', '2B', '3B', 'SS', 'OF', 'C', 'DH'] // Would exclude any DL or NA positions from lineups.
+
 const GameResultsView = require('../models/Game').GameResultsView;
 
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -19,7 +21,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
     switch (lineupSlot) {
       case "DH":
       case "XTRA":
-        return true;
+        return (validPositions.indexOf(playerPosition) != -1);
       default:
         return (playerPosition == lineupSlot)
     }
