@@ -19,6 +19,8 @@ class DraftController extends BaseController {
     super(Draftpicks, 'draftpicks');
   }
 
+
+
   async _getOne(req, res, next) {
     // Overriding the default, which would use an "id" as a passed parameter. For this model, the "season" acts as the ID.
     try {
@@ -30,6 +32,7 @@ class DraftController extends BaseController {
   }
 
   _get(req, res, next) {
+    console.log(`getting draft picks: ${req.query}`)
     this.model.find(req.query).populate('player').exec(function(err, results) {
       if (err) return next(err);
       res.json(results);
@@ -44,10 +47,10 @@ class DraftController extends BaseController {
 
   async _processDraftPicks(req, res, next) {
     try {
-      let allDraftPicks = await this.model.find({"season": "2024", "draftType": "supp_draft"}).exec()
+      let allDraftPicks = await this.model.find({"season": "2025", "draftType": "draft"}).exec()
       console.log(allDraftPicks)
       for (let p=0; p<allDraftPicks.length; p++) {
-       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2024-06-11T17:00:00Z"), true)
+       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2025-04-08T17:00:00Z"), true)
        console.log(addDude.name)
       }
       return res.send({success: true, addCount: allDraftPicks.length});

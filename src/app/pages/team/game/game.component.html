@@ -1,8 +1,35 @@
 <!-- src/app/pages/games/games.component.html -->
 <mat-paginator [length]="dataLength" [pageSize]="5" [pageSizeOptions]="[5, dataLength]" hidePageSize="false" aria-label="Games per page"></mat-paginator>
-<div  >
+<div *ngIf="(games$ | async) as games" >
 
-  <table mat-table [dataSource]="(games$ | async)" >
+<div *ngFor="let gm of games.data.slice(games.paginator.pageSize * games.paginator.pageIndex, games.paginator.pageSize * (games.paginator.pageIndex+1))">
+<span class="mobileGame" >
+  <span class="gameHeader">    {{gm?.awayTeam?.nickname}} @ {{gm?.homeTeam?.nickname}}</span>
+  <span class="gameDetail">
+    <span >
+      {{gm?.gameDate | date:'shortDate'}}
+    </span>
+    <span *ngFor="let game_result of gm.results; index as resIdx" >
+      <span  *ngIf="game_result">{{team._id == game_result?.winner?._id ? 'W' : 'L'}}</span>
+
+      <span [ngClass]="team._id == gm.awayTeam._id ? (team._id == game_result?.winner?._id ? 'green-text' : 'red-text') : ''" *ngIf="getGameScore(game_result, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span>
+      -
+      <span [ngClass]="team._id == gm.homeTeam._id ? (team._id == game_result?.winner?._id ? 'green-text' : 'red-text') : ''" *ngIf="getGameScore(game_result, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span>
+    </span>
+    <span *ngFor="let loc of _ownerLocs(gm)">
+      <button *ngIf="_needsAttest(gm, game_result) && _canAttest(gm, loc)" type="button" mdbBtn (click)="attest(gm, game_result._id, resIdx, loc)"  mdbWavesEffect>
+        <mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest
+      </button>
+    </span>
+  </span>
+
+</span>
+
+</div>
+
+
+
+  <table mat-table [dataSource]="games" >
 
     <ng-container matColumnDef="game" >
       <th mat-header-cell *matHeaderCellDef >Game</th>

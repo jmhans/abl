@@ -65,8 +65,12 @@ export class RosterService {
     combineLatestWith(this.allRostersObs$),
     map(([id, rstrs])=> {
       var team_roster = rstrs.find((roster)=> roster.ablTeam == id)
-      let lm = new LineupModel(team_roster._id, team_roster.ablTeam, team_roster.roster, team_roster.effectiveDate, team_roster.gameDate)
+      if (team_roster) {
+        let lm = new LineupModel(team_roster._id, team_roster.ablTeam, team_roster.roster, team_roster.effectiveDate, team_roster.gameDate)
         return lm // rstrs.find((roster)=> roster.ablTeam == id)
+      }
+      return new LineupModel('', '', [], new Date(), "2025-01-01", new Date())
+
     })
   )
 

@@ -153,7 +153,7 @@ class PlayersController extends BaseController {
                     {
                       'case': {
                         '$eq': [
-                          '$$this.season', 2024
+                          '$$this.season', 2025
                         ]
                       },
                       'then': {

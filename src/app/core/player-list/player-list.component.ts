@@ -34,9 +34,9 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() colNames:string[];
   // filteredPlayers: MlbPlayerModel[];
   @Input() ownerPrimaryTeam:AblTeamModel;
-@Input() defaultAddType:String='pickup';
-@Input() actionEligible:Boolean=false;
-@Input() ownerRoster:LineupModel;
+  @Input() defaultAddType:String='pickup';
+  @Input() actionEligible:Boolean=false;
+  @Input() ownerRoster:LineupModel;
 
   loading: boolean = true;
   error: boolean;
@@ -275,6 +275,7 @@ const dialogRef = this.dialog.open(PlayerAddDialog, {
 data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: this.defaultAddType}
 });
 
+
 dialogRef.afterClosed().subscribe(result => {
 if (result) {
 
@@ -299,6 +300,17 @@ err => this._handleSubmitError(err)
 
 
 
+}
+
+
+_refreshMLBStats(plyr) {
+    console.log(`Refresh requested for plyr: ${plyr.mlbID}`)
+    this.api.getMlbPlayerStats$(plyr.mlbID).subscribe(
+      res => {
+        if (res) {
+        console.log(`${JSON.stringify(res)}`)
+        }
+      })
 }
 
 _dropPlayerFromTeam(plyr) {

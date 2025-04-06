@@ -101,6 +101,13 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">Supp Draft</a>
       </li>
+        <li>
+        <a
+          *ngIf="auth.loggedIn"
+          routerLink="/draft"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">Draft</a>
+      </li>
       <!-- <li>
         <a
           *ngIf="auth.loggedIn"
