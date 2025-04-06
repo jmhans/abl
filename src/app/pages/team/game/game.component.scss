@@ -43,3 +43,25 @@ justify-content: space-around;
 
 }
 
+.mobileGame {
+display: flex;
+flex-direction:column;
+justify-content:space-around;
+align-items: center;
+}
+
+
+.mobileGame .gameHeader {
+  display: flex;
+  flex-direction:row;
+  justify-content:space-around;
+  align-items: center;
+  }
+
+  .mobileGame .gameDetail {
+    display: flex;
+    flex-direction:row;
+    justify-content:space-evenly;
+    align-items: center;
+    width: 100%
+    }

@@ -129,7 +129,7 @@ module.exports = function(app, config) {
                   ]
                 }, {
                   '$eq': [
-                    '$season', 2024
+                    '$season', 2025
                   ]
                 }
               ]

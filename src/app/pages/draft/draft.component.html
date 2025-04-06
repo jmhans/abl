@@ -1,7 +1,7 @@
 <p>{{pageTitle}}</p>
 
 <div *ngIf="draftSseService.draftOrder$ | async as draftData" class="flex-container">
-
+<div><b>{{draftData.currentPick.vis_team }}</b> are on the clock!</div>
 <div *ngIf=" draftData.rosters as rosters" class="flex-container">
 
 <div class="right-draft-board">
@@ -24,7 +24,7 @@
     [colNames]="colNames"
     [ownerPrimaryTeam]="ownerPrimaryTeam"
     defaultAddType="draft"
-    [actionEligible]="ownerPrimaryTeam.nickname == rosters[draftData.currentPick.column].nickname"
+    [actionEligible]="ownerPrimaryTeam?.nickname == draftData.currentPick.vis_team"
     >
     </app-player-list>
   </div>

@@ -83,11 +83,13 @@ var playerPositionsViewSchema = new mongoose.Schema({
 playerSchema.pre('save', function preSave(next){
   var plyr = this;
   plyr.lastUpdate = Date.now();
+  console.log(`Plyr being updated now: ${plyr.name}`)
   next();
 });
 
 playerSchema.post('save', function(doc, next) {
  // PlayerStream.emit('push', 'message', {msg: 'Player updated', player: doc});
+ 
   SSE.emit('push', 'player', {msg: 'Player updated', player: doc})
   next()
 })

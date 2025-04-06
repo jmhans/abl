@@ -138,7 +138,7 @@ dropPlayerAllowed(plyrRec) {
   let draftedRosterLength = this.rosterLength
   let now = new Date()
 
-  let suppDraftPrep = now >= new Date('2024-06-07T00:00:00Z') && now <=new Date('2024-06-10T00:00:00Z')
+  let suppDraftPrep = now >= new Date('2025-06-07T00:00:00Z') && now <=new Date('2025-06-10T00:00:00Z')
   return plyrRec.player.ablstatus.acqType == 'pickup' ||  (suppDraftPrep && draftedRosterLength>22)
 
 }

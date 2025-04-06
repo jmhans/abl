@@ -202,7 +202,7 @@ class ABLRosterController extends BaseController{
                       branches: [
                         {
                           case: {
-                            $eq: ["$$this.season", 2024],
+                            $eq: ["$$this.season", 2025],
                           },
                           then: {
                             curr: "$$this.eligiblePositions",
@@ -500,11 +500,10 @@ class ABLRosterController extends BaseController{
 
 async _makeDraftPick(plyr, teamId, acqType) {
   try {
-    var newPick = {season: "2024", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date(), draftType: acqType}
+    var newPick = {season: "2025", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date(), draftType: acqType}
     var draftPick = await DraftPick.create(newPick);
     var popDP = await draftPick.populate('player');
     var enrichedPlayer = await MlbEnrichedPlayerModel.findById(plyr._id)
-    console.log(enrichedPlayer);
     console.log(`Drafted Player`)
     SSE.emit('push', 'draft', {msg: 'Draft works!', pick: popDP})
     SSE.emit('push', 'player', {msg: 'Player updated', player: {...enrichedPlayer._doc, "ablstatus": {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true}}})
@@ -518,11 +517,13 @@ async _makeDraftPick(plyr, teamId, acqType) {
 
   async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate, forceDraft = false ) {
     try {
-      if (acqType == 'draft' || acqType == 'supp_draft' && !forceDraft) {
+      if (false && (acqType == 'draft' || acqType == 'supp_draft' && !forceDraft)) {
+          console.log(`In draft player logic`)
         let draftedPlyr = await this._makeDraftPick(plyr, teamId, acqType)
         return {player: draftedPlyr, roster: []};
 
       } else {
+          console.log(`Updating Player within add: ${plyr.name}}`)
         var savedMlbPlayer = await this._updatePlayerRecBackend(plyr, teamId, acqType, effDate )
 //        var popMlbPlayer = await MlbPlayer.populate(savedMlbPlayer, {path: 'ablstatus.ablTeam'});
         var firstDate = effDate ? new Date(effDate) : new Date()

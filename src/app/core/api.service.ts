@@ -80,6 +80,14 @@ export class ApiService {
     );
   }
 
+getMlbPlayerStats$(mlbID:string): Observable<any> {
+    return this.http
+      .get<any>(`https://statsapi.mlb.com/api/v1/people?personIds=${mlbID}&hydrate=stats(group=[hitting,fielding],type=season,season=2025)`)
+      .pipe(
+        catchError((error) => this._handleError(error))
+    );
+  }
+
   getMlbPlayerNames$():Observable<MlbPlayerModel[]> {
     return this.http
       .get<MlbPlayerModel[]>(`${this.v2_api}playernames`)
@@ -398,7 +406,7 @@ export class ApiService {
   }
   getDraftPicks$(draftType:string= 'draft'): Observable<DraftPickModel[]> {
     return this.http
-      .get<DraftPickModel[]>(`${this.v2_api}draftpicks?draftType=${draftType}`, {
+      .get<DraftPickModel[]>(`${this.v2_api}draftpicks?draftType=${draftType}&season=2025`, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(

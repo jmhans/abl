@@ -26,16 +26,17 @@ export class DraftSseService {
   draftData$: BehaviorSubject<any> = new BehaviorSubject([]);
   playerData$: BehaviorSubject<any> = new BehaviorSubject([]);
   draftOrder=[
-    {"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"1"},
-    {"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"2"},
-    {"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"3"},
-    {"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"4"},
-    {"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"5"},
-    {"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"6"},
-    {"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"7"},
-    {"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"8"},
-    {"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"9"},
-    {"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"10"}
+    {"_id":"5ca28dbed79ef30033562385","nickname":"Machines","pickOrder":"1"},
+    {"_id":"5cb0a459b3a023003331261f","nickname":"Psychos","pickOrder":"2"},
+    {"_id":"5cb0a403b3a0230033312618","nickname":"Vipers","pickOrder":"3"},
+    {"_id":"5cb0a3a4b3a0230033312614","nickname":"Campers","pickOrder":"4"},
+    {"_id":"5cb0a443b3a023003331261d","nickname":"Cracks","pickOrder":"5"},
+    {"_id":"5cb0a41fb3a023003331261a","nickname":"Winers","pickOrder":"6"},
+    {"_id":"6057711a0049fc1c60942e9d","nickname":"Iguanas","pickOrder":"7"},
+    {"_id":"5cb0a473b3a0230033312621","nickname":"Sferics","pickOrder":"8"},
+    {"_id":"5cb0a490b3a0230033312623","nickname":"Rats","pickOrder":"9"},
+    {"_id":"6237c905f0008a002ecab341","nickname":"Heifers","pickOrder":"10"},
+
   ]
 
   draftOrder$: BehaviorSubject<any> = new BehaviorSubject([]);
@@ -57,7 +58,7 @@ export class DraftSseService {
 
     ) {
       //this.notify();
-      if (true) {
+      if (false) {
         this.suppDraftDraftOrder()
       } else {
         this.regularDraftOrder()
@@ -78,16 +79,13 @@ export class DraftSseService {
       let multiPickDraftRounds = 2 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
       let picksPerMultiRound = 3
       let totalPicks = onePickDraftRounds + multiPickDraftRounds * picksPerMultiRound
-
-
-
       of(this.draftOrder).pipe(
         takeUntil(this.unsubscribe$),
-      combineLatestWith(this.rosterService.activeRosters$),
-      map(([standings, rosters])=> { return standings.map(s=> {
-        let rstr =rosters.find((r)=> r.ablTeam == s._id) //|| []
-        return {...s, roster: rstr }
-      })}),
+        combineLatestWith(this.rosterService.activeRosters$),
+        map(([standings, rosters])=> { return standings.map(s=> {
+            let rstr =rosters.find((r)=> r.ablTeam == s._id) //|| []
+            return {...s, roster: rstr }
+        })}),
       map((data) => {
         return data.map((team)=> {
           let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft') || [];
@@ -126,7 +124,7 @@ export class DraftSseService {
         let tm = 0
         do {
           pick = draftRounds[pickRd].data[tm].pick
-          currentPick = {row: pickRd, column: tm }// data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
+          currentPick = {row: pickRd, column: tm, vis_team: draftRounds[pickRd].data[tm].team }// data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
           if (pickRd < onePickDraftRounds) {
 
             tm = (tm+1) % data.length
@@ -152,6 +150,7 @@ export class DraftSseService {
       })
 
       ).subscribe(data => {
+          console.log(data)
         this.draftOrder$.next(data)
       })
 
@@ -166,7 +165,7 @@ export class DraftSseService {
     let totalPicks = 27
 
 
-    this.api.getStandings$('2024-06-08').pipe(
+    this.api.getStandings$('2025-06-08').pipe(
       takeUntil(this.unsubscribe$),
       map((data:any[]) => {
         return data.sort((a,b)=> {
