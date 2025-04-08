@@ -456,6 +456,18 @@ getMlbPlayerStats$(mlbID:string): Observable<any> {
 
     );
   }
+
+  postDraftPick$(draftPick): Observable<DraftPickModel> {
+    return this.http
+    .post<DraftPickModel>(`${this.v2_api}draftpicks`, draftPick, {
+      headers: new HttpHeaders().set('Authorization', this._authHeader)
+    })
+    .pipe(
+      catchError((error) => this._handleError(error))
+
+    );
+  }
+
   putLineup$(ablTeamId: string, lineup: SubmitLineup): Observable<LineupModel> {
     return this.http
     .put<LineupModel>(`${this.v2_api}lineups/${ablTeamId}/date/${lineup.effectiveDate.toISOString()}`, lineup, {

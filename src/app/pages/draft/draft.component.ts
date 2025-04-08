@@ -12,7 +12,7 @@ import { RosterService } from './../../core/services/roster.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
-import { switchMap, takeUntil, filter, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
+import { switchMap, takeUntil, filter, mergeMap, skip, mapTo, take,tap,  map , startWith, concatAll, scan } from 'rxjs/operators';
 import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 import { SseService } from 'src/app/core/services/sse.service';
 
@@ -34,6 +34,7 @@ export class DraftComponent implements OnInit {
   ownerTeams: AblTeamModel[];
   ownerPrimaryTeam: AblTeamModel;
   ownerSub: Subscription;
+  rosterUpdateSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
   draftTeam: AblTeamModel;
   dispStatuses: string[];
@@ -101,8 +102,23 @@ export class DraftComponent implements OnInit {
     _addSkip(tm) {
     this.api.postAPIData$('skips', [{ablTeam: tm._id}]).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
     console.log("Pick Skipped")
+    this.rosterService.refreshSkips()
+
     })
   }
+
+
+
+
+
+
+  _removeSkip(tm) {
+     this.api.deleteSkip$(tm).pipe(takeUntil(this.unsubscribe$)).subscribe((data)=> {
+       console.log("Pick Skipped")
+       this.rosterService.refreshSkips()
+     })
+  }
+
 
   onRowClicked(row) {
     console.log(row);
@@ -114,6 +130,8 @@ export class DraftComponent implements OnInit {
     this.unsubscribe$.complete();
   }
 
+
+
   playersDrafted(roster:any[]){
     if (!roster) return null;
 
@@ -124,6 +142,18 @@ export class DraftComponent implements OnInit {
     return accum;
     }, 0)
   }
+
+
+_addFakePlayerToTeam(defaultTeam: string = this.ownerPrimaryTeam.nickname) {
+
+    console.log(`defaultTeam:${defaultTeam}`);
+
+this.rosterUpdateSub = this.api.postDraftPick$({effective_date: new Date(), acqType:'draft', team: this.ownerPrimaryTeam._id})
+.subscribe(
+  data => console.log(data),
+  err => console.log(err)
+);
+}
 
 
 }
