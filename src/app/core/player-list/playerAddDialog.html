@@ -1,10 +1,12 @@
 <h1 mat-dialog-title>Pick up {{data.player}}</h1>
+
 <div mat-dialog-content>
   <p>Fill in pickup details</p>
-  <mat-form-field>
+  <mat-form-field *ngIf="teamList$ | async as teams">
   <mat-label>Team</mat-label>
+
     <mat-select placeholder="Team" [(ngModel)]="data.team" name="team">
-      <mat-option *ngFor="let tm of (teamList$ | async)" [value]="tm">
+      <mat-option *ngFor="let tm of teams" [value]="tm">
         {{tm.nickname}}
       </mat-option>
     </mat-select>

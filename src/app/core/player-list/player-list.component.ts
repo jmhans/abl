@@ -11,7 +11,7 @@ import { MatPaginator as MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table';
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
-import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , startWith, concatAll, scan } from 'rxjs/operators';
+import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , tap, startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog as MatDialog ,MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {UntypedFormControl} from '@angular/forms';
 
@@ -20,6 +20,7 @@ export interface DialogData {
   player: string;
   effective_date: Date;
   acqType: string;
+  team_string: string;
 }
 
 
@@ -37,6 +38,7 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() defaultAddType:String='pickup';
   @Input() actionEligible:Boolean=false;
   @Input() ownerRoster:LineupModel;
+  @Input() currentActor:string;
 
   loading: boolean = true;
   error: boolean;
@@ -268,11 +270,13 @@ return (roles.indexOf("admin") > -1)
 }
 
 
-_addPlayerToTeam(plyr) {
+_addPlayerToTeam(plyr, defaultTeam: string = this.ownerPrimaryTeam.nickname) {
 
 if (this.advancedMode) {
-const dialogRef = this.dialog.open(PlayerAddDialog, {
-data: {player: plyr.name, team: this.ownerPrimaryTeam, effective_date: new Date(), acqType: this.defaultAddType}
+    console.log(`defaultTeam:${defaultTeam}`);
+
+const dialogRef = this.dialog.open(PlayerAddDialog, { 
+    data: {player: plyr.name, team_string: defaultTeam, effective_date: new Date(), acqType: this.defaultAddType}
 });
 
 
@@ -377,7 +381,11 @@ this.unsubscribe$.complete();
 })
 export class PlayerAddDialog {
 date = new UntypedFormControl(new Date());
-teamList$ = this.api.getAblTeams$()
+team_string: string;
+teamList$ = this.api.getAblTeams$().pipe(tap((data)=> {
+    this.data.team = data.find((tm)=> {return tm.nickname == this.data.team_string})
+}))
+team: AblTeamModel;
 acqType: string;
 action: string;
 
