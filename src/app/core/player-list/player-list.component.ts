@@ -275,7 +275,7 @@ _addPlayerToTeam(plyr, defaultTeam: string = this.ownerPrimaryTeam.nickname) {
 if (this.advancedMode) {
     console.log(`defaultTeam:${defaultTeam}`);
 
-const dialogRef = this.dialog.open(PlayerAddDialog, { 
+const dialogRef = this.dialog.open(PlayerAddDialog, {
     data: {player: plyr.name, team_string: defaultTeam, effective_date: new Date(), acqType: this.defaultAddType}
 });
 
@@ -354,6 +354,7 @@ plyrStats.doubles * 10 +
     plyrStats.hitByPitch * 10 +
     plyrStats.stolenBases * 7 +
     plyrStats.caughtStealing * (-7)  +
+    plyrStats.pickoffs* (-7)+
     (plyrStats.sacBunts || 0 + plyrStats.sacFlies || 0) * 5) / plyrStats.atBats - 4.5
 } else {
 return 0;

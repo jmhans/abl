@@ -18,7 +18,9 @@
               <th scope="col" > SF </th>
               <th scope="col" > SB </th>
               <th scope="col" > CS </th>
+              <th scope="col" > PO </th>
               <th scope="col" > ERR </th>
+              <th scope="col" > PB </th>
               <th scope="col" > ABLPts </th>
               <th scope="col" >  Runs </th>
 
@@ -113,9 +115,20 @@
                   {{player.dailyStats ?  player.dailyStats.cs : 0 }} 
                 </span>
               </td>
+              
+              <td >
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'po', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.po : 0 }} 
+                </span>
+              </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'e', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.e : 0 }} 
+                </span>
+              </td>
+              <td >
+                <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'pb', $event, true)" (mousedown)="$event.stopPropagation()">
+                  {{player.dailyStats ?  player.dailyStats.pb : 0 }} 
                 </span>
               </td>
               <td >{{player.dailyStats ?  player.dailyStats.abl_score?.abl_points : 0 }} </td>
@@ -139,7 +152,9 @@
               <td ><em>{{teamScore ?  teamScore.regulation?.sf : 0 }}</em> </td>
               <td ><em>{{teamScore ?  teamScore.regulation?.sb : 0 }} </em></td>
               <td ><em>{{teamScore ?  teamScore.regulation?.cs : 0 }}</em> </td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.po : 0 }}</em> </td>
               <td ><em>{{teamScore ?  teamScore.regulation?.e : 0 }}</em> </td>
+              <td ><em>{{teamScore ?  teamScore.regulation?.pb : 0 }}</em> </td>
               <td >{{teamScore ?  teamScore.regulation?.abl_points : 0 }} </td>
               <td ><em>{{(teamScore ? teamScore.regulation?.abl_runs : 0) | number:'1.2-2' }}</em> </td>
             </tr>
@@ -157,7 +172,9 @@
               <th >{{teamScore ?  teamScore.final?.sf : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.sb : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.cs : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.po : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.e : 0 }} </th>
+              <th >{{teamScore ?  teamScore.final?.pb : 0 }} </th>
               <th >{{teamScore ?  teamScore.final?.abl_points : 0 }} </th>
               <th >{{(teamScore ? teamScore.final?.abl_runs : 0) | number:'1.2-2' }} </th>
             </tr>
@@ -197,7 +214,9 @@
               <td >{{ player.dailyStats?.sf  }} </td>
               <td >{{ player.dailyStats?.sb  }} </td>
               <td >{{ player.dailyStats?.cs  }} </td>
+              <td >{{ player.dailyStats?.po  }} </td>
               <td >{{ player.dailyStats?.e  }} </td>
+              <td >{{ player.dailyStats?.pb  }} </td>
               <td >{{ player.dailyStats?.abl_score?.abl_points }} </td>
               <td >{{ player.dailyStats?.abl_score?.abl_runs  | number:'1.2-2' }} </td>
 

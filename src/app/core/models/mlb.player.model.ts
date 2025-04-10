@@ -10,7 +10,7 @@ class MlbPlayerModel {
     public status: string,
     public stats: {batting: {
       hits: number, doubles: number, triples: number, homeRuns: number, baseOnBalls: number, hitByPitch: number,
-      atBats: number, stolenBases: number, caughtStealing: number, sacBunts: number, sacFlies: number, intentionalWalks: number, plateAppearances: number
+      atBats: number, stolenBases: number, caughtStealing: number, sacBunts: number, sacFlies: number, intentionalWalks: number, plateAppearances: number, pickoffs:number
     }, fielding: Object, pitching: Object},
     public games: Object[],
     public positionLog: Object,
@@ -41,7 +41,8 @@ class MlbPlayerModel {
               plyrStats.baseOnBalls * 10 +
               plyrStats.hitByPitch * 10 +
               plyrStats.stolenBases * 7 +
-              plyrStats.caughtStealing * (-7)  +
+              plyrStats.caughtStealing * (-7) +
+              plyrStats.pickoffs * (-7) +
               (plyrStats.sacBunts || 0 + plyrStats.sacFlies || 0) * 5) / plyrStats.atBats - 4.5
     } else {
       return -Infinity

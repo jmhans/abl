@@ -385,6 +385,7 @@ ngAfterViewInit() {
             plyrStats.intentionalWalks * 10 +
             plyrStats.stolenBases * 7 +
             plyrStats.caughtStealing * (-7)  +
+            plyrStats.pickoffs & (-7) +
             (plyrStats.sacBunts || 0  + plyrStats.sacFlies || 0) * 5) / plyrStats.atBats - 4.5
   }
 

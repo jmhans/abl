@@ -17,7 +17,7 @@ return Object.keys(obj)
 
 
 function shortenStats(statline) {
-  let outputObj = {batting: minifyJSON(statline.batting), fielding: {e: statline.fielding.errors}}
+  let outputObj = {batting: minifyJSON(statline.batting), fielding: {e: statline.fielding.errors, pb: statline.fielding.passedBall}}
 
 return outputObj
 
