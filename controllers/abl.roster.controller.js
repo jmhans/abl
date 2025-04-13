@@ -211,7 +211,7 @@ class ABLRosterController extends BaseController{
                         },
                         {
                           case: {
-                            $eq: ["$$this.season", 2023],
+                            $eq: ["$$this.season", 2024],
                           },
                           then: {
                             curr: "$$value.curr",

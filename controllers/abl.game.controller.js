@@ -61,67 +61,40 @@ class lineupArray extends Array {
     })
   }
 
-  ablscore(homeTeam = false) {
-    return this.active().reduce((total, curPlyr) => {
-      total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
-          // Player played in DH or XTRA spot, so errors are not counted toward team total.
-          total.e += (curPlyr.dailyStats.e || 0);
-        }
-
-
-        total.ab += (curPlyr.dailyStats.ab || 0);
-        total.abl_runs = total.abl_points / total.ab - 0.5 * total.e - 4.5 + 0.5 * homeTeam;
-
-      return total;
-
-    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0})
-  }
-
   order() {
     this.sort((a,b)=> {return (a.lineupOrder || Infinity) - (b.lineupOrder || Infinity)})
   }
 
-  regulationScore(homeTeam = false, oppErrors = 0) {
-    return this.regulation().reduce((total, curPlyr) => {
-      total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
-          // Player played in DH or XTRA spot, so errors are not counted toward team total.
-          total.e += (curPlyr.dailyStats.e || 0);
-        }
+  scoreReducer(roster, homeTeam, oppErrors, oppPassedBalls){
+    return roster.reduce(
+      (total, curPlyr) => {
+        total.abl_points += (curPlyr.dailyStats.abl_points || 0);
+          if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
+            // Player played in DH or XTRA spot, so errors are not counted toward team total.
+            total.e += (curPlyr.dailyStats.e || 0);
+            total.pb += (curPlyr.dailyStats.pb || 0);
 
-        ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs"].forEach((prop) => {
-          total[prop] += curPlyr.dailyStats[prop] || 0
-        })
+          }
 
-        // total.ab += (curPlyr.dailyStats.ab || 0);
+          ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs", "po"].forEach((prop) => {
+            total[prop] += curPlyr.dailyStats[prop] || 0
+          })
 
-        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
+          // total.ab += (curPlyr.dailyStats.ab || 0);
 
-      return total;
+          total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors + 0.2 * oppPassedBalls  - 4.5 + 0.5 * homeTeam;
 
-    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0, opp_e: oppErrors})
+        return total;
+
+      }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0, po:0, pb: 0, opp_e: oppErrors || 0, opp_pb: oppPassedBalls || 0}
+
+    )
   }
-
-  finalScore(homeTeam = false, oppErrors = 0) {
-    return this.active().reduce((total, curPlyr) => {
-      total.abl_points += (curPlyr.dailyStats.abl_points || 0);
-        if (!["DH", "XTRA"].includes(curPlyr.playedPosition)  ) {
-          // Player played in DH or XTRA spot, so errors are not counted toward team total.
-          total.e += (curPlyr.dailyStats.e || 0);
-        }
-
-        ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs"].forEach((prop) => {
-          total[prop] += curPlyr.dailyStats[prop] || 0
-        })
-
-        // total.ab += (curPlyr.dailyStats.ab || 0);
-
-        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + 0.5 * homeTeam;
-
-      return total;
-
-    }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0, opp_e: oppErrors})
+  regulationScore(homeTeam = false, oppErrors = 0, oppPassedBalls=0) {
+    return this.scoreReducer(this.regulation(), homeTeam, oppErrors, oppPassedBalls)
+  }
+  finalScore(homeTeam = false, oppErrors = 0, oppPassedBalls=0) {
+    return this.scoreReducer(this.active(), homeTeam, oppErrors, oppPassedBalls)
   }
   nextRosterPos() {
     return this.active().reduce((tot, cur)=> {return Math.max(cur.rosterPos, tot)}, 0)+1
@@ -167,10 +140,10 @@ class lineupArray extends Array {
             // Still not enough Plate Appearances. Add in Supplemental.
 
             if (posGs > 0) {
-              this.push({"player": {name: "supp"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'},  ablRosterPosition: rosterPos, ablPlayedType: playedType, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0}})
+              this.push({"player": {name: "supp"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'},  ablRosterPosition: rosterPos, ablPlayedType: playedType, lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 2 - posPAs, h: 0, e: 0, pb: 0}})
               posPAs = 2
             } else {
-              this.push({"player": {name: "four"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'},   ablRosterPosition: rosterPos, ablPlayedType: playedType,   lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0}})
+              this.push({"player": {name: "four"}, gameStatus: {lineupOrder : this.active().length + 1, playedPosition: pos, played: 'active'},   ablRosterPosition: rosterPos, ablPlayedType: playedType,   lineupOrder : this.active().length + 1, playedPosition: pos, ablstatus: 'active', dailyStats: {g: 1, ab: 4, h: 0, e: 0, pb: 0}})
               posPAs = 4
             }
 
@@ -238,6 +211,8 @@ class ABLGameController extends BaseController{
             'cs': statlineObj.stats.cs ,
             'sac': statlineObj.stats.sac,
             'sf': statlineObj.stats.sf ,
+            'po': statlineObj.stats.po,
+            'pb': statlineObj.stats.pb,
             'e': statlineObj.stats.e ,
             'position(s)': statlineObj.positions
 
@@ -262,7 +237,9 @@ class ABLGameController extends BaseController{
           'cs':  statlineObj.stats.batting.caughtStealing,
           'sac':  statlineObj.stats.batting.sacBunts,
           'sf':  statlineObj.stats.batting.sacFlies,
+          'po': statlineObj.stats.batting.pickoffs,
           'e':  statlineObj.stats.fielding.e,
+          'pb': statlineObj.stats.fielding.passedBall,
           'position(s)': statlineObj.positions
 
         }
@@ -290,6 +267,8 @@ class ABLGameController extends BaseController{
           'sac': 0,
           'sf': 0,
           'e': 0,
+          'po':0,
+          'pb': 0,
           'position(s)': []
         }
 
@@ -302,10 +281,10 @@ class ABLGameController extends BaseController{
           10 * (retObj.bb || 0) +
           //10 * (retObj.ibb || 0)+
           10 * (retObj.hbp || 0) +
-          7 * ((retObj.sb || 0) - (retObj.cs || 0)) +
+          7 * ((retObj.sb || 0) - (retObj.cs || 0) - (retObj.po || 0)) +
           5 * ((retObj.sac || 0) + (retObj.sf || 0));
 
-       var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
+       var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 0.2 * retObj.pb - 4.5;
       retObj.abl_points = ablPts;
       retObj.abl_score = ablruns;
       return retObj;
@@ -498,7 +477,8 @@ class ABLGameController extends BaseController{
       var result = {};
       var homeErrors = {reg: 0, final: 0}
       var awayErrors = {reg: 0, final: 0}
-
+      var homePBs = {reg: 0, final: 0}
+      var awayPBs = {reg: 0, final: 0}
       var tms = [gm.homeTeam._id, gm.awayTeam._id]
 
 
@@ -525,18 +505,22 @@ class ABLGameController extends BaseController{
             var lineups_with_starters = await this._getActiveStarters(lineups_with_stats);
               homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
               awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+              homePBs = {reg: lineups_with_starters[0].regulationScore(true).pb, final:lineups_with_starters[0].finalScore(true).pb} ;
+              awayPBs = {reg: lineups_with_starters[1].regulationScore(false).pb, final:lineups_with_starters[1].finalScore(false).pb};
 
-            homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) };
-            awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.reg) };
+            homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg, awayPBs.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final, awayPBs.final) };
+            awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg, homePBs.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.final, homePBs.final) };
             while (Math.abs(homeScore.final.abl_runs - awayScore.final.abl_runs) <= 0.5 && (lineups_with_starters[0].benchWithStats().length + lineups_with_starters[1].benchWithStats().length >0 )) {
 
               lineups_with_starters[0].startNextPlayer("XTRA", lineups_with_starters[0].nextRosterPos() , false );
               lineups_with_starters[1].startNextPlayer("XTRA",lineups_with_starters[1].nextRosterPos() , false);
               homeErrors = {reg: lineups_with_starters[0].regulationScore(true).e, final:lineups_with_starters[0].finalScore(true).e} ;
               awayErrors = {reg: lineups_with_starters[1].regulationScore(false).e, final:lineups_with_starters[1].finalScore(false).e};
+              homePBs = {reg: lineups_with_starters[0].regulationScore(true).pb, final:lineups_with_starters[0].finalScore(true).pb} ;
+              awayPBs = {reg: lineups_with_starters[1].regulationScore(false).pb, final:lineups_with_starters[1].finalScore(false).pb};
 
-              homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final) };
-              awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.final) };
+              homeScore = {regulation: lineups_with_starters[0].regulationScore(true, awayErrors.reg, awayPBs.reg), final: lineups_with_starters[0].finalScore(true, awayErrors.final, awayPBs.final) };
+              awayScore = {regulation: lineups_with_starters[1].regulationScore(false, homeErrors.reg, homePBs.reg), final: lineups_with_starters[1].finalScore(false, homeErrors.final, homePBs.final) };
             }
 
             result = {
@@ -674,7 +658,7 @@ async _getStatsForLineups(lineups, current_date) {
                    total.abl_score.abl_points += ( thisRec.abl_points || 0);
                    total.abl_score.e += (thisRec.e || 0);
                    total.abl_score.ab += (thisRec.ab || 0);
-                   total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e - 4.5;
+                   total.abl_score.abl_runs =  total.abl_score.abl_points / total.abl_score.ab - 0.5 * total.abl_score.e -0.2 * total.pb - 4.5;
                    break;
                  default:
                    total[propertyName] = (total[propertyName] || 0) + parseInt(thisRec[propertyName] || 0)

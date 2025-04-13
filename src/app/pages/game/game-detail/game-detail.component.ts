@@ -30,7 +30,6 @@ export class GameDetailComponent {
   @ViewChild('homeChild') homeChild: GameTeamDetailComponent;
 
   @Input() game: GameModel;
-  rosters: gameRosters;
   calc_rosters: gameRosters;
   potentialStatlines: object;
   statsSub: Subscription;

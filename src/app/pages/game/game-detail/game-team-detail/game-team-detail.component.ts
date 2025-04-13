@@ -24,6 +24,8 @@ interface abltotals {
   sf:number
   sb:number
   cs:number
+  po:number
+  pb:number
 }
 
 
@@ -64,9 +66,9 @@ export class GameTeamDetailComponent implements OnInit {
   dragSource: string;
   editField: string;
   regulation_score = ()=> { if (this.active) {
-    return this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e
+    return this.score(this.active.filter((plyr) => {return (plyr.playedPosition != 'XTRA')}),  this.oppScore.regulation.e , this.oppScore.regulation.pb
                       )}}
-  final_score = ()=>this.score(this.active,  this.oppScore.final.e )
+  final_score = ()=>this.score(this.active,  this.oppScore.final.e, this.oppScore.final.pb )
 
     ngOnChanges(changes: SimpleChanges) {
 
@@ -86,7 +88,7 @@ export class GameTeamDetailComponent implements OnInit {
 
 
 
-    displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'ablruns'];
+    displayedColumns: string[] = ['position', 'name', 'games',  'atbats', 'hits','doubles', 'triples', 'homeruns', 'bb', 'hbp', 'sac', 'sacflies', 'stolenBases', 'caughtStealing', 'errors', 'passedBalls', 'ablruns'];
 
   constructor() { }
 
@@ -192,16 +194,16 @@ export class GameTeamDetailComponent implements OnInit {
         10 * (retObj.bb || 0) +
         10 * (retObj.ibb || 0)+
         10 * (retObj.hbp || 0) +
-        7 * ((retObj.sb || 0) - (retObj.cs || 0)) +
+        7 * ((retObj.sb || 0) - (retObj.cs || 0) - (retObj.po)) +
         5 * ((retObj.sac || 0) + (retObj.sf || 0));
 
-     var ablruns = ablPts / retObj.ab - 0.5 * retObj.e - 4.5;
+     var ablruns = ablPts / retObj.ab - 0.5 * retObj.e -0.2 & retObj.pb - 4.5;
     retObj.abl_points = ablPts;
-    retObj.abl_score = {abl_runs: ablruns, abl_points: ablPts, e: retObj.e, ab: retObj.ab};
+    retObj.abl_score = {abl_runs: ablruns, abl_points: ablPts, e: retObj.e, po: retObj.po, ab: retObj.ab};
   }
 
 
-  score(playerList, oppErrors = 0) {
+  score(playerList, oppErrors = 0, oppPassedBalls=0) {
     if (playerList) {
     return playerList.reduce((total, curPlyr) => {
       total.abl_points += (curPlyr.dailyStats.abl_points || 0);
@@ -210,17 +212,17 @@ export class GameTeamDetailComponent implements OnInit {
           total.e += (curPlyr.dailyStats.e || 0);
         }
 
-        ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs"].forEach((prop) => {
+        ["g", "ab", "h", "2b", "3b", "hr", "bb", "hbp", "sac", "sf", "sb", "cs", "po"].forEach((prop) => {
           total[prop] += parseInt(curPlyr.dailyStats[prop]) || 0
         })
 
         // total.ab += (curPlyr.dailyStats.ab || 0);
 
-        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors  - 4.5 + (this.homeTeam ?  0.5 : 0 );
+        total.abl_runs = total.abl_points / total.ab + 0.5 * oppErrors +0.2 * oppPassedBalls - 4.5 + (this.homeTeam ?  0.5 : 0 );
 
       return total;
 
-      }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0 , opp_e: oppErrors})
+      }, {abl_runs: 0, abl_points: 0, e: 0, ab: 0, g:0, h:0, "2b": 0, "3b":0, hr:0, bb:0, hbp:0, sac:0, sf:0, sb:0, cs:0 , po:0, opp_e: oppErrors, opp_pb: oppPassedBalls})
   }
     }
 
