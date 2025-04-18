@@ -45,11 +45,26 @@ justify-content: space-around;
 
 .mobileGame {
 display: flex;
-flex-direction:column;
+flex-direction:row;
 justify-content:space-around;
 align-items: center;
+flex-wrap:wrap;
 }
 
+.calDate {
+flex: 1;
+flex-basis:13%;
+
+}
+
+.calDateContent {
+  display: flex;
+  flex-direction: column;
+  justify-content:space-around;
+  align-items: center;
+  flex-wrap:nowrap;
+
+  }
 
 .mobileGame .gameHeader {
   display: flex;

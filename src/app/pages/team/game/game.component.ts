@@ -4,15 +4,14 @@ import { ApiService } from './../../../core/api.service';
 import { UtilsService } from './../../../core/utils.service';
 import { FilterSortService } from './../../../core/filter-sort.service';
 import { Subscription, Observable } from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import { AblGameService } from './../../../core/services/abl-game.service';
-import { GameModel } from './../../../core/models/game.model';
+import { GameModel, CalendaredGameModel, GameClass } from './../../../core/models/game.model';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { AuthService } from './../../../auth/auth.service';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-
 
 
 @Component({
@@ -31,10 +30,12 @@ export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
   error: boolean;
   query: string = '';
   submitSub: Subscription;
+  sourceGames$:Observable<GameClass[]>;
   games$:Observable<MatTableDataSource<GameModel>>;
+  calendaredGames$:Observable<CalendaredGameModel[]>;
   currentWeek: number = 0
   dataLength: number;
-
+  displayDates:Date[] = [...Array(14).keys()].map(i=> new Date(new Date().setDate(new Date().getDate() + (i+1-4))) )
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -49,13 +50,18 @@ export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
+
    // this._getGamesList();
 
   }
 
   ngAfterViewInit() {
     // Establish MatTableDataSource with games content.
-    this.games$ =this.api.getAblGames$().pipe(
+    this.sourceGames$ = this.api.getAblGames$()
+
+
+
+    this.games$ =this.sourceGames$.pipe(
       map(d=> {
         let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
 
@@ -74,6 +80,31 @@ export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
         ds.paginator = this.paginator;
 
         return ds;
+      })
+    )
+
+    this.calendaredGames$ = this.sourceGames$.pipe(
+      tap( d=> console.log("I've got some cal games!")),
+      map(d=> {
+        let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
+        let grouped = data.reduce((acc,cur)=>
+          {
+            let checkDate = new Date(cur.gameDate)
+
+            let existing = acc.find((itm)=> {
+            return itm.date >= checkDate && itm.date <= checkDate})
+
+            if (existing) {
+              existing.games.push(cur)
+            } else {
+
+              let calGame = new CalendaredGameModel(new Date(cur.gameDate), [cur])
+              acc.push(calGame)
+            }
+            return acc
+          }, []
+        )
+        return grouped
       })
     )
   }
