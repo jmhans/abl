@@ -3,10 +3,10 @@ import { Title } from '@angular/platform-browser';
 import { ApiService } from './../../../core/api.service';
 import { UtilsService } from './../../../core/utils.service';
 import { FilterSortService } from './../../../core/filter-sort.service';
-import { Subscription, Observable } from 'rxjs';
-import {map} from 'rxjs/operators';
+import { Subscription, Observable, of , Subject, BehaviorSubject} from 'rxjs';
+import {map, tap, combineLatestWith} from 'rxjs/operators';
 import { AblGameService } from './../../../core/services/abl-game.service';
-import { GameModel } from './../../../core/models/game.model';
+import { GameModel, CalendaredGameModel, GameClass } from './../../../core/models/game.model';
 import { AblTeamModel } from './../../../core/models/abl.team.model';
 import { AuthService } from './../../../auth/auth.service';
 import { MatTableDataSource as MatTableDataSource } from '@angular/material/table'
@@ -15,12 +15,13 @@ import { MatSort } from '@angular/material/sort';
 
 
 
+
 @Component({
   selector: 'app-team-games',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TeamGameComponent implements OnInit, OnDestroy {
   @Input() team: AblTeamModel;
 
   pageTitle = 'Games';
@@ -31,12 +32,16 @@ export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
   error: boolean;
   query: string = '';
   submitSub: Subscription;
-  games$:Observable<MatTableDataSource<GameModel>>;
-  currentWeek: number = 0
+  calendaredGames$:Observable<CalendaredGameModel[]>;
+  displayedGames$:Observable<CalendaredGameModel[]>;
+  paginator$:BehaviorSubject<any>;
+  dates:Date[];
   dataLength: number;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
+
 
   constructor(
     private title: Title,
@@ -49,35 +54,56 @@ export class TeamGameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
+    this.paginator$ = new BehaviorSubject({'pageIndex': 0, 'pageSize': 6})
+
    // this._getGamesList();
 
+
+   this.calendaredGames$ = this.api.getAblGames$().pipe(
+     tap( (d)=> console.log("I've got some cal games!")),
+     map((d)=> {
+       let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
+
+       let grouped = data.reduce((acc,cur)=>
+         {
+           let checkDate = new Date(cur.gameDate)
+
+           let existing = acc.find((itm)=> {
+           return itm.date >= checkDate && itm.date <= checkDate})
+
+           if (existing) {
+             existing.games.push(cur)
+           } else {
+
+             let calGame = new CalendaredGameModel(new Date(cur.gameDate), [cur])
+             acc.push(calGame)
+           }
+           return acc
+         }, []
+       )
+         this.dataLength = grouped.length
+       return grouped
+     })
+   )
+
+
+     this.displayedGames$ =this.calendaredGames$.pipe(
+       combineLatestWith(this.paginator$),
+       map(([g, p])=> {
+
+
+
+         return g.slice(p.pageSize * (p.pageIndex), p.pageSize * (p.pageIndex + 1))
+       })
+     )
+
+
   }
 
-  ngAfterViewInit() {
-    // Establish MatTableDataSource with games content.
-    this.games$ =this.api.getAblGames$().pipe(
-      map(d=> {
-        let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
 
-        data.sort((a,b)=> {
-          let ad =new Date(a.gameDate)
-          let bd = new Date(b.gameDate)
-
-          return (ad < bd) ? -1 : ((ad == bd) ? 0 : 1) })
-
-        let nextGameIdx = data.findIndex(gm=> {return new Date(gm.gameDate) > new Date()})
-
- //       this.currentWeek = Math.floor(  nextGameIdx /5)
-        this.paginator.pageIndex = Math.floor( nextGameIdx / 5)
-        this.dataLength = data.length
-        const ds = new MatTableDataSource(data);
-        ds.paginator = this.paginator;
-
-        return ds;
-      })
-    )
-  }
-
+   public handlePage(e: any) {
+      this.paginator$.next(e)
+   }
 
   attest(gm: GameModel, result_id: string, resultIdx: number, loc: string) {
     console.log(gm);

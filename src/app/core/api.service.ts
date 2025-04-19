@@ -8,7 +8,7 @@ import { catchError, map , tap} from 'rxjs/operators';
 import { EventModel } from './models/event.model';
 import { RsvpModel } from './models/rsvp.model';
 import { MlbGameModel } from './models/mlbgame.model';
-import { GameModel } from './models/game.model';
+import { GameClass, GameModel } from './models/game.model';
 import { AblTeamModel } from './models/abl.team.model';
 import { OwnerModel } from './models/owner.model';
 import { MlbPlayerModel } from './models/mlb.player.model';
@@ -113,13 +113,17 @@ getMlbPlayerStats$(mlbID:string): Observable<any> {
     );
   }
 
-  getAblGames$(): Observable<GameModel[]> {
+  getAblGames$(): Observable<GameClass[]> {
     return this.http
-      .get<GameModel[]>(`${this.v2_api}allgames`, {
+      .get<GameClass[]>(`${this.v2_api}allgames`, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
-        catchError((error) => this._handleError(error))
+        catchError((error) => this._handleError(error)),
+        map((data: GameModel[])=> {
+          return data.map((g)=> {
+            return new GameClass(g)})
+        })
     );
   }
 

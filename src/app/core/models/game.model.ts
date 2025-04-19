@@ -2,7 +2,52 @@ import { AblTeamModel } from './abl.team.model'
 import { Roster, PopulatedRoster } from './lineup.model'
 import { rosterGameScoreRecord, rosterScoreRecord , playerModel} from './roster.record.model'
 
+
+interface IGame {
+  gameDate: string;
+  awayTeam: AblTeamModel;
+  homeTeam: AblTeamModel;
+  description?: string;
+  _id?: string;
+  gameType?: string;
+  awayTeamRoster?: Roster[];
+  homeTeamRoster?: Roster[];
+  results?: GameResultsModel[];
+}
+
+class GameClass implements IGame {
+  public gameDate: string;
+  public awayTeam: AblTeamModel;
+  public homeTeam: AblTeamModel;
+  public description?: string;
+  public _id?: string;
+  public gameType?: string;
+  public awayTeamRoster?: Roster[];
+  public homeTeamRoster?: Roster[];
+  public results?: GameResultsModel[];
+    constructor(game: IGame) {
+      for (let key in game) {
+        this[key] = game[key]
+      }
+    }
+
+  public get summary() {
+    return {gameDate: new Date(this.gameDate)
+      , status: this.results?.[0]?.status
+      , score: {
+        home: this.results?.[0]?.scores.find((r)=>{return  r.location=='H'}).final.abl_runs
+        , away: this.results?.[0]?.scores.find((r)=>{return  r.location=='A'}).final.abl_runs
+      }
+      , winner:this.results?.[0]?.winner
+      , loser: this.results?.[0]?.loser
+      , awayTeam: this.awayTeam.nickname
+      , homeTeam: this.homeTeam.nickname
+    }
+  }
+}
+
 class GameModel {
+
     constructor(
     public gameDate: string,
     public awayTeam: AblTeamModel,
@@ -13,7 +58,10 @@ class GameModel {
     public awayTeamRoster?: Roster[],
     public homeTeamRoster?: Roster[],
     public results?: GameResultsModel[]
-  ) { }
+  ) {
+
+  }
+
 }
 
 class FormGameModel {
@@ -53,7 +101,9 @@ interface gameLineModel {
   sf: number
   sb: number
   cs: number
+  po: number
   e: number
+  pb: number
   abl_points: number
 }
 
@@ -93,5 +143,13 @@ class GameResultForm {
     }
 }
 
+class CalendaredGameModel {
+  constructor(
+    public date:Date,
+    public games:GameClass[]
+) { }
+}
 
-export { GameModel, FormGameModel, PopulatedGameModel, GameResultsModel , GameResultForm};
+
+
+export { GameModel, FormGameModel, PopulatedGameModel, GameResultsModel , GameResultForm, CalendaredGameModel, GameClass};
