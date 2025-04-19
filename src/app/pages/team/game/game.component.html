@@ -1,133 +1,42 @@
 <!-- src/app/pages/games/games.component.html -->
-<mat-paginator [length]="dataLength" [pageSize]="5" [pageSizeOptions]="[5, dataLength]" hidePageSize="false" aria-label="Games per page"></mat-paginator>
 
-<div *ngIf="(calendaredGames$ | async) as calGames">
+<div *ngIf="(displayedGames$ | async) as calGames">
+  <mat-paginator *ngIf="(paginator$ | async) as pag" [length]="dataLength" [pageSize]="pag.pageSize" [pageSizeOptions]="[1,3,6,12, dataLength]" hidePageSize="false" aria-label="Game Dates per page"  (page)="pageEvent = handlePage($event)"></mat-paginator>
   <div class="mobileGame">
     <mat-card *ngFor="let tile of calGames" class="calDate">
       <mat-card-header>
-      <mat-card-title>{{tile.date | date:shortDate}}</mat-card-title>
+      <mat-card-title>{{tile.date | date:'MMM d'}}</mat-card-title>
     </mat-card-header>
       <mat-card-content class="calDateContent">
         <span *ngFor="let game of tile.games">
 
-              <span *ngIf="game.summary.awayTeam == team.nickname then awayGameBlock else homeGameBlock"></span>
+          <span *ngIf="game.summary.awayTeam == team.nickname then awayGameBlock else homeGameBlock"></span>
 
-          <ng-template #awayGameBlock> @ {{game.summary.homeTeam}} </ng-template>
-          <ng-template #homeGameBlock> vs. {{game.summary.awayTeam }} </ng-template>
-          <button mat-button [routerLink]="['/game', game._id]" ><span *ngIf="game.summary.status; then thenBlock else elseBlock"></span>
-            <ng-template #thenBlock> {{game.summary.score.home | number: '1.0-1'}}- {{game.summary.score.away | number: '1.0-1'}}</ng-template>
-            <ng-template #elseBlock>Preview</ng-template>
+          <ng-template #awayGameBlock> @ {{game.summary.homeTeam}}
+            <button mat-button [routerLink]="['/game', game._id]" [ngClass]="{'winner': game.summary.winner?.nickname == team.nickname, 'loser': game.summary?.loser?.nickname == team.nickname}">
+              <span *ngIf="game.summary.status; then thenAwayBlock else elseBlock"></span>
+              <ng-template #thenAwayBlock > {{game.summary.score.away | number: '1.0-1'}}- {{game.summary.score.home | number: '1.0-1'}}</ng-template>
 
-          </button>
+            </button>
+          </ng-template>
+          <ng-template #homeGameBlock> vs. {{game.summary.awayTeam }}
+            <button mat-button [routerLink]="['/game', game._id]" [ngClass]="{'winner': game.summary.winner?.nickname == team.nickname, 'loser': game.summary?.loser?.nickname == team.nickname}">
+              <span *ngIf="game.summary.status; then thenHomeBlock else elseBlock"></span>
+              <ng-template #thenHomeBlock > {{game.summary.score.home | number: '1.0-1'}}- {{game.summary.score.away | number: '1.0-1'}}</ng-template>
+
+            </button>
+           </ng-template>
+           <ng-template #elseBlock>Preview</ng-template>
+
+
           </span>
     </mat-card-content>
     </mat-card>
 </div>
 
+<div *ngFor="let dt of dates">{{dt}}</div>
+
+
 </div>
 
-
-<div *ngIf="(games$ | async) as games" >
-
-
-
-
-  <!-- <div class="mobileGame">
-  <mat-card *ngFor="let gm of games.data.slice(games.paginator.pageSize * games.paginator.pageIndex, games.paginator.pageSize * (games.paginator.pageIndex+1))">
-    <mat-card-header>
-    <mat-card-title>{{gm?.awayTeam?.nickname}} @ {{gm?.homeTeam?.nickname}}</mat-card-title>
-    <mat-card-subtitle>{{gm?.gameDate | date:'shortDate'}}</mat-card-subtitle>
-  </mat-card-header>
-    <mat-card-content>
-      Something about the game here.
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-button>Box</button>
-    </mat-card-actions>
-  </mat-card>
-</div> -->
-
-  <table mat-table [dataSource]="games" >
-
-    <ng-container matColumnDef="game" >
-      <th mat-header-cell *matHeaderCellDef >Game</th>
-      <td mat-cell *matCellDef="let game">
-        <button mat-button [routerLink]="['/game', game._id]">
-          <span class="fw-bold"><span *ngIf="game.awayTeam">{{game.awayTeam.nickname }}</span> @ <span *ngIf="game.homeTeam">{{game.homeTeam.nickname}}</span></span>
-        </button>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="game.gameDate" >
-      <th mat-header-cell *matHeaderCellDef >Date</th>
-      <td mat-cell *matCellDef="let game">
-        <span > {{game.gameDate | date:'longDate'}}</span>
-
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="game.status" >
-      <th mat-header-cell *matHeaderCellDef >Status</th>
-      <td mat-cell *matCellDef="let game">
-        <span > {{game.gameDate | date:'longDate'}}</span>
-
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="action">
-      <th mat-header-cell *matHeaderCellDef>Attestations</th>
-      <td mat-cell *matCellDef="let game">
-        <span *ngFor="let game_result of game.results; index as resIdx">
-            <span fxLayout="row" fxLayoutAlign="space-evenly center" >
-                <span *ngFor="let loc of _ownerLocs(game)">
-                    <button *ngIf="_needsAttest(game, game_result) && _canAttest(game, loc)" type="button" mdbBtn (click)="attest(game, game_result._id, resIdx, loc)"  mdbWavesEffect>
-                      <mdb-icon far class="green-text"  size="lg" icon="check-circle"></mdb-icon> Attest as {{loc}} team
-                    </button>
-                    </span>
-            </span>
-          </span>
-
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="awayScore">
-      <th mat-header-cell *matHeaderCellDef>Away Score<th>
-
-          <td mat-cell *matCellDef="let game">
-            <span *ngFor="let game_result of game.results; index as resIdx" class="d-block">
-              <span [ngClass]="team._id == game.awayTeam._id ? (team._id == game_result?.winner?._id ? 'green-text' : 'red-text') : ''" *ngIf="getGameScore(game_result, 'A') as awayScore">{{awayScore.final.abl_runs | number:'1.2-2'}}</span>
-            </span>
-          </td>
-    </ng-container>
-
-    <ng-container matColumnDef="homeScore">
-      <th mat-header-cell *matHeaderCellDef>Home Score<th>
-        <td mat-cell *matCellDef="let game">
-          <span *ngFor="let game_result of game.results; index as resIdx" class="d-block">
-            <span [ngClass]="team._id == game.homeTeam._id ? (team._id == game_result?.winner?._id ? 'green-text' : 'red-text') : ''" *ngIf="getGameScore(game_result, 'H') as homeScore">{{homeScore.final.abl_runs | number:'1.2-2'}}</span>
-          </span>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="myResult">
-      <th mat-header-cell *matHeaderCellDef>Result<th>
-        <td mat-cell *matCellDef="let game">
-          <span *ngFor="let game_result of game.results; index as resIdx" class="d-block">
-            <span  *ngIf="game_result">{{team._id == game_result?.winner?._id ? 'W' : 'L'}}</span>
-          </span>
-        </td>
-
-    </ng-container>
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef>Status<th>
-        <td mat-cell *matCellDef="let game">
-          <span *ngFor="let game_result of game.results; index as resIdx" class="d-block">
-            <span  *ngIf="game_result">{{game_result.status}}</span>
-          </span>
-        </td>
-
-    </ng-container>
-
-
-
-    <tr mat-header-row *matHeaderRowDef="['game', 'game.gameDate',  'awayScore', 'homeScore', 'myResult', 'status', 'action' ]"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['game', 'game.gameDate', 'awayScore', 'homeScore', 'myResult', 'status' , 'action'];"></tr>
-  </table>
-</div>
 

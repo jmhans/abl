@@ -45,16 +45,37 @@ justify-content: space-around;
 
 .mobileGame {
 display: flex;
-flex-direction:row;
+flex-flow: row;
+flex-wrap: wrap;
+background-color: lightgray;
 justify-content:space-around;
 align-items: center;
-flex-wrap:wrap;
 }
 
-.calDate {
-flex: 1;
-flex-basis:13%;
 
+
+.calDate {
+  font-size: medium;
+  flex:1;
+  flex-basis: 16.66%;
+}
+
+
+@media screen and (max-width: 700px) {
+  .calDate {
+    flex:1;
+    flex-basis: 100%;
+  }
+}
+
+.winner {
+  background-color: lightgreen;
+  color: darkgreen
+}
+
+.loser {
+  background-color: pink;
+  color: darkred
 }
 
 .calDateContent {
@@ -63,8 +84,11 @@ flex-basis:13%;
   justify-content:space-around;
   align-items: center;
   flex-wrap:nowrap;
+  font-size: medium;
 
   }
+
+
 
 .mobileGame .gameHeader {
   display: flex;
