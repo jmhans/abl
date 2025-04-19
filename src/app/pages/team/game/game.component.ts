@@ -91,7 +91,11 @@ export class TeamGameComponent implements OnInit, OnDestroy {
        combineLatestWith(this.paginator$),
        map(([g, p])=> {
 
+        g.sort((a,b)=> {
+          let ad = a.date
+          let bd = b.date
 
+          return (ad < bd) ? -1 : ((ad == bd) ? 0 : 1) })
 
          return g.slice(p.pageSize * (p.pageIndex), p.pageSize * (p.pageIndex + 1))
        })
