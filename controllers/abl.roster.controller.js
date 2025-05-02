@@ -206,6 +206,7 @@ class ABLRosterController extends BaseController{
                           },
                           then: {
                             curr: "$$this.eligiblePositions",
+                            curr_max: "$$this.maxPosition",
                             prior: "$$value.prior",
                           },
                         },
@@ -215,6 +216,7 @@ class ABLRosterController extends BaseController{
                           },
                           then: {
                             curr: "$$value.curr",
+                            curr_max: "$$value.curr_max",
                             prior: "$$this.maxPosition",
                           },
                         },
@@ -249,7 +251,7 @@ class ABLRosterController extends BaseController{
                           $first:
                             "$tempCommish.CommishPos",
                         },
-                        "$newPosLog.prior",
+                        {$ifNull: ["$newPosLog.prior", "$newPosLog.curr_max"]},
                       ],
                     },
                   ],
