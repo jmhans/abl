@@ -1,7 +1,7 @@
 <!-- src/app/pages/games/games.component.html -->
 
 <div *ngIf="(displayedGames$ | async) as calGames">
-  <mat-paginator *ngIf="(paginator$ | async) as pag" [length]="dataLength" [pageSize]="pag.pageSize" [pageSizeOptions]="[1,3,6,12, dataLength]" hidePageSize="false" aria-label="Game Dates per page"  (page)="pageEvent = handlePage($event)"></mat-paginator>
+  <mat-paginator *ngIf="(paginator$ | async) as pag" [length]="dataLength" [pageSize]="pag.pageSize" [pageSizeOptions]="[1,3,6,12, dataLength]" [pageIndex]="initialPgIdx" hidePageSize="false" aria-label="Game Dates per page"  (page)="pageEvent = handlePage($event)"></mat-paginator>
   <div class="mobileGame">
     <mat-card *ngFor="let tile of calGames" class="calDate">
       <mat-card-header>

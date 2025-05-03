@@ -79,223 +79,43 @@ class ABLRosterController extends BaseController{
           },
           {
             $sort: {
-              effectiveDate: -1,
-            },
+              effectiveDate: -1
+            }
           },
           {
-            $limit: 1,
+            $limit: 1
           },
           {
             $unwind: {
               path: "$roster",
-              preserveNullAndEmptyArrays: false,
-            },
+              preserveNullAndEmptyArrays: false
+            }
           },
           {
             $lookup:
-              /**
-               * from: The target collection.
-               * localField: The local join field.
-               * foreignField: The target join field.
-               * as: The name for the results.
-               * pipeline: Optional pipeline to run on the foreign collection.
-               * let: Optional variables to use in the pipeline field stages.
-               */
               {
-                from: "players",
+                from: "players_view",
                 let: {
-                  plyrId: "$roster.player",
+                  plyrId: "$roster.player"
                 },
                 pipeline: [
                   {
-                    $project: {
-                      ablstatus: 1,
-                      mlbID: 1,
-                      name: 1,
-                      stats: 1,
-                    },
-                  },
-                  {
                     $match: {
                       $expr: {
-                        $eq: ["$$plyrId", "$_id"],
-                      },
-                    },
-                  },
+                        $eq: ["$$plyrId", "$_id"]
+                      }
+                    }
+                  }
                 ],
-                as: "player",
-              },
+                as: "player"
+              }
           },
           {
-            $unwind: {
-              path: "$player",
-              preserveNullAndEmptyArrays: false,
-            },
-          },
-          {
-            $lookup: {
-              from: "mlbrosters",
-              let: {
-                plyrId: "$player.mlbID",
-              },
-              pipeline: [
-                {
-                  $unwind: {
-                    path: "$roster",
-                    preserveNullAndEmptyArrays: true,
-                  },
-                },
-                {
-                  $project: {
-                    teamId: 1,
-                    player: "$roster.person",
-                    status: "$roster.status",
-                    team: 1,
-                  },
-                },
-                {
-                  $match: {
-                    $expr: {
-                      $eq: [
-                        "$$plyrId",
-                        {
-                          $toString: "$player.id",
-                        },
-                      ],
-                    },
-                  },
-                },
-              ],
-              as: "rosterStatus",
-            },
-          },
-          {
-            $lookup: {
-              from: "position_log",
-              let: {
-                plyrId: "$player.mlbID",
-              },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: {
-                      $and: [
-                        {
-                          $eq: ["$mlbId", "$$plyrId"],
-                        },
-                      ],
-                    },
-                  },
-                },
-              ],
-              as: "posLog",
-            },
-          },
-          {
-            $addFields: {
-              newPosLog: {
-                $reduce: {
-                  input: "$posLog",
-                  initialValue: {},
-                  in: {
-                    $switch: {
-                      branches: [
-                        {
-                          case: {
-                            $eq: ["$$this.season", 2025],
-                          },
-                          then: {
-                            curr: "$$this.eligiblePositions",
-                            curr_max: "$$this.maxPosition",
-                            prior: "$$value.prior",
-                          },
-                        },
-                        {
-                          case: {
-                            $eq: ["$$this.season", 2024],
-                          },
-                          then: {
-                            curr: "$$value.curr",
-                            curr_max: "$$value.curr_max",
-                            prior: "$$this.maxPosition",
-                          },
-                        },
-                      ],
-                      default: "$$value",
-                    },
-                  },
-                },
-              },
-            },
-          },
-          {
-            $lookup: {
-              from: "positions",
-              localField: "player.mlbID",
-              foreignField: "mlbId",
-              as: "tempCommish",
-            },
-          },
-          {
-            $addFields: {
-              "player.status": {
-                $first:
-                  "$rosterStatus.status.description",
-              },
-              allPos: {
-                $concatArrays: [
-                  [
-                    {
-                      $ifNull: [
-                        {
-                          $first:
-                            "$tempCommish.CommishPos",
-                        },
-                        {$ifNull: ["$newPosLog.prior", "$newPosLog.curr_max"]},
-                      ],
-                    },
-                  ],
-                  {
-                    $ifNull: ["$newPosLog.curr", []],
-                  },
-                ],
-              },
-              "player.team": {
-                $first: "$rosterStatus.team.abbreviation",
-              },
-            },
-          },
-          {
-            $addFields: {
-              "player.eligible": {
-                $filter: {
-                  input: {
-                    $reduce: {
-                      input: "$allPos",
-                      initialValue: [],
-                      in: {
-                        $cond: [
-                          {
-                            $in: ["$$this", "$$value"],
-                          },
-                          "$$value",
-                          {
-                            $concatArrays: [
-                              "$$value",
-                              ["$$this"],
-                            ],
-                          },
-                        ],
-                      },
-                    },
-                  },
-                  as: "pos",
-                  cond: {
-                    $ne: ["$$pos", null],
-                  },
-                },
-              },
-            },
+            $unwind:
+              {
+                path: "$player",
+                preserveNullAndEmptyArrays: true
+              }
           },
           {
             $project: {
@@ -304,8 +124,8 @@ class ABLRosterController extends BaseController{
               posLog: 0,
               newPosLog: 0,
               rosterStatus: 0,
-              priorRosters: 0,
-            },
+              priorRosters: 0
+            }
           },
           {
             $group: {
@@ -315,17 +135,17 @@ class ABLRosterController extends BaseController{
                   player: "$player",
                   lineupPosition:
                     "$roster.lineupPosition",
-                  rosterOrder: "$roster.rosterOrder",
-                },
+                  rosterOrder: "$roster.rosterOrder"
+                }
               },
               effectiveDate: {
-                $first: "$effectiveDate",
+                $first: "$effectiveDate"
               },
               ablTeam: {
-                $first: "$ablTeam",
-              },
-            },
-          },
+                $first: "$ablTeam"
+              }
+            }
+          }
         ]
 
 

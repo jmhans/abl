@@ -38,6 +38,8 @@ export class TeamGameComponent implements OnInit, OnDestroy {
   dates:Date[];
   dataLength: number;
 
+  initialPgIdx: number;
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -61,7 +63,7 @@ export class TeamGameComponent implements OnInit, OnDestroy {
 
    this.calendaredGames$ = this.api.getAblGames$().pipe(
      tap( (d)=> console.log("I've got some cal games!")),
-     map((d)=> {
+     map((d:GameClass[])=> {
        let data = d.filter((gm)=>{ return gm.awayTeam._id == this.team._id || gm.homeTeam._id == this.team._id});
 
        let grouped = data.reduce((acc,cur)=>
@@ -83,7 +85,17 @@ export class TeamGameComponent implements OnInit, OnDestroy {
        )
          this.dataLength = grouped.length
        return grouped
-     })
+     }),
+     tap ( (d:CalendaredGameModel[])=> {
+      let lastGame = 0
+      while (new Date(d[lastGame].date) < new Date()) {
+        lastGame++
+      }
+      let pgIdx = Math.floor(lastGame/6)
+
+      this.initialPgIdx = pgIdx;
+      //this.paginator$.next({'pageIndex': pgIdx, 'pageSize': 6})
+     }),
    )
 
 
