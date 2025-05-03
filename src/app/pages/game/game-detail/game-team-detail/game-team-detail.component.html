@@ -1,9 +1,10 @@
       <div >
         <ng-container  cdkDropListGroup>
         <table class="table table-responsive table-sm table-editable table-full">
-          <thead>
+          <ng-template #tableHeader>
+            <thead>
             <tr>
-              
+
               <th scope="col">Pos</th>
               <th scope="col">Player</th>
               <th scope="col">G</th>
@@ -25,32 +26,34 @@
               <th scope="col" >  Runs </th>
 
             </tr>
-          </thead>
-          
+
+          </thead></ng-template>
+          <ng-container *ngTemplateOutlet="tableHeader"></ng-container>
+
           <tbody *ngIf="status!='scheduled'"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="active"
                   (cdkDropListDropped)="drop($event)"
                  >
-    
+
             <tr  *ngFor="let player of active ; index as i"  cdkDrag [ngClass]="(player.ablstatus != 'active' ? 'table-dark': '')"
                 (cdkDragStarted)="toggleDrag('active')"
                 (cdkDragEnded)="toggleDrag('')"
-                
+
                 >
               <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
               <th scope="row">
                 <span *ngIf="editable">
-                  <select [(ngModel)]="player.playedPosition"> 
-                      <option *ngFor="let pos of ['1B', '2B', 'SS', '3B', 'OF', 'C', 'DH', 'XTRA']" [value]="pos" >{{pos}}</option> 
-                  </select> 
+                  <select [(ngModel)]="player.playedPosition">
+                      <option *ngFor="let pos of ['1B', '2B', 'SS', '3B', 'OF', 'C', 'DH', 'XTRA']" [value]="pos" >{{pos}}</option>
+                  </select>
                    </span>
                 <span *ngIf="!editable">{{player.playedPosition}} </span>|
                 <span *ngIf="editable">
-                  <select [(ngModel)]="player.ablPlayedType"> 
-                      <option *ngFor="let playType of ['STARTER', 'SUB', 'XTRA']" [value]="playType" >{{playType}}</option> 
-                  </select> 
+                  <select [(ngModel)]="player.ablPlayedType">
+                      <option *ngFor="let playType of ['STARTER', 'SUB', 'XTRA']" [value]="playType" >{{playType}}</option>
+                  </select>
 
                    </span>
                 <span *ngIf="!editable"> {{player.ablPlayedType}} </span>
@@ -60,24 +63,24 @@
               <td>
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'g', $event)" (mousedown)="$event.stopPropagation()">{{player.dailyStats ?  player.dailyStats.g : 0 }} </span>
               </td>
-              <td> 
+              <td>
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'ab', $event, true)" (mousedown)="$event.stopPropagation()">
-                {{player.dailyStats ?  player.dailyStats.ab : 0 }} 
+                {{player.dailyStats ?  player.dailyStats.ab : 0 }}
                 </span>
               </td>
-              <td> 
+              <td>
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'h', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.h : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.h : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, '2b', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats['2b'] : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats['2b'] : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, '3b', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats['3b'] : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats['3b'] : 0 }}
                 </span>
               </td>
               <td >
@@ -92,43 +95,43 @@
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'hbp', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.hbp : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.hbp : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sac', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.sac : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.sac : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sf', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.sf : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.sf : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'sb', $event, true)" (mousedown)="$event.stopPropagation()">
                   {{player.dailyStats ?  player.dailyStats.sb : 0 }}
-                </span> 
+                </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'cs', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.cs : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.cs : 0 }}
                 </span>
               </td>
-              
+
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'po', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.po : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.po : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'e', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.e : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.e : 0 }}
                 </span>
               </td>
               <td >
                 <span [contentEditable]="editable" (blur)="updateList(i, player.dailyStats, 'pb', $event, true)" (mousedown)="$event.stopPropagation()">
-                  {{player.dailyStats ?  player.dailyStats.pb : 0 }} 
+                  {{player.dailyStats ?  player.dailyStats.pb : 0 }}
                 </span>
               </td>
               <td >{{player.dailyStats ?  player.dailyStats.abl_score?.abl_points : 0 }} </td>
@@ -186,18 +189,21 @@
               </th>
             </tr>
             </tbody>
-          <tbody 
+            <ng-container *ngIf="showBench && true">
+              <ng-container  *ngTemplateOutlet="tableHeader"></ng-container>
+            </ng-container>
+          <tbody
                  *ngIf="showBench && true"
                      cdkDropList
                  [cdkDropListDisabled]="!editable"
                   [cdkDropListData]="bench"
                  (cdkDropListEntered)="enter($event)"
                  (cdkDropListDropped)="drop($event)" >
-            <tr *ngFor="let player of bench ; index as i" cdkDrag 
+            <tr *ngFor="let player of bench ; index as i" cdkDrag
                 (cdkDragStarted)="toggleDrag('bench')"
                 (cdkDragEnded)="toggleDrag('')"
                 [ngClass]="(player.ablstatus != 'active' && status == 'final' ? 'table-dark': '')" >
-              
+
               <div class="example-custom-placeholder" *cdkDragPlaceholder>Move {{player.player.name}} Here</div>
 
               <th scope="row">{{player.playedPosition || (status == 'final' ? "B" : player.lineupPosition)}}</th>
@@ -222,17 +228,17 @@
 
             </tr>
 
-          </tbody>  
+          </tbody>
             <tfoot>
 
           </tfoot>
         </table>
-          
+
               <span class="alert alert-success d-block" role="alert" *ngIf="!roster">
-            This score was saved with an old version of the application. Click save to add player data to stored record.   
+            This score was saved with an old version of the application. Click save to add player data to stored record.
           </span>
           </ng-container>
 
-        
-        
+
+
       </div>
