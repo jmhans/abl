@@ -94,7 +94,7 @@ export class TeamGameComponent implements OnInit, OnDestroy {
       let pgIdx = Math.floor(lastGame/6)
 
       this.initialPgIdx = pgIdx;
-      //this.paginator$.next({'pageIndex': pgIdx, 'pageSize': 6})
+      this.paginator$.next({'pageIndex': pgIdx, 'pageSize': 6})
      }),
    )
 
