@@ -10,7 +10,7 @@ class SSE_Controller {
   constructor() {
     //this.stream = Stream; //new EventEmitter();
     setInterval(function() {
-      Stream.emit('push', 'ping', {msg: "testing server ping"})
+      Stream.emit('push', 'ping', {msg: "testing server ping from SSE controller"})
       }, 30000)
   }
 

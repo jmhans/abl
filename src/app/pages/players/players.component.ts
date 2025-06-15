@@ -34,6 +34,7 @@ export class PlayersComponent implements OnInit, OnDestroy, AfterViewInit {
   ownerPrimaryTeam: AblTeamModel;
   ownerSub: Subscription;
   unsubscribe$: Subject<void> = new Subject<void>();
+  rosterUpdateSub: Subscription;
 
   colNames= ['name', 'mlbID', 'ablstatus.ablTeam.nickname', 'ablstatus.acqType', 'position', 'team', 'status', 'lastStatUpdate', 'abl_runs', 'stats.batting.gamesPlayed', 'stats.batting.atBats', 'stats.batting.hits', 'stats.batting.doubles',
              'stats.batting.triples', 'stats.batting.homeRuns', 'bb', 'stats.batting.hitByPitch', 'stats.batting.stolenBases', 'stats.batting.caughtStealing', 'action']
@@ -89,6 +90,26 @@ activeRoster(tmId, rosters) {
   }
  return []
 }
+
+
+_handlePlayerAction($event) {
+  this.rosterUpdateSub = this.rosterService
+  .addPlayertoTeam$($event)
+  .subscribe(
+    data => this._handleSubmitSuccess(data, $event.player),
+    err => this._handleSubmitError(err)
+  );
+}
+
+
+private _handleSubmitSuccess(res, plyr) {
+//  plyr.ablstatus = res.player.ablstatus;
+console.log(res)
+  }
+
+  private _handleSubmitError(err) {
+  console.error(err);
+  }
 
 
   _isAdmin() {

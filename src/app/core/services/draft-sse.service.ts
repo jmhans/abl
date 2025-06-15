@@ -58,8 +58,8 @@ export class DraftSseService {
 
     ) {
       //this.notify();
-      if (false) {
-        this.suppDraftDraftOrder()
+      if (true) {
+        this.suppDraft_new()
       } else {
         this.regularDraftOrder()
       }
@@ -156,64 +156,162 @@ export class DraftSseService {
 
     }
 
-  suppDraftDraftOrder() {
+
+    suppDraft_new() {
+      this.rosterService.draftList$.pipe(
+        takeUntil(this.unsubscribe$),
+        map((data:any[])=> {
+          var currPickNumber = data.filter((dp)=> {return dp.status == 'Pending'}).reduce((acc, cur)=> {
+            return Math.min(acc, cur.pickNumber)
+          }, 999)
+
+          let newData =data.map((dp)=> {
+            if (dp.pickNumber == currPickNumber) {
+              return {...dp,status:'Current'}
+            }
+            return dp
+          })
 
 
-    let onePickDraftRounds = 5 // This must be an even number the way things are currently set up.
-    let multiPickDraftRounds = 0 // This is used for totalPicks, but isn't fully incorporated in actual picks below. Logic below just assumes 2 multipick rounds at the end.
-    let picksPerMultiRound = 1
-    let totalPicks = 27
+        var groupByArr = function(xs, key) {
+          return xs.reduce(function(rv, x) {
+            (rv[x[key]-1] ??= []).push(x);
+            return rv;
+          }, []);
+        }
+
+        let grouped = groupByArr(newData, "round")
+        let teams = grouped[0]
+
+        return {currentPick: newData.find((pick)=>{return pick.status == 'Current'}),  rounds: grouped, teams :teams }
+      })
+
+      ).subscribe(data => {
+        console.log(data)
+      this.draftOrder$.next(data)
+    })
+
+    }
 
 
-    this.api.getStandings$('2025-06-08').pipe(
-      takeUntil(this.unsubscribe$),
-      map((data:any[]) => {
-        return data.sort((a,b)=> {
-          let wpct = (o)=> {return o.w/o.g}
-          if (wpct(a) == wpct(b)) {
-            return a.avg_runs - b.avg_runs
-          }
+    suppDraftDraftOrder2() {
+      let onePickDraftRounds = 5
+      let multiPickDraftRounds = 0
+      let picksPerMultiRound = 0
+      let totalPicks = 27
 
-          return (a.w / a.g) - (b.w / b.g)})
-      }),
-      combineLatestWith(this.rosterService.activeRosters$),
-      map(([standings, rosters])=> { return standings.map(s=> {
-        s.roster =rosters.find((r)=> r.ablTeam == s.tm._id)
-        return s
-      })}),
-      combineLatestWith(this.rosterService.skipList$),
-      combineLatestWith(this.rosterService.draftList$),
-      map(([[data, skips], draftList]) => {
+      this.api.getStandings$('2025-06-03').pipe(
+        takeUntil(this.unsubscribe$),
+
+        map((data:any[]) => {
+
+          data.sort((a,b)=> {
+            let wpct = (o)=> {return o.w/o.g}
+            if (wpct(a) == wpct(b)) {
+              return a.avg_runs - b.avg_runs
+            }
+
+            return (a.w / a.g) - (b.w / b.g)})
+
+          let newData = data.map((d)=> {
+            const {tm, ...otherProps} = d
+            return tm
+          })
+
+          return newData
+        }),
+        combineLatestWith(this.rosterService.activeRosters$),
+        map(([standings, rosters])=> { return standings.map(s=> {
+            let rstr =rosters.find((r)=> r.ablTeam == s._id) //|| []
+            return {...s, roster: rstr }
+        })}),
+        // This came from Regular Draft order
+        combineLatestWith(this.rosterService.skipList$),
+        combineLatestWith(this.rosterService.draftList$),
+        map(([[data, skips], draftList]) => {
+          return data.map((team)=> {
+            //let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType != 'draft');
+            let supp_draft_picks= draftList.filter((p)=> (typeof p.ablTeam == 'string' ? (p.ablTeam == team._id) : (p.ablTeam._id == team._id)) );
+            let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
+            supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam == team._id).map((item)=> {
+              return  {type: "Skip", _id: item._id, player: {name: "skip", team: null, eligible:[]}}
+            })]
+            return {...team, supp_draft_picks: supp_draft_picks, orig_roster: origRoster, picks_allowed: totalPicks-origRoster?.length }
+
+          })
+        }),
+        map((data) => {
         return data.map((team)=> {
-          //let supp_draft_picks = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType != 'draft');
-          let supp_draft_picks= draftList.filter((p)=> (typeof p.ablTeam == 'string' ? (p.ablTeam == team._id) : (p.ablTeam._id == team._id)) );
-          let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
-          supp_draft_picks = [...supp_draft_picks, ...skips.filter((s)=> s.ablTeam == team.tm._id).map((item)=> {return  {type: "Skip", _id: item._id}})]
-          return {...team, supp_draft_picks: supp_draft_picks, orig_roster: origRoster, picks_allowed: totalPicks-origRoster?.length }
+          let origRoster = team.roster?.roster.filter((p)=> p.player.ablstatus.acqType == 'draft') || [];
+          return {...team, picks_allowed: totalPicks-origRoster?.length, origRoster: origRoster }
 
         })
       }),
       map((data:any[])=> {
         let draftRounds = []
-        let currentPick
+
+
+
         for (let i=0; i<onePickDraftRounds; i=i+1) {
-          draftRounds[i]= {rowrev: false, data: data.map((tm, tmIdx) => {
-            let pick ={team: tm.tm, pick: tm.supp_draft_picks[i], allowed: i+1 <= (totalPicks - (tm.orig_roster?.length || 0))}
-            if (!pick.pick && pick.allowed && !currentPick) {
-              currentPick = {row: i, column: tmIdx }
-            }
-            return pick
+          draftRounds[i]= {rowrev: false, data: data.map(tm=> {
+            const { nickname, _id } = tm;
+
+            return {team: { nickname, _id }, pick: tm.supp_draft_picks[i], allowed: i+1 <= (totalPicks - (tm.origRoster.length || 0))}
           })}
         }
-        if (!currentPick) {
-          currentPick = {row: 0, column: 0}
+          let newi = onePickDraftRounds
+          for (let sub_i=0; sub_i<picksPerMultiRound; sub_i++) {
+            draftRounds[newi+sub_i]= {rowrev: false, data: data.map(tm=> {
+              const { nickname, _id }= tm;
+              return {team: { nickname, _id }, pick: tm.supp_draft_picks[newi+sub_i], allowed: newi+sub_i+1 <= (totalPicks - (tm.origRoster.length || 0))}
+            })}
+            draftRounds[newi+sub_i+picksPerMultiRound] = {rowrev: true, data: [...data].reverse().map(tm=> {
+              const { nickname, _id }= tm;
+              return {team: { nickname, _id }, pick: tm.supp_draft_picks[newi+sub_i+picksPerMultiRound], allowed: newi+sub_i+picksPerMultiRound <= (totalPicks - (tm.origRoster.length || 0))}
+            })}
+
         }
-        return {currentPick: currentPick, rosters: data, rounds: draftRounds, activeRounds : totalPicks}
+
+
+
+        let pick, currentPick;
+        let pickRd = 0;
+        let pickRow = 0;
+        let tm = 0
+        do {
+          pick = draftRounds[pickRd].data[tm].pick
+          currentPick = {row: pickRd, column: tm, vis_team: draftRounds[pickRd].data[tm].team.nickname }// data.findIndex((item)=> {return item.nickname == draftRounds[pickRd].data[tm].team})}
+          if (pickRd < onePickDraftRounds) {
+
+            tm = (tm+1) % data.length
+            if (tm == 0) {
+              pickRd++
+            }
+          } else {
+            pickRd++
+            if (((pickRd - onePickDraftRounds) % picksPerMultiRound) == 0) {
+              tm = (tm+1) % data.length
+              if (tm != 0) {
+                pickRd = pickRd - picksPerMultiRound
+
+              }
+            }
+          }
+        } while (pick && (pickRd < onePickDraftRounds + picksPerMultiRound * multiPickDraftRounds))
+        let maxRosterLength = data.reduce((acc, cur)=> {
+          return Math.max(acc, cur.origRoster.length)
+        }, 0
+        )
+        return {currentPick: currentPick, rosters: data, rounds: draftRounds, activeRounds : maxRosterLength}
       })
-    ).subscribe(data => {
-    this.draftOrder$.next(data)
-  })
-  }
+
+      ).subscribe(data => {
+          console.log(data)
+        this.draftOrder$.next(data)
+      })
+
+    }
+
 
 
   ngOnDestroy() {

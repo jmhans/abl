@@ -81,11 +81,14 @@ export class PlayersService {
         })
 
         this.allPlayersWithDraft$ = this.allEnrichedPlayers$.pipe(
-         combineLatestWith(api.getDraftPicks$('supp_draft')),
+         combineLatestWith(this.rosterService.draftListReplay$),
          map(([data, draftList]) => {
           draftList.forEach((d)=> {
-          let stalePlayerIndex = data.findIndex((p)=> {return p._id == d.player["_id"]});
-          data[stalePlayerIndex].ablstatus = {onRoster: true, acqType: d.draftType, ablTeam: d.ablTeam }
+            if (d.player) {
+              let stalePlayerIndex = data.findIndex((p)=> {return p._id == d.player["_id"]});
+              data[stalePlayerIndex].ablstatus = {onRoster: true, acqType: d.draftType, ablTeam: d.ablTeam }
+            }
+
           })
           return data
 

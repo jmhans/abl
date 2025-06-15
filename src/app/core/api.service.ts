@@ -13,7 +13,7 @@ import { AblTeamModel } from './models/abl.team.model';
 import { OwnerModel } from './models/owner.model';
 import { MlbPlayerModel } from './models/mlb.player.model';
 import { MlbRoster } from './models/mlb.roster';
-import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './models/lineup.model';
+import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel, RosterAction } from './models/lineup.model';
 import { DraftPickModel } from './models/draft.model';
 import { CreateRosterRecordModel, RosterRecordModel } from './models/roster.record.model';
 
@@ -428,9 +428,9 @@ getMlbPlayerStats$(mlbID:string): Observable<any> {
   }
 
 
-  addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
+  addPlayertoTeam$(addPlayer: RosterAction ): Observable<LineupModel> {
     return this.http
-      .post<LineupModel>(`${this.v2_api}team/${ablTeamId}/addPlayer`, addPlayer, {
+      .post<LineupModel>(`${this.v2_api}team/${addPlayer.team}/addPlayer`, addPlayer, {
         headers: new HttpHeaders().set('Authorization', this._authHeader)
       })
       .pipe(
@@ -438,8 +438,10 @@ getMlbPlayerStats$(mlbID:string): Observable<any> {
       );
   }
 
-  dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
-
+  dropPlayerFromTeam$(ablTeamId: string, plyr: string, delayedDrop: boolean = false): Observable<any> {
+    if (delayedDrop) {
+      return this.postAPIData$('drops', [{ablTeam: ablTeamId, player: plyr}])
+    }
     return this.http
         .get<any>(`${this.v2_api}lineups/${ablTeamId}/drop/${plyr}`, {
           headers: new HttpHeaders().set('Authorization', this._authHeader)

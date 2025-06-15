@@ -23,6 +23,7 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
           Pickup
 
         </span>
+        <span *ngIf="rosterRec.player.ablstatus.pending_drop"> Drop Pending</span>
       </td>
     </ng-container>
     <ng-container matColumnDef="player.drop">
@@ -58,7 +59,7 @@ Too many active players ({{getActiveRosterLength()}}). You must drop pickup(s) o
         <td mat-cell *matCellDef="let rosterRec">
           <span *ngIf="editable" class=" example-handle " ><mat-icon cdkDragHandle (touchstart)="dragDisabled = false" (touchend)="dragDisabled = true" (mousedown)="dragDisabled= false" (mouseup)="dragDisabled=true"> drag_handle</mat-icon></span>
           <button mat-icon-button color="warn" *ngIf="editable && dropPlayerAllowed(rosterRec)" (click)="_dropPlyr(rosterRec.player._id)"><mat-icon>person_remove</mat-icon></button>
-
+          <button mat-icon-button color="accent" *ngIf="editable && preDropPlayerAllowed(rosterRec)" (click)="_preDropPlyr(rosterRec.player._id)"><mat-icon>person_remove</mat-icon></button>
         </td>
       </ng-container>
       <ng-container matColumnDef="abl_runs" >
