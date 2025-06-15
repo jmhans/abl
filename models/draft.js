@@ -24,7 +24,8 @@ var draftPickSchema = new mongoose.Schema({
   draftType: {type: String, required: false, default: 'draft'  },
   round: {type: Number, required: false},
   pickInRound: {type: Number, required: false},
-  status: {type: String, required: false}
+  status: {type: String, required: false},
+  expiration: {type: Date, required: false}
 })
 
 
@@ -48,8 +49,6 @@ drop.post('save', function(doc) {
   SSE.emit('push', 'skips', {msg: 'new skip saved!'})
 
 });
-
-
 
 module.exports = {Draft: mongoose.model('Draft', draftSchema),
                   draftSchema: draftSchema,

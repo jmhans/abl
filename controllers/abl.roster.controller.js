@@ -489,16 +489,12 @@ async _makeDraftPick(plyr, teamId, acqType) {
 
       } else {
         // Create a new one first. Then, update many
-        console.log(`${yesterdayDeadline} <= ${new Date(mostRecent.effectiveDate)}`)
-        console.log("Creating new lineup where player is dropped")
 
         var newLineup = await Lineup.create({
           ablTeam: mostRecent.ablTeam,
           roster: mostRecent.roster,
           effectiveDate: rosterDeadline
         })
-        console.log(newLineup)
-
       }
 
       var remList = await Lineup.updateMany({ablTeam: tmId, effectiveDate: {$gt: yesterdayDeadline}}, {$pull : {roster: {player: mlbPlayer._id}}})

@@ -1,0 +1,20 @@
+
+<div class="count-down-timer">
+  <p>Countdown to {{ targetDate | date: 'medium' }}</p>
+  <p>Current Time {{ displayDate | date: 'medium' }}</p>
+
+  <div class="wrapper">
+    <div class="description">
+      <p>Days</p>
+      <p>Hours</p>
+      <p>Minutes</p>
+      <p>Seconds</p>
+    </div>
+    <div class="times">
+      <p #days></p>
+      <p #hours></p>
+      <p #minutes></p>
+      <p #seconds></p>
+    </div>
+  </div>
+</div>

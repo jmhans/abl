@@ -45,6 +45,6 @@ router.use(new DraftController().reroute());
 router.use(new PostController().route());
 router.use(SSEController.route());
 router.use(new SkipController().route());
-router.use(new DropController().route());
+router.use(new DropController().reroute());
 
 module.exports = router;

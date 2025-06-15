@@ -11,7 +11,7 @@ import { RosterService } from './../../core/services/roster.service';
 
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
-import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
+import {  Subscription,   throwError as ObservableThrowError, interval, Observable , Subject, of, merge} from 'rxjs';
 import {  takeUntil, combineLatestWith , map} from 'rxjs/operators';
 import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 import { SseService } from 'src/app/core/services/sse.service';
@@ -30,6 +30,7 @@ export class SuppDraftComponent implements OnInit {
   pageTitle = 'Draft';
 
   // filteredPlayers: MlbPlayerModel[];
+  public now: Date = new Date();
   loading: boolean;
   error: boolean;
   ownerTeams: AblTeamModel[];
@@ -56,6 +57,9 @@ export class SuppDraftComponent implements OnInit {
     return origRoster
   }))
 
+
+
+
   constructor(private title: Title,
               public utils: UtilsService,
               public api: ApiService,
@@ -68,7 +72,12 @@ export class SuppDraftComponent implements OnInit {
               public draftSseService:DraftSseService,
               public SseService:SseService,
               private ngZone: NgZone
-              ) { }
+              ) {
+
+                setInterval(() => {
+                  this.now = new Date()
+                }, 1000);
+               }
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
@@ -81,7 +90,6 @@ export class SuppDraftComponent implements OnInit {
     this.SseService.getSSE$('ping').pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
       console.log(data);
     })
-
 
 
   }
