@@ -4,6 +4,7 @@ const BaseController = require('./base.controller');
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
 var express = require('express');
+const MlbPlayer = require('./../models/player').Player;
 
 var   router = express.Router();
 
@@ -25,6 +26,16 @@ class DropController extends BaseController {
           output = [...output, popMlbPlayer]
         await this.model.remove({ _id: items[p]._id })
       }
+
+      let pickups = await MlbPlayer.find({"ablstatus.acqType": "pickup"})
+      for (let p= 0; p<pickups.length; p++) {
+        let popMlbPlayer = await myAblRoster._dropPlayerBackend(pickups[p]._id, pickups[p].ablstatus.ablTeam)
+          output = [...output, popMlbPlayer]
+       //await this.model.remove({ _id: items[p]._id })
+      }
+
+
+
       res.send(output)
 
 
