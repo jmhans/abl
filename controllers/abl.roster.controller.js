@@ -325,13 +325,11 @@ async _makeDraftPick(plyr, teamId, acqType) {
     var newPick = {season: "2025", player: new ObjectId(plyr._id), ablTeam: new ObjectId(teamId), pickTime: new Date(), draftType: acqType}
     var draftPick = await DraftPick.create(newPick);
     var popDP = await draftPick.populate('player');
-    var enrichedPlayer = await MlbEnrichedPlayerModel.findById(plyr._id)
     console.log(`Drafted Player`)
     SSE.emit('push', 'draft', {msg: 'Draft works!', pick: popDP})
-    SSE.emit('push', 'player', {msg: 'Player updated', player: {...enrichedPlayer._doc, "ablstatus": {ablTeam : new ObjectId(teamId), acqType : acqType, onRoster: true}}})
-    return enrichedPlayer
+    return popDP.player
   } catch (err) {
-    console.log("I have failed to make draft pick. ")
+    console.log(`I have failed to make draft pick. ${err}`)
   }
 
 }
@@ -339,7 +337,7 @@ async _makeDraftPick(plyr, teamId, acqType) {
 
   async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate, forceDraft = false ) {
     try {
-      if (false && (acqType == 'draft' || acqType == 'supp_draft' && !forceDraft)) {
+      if (acqType == 'draft' || acqType == 'supp_draft') {
           console.log(`In draft player logic`)
         let draftedPlyr = await this._makeDraftPick(plyr, teamId, acqType)
         return {player: draftedPlyr, roster: []};
@@ -570,7 +568,7 @@ async _makeDraftPick(plyr, teamId, acqType) {
  establishHeartbeat(strm){
      console.log('Heartbeat establishing.')
    setInterval(function() {
-    strm.emit('push', 'ping', {msg: "testing server ping"})
+    strm.emit('push', 'ping', {msg: "testing server ping from ABL Roster controller"})
    }, 30000)
  }
 

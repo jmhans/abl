@@ -5,13 +5,19 @@ const Draftpicks  = require('../models/draft').DraftPick;
 const BaseController = require('./base.controller');
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
+const StandingsController = require('./standings.controller');
+var myStandings = new StandingsController();
 const Lineup = require('./../models/lineup').Lineup;
+const CurrentLineupModel=require('./../models/lineup').CurrentLineups;
+
 
 var express = require('express');
 
 var   router = express.Router();
 
 const ObjectId = require('mongoose').Types.ObjectId;
+
+
 
 class DraftController extends BaseController {
 
@@ -24,7 +30,7 @@ class DraftController extends BaseController {
   async _getOne(req, res, next) {
     // Overriding the default, which would use an "id" as a passed parameter. For this model, the "season" acts as the ID.
     try {
-      const draft = await this.find({season: req.params.id});
+      const draft = await this.model.find({season: req.params.id});
       return res.send(draft);
     } catch (err) {
       return res.status(500).send({message: err.message});
@@ -33,7 +39,7 @@ class DraftController extends BaseController {
 
   _get(req, res, next) {
     console.log(`getting draft picks: ${req.query}`)
-    this.model.find(req.query).populate('player').exec(function(err, results) {
+    this.model.find(req.query).populate('ablTeam player').exec(function(err, results) {
       if (err) return next(err);
       res.json(results);
     });
@@ -110,10 +116,101 @@ class DraftController extends BaseController {
     }
 
   }
+
+
+
+
+
+
+  async _generateDraftPicks(req, res, next) {
+
+try {
+    let onePickDraftRounds = 6
+    let multiPickDraftRounds = 0
+    let picksPerMultiRound = 0
+    let totalPicks = 27
+    let snake = false
+
+    console.log(`Generating Draft`)
+    let standings = await myStandings._getBackend({"asOfDate": "2025-06-14"})
+
+    standings.sort((a,b)=> {
+      let wpct = (o)=> {return o.w/o.g}
+      if (wpct(a) == wpct(b)) {
+        return a.avg_runs - b.avg_runs
+      }
+      return (a.w / a.g) - (b.w / b.g)}
+      )
+
+      let draftOrder = standings.map((d)=> {
+        const {tm, ...otherProps} = d
+        return tm
+      })
+
+      let currentLineups = await CurrentLineupModel.find()
+
+      let roster_lengths = currentLineups.reduce((acc, cur)=> {
+        let origRoster = cur.roster.filter((p)=> p.player.ablstatus.acqType == 'draft');
+        return [...acc, {team: cur.ablTeam.toString(), roster_size: origRoster.length}]
+      }, [])
+
+      console.log(roster_lengths)
+      let draftRounds = []
+
+      for (let i=0; i<onePickDraftRounds; i=i+1) {
+        for (let tm = 0; tm<draftOrder.length; tm++){
+          let team_roster_length =roster_lengths.find((rl)=> {return rl.team == draftOrder[tm]._id})?.roster_size
+
+          // Create the pick for the current team in the current round
+          let pick = {
+            ablTeam: draftOrder[tm]._id
+            ,season: "2025"
+            , draftType: "supp_draft"
+            ,pickNumber: i*draftOrder.length+((snake && i % 2 === 1) ? draftOrder.length - tm : tm+1)
+            ,round: i+1
+            ,pickInRound: tm+1
+            ,status: (team_roster_length+i+1 <=totalPicks ) ? 'Pending' : 'Not Allowed'
+          }
+        draftRounds.push(pick)
+        }
+      }
+
+      let newPicks = await this.model.insertMany(draftRounds)
+      //res.json(newPicks);
+      return res.json(newPicks)
+    } catch (err) {
+
+      return next(err)
+
+  }
+}
+
+
+async _updateCurrentPick(req, res, next) {
+  try {
+    console.log(`Curr Pick stuff`)
+    let next_pick = await this.model.findOneAndUpdate({"season":"2025", "draftType":"supp_draft", "status":"Pending"}, {"$set": {"status": "Current"}}, {sort: {"pickNumber": 1}})
+    return res.json(next_pick)
+
+  }catch (err) {
+    return next(err)
+
+  }
+}
+
+
+
+  _setupSuppDraft(req, res, next) {
+
+  }
+
+
   reroute() {
     router = this.route();
 //    router.get('/processDraftResults', (...args)=>this._processDraftResults(...args));
     router.get('/processAllDraftPicks', (...args)=>this._processDraftPicks(...args));
+    router.get('/create_supp', (...args)=>this._generateDraftPicks(...args));
+    router.get('/getnext', (...args)=>this._updateCurrentPick(...args));
 
     return router;
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { RosterRecordModel, CreateRosterRecordModel } from './../models/roster.record.model';
-import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel } from './../models/lineup.model';
+import { LineupModel, LineupAddPlayerModel, SubmitLineup, LineupCollectionModel, RosterAction } from './../models/lineup.model';
 import { DraftPickModel } from './../models/draft.model';
 import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
@@ -49,7 +49,10 @@ export class RosterService {
   refresh$: Subject<void> = new Subject();
   //activeRosters$: BehaviorSubject<LineupModel[]>= new BehaviorSubject([]);
   activeRosters$:Observable<LineupModel[]>;
+  preDraftRosters$:Observable<any[]>;
   draftList$:Observable<DraftPickModel[]>;
+  draftListReplay$= new ReplaySubject<DraftPickModel[]>(1)
+
   skipList$:BehaviorSubject<any> = new BehaviorSubject([]);
 
 
@@ -73,6 +76,10 @@ export class RosterService {
 
     })
   )
+
+
+
+
 
     private cachedRosters:LineupModel[];
 
@@ -101,7 +108,19 @@ this.activeRosters$ = this.refresh$.pipe(
   switchMap(()=> this.api.getAllLineups$())
   );
 
-this.draftList$ = this.refresh$.pipe(switchMap(()=> this.api.getDraftPicks$('supp_draft')))
+  this.preDraftRosters$ = this.activeRosters$.pipe(map((rosters: LineupModel[])=> {
+    let origRoster = rosters.map(r=> r.roster.filter((p)=> p.player.ablstatus.acqType == 'draft'));
+    return origRoster
+  }))
+
+this.draftList$ = this.refresh$.pipe(
+  switchMap(()=> this.api.getDraftPicks$('supp_draft')),
+  map((data)=> {
+    return data
+  }),
+  tap((data)=> this.draftListReplay$.next(data))
+  )
+
 
 this.refreshLineups();
 this.refreshSkips();
@@ -123,8 +142,8 @@ this.refreshSkips();
   }
 
 
-  addPlayertoTeam$(addPlayer: Object, ablTeamId: string ): Observable<LineupModel> {
-    return this.api.addPlayertoTeam$(addPlayer, ablTeamId)
+  addPlayertoTeam$(addPlayer: RosterAction ): Observable<LineupModel> {
+    return this.api.addPlayertoTeam$(addPlayer)
       .pipe(
         //tap(()=> this.getRosters())
       );
@@ -155,9 +174,9 @@ this.refreshSkips();
         );
   }
 
-  dropPlayerFromTeam$(ablTeamId: string, plyr: string): Observable<any> {
+  dropPlayerFromTeam$(ablTeamId: string, plyr: string, delayedDrop:boolean = false): Observable<any> {
 
-    return this.api.dropPlayerFromTeam$(ablTeamId, plyr)
+    return this.api.dropPlayerFromTeam$(ablTeamId, plyr, !delayedDrop)
         .pipe(
           tap(()=> this.refreshLineups())
 

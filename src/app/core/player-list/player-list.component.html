@@ -130,6 +130,7 @@
                <button mdbBtn type="button" color="primary" mdbWavesEffect (click)= "_addPlayerToTeam(row, currentActor)" *ngIf="!row.ablstatus?.ablTeam && (advancedMode || (draftMode && ownerPrimaryTeam))">
                 Draft Player to {{currentActor}}
                </button>
+
 <!--                 <button mdbBtn type="button" mdbWavesEffect (click)="_refreshMLBStats(row)" *ngIf="advancedMode">
                  <mdb-icon fas icon="rotate"></mdb-icon>
                </button> -->

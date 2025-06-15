@@ -1,64 +1,53 @@
 <p>{{pageTitle}}</p>
 
 <div *ngIf="draftSseService.draftOrder$ | async as draftData" class="flex-container">
-
-<div *ngIf=" draftData.rosters as rosters" class="flex-container">
-  <div class="selected-team">
-    <mat-form-field appearance="fill" style="width:100%">
-      <mat-label>Teams</mat-label>
-      <mat-select [(ngModel)]="selectedTeam">
-        <mat-option *ngFor="let tm of rosters" [value]="tm">
-          {{tm.tm.nickname}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <div *ngFor="let plyr of selectedTeam?.roster.roster">
-      <strong>{{plyr.lineupPosition}} </strong>| {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
-    </div>
-
-  </div>
-
-
-<div class="right-draft-board">
-
-  <div class="flex-container">
-    <div class="flex-row" *ngFor='let draftTm of rosters; let c=index' class="draft-history">
-      <div class="header-cell">{{draftTm.tm.nickname}}</div>
-    </div>
-    <div  *ngFor='let rd of draftData.rounds; let r=index' [ngClass]="rd.rowrev ? 'flex-row-rev' : 'flex-row'">
-      <div class="flex-col draft-cell" *ngFor='let pick of rd.data;  let p=index' [ngClass]="{'next-pick': r == draftData.currentPick.row && p == draftData.currentPick.column, 'inactive-pick':!pick.allowed
-    }">
-        <span #showPick *ngIf="pick.pick; else makePick">
-          <span *ngIf="pick.pick.type == 'Skip'">
-            Pick Skipped
-            <button mat-icon-button color="accent" (click)="_removeSkip(pick.pick._id)"><mat-icon>undo</mat-icon></button>
+    <div><b>{{draftData.currentPick?.ablTeam.nickname }}</b> are on the clock!</div>
+    <div  class="flex-container">
+<!--        <div *ngIf="rosterService.preDraftRosters$ | async as rosters" class="selected-team"><mat-select [(value)]="selected_team" ><mat-option *ngFor='let tm of rosters' [value]="tm">{{tm.nickname}}</mat-option></mat-select>
+        <span class="flex-container">
+          <span *ngFor="let plyr of selected_team?.roster.roster" class="flex-row">
+            {{plyr.player.name}} ({{plyr.player.team}} - {{plyr.player.eligible.toString()}})
           </span>
-
-          <span *ngIf="pick?.pick?.player">  {{pick.pick.player.name }} ({{pick.pick.player.team}} - {{pick.pick.player.eligible.toString()}}) </span>
         </span>
-        <ng-template #makePick>
-          <span *ngIf="pick.allowed && (pick.team.nickname == ownerPrimaryTeam.nickname || auth.isAdmin)"> <button (click)="_addSkip(pick.team)">Skip {{pick.team.nickname}} Pick</button> </span>
-        </ng-template>
 
 
+      </div> -->
+        <div class="right-draft-board">
+          <div class="flex-container">
+            <div class="flex-row" *ngFor='let draftTm of draftData.teams; let c=index' class="draft-history">
+              <div class="header-cell">
 
-      </div>
+                  {{draftTm.ablTeam.nickname}}
+              </div>
+              </div>
+            <div *ngFor='let dr of draftData.rounds; let c=index' class="flex-row">
+              <div *ngFor='let pick of dr; let r=index' class="flex-col draft-cell" [ngClass]="{'next-pick': pick.status =='Current', 'no-pick': pick.status == 'Not Allowed'}">
+                <span [ngSwitch]="pick.status" class='flex-row'>
+                  <span *ngSwitchCase="'Complete'">{{pick.player?.name}} ({{pick.player?.team}} - {{pick.player?.eligible.toString()}})</span>
+                  <span *ngSwitchCase="'Skipped'"><button mdbBtn type="button" color="primary" size='sm' (click)= "_removeSkip(pick._id)" class="flex-grow">REMOVE SKIP</button></span>
+                  <span *ngSwitchCase="'Pending'"> <button mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button></span>
+                  <span *ngSwitchCase="'Current'"> <button mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button></span>
+                  <span *ngSwitchCase="'Not Allowed'"> {{pick.status}}</span>
+                </span>
+              </div>
+            </div>
+
+        </div>
+
+        </div>
+
     </div>
+    <div class="players-list flex-container">
+      <app-player-list class="container-fluid"
+      [players$]="players.allPlayersWithDraft$"
+      [colNames]="colNames"
+      [ownerPrimaryTeam]="ownerPrimaryTeam"
+      defaultAddType="supp_draft"
+      [actionEligible]="ownerPrimaryTeam?.nickname == draftData.currentPick?.ablTeam.nickname"
+      [currentActor]="draftData.currentPick?.ablTeam.nickname"
+      (playerAction)="_handleAction($event, draftData.currentPick)"
+      >
+      </app-player-list>
   </div>
-  <div class="players-list">
-    <app-player-list class="container-fluid"
-    [players$]="players.allPlayersWithDraft$"
-    [colNames]="colNames"
-    [ownerPrimaryTeam]="ownerPrimaryTeam"
-    defaultAddType="supp_draft"
-    [actionEligible]="ownerPrimaryTeam.nickname == rosters[draftData.currentPick?.column].tm.nickname"
-    >
-    </app-player-list>
-  </div>
-</div>
-
-</div>
-
 </div>
 

@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild , Inject,Input, AfterViewInit, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild , Inject,Input, AfterViewInit, ChangeDetectorRef, Output, EventEmitter} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
 import { UtilsService } from './../../core/utils.service';
 import { MlbPlayerModel } from './../../core/models/mlb.player.model';
-import { LineupModel } from './../../core/models/lineup.model';
+import { LineupModel, RosterAction } from './../../core/models/lineup.model';
 import { AblTeamModel } from './../../core/models/abl.team.model';
 import { RosterService } from './../../core/services/roster.service';
 import { MatPaginator as MatPaginator } from '@angular/material/paginator';
@@ -14,6 +14,7 @@ import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Ob
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , tap, startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog as MatDialog ,MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {UntypedFormControl} from '@angular/forms';
+import { DraftPickModel } from '../models/draft.model';
 
 export interface DialogData {
   team: AblTeamModel;
@@ -35,10 +36,14 @@ export class PlayerListComponent implements OnInit, OnDestroy{
   @Input() colNames:string[];
   // filteredPlayers: MlbPlayerModel[];
   @Input() ownerPrimaryTeam:AblTeamModel;
-  @Input() defaultAddType:String='pickup';
+  @Input() defaultAddType:string='pickup';
   @Input() actionEligible:Boolean=false;
   @Input() ownerRoster:LineupModel;
   @Input() currentActor:string;
+  @Input() currentDraftPick:DraftPickModel;
+  @Output() playerAction = new EventEmitter<RosterAction>();
+
+
 
   loading: boolean = true;
   error: boolean;
@@ -270,11 +275,18 @@ return (roles.indexOf("admin") > -1)
 }
 
 
+processPlayerAdd(obj) {
+    this.rosterUpdateSub = this.rosterService
+    .addPlayertoTeam$(obj)
+    .subscribe(
+      data => this._handleSubmitSuccess(data, obj.player),
+      err => this._handleSubmitError(err)
+    );
+}
+
 _addPlayerToTeam(plyr, defaultTeam: string = this.ownerPrimaryTeam.nickname) {
 
 if (this.advancedMode) {
-    console.log(`defaultTeam:${defaultTeam}`);
-
 const dialogRef = this.dialog.open(PlayerAddDialog, {
     data: {player: plyr.name, team_string: defaultTeam, effective_date: new Date(), acqType: this.defaultAddType}
 });
@@ -282,24 +294,15 @@ const dialogRef = this.dialog.open(PlayerAddDialog, {
 
 dialogRef.afterClosed().subscribe(result => {
 if (result) {
+  this.playerAction.emit({player: plyr, effective_date: result.effective_date.toISOString(), acqType: result.acqType, team: result.team._id})
 
-this.rosterUpdateSub = this.rosterService
-.addPlayertoTeam$({player: plyr, effective_date: result.effective_date.toISOString(), acqType: result.acqType}, result.team._id)
-.subscribe(
-  data => this._handleSubmitSuccess(data, plyr),
-  err => this._handleSubmitError(err)
-);
+} else {
+  // Do nothing. Dialog was cancelled.
 }
 
 });
 } else {
-
-this.rosterUpdateSub = this.rosterService
-.addPlayertoTeam$({player: plyr, effective_date: new Date(), acqType: this.defaultAddType}, this.ownerPrimaryTeam._id)
-.subscribe(
-data => this._handleSubmitSuccess(data, plyr),
-err => this._handleSubmitError(err)
-);
+  this.playerAction.emit({player: plyr, effective_date: (new Date()).toISOString(), acqType: this.defaultAddType, team: this.ownerPrimaryTeam._id})
 }
 
 

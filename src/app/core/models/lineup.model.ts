@@ -101,7 +101,7 @@ interface PopulatedRoster {
 interface SubmitLineup {
   _id?: string;
   effectiveDate: Date;
-  gameDate: String;
+  gameDate: string;
   roster: [{
     "_id": string;
     "player": string;
@@ -111,5 +111,13 @@ interface SubmitLineup {
 
 }
 
+interface RosterAction {
+  player: MlbPlayerModel;
+  effective_date: string;
+  acqType: string;
+  team: string
+}
 
-export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel, LineupFormModel};
+
+
+export { LineupModel, LineupAddPlayerModel, Roster, PopulatedRoster, SubmitLineup , LineupCollectionModel, LineupFormModel, RosterAction};

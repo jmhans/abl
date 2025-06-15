@@ -37,6 +37,7 @@ export class TeamRosterComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() originalLineup: LineupModel;
   @Input() editable: boolean;
   @Output() dropPlyr = new EventEmitter<{playerId: string}>();
+  @Output() preDropPlyr = new EventEmitter<{playerId: string}>();
   @Output() update = new EventEmitter<{lineup: SubmitLineup}>();
   @Output() raiseAlert = new EventEmitter<any>();
     lineupChanged: Boolean = false;
@@ -135,11 +136,16 @@ saveable() {
 
 
 dropPlayerAllowed(plyrRec) {
+  return plyrRec.player.ablstatus.acqType == 'pickup'
+
+}
+
+preDropPlayerAllowed(plyrRec) {
   let draftedRosterLength = this.rosterLength
   let now = new Date()
 
-  let suppDraftPrep = now >= new Date('2025-06-07T00:00:00Z') && now <=new Date('2025-06-10T00:00:00Z')
-  return plyrRec.player.ablstatus.acqType == 'pickup' ||  (suppDraftPrep && draftedRosterLength>22)
+  let suppDraftPrep = now >= new Date('2025-06-15T00:00:00Z') && now <=new Date('2025-06-16T00:00:00Z')
+  return plyrRec.player.ablstatus.acqType == 'draft' && !plyrRec.player.ablstatus.pending_drop && (suppDraftPrep && draftedRosterLength>21)
 
 }
 
@@ -235,6 +241,10 @@ dropPlayerAllowed(plyrRec) {
 
   _dropPlyr(playerId) {
     this.dropPlyr.emit({playerId: playerId});
+  }
+
+  _preDropPlyr(playerId) {
+    this.preDropPlyr.emit({playerId: playerId});
   }
 
   _rosterAlert(msg) {
