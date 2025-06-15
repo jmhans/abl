@@ -45,6 +45,58 @@ class DraftController extends BaseController {
     });
   }
 
+  async _update (req, res, next) {
+
+    try {
+      var options = {new : false, upsert : true};
+      let resp = await this.model.findByIdAndUpdate(req.params.id, req.body, options)
+      if (resp.status != 'Complete' && req.body.status == 'Complete') {
+        // A new pick was just submitted. Update current and set expiration timer.
+        this._resetCurrentPick()
+      }
+      return res.send(resp);
+
+    } catch (err) {
+      return res.status(500).send({message: err.message})
+    }
+  }
+
+  async _resetCurrentPick() {
+    let minutes_per_pick = 60;
+
+    var t = new Date();
+    t.setSeconds(t.getSeconds() + minutes_per_pick * 60);
+    let next_pick = await this.model.findOneAndUpdate({
+      season: "2025",
+      draftType: "supp_draft",
+      status: { $in: ["Pending", "Current"] }
+}, {"$set": {"status": "Current", "expiration": t.toISOString()}}, {sort: {"pickNumber": 1}})
+
+
+    //this._autoSkipPick(next_pick._id, minutes_per_pick * 60 * 100)
+
+    return next_pick
+  }
+
+
+  async _autoSkipPick(pickId, waitTime) {
+    try {
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+      let lookupPick = await this.model.findById(pickId)
+      if (lookupPick.status != 'Complete') {
+        let updated_pick = await this.model.findByIdAndUpdate(pickId, {"$set": {"status": "Skipped"}})
+      }
+      if (lookupPick.status == 'Current') {
+        this._resetCurrentPick()
+      }
+
+
+    }catch (err) {
+
+    }
+  }
+
+
   _setupSuppDraft(req, res, next) {
 
   }
@@ -188,13 +240,12 @@ try {
 
 async _updateCurrentPick(req, res, next) {
   try {
-    console.log(`Curr Pick stuff`)
-    let next_pick = await this.model.findOneAndUpdate({"season":"2025", "draftType":"supp_draft", "status":"Pending"}, {"$set": {"status": "Current"}}, {sort: {"pickNumber": 1}})
-    return res.json(next_pick)
+
+    let newCurrentPick = await this._resetCurrentPick()
+    return res.json(newCurrentPick)
 
   }catch (err) {
-    return next(err)
-
+    return res.status(500).send({message: err.message});
   }
 }
 

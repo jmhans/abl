@@ -1,7 +1,7 @@
 <p>{{pageTitle}}</p>
 
 <div *ngIf="draftSseService.draftOrder$ | async as draftData" class="flex-container">
-    <div><b>{{draftData.currentPick?.ablTeam.nickname }}</b> are on the clock!</div>
+  <div><b>{{draftData.currentPick?.ablTeam.nickname }}</b> are on the clock!</div>
     <div  class="flex-container">
 <!--        <div *ngIf="rosterService.preDraftRosters$ | async as rosters" class="selected-team"><mat-select [(value)]="selected_team" ><mat-option *ngFor='let tm of rosters' [value]="tm">{{tm.nickname}}</mat-option></mat-select>
         <span class="flex-container">
@@ -16,7 +16,6 @@
           <div class="flex-container">
             <div class="flex-row" *ngFor='let draftTm of draftData.teams; let c=index' class="draft-history">
               <div class="header-cell">
-
                   {{draftTm.ablTeam.nickname}}
               </div>
               </div>
@@ -24,10 +23,18 @@
               <div *ngFor='let pick of dr; let r=index' class="flex-col draft-cell" [ngClass]="{'next-pick': pick.status =='Current', 'no-pick': pick.status == 'Not Allowed'}">
                 <span [ngSwitch]="pick.status" class='flex-row'>
                   <span *ngSwitchCase="'Complete'">{{pick.player?.name}} ({{pick.player?.team}} - {{pick.player?.eligible.toString()}})</span>
-                  <span *ngSwitchCase="'Skipped'"><button mdbBtn type="button" color="primary" size='sm' (click)= "_removeSkip(pick._id)" class="flex-grow">REMOVE SKIP</button></span>
-                  <span *ngSwitchCase="'Pending'"> <button mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button></span>
-                  <span *ngSwitchCase="'Current'"> <button mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button></span>
-                  <span *ngSwitchCase="'Not Allowed'"> {{pick.status}}</span>
+                  <span *ngSwitchCase="'Skipped'">
+                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_removeSkip(pick._id)" class="flex-grow">REMOVE SKIP</button>
+                  </span>
+                  <span *ngSwitchCase="'Pending'">
+                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
+                  </span>
+                  <span *ngSwitchCase="'Current'">
+                    <span>{{pick.expiration | date: 'medium'}}</span>
+                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
+                  </span>
+                  <span *ngSwitchCase="'Not Allowed'"></span>
+                  <ng-template #pickStatus>{{pick.status}}</ng-template>
                 </span>
               </div>
             </div>

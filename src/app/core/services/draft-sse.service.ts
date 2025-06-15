@@ -165,12 +165,20 @@ export class DraftSseService {
             return Math.min(acc, cur.pickNumber)
           }, 999)
 
-          let newData =data.map((dp)=> {
+          var lastPick = data.filter((dp)=> {return dp.status == 'Complete'} ).reduce((acc, cur)=> {
+            if ((cur.pickTime >= acc.pickTime) || !acc.pickTime) {
+              return cur
+            } else {
+              return acc
+            }
+          })
+
+/*           let newData =data.map((dp)=> {
             if (dp.pickNumber == currPickNumber) {
               return {...dp,status:'Current'}
             }
             return dp
-          })
+          }) */
 
 
         var groupByArr = function(xs, key) {
@@ -180,10 +188,10 @@ export class DraftSseService {
           }, []);
         }
 
-        let grouped = groupByArr(newData, "round")
+        let grouped = groupByArr(data, "round")
         let teams = grouped[0]
 
-        return {currentPick: newData.find((pick)=>{return pick.status == 'Current'}),  rounds: grouped, teams :teams }
+        return {currentPick: data.find((pick)=>{return pick.status == 'Current'}),  rounds: grouped, teams :teams, lastPick: lastPick }
       })
 
       ).subscribe(data => {

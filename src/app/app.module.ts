@@ -80,6 +80,7 @@ import { NewMessageFormComponent } from './message/new-message-form/new-message-
 import {NgxEditorModule } from 'ngx-editor';
 import { DraftComponent } from './pages/draft/draft.component';
 import { HistoryComponent } from './pages/history/history.component';
+import { CountdownComponent } from './core/countdown/countdown.component';
 
 
 @NgModule({
@@ -127,7 +128,8 @@ import { HistoryComponent } from './pages/history/history.component';
         PlayerListComponent,
         NewMessageFormComponent,
         DraftComponent,
-        HistoryComponent
+        HistoryComponent,
+        CountdownComponent
     ],
     imports: [
         BrowserModule,
