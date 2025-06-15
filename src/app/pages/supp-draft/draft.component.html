@@ -1,5 +1,7 @@
 <p>{{pageTitle}}</p>
 
+
+<div *ngIf="userContext.owner$ | async as usr">
 <div *ngIf="draftSseService.draftOrder$ | async as draftData" class="flex-container">
   <div><b>{{draftData.currentPick?.ablTeam.nickname }}</b> are on the clock!</div>
     <div  class="flex-container">
@@ -24,14 +26,14 @@
                 <span [ngSwitch]="pick.status" class='flex-row'>
                   <span *ngSwitchCase="'Complete'">{{pick.player?.name}} ({{pick.player?.team}} - {{pick.player?.eligible.toString()}})</span>
                   <span *ngSwitchCase="'Skipped'">
-                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_removeSkip(pick._id)" class="flex-grow">REMOVE SKIP</button>
+                    <button *ngIf="(ownerPrimaryTeam._id == pick.ablTeam._id || usr.name =='Justin Hanson'); else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_removeSkip(pick._id)" class="flex-grow">REMOVE SKIP</button>
                   </span>
                   <span *ngSwitchCase="'Pending'">
-                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
+                    <button *ngIf="(ownerPrimaryTeam._id == pick.ablTeam._id || usr.name =='Justin Hanson') ; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
                   </span>
                   <span *ngSwitchCase="'Current'">
                     <span>{{pick.expiration | date: 'medium'}}</span>
-                    <button *ngIf="ownerPrimaryTeam._id == pick.ablTeam._id; else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
+                    <button *ngIf="(ownerPrimaryTeam._id == pick.ablTeam._id || usr.name =='Justin Hanson'); else pickStatus" mdbBtn type="button" color="primary" size='sm' (click)= "_skipPick(pick._id)" class="flex-grow">SKIP</button>
                   </span>
                   <span *ngSwitchCase="'Not Allowed'"></span>
                   <ng-template #pickStatus>{{pick.status}}</ng-template>
@@ -57,4 +59,4 @@
       </app-player-list>
   </div>
 </div>
-
+</div>
