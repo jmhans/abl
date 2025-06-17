@@ -105,10 +105,10 @@ class DraftController extends BaseController {
 
   async _processDraftPicks(req, res, next) {
     try {
-      let allDraftPicks = await this.model.find({"season": "2025", "draftType": "draft"}).exec()
+      let allDraftPicks = await this.model.find({"season": "2025", "draftType": "supp_draft"}).exec()
       console.log(allDraftPicks)
       for (let p=0; p<allDraftPicks.length; p++) {
-       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2025-04-08T17:00:00Z"), true)
+       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2025-06-17T17:00:00Z"), true)
        console.log(addDude.name)
       }
       return res.send({success: true, addCount: allDraftPicks.length});
