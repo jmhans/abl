@@ -5,6 +5,8 @@ const Draftpicks  = require('../models/draft').DraftPick;
 const BaseController = require('./base.controller');
 var AblRosterController = require('./abl.roster.controller');
 var myAblRoster = new AblRosterController()
+const Player = require('../models/player').Player;
+
 const StandingsController = require('./standings.controller');
 var myStandings = new StandingsController();
 const Lineup = require('./../models/lineup').Lineup;
@@ -105,12 +107,14 @@ class DraftController extends BaseController {
 
   async _processDraftPicks(req, res, next) {
     try {
-      let allDraftPicks = await this.model.find({"season": "2025", "draftType": "supp_draft"}).exec()
+      let allDraftPicks = await this.model.find({"season": "2025", "draftType": "supp_draft"}).populate('player').exec()
       console.log(allDraftPicks)
       for (let p=0; p<allDraftPicks.length; p++) {
-       let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2025-06-17T17:00:00Z"), true)
-       console.log(addDude.name)
+        if (allDraftPicks[p].player) {
+          let addDude = myAblRoster._addPlayerToTeamBackend(allDraftPicks[p].player, allDraftPicks[p].ablTeam , allDraftPicks[p].draftType, new Date("2025-06-17T17:00:00Z"), true, true)
+          console.log(addDude.name)
       }
+    }
       return res.send({success: true, addCount: allDraftPicks.length});
 
 
