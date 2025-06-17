@@ -335,9 +335,9 @@ async _makeDraftPick(plyr, teamId, acqType) {
 }
 
 
-  async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate, forceDraft = false ) {
+  async _addPlayerToTeamBackend(plyr, teamId, acqType, effDate, forceDraft = false, processingDraft = false ) {
     try {
-      if (acqType == 'draft' || acqType == 'supp_draft') {
+      if ((acqType == 'draft' || acqType == 'supp_draft') && !processingDraft) {
           console.log(`In draft player logic`)
         let draftedPlyr = await this._makeDraftPick(plyr, teamId, acqType)
         return {player: draftedPlyr, roster: []};
