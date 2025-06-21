@@ -56,7 +56,7 @@ export class TeamGameComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.title.setTitle(this.pageTitle);
-    this.paginator$ = new BehaviorSubject({'pageIndex': 0, 'pageSize': 6})
+    this.paginator$ = new BehaviorSubject({'pageIndex': 0, 'pageSize': 81})
 
    // this._getGamesList();
 
