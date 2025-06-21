@@ -176,7 +176,7 @@ this.refreshSkips();
 
   dropPlayerFromTeam$(ablTeamId: string, plyr: string, delayedDrop:boolean = false): Observable<any> {
 
-    return this.api.dropPlayerFromTeam$(ablTeamId, plyr, !delayedDrop)
+    return this.api.dropPlayerFromTeam$(ablTeamId, plyr, delayedDrop)
         .pipe(
           tap(()=> this.refreshLineups())
 
