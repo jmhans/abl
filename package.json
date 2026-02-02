@@ -30,7 +30,7 @@
     "@auth0/auth0-angular": "^2.5.0",
     "@fortawesome/fontawesome-free": "^5.15.3",
     "@hapi/hoek": "^9.0.4",
-    "@ng-bootstrap/ng-bootstrap": "^14.0.1",
+    "@ng-bootstrap/ng-bootstrap": "^17.0.1",
     "@popperjs/core": "^2.11.5",
     "@types/chart.js": "^2.9.31",
     "ajv": "^8.17.1",
