@@ -7,7 +7,7 @@ import { MlbPlayerModel } from './../models/mlb.player.model';
 import { AuthService } from './../../auth/auth.service';
 import { ApiService } from './../../core/api.service';
 import { throwError as ObservableThrowError, Observable, BehaviorSubject, Subject, merge, ReplaySubject, combineLatest, of } from 'rxjs';
-import { catchError, switchMap, map, tap, scan, combineLatestAll, shareReplay,combineLatestWith } from 'rxjs/operators';
+import { catchError, switchMap, map, tap, scan, combineLatestAll, shareReplay, combineLatestWith } from 'rxjs/operators';
 import { SseService } from './sse.service';
 
 function Identity<T>(value: T): T {

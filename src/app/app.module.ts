@@ -1,5 +1,6 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { AuthModule } from '@auth0/auth0-angular';
 import { AUTH_CONFIG } from './auth/auth.config';
@@ -133,6 +134,7 @@ import { CountdownComponent } from './core/countdown/countdown.component';
     ],
     imports: [
         BrowserModule,
+        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         FlexLayoutModule,

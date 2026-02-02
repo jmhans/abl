@@ -1,6 +1,6 @@
 // src/app/pages/admin/team-form/team-form.component.ts
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl, UntypedFormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
@@ -24,10 +24,10 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   @Input() activeOwner: OwnerInterface;
   isEdit: boolean;
   // FormBuilder form
-  teamForm: UntypedFormGroup;
+  teamForm: FormGroup;
   // Model storing initial form values
   formTeam: FormTeamModel;
-  formOwners: UntypedFormArray;
+  formOwners: FormArray;
   formOwnerControl: OwnerInterface;
   submitOwners: OwnerInterface[];
   
@@ -43,7 +43,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   submitBtnText: string;
 
   constructor(
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private api: ApiService,
     private auth: AuthService,
     private datePipe: DatePipe,
@@ -238,7 +238,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     this.teamForm.reset();
   }
   
-  createFormOwner(owner): UntypedFormGroup {
+  createFormOwner(owner): FormGroup {
     return this.fb.group({
       name: owner.name,
       email: owner.email,
@@ -247,7 +247,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     })
   }
   
-  createOwner(): UntypedFormGroup {
+  createOwner(): FormGroup {
     return this.fb.group({
       name:  '',
       email: '',

@@ -13,7 +13,7 @@ import { MatTableDataSource as MatTableDataSource } from '@angular/material/tabl
 import {  Subscription, BehaviorSubject,  throwError as ObservableThrowError, Observable , Subject, combineLatest, scheduled, asyncScheduler, of, merge} from 'rxjs';
 import { switchMap, takeUntil, mergeMap, skip, mapTo, take, map , tap, startWith, concatAll, scan } from 'rxjs/operators';
 import {MatDialog as MatDialog ,MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {UntypedFormControl} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import { DraftPickModel } from '../models/draft.model';
 
 export interface DialogData {
@@ -384,7 +384,7 @@ this.unsubscribe$.complete();
   templateUrl: 'playerAddDialog.html',
 })
 export class PlayerAddDialog {
-date = new UntypedFormControl(new Date());
+date = new FormControl(new Date());
 team_string: string;
 teamList$ = this.api.getAblTeams$().pipe(tap((data)=> {
     this.data.team = data.find((tm)=> {return tm.nickname == this.data.team_string})

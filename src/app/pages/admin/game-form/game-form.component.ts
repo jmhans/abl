@@ -1,7 +1,7 @@
 // src/app/pages/admin/game-form/game-form.component.ts
 import { Component, OnInit, OnDestroy, Input, ViewEncapsulation } from '@angular/core';
 
-import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from './../../../core/api.service';
@@ -25,7 +25,7 @@ export class GameFormComponent implements OnInit, OnDestroy {
   @Input() game: GameModel;
   isEdit: boolean;
   // FormBuilder form
-  gameForm: UntypedFormGroup;
+  gameForm: FormGroup;
   datesGroup: AbstractControl;
   // Model storing initial form values
   formGame: FormGameModel;
@@ -48,7 +48,7 @@ event: any;
 
 
   constructor(
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private api: ApiService,
     private datePipe: DatePipe,
     public gf: GameFormService,

@@ -12,7 +12,7 @@ import { RosterService } from './../../core/services/roster.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import {  Subscription,   throwError as ObservableThrowError, interval, Observable , Subject, of, merge} from 'rxjs';
-import {  takeUntil, combineLatestWith , map} from 'rxjs/operators';
+import {takeUntil, combineLatestWith, map} from 'rxjs/operators';
 import { DraftSseService } from 'src/app/core/services/draft-sse.service';
 import { SseService } from 'src/app/core/services/sse.service';
 import { LineupModel } from 'src/app/core/models/lineup.model';
