@@ -12,7 +12,7 @@
 
           <span *ngIf="game.summary.awayTeam == team.nickname then awayGameBlock else homeGameBlock"></span>
 
-          <ng-template #awayGameBlock> @ {{game.summary.homeTeam}}
+          <ng-template #awayGameBlock> &#64; {{game.summary.homeTeam}}
             <button mat-button [routerLink]="['/game', game._id]" [ngClass]="{'winner': game.summary.winner?.nickname == team.nickname, 'loser': game.summary?.loser?.nickname == team.nickname}">
               <span *ngIf="game.summary.status; then thenAwayBlock else elseBlock"></span>
               <ng-template #thenAwayBlock > {{game.summary.score.away | number: '1.0-1'}}- {{game.summary.score.home | number: '1.0-1'}}</ng-template>

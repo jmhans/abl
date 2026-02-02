@@ -145,7 +145,7 @@ preDropPlayerAllowed(plyrRec) {
   let now = new Date()
 
   let suppDraftPrep = now >= new Date('2025-06-15T00:00:00Z') && now <=new Date('2025-06-16T00:00:00Z')
-  return plyrRec.player.ablstatus.acqType == 'draft' && !plyrRec.player.ablstatus.pending_drop && (suppDraftPrep && draftedRosterLength>21)
+  return plyrRec.player.ablstatus.acqType == 'draft' && !plyrRec.player.ablstatus.pending_drop && (suppDraftPrep && Number(draftedRosterLength)>21)
 
 }
 
@@ -156,16 +156,16 @@ preDropPlayerAllowed(plyrRec) {
 
     var pickupMin = this.lineup.roster.reduce((prev, cur)=> {
       if (cur.player.ablstatus.acqType == 'pickup') {
-        return Math.min(cur.rosterOrder, prev)
+        return Math.min(Number(cur.rosterOrder), Number(prev))
       } else {
         return prev
       }
     }, Infinity)
 
-    if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'pickup' && event.currentIndex +1 < pickupMin) {
+    if (this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'pickup' && event.currentIndex +1 < Number(pickupMin)) {
       // This is an issue. I've tried to move a pickup ahead of a drafted player.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a post-draft pickup, and cannot be placed higher than a drafted player.`)
-    } else if ((this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' || this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'supp_draft') && event.currentIndex + 1 >= pickupMin) {
+    } else if ((this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'draft' || this.lineup.roster[event.previousIndex].player.ablstatus.acqType == 'supp_draft') && event.currentIndex + 1 >= Number(pickupMin)) {
       // This is an issue. You've tried to move a drafted player lower than a pickup.
       this._rosterAlert(`${this.lineup.roster[event.previousIndex].player.name} was a drafted player, and cannot be placed lower than a pickup.`)
     } else {

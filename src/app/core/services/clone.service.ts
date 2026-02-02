@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as clone from 'clone';
+import clone from 'clone';
 
 
 @Injectable({

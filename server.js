@@ -21,7 +21,7 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(cors());
 
 // Create link to Angular build directory
-var distDir = __dirname + "/dist/";
+var distDir = __dirname + "/dist/browser/";
 app.use(express.static(distDir));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
