@@ -21,7 +21,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import { RosterImportComponent } from './roster-import/roster-import.component'
 
 
-import { UntypedFormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 
 interface Alert {
@@ -50,7 +50,7 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   roster_date$: Observable<Date>;
   roster_deadline$: Observable<Date>;
-  formDate$: Observable<UntypedFormControl>;
+  formDate$: Observable<FormControl>;
   current_roster_deadline$: Observable<Date>;
   current_roster$: Observable<LineupFormModel>;
   retrieveLineup$:  BehaviorSubject<void> = new BehaviorSubject(null);
@@ -60,7 +60,7 @@ export class RosterComponent implements OnInit, OnDestroy {
 
   roster_date: Date;
   roster_deadline: Date;
-  formDate: UntypedFormControl;
+  formDate: FormControl;
 
   roster_editable: boolean;
   edit_lineup: boolean;
@@ -118,7 +118,7 @@ export class RosterComponent implements OnInit, OnDestroy {
     }), share())
 /*
     this.formDate$ = this.roster_deadline$.pipe(map((deadline)=> {
-      return new UntypedFormControl(deadline)
+      return new FormControl(deadline)
     })) */
 
     this.current_roster_deadline$ = this.leagueConfig.league$.pipe(map((lg)=> {

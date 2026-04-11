@@ -1,11 +1,11 @@
 // src/app/auth/admin.guard.ts
 import { Injectable } from '@angular/core';
-import { Router, CanActivate } from '@angular/router';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class AdminGuard implements CanActivate {
+export class AdminGuard  {
 
   constructor(
     private auth: AuthService,

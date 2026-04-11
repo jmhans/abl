@@ -1,5 +1,5 @@
 import { Component, OnInit, Input , Output, EventEmitter, SimpleChanges, SimpleChange, OnChanges} from '@angular/core';
-import { WavesModule } from 'angular-bootstrap-md';
+// import { WavesModule } from 'angular-bootstrap-md';
 import {CdkDragDrop, CdkDragEnter, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { playerModel } from './../../../../core/models/roster.record.model';
 

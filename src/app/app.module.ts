@@ -1,15 +1,16 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { AuthModule } from '@auth0/auth0-angular';
 import { AUTH_CONFIG } from './auth/auth.config';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
-import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
+// import { ButtonsModule,CollapseModule } from 'angular-bootstrap-md'
+// import { IconsModule ,WavesModule, TableModule} from 'angular-bootstrap-md'
 
 
-import { HttpClientModule }    from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi }    from '@angular/common/http';
 
 import { DatePipe } from '@angular/common';
 import { ApiService } from './core/api.service';
@@ -83,8 +84,7 @@ import { HistoryComponent } from './pages/history/history.component';
 import { CountdownComponent } from './core/countdown/countdown.component';
 
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent,
         CallbackComponent,
         OwnerDetailsComponent,
@@ -131,38 +131,34 @@ import { CountdownComponent } from './core/countdown/countdown.component';
         HistoryComponent,
         CountdownComponent
     ],
-    imports: [
-        BrowserModule,
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         FlexLayoutModule,
-        HttpClientModule,
         OwnersModule,
         AppRoutingModule,
         BrowserAnimationsModule,
         DataTablesModule,
         NgbModule,
-        ButtonsModule,
-        WavesModule,
-        CollapseModule,
-        IconsModule,
-        TableModule,
+        // ButtonsModule,
+        // WavesModule,
+        // CollapseModule,
+        // IconsModule,
+        // TableModule,
         //  Angular2CsvModule,
         LocalMaterialModule,
         AuthModule.forRoot({
             domain: AUTH_CONFIG.CLIENT_DOMAIN,
             clientId: AUTH_CONFIG.CLIENT_ID,
         }),
-        NgxEditorModule
-    ],
-    providers: [
+        NgxEditorModule], providers: [
         Title,
         AuthService,
         ApiService,
         DatePipe,
         UtilsService,
-        FilterSortService
-    ],
-    bootstrap: [AppComponent]
-})
+        FilterSortService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

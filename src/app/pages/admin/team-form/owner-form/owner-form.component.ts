@@ -1,7 +1,7 @@
 
 // src/app/pages/admin/team-form/owner-form/owner-form.component.ts
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl, UntypedFormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormArray } from '@angular/forms';
 import { AblTeamModel, FormTeamModel, OwnerInterface } from './../../../../core/models/abl.team.model';
 
 @Component({
@@ -11,11 +11,11 @@ import { AblTeamModel, FormTeamModel, OwnerInterface } from './../../../../core/
 })
 export class OwnerFormComponent implements OnInit {
   @Input() owners: OwnerInterface[];
-  ownerForm: UntypedFormGroup;
-  formOwners: UntypedFormArray;
+  ownerForm: FormGroup;
+  formOwners: FormArray;
   userIsOwner: boolean;
 
-  constructor(    private fb: UntypedFormBuilder) { }
+  constructor(    private fb: FormBuilder) { }
 
   ngOnInit() {
     
@@ -25,7 +25,7 @@ export class OwnerFormComponent implements OnInit {
     
   }
   
-  createFormOwner(owner): UntypedFormGroup {
+  createFormOwner(owner): FormGroup {
     return this.fb.group({
       name: owner.name,
       email: owner.email,
@@ -35,7 +35,7 @@ export class OwnerFormComponent implements OnInit {
   }
   
   
-  createOwner(): UntypedFormGroup {
+  createOwner(): FormGroup {
     return this.fb.group({
       name: '',
       email: '',
@@ -45,7 +45,7 @@ export class OwnerFormComponent implements OnInit {
   }
   
   addOwner(): void {
-    this.formOwners = this.ownerForm.get('owners') as UntypedFormArray;
+    this.formOwners = this.ownerForm.get('owners') as FormArray;
     this.formOwners.push(this.createOwner());
   }
   
